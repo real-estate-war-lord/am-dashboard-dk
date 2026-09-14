@@ -374,15 +374,15 @@
      "db": "boligstat",
      "table": "husleje_privat",
      "geo": "kommune",
-     "asof": "2025"
+     "asof": "2026"
     }
    ],
    "calc": "passthrough",
    "note": "Scraped annually from boligstat.dk; computed by the ministry from Boligstøtteregister × BBR (87 % coverage). Analogue of the Finnish Kela rent.",
    "fmt": "dkk0",
-   "desc": "Average rent DKK/m²/yr in private rental buildings with ≥3 dwellings.",
-   "source": "Social- og Boligstyrelsen, boligstat.dk",
-   "warn": "Computed from the housing-benefit register × BBR (87 % coverage); skews to the cheaper end — market rents are typically higher.",
+   "desc": "Average rent DKK/m²/yr in private rental dwellings (private udlejningsboliger i alt, all construction years).",
+   "source": "Social- og Boligstyrelsen, boligstat.dk Huslejestatistik — computed from the housing-benefit register × BBR",
+   "warn": "Based on households receiving housing benefit, upscaled to the stock (≈87 % coverage); skews to the cheaper end — asking rents in the market are typically higher. Small municipalities suppressed.",
    "group": "Rents"
   },
   {
@@ -406,8 +406,8 @@
    ],
    "calc": "passthrough",
    "fmt": "dkk0",
-   "desc": "Average rent DKK/m²/yr in social (almene) family dwellings.",
-   "source": "Landsbyggefonden, Huslejestatistik",
+   "desc": "Average rent DKK/m²/yr in social (almene) family dwellings, 1 Jan 2026.",
+   "source": "Landsbyggefonden, Huslejestatistik 2026, Tabel 7 (100 % coverage via Huslejeregisteret)",
    "group": "Rents"
   },
   {

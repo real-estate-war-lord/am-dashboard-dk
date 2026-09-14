@@ -64,3 +64,44 @@ Fallback after the deadline: Datafordeler DAGI Fildownload → `ogr2ogr` (docs/G
 - Every processed number carries its period (`asof`) and the source's `updated` stamp so the Sources view is always honest.
 - Values suppressed by the source (`..`) stay null and render as `–`; never imputed.
 - Commit messages: `feat:`, `data:`, `fix:`, `docs:`.
+
+---
+
+## Roadmap after the first public release (2026-09-14)
+
+Status: phases 0–5 done; live at https://real-estate-war-lord.github.io/am-dashboard-dk/ · every push to `main` deploys, the 3rd of each month refreshes data.
+
+### Next three
+1. **Rents (phase 4).** boligstat.dk private rent + Landsbyggefonden social rent → `data/external/*.csv`. Fills the two empty chips and gives the Kela-rent analogue. Manual, ~30 min/yr.
+2. **Verification log.** 5 municipalities × 3 indicators + 1 Finans Danmark cell checked against statistikbanken.dk; especially EJ56 flats +15.8 % y/y and the single-household definition. Written into DATA_MAP §7.
+3. **README for the public.** Screenshot, live link, what/why/how-to-run/how-to-cite, data-licence block.
+
+### UI backlog (one push each)
+- Compare mode: pin 2–5 municipalities/postal codes and show them side by side (table + small bars).
+- Map legend with actual min/max values (as in the Finnish SVG version) instead of low/high.
+- Postal-code level: label declutter at mid zoom; hide street-level merged codes' `°` noise.
+- Market view: hero tiles for the *selected municipality* (price, supply, completions) in addition to national.
+- Permalinks: encode indicator/mode/municipality in the URL hash so a view can be shared.
+- Mobile layout (sidebar collapses; tables scroll).
+- Dark theme variant of the palette.
+
+### Data depth (phase 6)
+- **BBR via Datafordeler GraphQL** (free key): dwelling size/age/tenure mix per postal code → real postnr-level structure indicators.
+- **Copenhagen bydele/roder** via `s30` as a third map level.
+- **Plandata kommuneplanrammer** as a context layer: planned housing capacity (plot ratio × area) per municipality.
+- **Live mortgage yield** (Nationalbanken statbank or Finans Danmark LT10) to replace the retired DNRENTM bond series.
+- **Vacancy**: BOL101 BEBO=2000 proxy + Landsbyggefonden ledige boliger.
+- **Migration components** (BEV107): internal vs international net migration as separate chips.
+- **Eurostat NUTS3 GDP per capita** for the 11 landsdele.
+
+### Portfolio module (what makes it an AM tool)
+- `data/processed/portfolio.json` (private, never committed): properties with address → DAR lookup → kommune + postnr + lat/lon.
+- "Own properties" markers coloured by vacancy pressure (already wired in `app.js`); municipality table gains Properties/Units columns automatically.
+- Rent benchmark: own DKK/m²/month × 12 vs boligstat private rent and LBF social rent for the same municipality → "gap to market" column and chip.
+- Portfolio exposure view: share of units by municipality vs growth/price/supply → concentration risk.
+
+### Engineering hygiene
+- Unit tests for the calcs in `build_makro.py` (fixtures from real CSV rows).
+- `make validate` in CI monthly (catches retired DST tables like PRIS111 → PRIS01).
+- Datafordeler DAGI path (docs/GEO.md) exercised once before 2027-01-15 so the boundary refresh is proven.
+- Semantic version tags; CHANGELOG per release.
