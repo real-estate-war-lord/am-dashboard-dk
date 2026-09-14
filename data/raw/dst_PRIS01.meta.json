@@ -1,0 +1,3031 @@
+{
+ "id": "PRIS01",
+ "text": "Consumer price index",
+ "description": "Consumer price index by commodity group, unit and time",
+ "unit": "-",
+ "suppressedDataValue": "0",
+ "updated": "2026-09-10T08:00:00",
+ "active": true,
+ "contacts": [
+  {
+   "name": "Christian Lindeskov",
+   "phone": "+4521222857",
+   "mail": "chl@dst.dk"
+  }
+ ],
+ "documentation": {
+  "id": "915908cd-1d27-45e5-91ca-1cbd5b73f1a0",
+  "url": "https://www.dst.dk/documentationofstatistics/915908cd-1d27-45e5-91ca-1cbd5b73f1a0"
+ },
+ "footnote": null,
+ "variables": [
+  {
+   "id": "VAREGR",
+   "text": "commodity group",
+   "elimination": true,
+   "time": false,
+   "values": [
+    {
+     "id": "000000",
+     "text": "00 Consumer price index, total"
+    },
+    {
+     "id": "01",
+     "text": "01 Food and non-alcoholic beverages"
+    },
+    {
+     "id": "011",
+     "text": "01.1 Food"
+    },
+    {
+     "id": "0111",
+     "text": "01.1.1 Cereals and cereal products"
+    },
+    {
+     "id": "01111",
+     "text": "01.1.1.1 Cereals"
+    },
+    {
+     "id": "01112",
+     "text": "01.1.1.2 Flour of cereals"
+    },
+    {
+     "id": "01113",
+     "text": "01.1.1.3 Bread and bakery products"
+    },
+    {
+     "id": "01114",
+     "text": "01.1.1.4 Breakfast cereals"
+    },
+    {
+     "id": "01115",
+     "text": "01.1.1.5 Macaroni, noodles, couscous and similar pasta products"
+    },
+    {
+     "id": "01119",
+     "text": "01.1.1.9 Other milled cereal and grain products"
+    },
+    {
+     "id": "0112",
+     "text": "01.1.2 Live animals, and meat and other parts of slaughtered land animals"
+    },
+    {
+     "id": "01122",
+     "text": "01.1.2.2 Meat, fresh, chilled or frozen"
+    },
+    {
+     "id": "011221",
+     "text": "01.1.2.2.1 Meat of bovine animals, fresh, chilled or frozen"
+    },
+    {
+     "id": "011222",
+     "text": "01.1.2.2.2 Meat of pigs, fresh, chilled or frozen"
+    },
+    {
+     "id": "011223",
+     "text": "01.1.2.2.3 Meat of goats, lambs and sheep, fresh, chilled or frozen"
+    },
+    {
+     "id": "011224",
+     "text": "01.1.2.2.4 Meat of poultry, fresh, chilled or frozen"
+    },
+    {
+     "id": "01123",
+     "text": "01.1.2.3 Meat, dried, salted, in brine or smoked"
+    },
+    {
+     "id": "01124",
+     "text": "01.1.2.4 Offal, blood and other parts of slaughtered animals, fresh, chilled or frozen, dried, salted, in brine or smoked"
+    },
+    {
+     "id": "01125",
+     "text": "01.1.2.5 Preparations of meat, offal, blood and other parts of slaughtered animals"
+    },
+    {
+     "id": "0113",
+     "text": "01.1.3 Fish and other seafood"
+    },
+    {
+     "id": "01131",
+     "text": "01.1.3.1 Fish, live, fresh, chilled or frozen"
+    },
+    {
+     "id": "01132",
+     "text": "01.1.3.2 Fish, dried, salted, in brine or smoked"
+    },
+    {
+     "id": "01133",
+     "text": "01.1.3.3 Fish preparations"
+    },
+    {
+     "id": "01134",
+     "text": "01.1.3.4 Other seafood, live, fresh, chilled or frozen"
+    },
+    {
+     "id": "01136",
+     "text": "01.1.3.6 Other seafood preparations"
+    },
+    {
+     "id": "01137",
+     "text": "01.1.3.7 Livers, roes and other offal of fish and of other seafood in all forms"
+    },
+    {
+     "id": "0114",
+     "text": "01.1.4 Milk, other dairy products and eggs"
+    },
+    {
+     "id": "01141",
+     "text": "01.1.4.1 Raw and whole milk"
+    },
+    {
+     "id": "01142",
+     "text": "01.1.4.2 Skimmed milk"
+    },
+    {
+     "id": "01143",
+     "text": "01.1.4.3 Other milk and cream"
+    },
+    {
+     "id": "01144",
+     "text": "01.1.4.4 Non-animal milk"
+    },
+    {
+     "id": "01145",
+     "text": "01.1.4.5 Cheese"
+    },
+    {
+     "id": "01146",
+     "text": "01.1.4.6 Yoghurt and similar products"
+    },
+    {
+     "id": "01147",
+     "text": "01.1.4.7 Milk-based dessert and beverages"
+    },
+    {
+     "id": "01148",
+     "text": "01.1.4.8 Eggs"
+    },
+    {
+     "id": "0115",
+     "text": "01.1.5 Oils and fats"
+    },
+    {
+     "id": "01151",
+     "text": "01.1.5.1 Vegetable oils"
+    },
+    {
+     "id": "01152",
+     "text": "01.1.5.2 Butter and other oils and fats derived from milk"
+    },
+    {
+     "id": "01153",
+     "text": "01.1.5.3 Margarine and similar preparations"
+    },
+    {
+     "id": "0116",
+     "text": "01.1.6 Fruits and nuts"
+    },
+    {
+     "id": "01161",
+     "text": "01.1.6.1 Dates, figs and tropical fruits, fresh"
+    },
+    {
+     "id": "01162",
+     "text": "01.1.6.2 Citrus fruits, fresh"
+    },
+    {
+     "id": "01163",
+     "text": "01.1.6.3 Stone fruits and pome fruits, fresh"
+    },
+    {
+     "id": "01164",
+     "text": "01.1.6.4 Berries, fresh"
+    },
+    {
+     "id": "01165",
+     "text": "01.1.6.5 Other fruits, fresh"
+    },
+    {
+     "id": "01166",
+     "text": "01.1.6.6 Fruits, frozen"
+    },
+    {
+     "id": "01167",
+     "text": "01.1.6.7 Fruits, dried and dehydrated"
+    },
+    {
+     "id": "01168",
+     "text": "01.1.6.8 Nuts, in shell or shelled"
+    },
+    {
+     "id": "01169",
+     "text": "01.1.6.9 Fruits and nuts, ground, and in other preparations"
+    },
+    {
+     "id": "0117",
+     "text": "01.1.7 Vegetables"
+    },
+    {
+     "id": "01171",
+     "text": "01.1.7.1 Salad, salad mixes, cabbage etc."
+    },
+    {
+     "id": "01172",
+     "text": "01.1.7.2 Tomatoes, cucumbers etc."
+    },
+    {
+     "id": "01173",
+     "text": "01.1.7.3 Beans, sugar snap peas etc."
+    },
+    {
+     "id": "01174",
+     "text": "01.1.7.4 Carrots, onions, leeks, mushrooms etc."
+    },
+    {
+     "id": "01175",
+     "text": "01.1.7.5 Potatoes"
+    },
+    {
+     "id": "01176",
+     "text": "01.1.7.6 Dried lentils, beans etc."
+    },
+    {
+     "id": "01178",
+     "text": "01.1.7.8 Vegetables, tubers, plantains and cooking bananas, frozen"
+    },
+    {
+     "id": "01179",
+     "text": "01.1.7.9 Vegetables, tubers, plantains, cooking bananas and pulses, ground, and in other preparations"
+    },
+    {
+     "id": "0118",
+     "text": "01.1.8 Sugar, confectionery and desserts"
+    },
+    {
+     "id": "01181",
+     "text": "01.1.8.1 Cane sugar and beet sugar"
+    },
+    {
+     "id": "01182",
+     "text": "01.1.8.2 Other sugars and sugar substitutes"
+    },
+    {
+     "id": "01183",
+     "text": "01.1.8.3 Jams, marmalades, fruit jellies, purées and pastes, and honey"
+    },
+    {
+     "id": "01184",
+     "text": "01.1.8.4 Nut purées, nut butters and nut pastes"
+    },
+    {
+     "id": "01185",
+     "text": "01.1.8.5 Chocolate, cocoa and cocoa-based food products"
+    },
+    {
+     "id": "01186",
+     "text": "01.1.8.6 Ice, ice cream and sorbets"
+    },
+    {
+     "id": "01189",
+     "text": "01.1.8.9 Other sugar confectionery and desserts n.e.c."
+    },
+    {
+     "id": "0119",
+     "text": "01.1.9 Ready-made food and other food products"
+    },
+    {
+     "id": "01191",
+     "text": "01.1.9.1 Ready-made food"
+    },
+    {
+     "id": "01192",
+     "text": "01.1.9.2 Baby food"
+    },
+    {
+     "id": "01193",
+     "text": "01.1.9.3 Salt, condiments and sauces"
+    },
+    {
+     "id": "01194",
+     "text": "01.1.9.4 Spices, culinary herbs and seeds"
+    },
+    {
+     "id": "01199",
+     "text": "01.1.9.9 Other food products n.e.c."
+    },
+    {
+     "id": "012",
+     "text": "01.2 Non-alcoholic beverages"
+    },
+    {
+     "id": "0121",
+     "text": "01.2.1 Fruit and vegetable juices"
+    },
+    {
+     "id": "01210",
+     "text": "01.2.1.0 Fruit and vegetable juices"
+    },
+    {
+     "id": "0122",
+     "text": "01.2.2 Coffee and coffee substitutes"
+    },
+    {
+     "id": "01220",
+     "text": "01.2.2.0 Coffee and coffee substitutes"
+    },
+    {
+     "id": "0123",
+     "text": "01.2.3 Tea, maté and other plant-derived products for infusion"
+    },
+    {
+     "id": "01230",
+     "text": "01.2.3.0 Tea, maté and other plant-derived products for infusion"
+    },
+    {
+     "id": "0124",
+     "text": "01.2.4 Cocoa drinks"
+    },
+    {
+     "id": "01240",
+     "text": "01.2.4.0 Cocoa drinks"
+    },
+    {
+     "id": "0125",
+     "text": "01.2.5 Water"
+    },
+    {
+     "id": "01250",
+     "text": "01.2.5.0 Water"
+    },
+    {
+     "id": "0126",
+     "text": "01.2.6 Soft drinks"
+    },
+    {
+     "id": "01260",
+     "text": "01.2.6.0 Soft drinks"
+    },
+    {
+     "id": "0129",
+     "text": "01.2.9 Other non-alcoholic beverages"
+    },
+    {
+     "id": "01290",
+     "text": "01.2.9.0 Other non-alcoholic beverages"
+    },
+    {
+     "id": "02",
+     "text": "02 Alcoholic beverages and tobacco"
+    },
+    {
+     "id": "021",
+     "text": "02.1 Alcoholic beverages"
+    },
+    {
+     "id": "0211",
+     "text": "02.1.1 Spirits and liquors"
+    },
+    {
+     "id": "02110",
+     "text": "02.1.1.0 Spirits and liquors"
+    },
+    {
+     "id": "0212",
+     "text": "02.1.2 Wine"
+    },
+    {
+     "id": "02121",
+     "text": "02.1.2.1 Wine from grapes"
+    },
+    {
+     "id": "02122",
+     "text": "02.1.2.2 Wine from other sources"
+    },
+    {
+     "id": "0213",
+     "text": "02.1.3 Beer"
+    },
+    {
+     "id": "02130",
+     "text": "02.1.3.0 Beer"
+    },
+    {
+     "id": "0219",
+     "text": "02.1.9 Other alcoholic beverages"
+    },
+    {
+     "id": "02190",
+     "text": "02.1.9.0 Other alcoholic beverages"
+    },
+    {
+     "id": "023",
+     "text": "02.3 Tobacco"
+    },
+    {
+     "id": "0230",
+     "text": "02.3.0 Tobacco"
+    },
+    {
+     "id": "02301",
+     "text": "02.3.0.1 Cigarettes"
+    },
+    {
+     "id": "02302",
+     "text": "02.3.0.2 Cigars"
+    },
+    {
+     "id": "02309",
+     "text": "02.3.0.9 Other tobacco products"
+    },
+    {
+     "id": "03",
+     "text": "03 Clothing and footwear"
+    },
+    {
+     "id": "031",
+     "text": "03.1 Clothing"
+    },
+    {
+     "id": "0311",
+     "text": "03.1.1 Clothing materials"
+    },
+    {
+     "id": "03110",
+     "text": "03.1.1.0 Clothing materials"
+    },
+    {
+     "id": "0312",
+     "text": "03.1.2 Garments"
+    },
+    {
+     "id": "03121",
+     "text": "03.1.2.1 Garments for men or boys"
+    },
+    {
+     "id": "03122",
+     "text": "03.1.2.2 Garments for women or girls"
+    },
+    {
+     "id": "03123",
+     "text": "03.1.2.3 Garments for infants (under 2 years of age)"
+    },
+    {
+     "id": "0313",
+     "text": "03.1.3 Other articles of clothing and clothing accessories"
+    },
+    {
+     "id": "03131",
+     "text": "03.1.3.1 Other articles of clothing"
+    },
+    {
+     "id": "03132",
+     "text": "03.1.3.2 Clothing accessories"
+    },
+    {
+     "id": "0314",
+     "text": "03.1.4 Cleaning, repair, tailoring and hire of clothing"
+    },
+    {
+     "id": "03141",
+     "text": "03.1.4.1 Cleaning of clothing"
+    },
+    {
+     "id": "03142",
+     "text": "03.1.4.2 Repair, tailoring and hire of clothing"
+    },
+    {
+     "id": "032",
+     "text": "03.2 Footwear"
+    },
+    {
+     "id": "0321",
+     "text": "03.2.1 Shoes and other footwear"
+    },
+    {
+     "id": "03211",
+     "text": "03.2.1.1 Footwear for men"
+    },
+    {
+     "id": "03212",
+     "text": "03.2.1.2 Footwear for women"
+    },
+    {
+     "id": "03213",
+     "text": "03.2.1.3 Footwear for infants and children"
+    },
+    {
+     "id": "0322",
+     "text": "03.2.2 Cleaning, repair and hire of footwear"
+    },
+    {
+     "id": "03220",
+     "text": "03.2.2.0 Cleaning, repair and hire of footwear"
+    },
+    {
+     "id": "04",
+     "text": "04 Housing, water, electricity, gas and other fuels"
+    },
+    {
+     "id": "041",
+     "text": "04.1 Actual rental payments made for housing"
+    },
+    {
+     "id": "0411",
+     "text": "04.1.1 Actual rental payments made by tenants for main residence"
+    },
+    {
+     "id": "04110",
+     "text": "04.1.1.0 Actual rental payments made by tenants for main residence"
+    },
+    {
+     "id": "0412",
+     "text": "04.1.2 Other actual rental payments"
+    },
+    {
+     "id": "04121",
+     "text": "04.1.2.1 Actual rental payments made by tenants for secondary residences"
+    },
+    {
+     "id": "042",
+     "text": "04.2 Imputed rental payments for housing"
+    },
+    {
+     "id": "0421",
+     "text": "04.2.1 Imputed rental payments of owner-occupiers for their main residence"
+    },
+    {
+     "id": "04210",
+     "text": "04.2.1.0 Imputed rental payments of owner-occupiers for their main residence"
+    },
+    {
+     "id": "0422",
+     "text": "04.2.2 Other imputed rentals"
+    },
+    {
+     "id": "04220",
+     "text": "04.2.2.0 Other imputed rentals"
+    },
+    {
+     "id": "043",
+     "text": "04.3 Maintenance, repair and security of the dwelling"
+    },
+    {
+     "id": "0431",
+     "text": "04.3.1 Security equipment and materials for dwelling maintenance and repair"
+    },
+    {
+     "id": "04311",
+     "text": "04.3.1.1 Materials for the maintenance and repair of the dwelling"
+    },
+    {
+     "id": "0432",
+     "text": "04.3.2 Services for the maintenance, repair and security of the dwelling"
+    },
+    {
+     "id": "04320",
+     "text": "04.3.2.0 Services for the maintenance, repair and security of the dwelling"
+    },
+    {
+     "id": "044",
+     "text": "04.4 Water supply and miscellaneous services relating to the dwelling"
+    },
+    {
+     "id": "0441",
+     "text": "04.4.1 Water supply"
+    },
+    {
+     "id": "04411",
+     "text": "04.4.1.1 Water supply delivered through network systems"
+    },
+    {
+     "id": "0442",
+     "text": "04.4.2 Refuse collection"
+    },
+    {
+     "id": "04420",
+     "text": "04.4.2.0 Refuse collection"
+    },
+    {
+     "id": "0443",
+     "text": "04.4.3 Sewage collection"
+    },
+    {
+     "id": "04431",
+     "text": "04.4.3.1 Sewage collection through sewer systems"
+    },
+    {
+     "id": "04432",
+     "text": "04.4.3.2 Sewage collection through on-site sanitation systems"
+    },
+    {
+     "id": "0444",
+     "text": "04.4.4 Other services related to the dwelling"
+    },
+    {
+     "id": "04449",
+     "text": "04.4.4.9 Other services related to the dwelling n.e.c."
+    },
+    {
+     "id": "045",
+     "text": "04.5 Electricity, gas and other fuels"
+    },
+    {
+     "id": "0451",
+     "text": "04.5.1 Electricity"
+    },
+    {
+     "id": "04510",
+     "text": "04.5.1.0 Electricity"
+    },
+    {
+     "id": "0452",
+     "text": "04.5.2 Gas"
+    },
+    {
+     "id": "04521",
+     "text": "04.5.2.1 Natural gas through networks"
+    },
+    {
+     "id": "04522",
+     "text": "04.5.2.2 Liquefied hydrocarbons"
+    },
+    {
+     "id": "0453",
+     "text": "04.5.3 Liquid fuels"
+    },
+    {
+     "id": "04530",
+     "text": "04.5.3.0 Liquid fuels"
+    },
+    {
+     "id": "0454",
+     "text": "04.5.4 Solid fuels"
+    },
+    {
+     "id": "04541",
+     "text": "04.5.4.1 Coal, coal briquettes, peat and peat briquettes"
+    },
+    {
+     "id": "04542",
+     "text": "04.5.4.2 Wood fuel, including pellets and briquettes"
+    },
+    {
+     "id": "04543",
+     "text": "04.5.4.3 Charcoal"
+    },
+    {
+     "id": "0455",
+     "text": "04.5.5 District heating"
+    },
+    {
+     "id": "04550",
+     "text": "04.5.5.0 District heating"
+    },
+    {
+     "id": "05",
+     "text": "05 Furnishings, household equipment and routine household maintenance"
+    },
+    {
+     "id": "051",
+     "text": "05.1 Furniture, furnishings, and loose carpets"
+    },
+    {
+     "id": "0511",
+     "text": "05.1.1 Furniture, furnishings and loose carpets"
+    },
+    {
+     "id": "05111",
+     "text": "05.1.1.1 Household furniture"
+    },
+    {
+     "id": "05112",
+     "text": "05.1.1.2 Garden and camping furniture"
+    },
+    {
+     "id": "05113",
+     "text": "05.1.1.3 Lighting equipment"
+    },
+    {
+     "id": "05114",
+     "text": "05.1.1.4 Furnishings, loose carpets and rugs"
+    },
+    {
+     "id": "0512",
+     "text": "05.1.2 Repair, installation and hire of furniture, furnishings and loose carpets"
+    },
+    {
+     "id": "05120",
+     "text": "05.1.2.0 Repair, installation and hire of furniture, furnishings and loose carpets"
+    },
+    {
+     "id": "052",
+     "text": "05.2 Household textiles"
+    },
+    {
+     "id": "0521",
+     "text": "05.2.1 Household textiles"
+    },
+    {
+     "id": "05211",
+     "text": "05.2.1.1 Furnishing fabrics and curtains"
+    },
+    {
+     "id": "05212",
+     "text": "05.2.1.2 Bed linen and bedding"
+    },
+    {
+     "id": "05213",
+     "text": "05.2.1.3 Table linen and bathroom linen"
+    },
+    {
+     "id": "05219",
+     "text": "05.2.1.9 Other household textiles"
+    },
+    {
+     "id": "053",
+     "text": "05.3 Household appliances"
+    },
+    {
+     "id": "0531",
+     "text": "05.3.1 Major electric and other household appliances"
+    },
+    {
+     "id": "05311",
+     "text": "05.3.1.1 Major kitchen appliances"
+    },
+    {
+     "id": "05312",
+     "text": "05.3.1.2 Major laundry appliances"
+    },
+    {
+     "id": "05313",
+     "text": "05.3.1.3 Heaters and air conditioners"
+    },
+    {
+     "id": "05314",
+     "text": "05.3.1.4 Cleaning equipment"
+    },
+    {
+     "id": "05319",
+     "text": "05.3.1.9 Other major household appliances"
+    },
+    {
+     "id": "0532",
+     "text": "05.3.2 Small household appliances"
+    },
+    {
+     "id": "05321",
+     "text": "05.3.2.1 Small appliances for the cooking and processing of food"
+    },
+    {
+     "id": "05322",
+     "text": "05.3.2.2 Small appliances for the preparation of beverages"
+    },
+    {
+     "id": "05329",
+     "text": "05.3.2.9 Other small household appliances"
+    },
+    {
+     "id": "0533",
+     "text": "05.3.3 Repair, installation and hire of household appliances"
+    },
+    {
+     "id": "05330",
+     "text": "05.3.3.0 Repair, installation and hire of household appliances"
+    },
+    {
+     "id": "054",
+     "text": "05.4 Glassware, tableware and household utensils"
+    },
+    {
+     "id": "0540",
+     "text": "05.4.0 Glassware, tableware and household utensils"
+    },
+    {
+     "id": "05401",
+     "text": "05.4.0.1 Glassware, crystal ware, ceramic ware and china ware"
+    },
+    {
+     "id": "05402",
+     "text": "05.4.0.2 Cutlery, flatware and silverware"
+    },
+    {
+     "id": "05403",
+     "text": "05.4.0.3 Kitchen utensils and articles"
+    },
+    {
+     "id": "055",
+     "text": "05.5 Tools and equipment for house and garden"
+    },
+    {
+     "id": "0551",
+     "text": "05.5.1 Motorized tools and equipment"
+    },
+    {
+     "id": "05510",
+     "text": "05.5.1.0 Motorized tools and equipment"
+    },
+    {
+     "id": "0552",
+     "text": "05.5.2 Non-motorized tools and miscellaneous accessories"
+    },
+    {
+     "id": "05521",
+     "text": "05.5.2.1 Non-motorized tools"
+    },
+    {
+     "id": "05522",
+     "text": "05.5.2.2 Miscellaneous accessories"
+    },
+    {
+     "id": "056",
+     "text": "05.6 Goods and services for routine household maintenance"
+    },
+    {
+     "id": "0561",
+     "text": "05.6.1 Non-durable household goods"
+    },
+    {
+     "id": "05611",
+     "text": "05.6.1.1 Household cleaning and maintenance products"
+    },
+    {
+     "id": "05619",
+     "text": "05.6.1.9 Other non-durable household goods"
+    },
+    {
+     "id": "0562",
+     "text": "05.6.2 Domestic services and household services"
+    },
+    {
+     "id": "05629",
+     "text": "05.6.2.9 Other household services"
+    },
+    {
+     "id": "06",
+     "text": "06 Health"
+    },
+    {
+     "id": "061",
+     "text": "06.1 Medicines and health products"
+    },
+    {
+     "id": "0611",
+     "text": "06.1.1 Medicines"
+    },
+    {
+     "id": "06111",
+     "text": "06.1.1.1 Medicines, vaccines and other pharmaceutical preparations"
+    },
+    {
+     "id": "0612",
+     "text": "06.1.2 Medical products"
+    },
+    {
+     "id": "06121",
+     "text": "06.1.2.1 Medical diagnostic products"
+    },
+    {
+     "id": "06122",
+     "text": "06.1.2.2 Preventive and protective devices"
+    },
+    {
+     "id": "06123",
+     "text": "06.1.2.3 Treatment devices for personal use"
+    },
+    {
+     "id": "0613",
+     "text": "06.1.3 Assistive products"
+    },
+    {
+     "id": "06131",
+     "text": "06.1.3.1 Assistive products for vision"
+    },
+    {
+     "id": "062",
+     "text": "06.2 Outpatient care services"
+    },
+    {
+     "id": "0621",
+     "text": "06.2.1 Preventive care services"
+    },
+    {
+     "id": "06219",
+     "text": "06.2.1.9 Other preventive care services"
+    },
+    {
+     "id": "0622",
+     "text": "06.2.2 Outpatient dental services"
+    },
+    {
+     "id": "06221",
+     "text": "06.2.2.1 Dental preventive services"
+    },
+    {
+     "id": "06229",
+     "text": "06.2.2.9 Other outpatient dental services"
+    },
+    {
+     "id": "0623",
+     "text": "06.2.3 Other outpatient care services"
+    },
+    {
+     "id": "06231",
+     "text": "06.2.3.1 Outpatient curative and rehabilitative services"
+    },
+    {
+     "id": "063",
+     "text": "06.3 Inpatient care services"
+    },
+    {
+     "id": "0632",
+     "text": "06.3.2 Inpatient long-term care services"
+    },
+    {
+     "id": "06320",
+     "text": "06.3.2.0 Inpatient long-term care services"
+    },
+    {
+     "id": "07",
+     "text": "07 Transport"
+    },
+    {
+     "id": "071",
+     "text": "07.1 Purchase of vehicles"
+    },
+    {
+     "id": "0711",
+     "text": "07.1.1 Motor cars"
+    },
+    {
+     "id": "07111",
+     "text": "07.1.1.1 New motor cars"
+    },
+    {
+     "id": "07112",
+     "text": "07.1.1.2 Second-hand motor cars"
+    },
+    {
+     "id": "0712",
+     "text": "07.1.2 Motorcycles"
+    },
+    {
+     "id": "07120",
+     "text": "07.1.2.0 Motorcycles"
+    },
+    {
+     "id": "0713",
+     "text": "07.1.3 Bicycles"
+    },
+    {
+     "id": "07130",
+     "text": "07.1.3.0 Bicycles"
+    },
+    {
+     "id": "072",
+     "text": "07.2 Operation of personal transport equipment"
+    },
+    {
+     "id": "0721",
+     "text": "07.2.1 Parts and accessories for personal transport equipment"
+    },
+    {
+     "id": "07211",
+     "text": "07.2.1.1 Tyres"
+    },
+    {
+     "id": "07212",
+     "text": "07.2.1.2 Parts for personal transport equipment"
+    },
+    {
+     "id": "07213",
+     "text": "07.2.1.3 Accessories for personal transport equipment"
+    },
+    {
+     "id": "0722",
+     "text": "07.2.2 Fuels and lubricants for personal transport equipment"
+    },
+    {
+     "id": "07221",
+     "text": "07.2.2.1 Diesel"
+    },
+    {
+     "id": "07222",
+     "text": "07.2.2.2 Petrol"
+    },
+    {
+     "id": "07223",
+     "text": "07.2.2.3 Other fuels for personal transport equipment"
+    },
+    {
+     "id": "07224",
+     "text": "07.2.2.4 Lubricants"
+    },
+    {
+     "id": "0723",
+     "text": "07.2.3 Maintenance and repair of personal transport equipment"
+    },
+    {
+     "id": "07230",
+     "text": "07.2.3.0 Maintenance and repair of personal transport equipment"
+    },
+    {
+     "id": "0724",
+     "text": "07.2.4 Other services related to personal transport equipment"
+    },
+    {
+     "id": "07241",
+     "text": "07.2.4.1 Parking services"
+    },
+    {
+     "id": "07242",
+     "text": "07.2.4.2 Toll facilities"
+    },
+    {
+     "id": "07243",
+     "text": "07.2.4.3 Driving lessons, tests, licences and roadworthiness tests"
+    },
+    {
+     "id": "07244",
+     "text": "07.2.4.4 Hire of personal transport equipment without driver"
+    },
+    {
+     "id": "073",
+     "text": "07.3 Passenger transport services"
+    },
+    {
+     "id": "0731",
+     "text": "07.3.1 Passenger transport by railway"
+    },
+    {
+     "id": "07311",
+     "text": "07.3.1.1 Passenger transport by train"
+    },
+    {
+     "id": "07312",
+     "text": "07.3.1.2 Passenger transport by rapid transit and tram"
+    },
+    {
+     "id": "0732",
+     "text": "07.3.2 Passenger transport by road"
+    },
+    {
+     "id": "07321",
+     "text": "07.3.2.1 Passenger transport by bus and coach"
+    },
+    {
+     "id": "07322",
+     "text": "07.3.2.2 Passenger transport by taxi and hired vehicle with driver"
+    },
+    {
+     "id": "0733",
+     "text": "07.3.3 Passenger transport by air"
+    },
+    {
+     "id": "07331",
+     "text": "07.3.3.1 Passenger transport by air, domestic"
+    },
+    {
+     "id": "07332",
+     "text": "07.3.3.2 Passenger transport by air, international"
+    },
+    {
+     "id": "0734",
+     "text": "07.3.4 Passenger transport by sea and inland waterway"
+    },
+    {
+     "id": "07340",
+     "text": "07.3.4.0 Passenger transport by sea and inland waterway"
+    },
+    {
+     "id": "0735",
+     "text": "07.3.5 Combined passenger transport"
+    },
+    {
+     "id": "07350",
+     "text": "07.3.5.0 Combined passenger transport"
+    },
+    {
+     "id": "074",
+     "text": "07.4 Transport services for goods"
+    },
+    {
+     "id": "0741",
+     "text": "07.4.1 Postal and courier services"
+    },
+    {
+     "id": "07411",
+     "text": "07.4.1.1 Letter handling services"
+    },
+    {
+     "id": "07412",
+     "text": "07.4.1.2 Courier and parcel delivery services"
+    },
+    {
+     "id": "0749",
+     "text": "07.4.9 Other transport of goods"
+    },
+    {
+     "id": "07491",
+     "text": "07.4.9.1 Removal and storage services"
+    },
+    {
+     "id": "07492",
+     "text": "07.4.9.2 Delivery of goods"
+    },
+    {
+     "id": "08",
+     "text": "08 Information and communication"
+    },
+    {
+     "id": "081",
+     "text": "08.1 Information and communication equipment"
+    },
+    {
+     "id": "0811",
+     "text": "08.1.1 Fixed telephone equipment"
+    },
+    {
+     "id": "08110",
+     "text": "08.1.1.0 Fixed telephone equipment"
+    },
+    {
+     "id": "0812",
+     "text": "08.1.2 Mobile telephone equipment"
+    },
+    {
+     "id": "08120",
+     "text": "08.1.2.0 Mobile telephone equipment"
+    },
+    {
+     "id": "0813",
+     "text": "08.1.3 Information processing equipment"
+    },
+    {
+     "id": "08131",
+     "text": "08.1.3.1 Computers, laptops and tablets"
+    },
+    {
+     "id": "08132",
+     "text": "08.1.3.2 Peripheral equipment and its consumable components"
+    },
+    {
+     "id": "0814",
+     "text": "08.1.4 Equipment for the reception, recording and reproduction of sound and vision"
+    },
+    {
+     "id": "08140",
+     "text": "08.1.4.0 Equipment for the reception, recording and reproduction of sound and vision"
+    },
+    {
+     "id": "0815",
+     "text": "08.1.5 Unrecorded recording media"
+    },
+    {
+     "id": "08150",
+     "text": "08.1.5.0 Unrecorded recording media"
+    },
+    {
+     "id": "0819",
+     "text": "08.1.9 Other information and communication equipment and accessories"
+    },
+    {
+     "id": "08191",
+     "text": "08.1.9.1 Other information and communication equipment"
+    },
+    {
+     "id": "08192",
+     "text": "08.1.9.2 Other information and communication accessories"
+    },
+    {
+     "id": "082",
+     "text": "08.2 Software, excluding games"
+    },
+    {
+     "id": "0820",
+     "text": "08.2.0 Software, excluding games"
+    },
+    {
+     "id": "08200",
+     "text": "08.2.0.0 Software, excluding games"
+    },
+    {
+     "id": "083",
+     "text": "08.3 Information and communication services"
+    },
+    {
+     "id": "0831",
+     "text": "08.3.1 Fixed communication services"
+    },
+    {
+     "id": "08310",
+     "text": "08.3.1.0 Fixed communication services"
+    },
+    {
+     "id": "0832",
+     "text": "08.3.2 Mobile communication services"
+    },
+    {
+     "id": "08320",
+     "text": "08.3.2.0 Mobile communication services"
+    },
+    {
+     "id": "0833",
+     "text": "08.3.3 Internet access provision services and online storage services"
+    },
+    {
+     "id": "08330",
+     "text": "08.3.3.0 Internet access provision services and online storage services"
+    },
+    {
+     "id": "0834",
+     "text": "08.3.4 Bundled telecommunication services"
+    },
+    {
+     "id": "08340",
+     "text": "08.3.4.0 Bundled telecommunication services"
+    },
+    {
+     "id": "0835",
+     "text": "08.3.5 Repair and rental of information and communication equipment"
+    },
+    {
+     "id": "08350",
+     "text": "08.3.5.0 Repair and rental of information and communication equipment"
+    },
+    {
+     "id": "0839",
+     "text": "08.3.9 Other information and communication services"
+    },
+    {
+     "id": "08391",
+     "text": "08.3.9.1 Television and radio licences and fees"
+    },
+    {
+     "id": "08392",
+     "text": "08.3.9.2 Subscriptions to audiovisual streaming services and rental of audiovisual content"
+    },
+    {
+     "id": "09",
+     "text": "09 Recreation, sport and culture"
+    },
+    {
+     "id": "091",
+     "text": "09.1 Recreational durables"
+    },
+    {
+     "id": "0911",
+     "text": "09.1.1 Photographic and cinematographic equipment and optical instruments"
+    },
+    {
+     "id": "09111",
+     "text": "09.1.1.1 Cameras"
+    },
+    {
+     "id": "09112",
+     "text": "09.1.1.2 Accessories for photographic and cinematographic equipment"
+    },
+    {
+     "id": "0912",
+     "text": "09.1.2 Major recreational durables"
+    },
+    {
+     "id": "09121",
+     "text": "09.1.2.1 Camper vans, caravans and trailers"
+    },
+    {
+     "id": "09123",
+     "text": "09.1.2.3 Boats, yachts, outboard motors and other water-sport equipment"
+    },
+    {
+     "id": "092",
+     "text": "09.2 Other recreational goods"
+    },
+    {
+     "id": "0921",
+     "text": "09.2.1 Games, toys and hobby-related articles"
+    },
+    {
+     "id": "09211",
+     "text": "09.2.1.1 Video game computers, consoles, game applications and software"
+    },
+    {
+     "id": "09212",
+     "text": "09.2.1.2 Other games, toys and hobby-related articles"
+    },
+    {
+     "id": "0922",
+     "text": "09.2.2 Sporting, camping and open-air recreation equipment"
+    },
+    {
+     "id": "09221",
+     "text": "09.2.2.1 Sporting equipment"
+    },
+    {
+     "id": "09222",
+     "text": "09.2.2.2 Camping and open-air recreation equipment"
+    },
+    {
+     "id": "093",
+     "text": "09.3 Garden products and pets"
+    },
+    {
+     "id": "0931",
+     "text": "09.3.1 Garden products, plants and flowers"
+    },
+    {
+     "id": "09311",
+     "text": "09.3.1.1 Garden products"
+    },
+    {
+     "id": "09312",
+     "text": "09.3.1.2 Plants, seeds and flowers"
+    },
+    {
+     "id": "0932",
+     "text": "09.3.2 Pets and pet products"
+    },
+    {
+     "id": "09321",
+     "text": "09.3.2.1 Pets"
+    },
+    {
+     "id": "09322",
+     "text": "09.3.2.2 Products for pets and other household animals"
+    },
+    {
+     "id": "094",
+     "text": "09.4 Recreational services"
+    },
+    {
+     "id": "0945",
+     "text": "09.4.5 Veterinary and other services for pets"
+    },
+    {
+     "id": "09450",
+     "text": "09.4.5.0 Veterinary and other services for pets"
+    },
+    {
+     "id": "0946",
+     "text": "09.4.6 Recreational and sporting services"
+    },
+    {
+     "id": "09461",
+     "text": "09.4.6.1 Recreational and leisure services"
+    },
+    {
+     "id": "09462",
+     "text": "09.4.6.2 Services associated with the practice of sports"
+    },
+    {
+     "id": "09463",
+     "text": "09.4.6.3 Services associated with attendance at sporting events"
+    },
+    {
+     "id": "0947",
+     "text": "09.4.7 Games of chance"
+    },
+    {
+     "id": "09470",
+     "text": "09.4.7.0 Games of chance"
+    },
+    {
+     "id": "095",
+     "text": "09.5 Cultural goods"
+    },
+    {
+     "id": "0951",
+     "text": "09.5.1 Musical instruments"
+    },
+    {
+     "id": "09510",
+     "text": "09.5.1.0 Musical instruments"
+    },
+    {
+     "id": "0952",
+     "text": "09.5.2 Audiovisual media"
+    },
+    {
+     "id": "09520",
+     "text": "09.5.2.0 Audiovisual media"
+    },
+    {
+     "id": "096",
+     "text": "09.6 Cultural services"
+    },
+    {
+     "id": "0961",
+     "text": "09.6.1 Services provided by cinemas, theatres and concert venues"
+    },
+    {
+     "id": "09610",
+     "text": "09.6.1.0 Services provided by cinemas, theatres and concert venues"
+    },
+    {
+     "id": "0962",
+     "text": "09.6.2 Services provided by museums, libraries and cultural sites"
+    },
+    {
+     "id": "09620",
+     "text": "09.6.2.0 Services provided by museums, libraries and cultural sites"
+    },
+    {
+     "id": "0963",
+     "text": "09.6.3 Photographic services"
+    },
+    {
+     "id": "09630",
+     "text": "09.6.3.0 Photographic services"
+    },
+    {
+     "id": "097",
+     "text": "09.7 Newspapers, books and stationery"
+    },
+    {
+     "id": "0971",
+     "text": "09.7.1 Books"
+    },
+    {
+     "id": "09711",
+     "text": "09.7.1.1 Educational books and textbooks"
+    },
+    {
+     "id": "09719",
+     "text": "09.7.1.9 Other books"
+    },
+    {
+     "id": "0972",
+     "text": "09.7.2 Newspapers and periodicals"
+    },
+    {
+     "id": "09721",
+     "text": "09.7.2.1 Newspapers"
+    },
+    {
+     "id": "09722",
+     "text": "09.7.2.2 Magazines and periodicals"
+    },
+    {
+     "id": "0973",
+     "text": "09.7.3 Miscellaneous printed matter"
+    },
+    {
+     "id": "09730",
+     "text": "09.7.3.0 Miscellaneous printed matter"
+    },
+    {
+     "id": "0974",
+     "text": "09.7.4 Stationery and drawing materials"
+    },
+    {
+     "id": "09740",
+     "text": "09.7.4.0 Stationery and drawing materials"
+    },
+    {
+     "id": "098",
+     "text": "09.8 Package holidays"
+    },
+    {
+     "id": "0980",
+     "text": "09.8.0 Package holidays"
+    },
+    {
+     "id": "09800",
+     "text": "09.8.0.0 Package holidays"
+    },
+    {
+     "id": "10",
+     "text": "10 Education services"
+    },
+    {
+     "id": "101",
+     "text": "10.1 Early childhood and primary education"
+    },
+    {
+     "id": "1010",
+     "text": "10.1.0 Early childhood and primary education"
+    },
+    {
+     "id": "10102",
+     "text": "10.1.0.2 Primary education"
+    },
+    {
+     "id": "102",
+     "text": "10.2 Boarding schools"
+    },
+    {
+     "id": "1020",
+     "text": "10.2.0 Boarding schools"
+    },
+    {
+     "id": "10200",
+     "text": "10.2.0.0 Boarding schools"
+    },
+    {
+     "id": "104",
+     "text": "10.4 Tertiary education"
+    },
+    {
+     "id": "1040",
+     "text": "10.4.0 Tertiary education"
+    },
+    {
+     "id": "10400",
+     "text": "10.4.0.0 Tertiary education"
+    },
+    {
+     "id": "105",
+     "text": "10.5 Education not defined by level"
+    },
+    {
+     "id": "1050",
+     "text": "10.5.0 Education not defined by level"
+    },
+    {
+     "id": "10509",
+     "text": "10.5.0.9 Other education not defined by level"
+    },
+    {
+     "id": "11",
+     "text": "11 Restaurants and accommodation services"
+    },
+    {
+     "id": "111",
+     "text": "11.1 Food and beverage serving services"
+    },
+    {
+     "id": "1111",
+     "text": "11.1.1 Restaurants, cafés and the like"
+    },
+    {
+     "id": "11111",
+     "text": "11.1.1.1 Restaurants, cafés and the like ¿ with full service"
+    },
+    {
+     "id": "11112",
+     "text": "11.1.1.2 Restaurants, cafés and the like ¿ with limited service"
+    },
+    {
+     "id": "1112",
+     "text": "11.1.2 Canteens, cafeterias and refectories"
+    },
+    {
+     "id": "11129",
+     "text": "11.1.2.9 Other canteens, cafeterias and refectories"
+    },
+    {
+     "id": "112",
+     "text": "11.2 Accommodation services"
+    },
+    {
+     "id": "1120",
+     "text": "11.2.0 Accommodation services"
+    },
+    {
+     "id": "11201",
+     "text": "11.2.0.1 Hotels, motels, inns and similar accommodation services"
+    },
+    {
+     "id": "11202",
+     "text": "11.2.0.2 Holiday centres, camping sites, youth hostels and similar accommodation services"
+    },
+    {
+     "id": "12",
+     "text": "12 Insurance and financial services"
+    },
+    {
+     "id": "121",
+     "text": "12.1 Insurance"
+    },
+    {
+     "id": "1211",
+     "text": "12.1.1 Life and accident insurance"
+    },
+    {
+     "id": "12110",
+     "text": "12.1.1.0 Life and accident insurance"
+    },
+    {
+     "id": "1212",
+     "text": "12.1.2 Insurance connected with health"
+    },
+    {
+     "id": "12120",
+     "text": "12.1.2.0 Insurance connected with health"
+    },
+    {
+     "id": "1213",
+     "text": "12.1.3 Insurance connected with dwellings"
+    },
+    {
+     "id": "12130",
+     "text": "12.1.3.0 Insurance connected with dwellings"
+    },
+    {
+     "id": "1214",
+     "text": "12.1.4 Insurance connected with transport"
+    },
+    {
+     "id": "12141",
+     "text": "12.1.4.1 Personal transport insurance"
+    },
+    {
+     "id": "12142",
+     "text": "12.1.4.2 Travel insurance"
+    },
+    {
+     "id": "1219",
+     "text": "12.1.9 Other insurance"
+    },
+    {
+     "id": "12190",
+     "text": "12.1.9.0 Other insurance"
+    },
+    {
+     "id": "122",
+     "text": "12.2 Financial services"
+    },
+    {
+     "id": "1222",
+     "text": "12.2.2 Explicit charges by deposit-taking corporations"
+    },
+    {
+     "id": "12220",
+     "text": "12.2.2.0 Explicit charges by deposit-taking corporations"
+    },
+    {
+     "id": "13",
+     "text": "13 Personal care, social protection and miscellaneous goods and services"
+    },
+    {
+     "id": "131",
+     "text": "13.1 Personal care"
+    },
+    {
+     "id": "1311",
+     "text": "13.1.1 Electric appliances for personal care"
+    },
+    {
+     "id": "13111",
+     "text": "13.1.1.1 Purchase of electric appliances for personal care"
+    },
+    {
+     "id": "1312",
+     "text": "13.1.2 Other appliances, articles and products for personal care"
+    },
+    {
+     "id": "13120",
+     "text": "13.1.2.0 Other appliances, articles and products for personal care"
+    },
+    {
+     "id": "1313",
+     "text": "13.1.3 Hairdressing salons and personal grooming establishments"
+    },
+    {
+     "id": "13131",
+     "text": "13.1.3.1 Hairdressing"
+    },
+    {
+     "id": "13132",
+     "text": "13.1.3.2 Personal grooming treatments"
+    },
+    {
+     "id": "132",
+     "text": "13.2 Other personal effects"
+    },
+    {
+     "id": "1321",
+     "text": "13.2.1 Jewellery and watches"
+    },
+    {
+     "id": "13211",
+     "text": "13.2.1.1 Purchase of jewellery and watches"
+    },
+    {
+     "id": "13212",
+     "text": "13.2.1.2 Repair and hire of jewellery, clocks and watches"
+    },
+    {
+     "id": "1329",
+     "text": "13.2.9 Other personal effects n.e.c."
+    },
+    {
+     "id": "13291",
+     "text": "13.2.9.1 Travel goods, baby articles and other personal effects n.e.c."
+    },
+    {
+     "id": "133",
+     "text": "13.3 Daycare institutions and social care"
+    },
+    {
+     "id": "1330",
+     "text": "13.3.0 Daycare institutions and social care"
+    },
+    {
+     "id": "13301",
+     "text": "13.3.0.1 Childcare services"
+    },
+    {
+     "id": "13302",
+     "text": "13.3.0.2 Retirement homes for elderly persons and residences for disabled persons, not providing medical care"
+    },
+    {
+     "id": "13303",
+     "text": "13.3.0.3 Home care services for elderly and disabled"
+    },
+    {
+     "id": "139",
+     "text": "13.9 Other services"
+    },
+    {
+     "id": "1390",
+     "text": "13.9.0 Other services"
+    },
+    {
+     "id": "13909",
+     "text": "13.9.0.9 Other services n.e.c."
+    },
+    {
+     "id": "141",
+     "text": "14.1 Goods (total)"
+    },
+    {
+     "id": "142",
+     "text": "14.2 Services (total)"
+    },
+    {
+     "id": "151",
+     "text": "15.1 Overall Consumer Price Index - excl. energy and unprocessed food (core inflation)"
+    },
+    {
+     "id": "161",
+     "text": "16.1 Overall Consumer Price Index excl. energy"
+    }
+   ]
+  },
+  {
+   "id": "ENHED",
+   "text": "unit",
+   "elimination": false,
+   "time": false,
+   "values": [
+    {
+     "id": "100",
+     "text": "Index"
+    },
+    {
+     "id": "200",
+     "text": "Percentage change compared to previous month (per cent)"
+    },
+    {
+     "id": "300",
+     "text": "Percentage change compared to same month the year before (per cent)"
+    }
+   ]
+  },
+  {
+   "id": "Tid",
+   "text": "time",
+   "elimination": false,
+   "time": true,
+   "values": [
+    {
+     "id": "2000M12",
+     "text": "2000M12"
+    },
+    {
+     "id": "2001M01",
+     "text": "2001M01"
+    },
+    {
+     "id": "2001M02",
+     "text": "2001M02"
+    },
+    {
+     "id": "2001M03",
+     "text": "2001M03"
+    },
+    {
+     "id": "2001M04",
+     "text": "2001M04"
+    },
+    {
+     "id": "2001M05",
+     "text": "2001M05"
+    },
+    {
+     "id": "2001M06",
+     "text": "2001M06"
+    },
+    {
+     "id": "2001M07",
+     "text": "2001M07"
+    },
+    {
+     "id": "2001M08",
+     "text": "2001M08"
+    },
+    {
+     "id": "2001M09",
+     "text": "2001M09"
+    },
+    {
+     "id": "2001M10",
+     "text": "2001M10"
+    },
+    {
+     "id": "2001M11",
+     "text": "2001M11"
+    },
+    {
+     "id": "2001M12",
+     "text": "2001M12"
+    },
+    {
+     "id": "2002M01",
+     "text": "2002M01"
+    },
+    {
+     "id": "2002M02",
+     "text": "2002M02"
+    },
+    {
+     "id": "2002M03",
+     "text": "2002M03"
+    },
+    {
+     "id": "2002M04",
+     "text": "2002M04"
+    },
+    {
+     "id": "2002M05",
+     "text": "2002M05"
+    },
+    {
+     "id": "2002M06",
+     "text": "2002M06"
+    },
+    {
+     "id": "2002M07",
+     "text": "2002M07"
+    },
+    {
+     "id": "2002M08",
+     "text": "2002M08"
+    },
+    {
+     "id": "2002M09",
+     "text": "2002M09"
+    },
+    {
+     "id": "2002M10",
+     "text": "2002M10"
+    },
+    {
+     "id": "2002M11",
+     "text": "2002M11"
+    },
+    {
+     "id": "2002M12",
+     "text": "2002M12"
+    },
+    {
+     "id": "2003M01",
+     "text": "2003M01"
+    },
+    {
+     "id": "2003M02",
+     "text": "2003M02"
+    },
+    {
+     "id": "2003M03",
+     "text": "2003M03"
+    },
+    {
+     "id": "2003M04",
+     "text": "2003M04"
+    },
+    {
+     "id": "2003M05",
+     "text": "2003M05"
+    },
+    {
+     "id": "2003M06",
+     "text": "2003M06"
+    },
+    {
+     "id": "2003M07",
+     "text": "2003M07"
+    },
+    {
+     "id": "2003M08",
+     "text": "2003M08"
+    },
+    {
+     "id": "2003M09",
+     "text": "2003M09"
+    },
+    {
+     "id": "2003M10",
+     "text": "2003M10"
+    },
+    {
+     "id": "2003M11",
+     "text": "2003M11"
+    },
+    {
+     "id": "2003M12",
+     "text": "2003M12"
+    },
+    {
+     "id": "2004M01",
+     "text": "2004M01"
+    },
+    {
+     "id": "2004M02",
+     "text": "2004M02"
+    },
+    {
+     "id": "2004M03",
+     "text": "2004M03"
+    },
+    {
+     "id": "2004M04",
+     "text": "2004M04"
+    },
+    {
+     "id": "2004M05",
+     "text": "2004M05"
+    },
+    {
+     "id": "2004M06",
+     "text": "2004M06"
+    },
+    {
+     "id": "2004M07",
+     "text": "2004M07"
+    },
+    {
+     "id": "2004M08",
+     "text": "2004M08"
+    },
+    {
+     "id": "2004M09",
+     "text": "2004M09"
+    },
+    {
+     "id": "2004M10",
+     "text": "2004M10"
+    },
+    {
+     "id": "2004M11",
+     "text": "2004M11"
+    },
+    {
+     "id": "2004M12",
+     "text": "2004M12"
+    },
+    {
+     "id": "2005M01",
+     "text": "2005M01"
+    },
+    {
+     "id": "2005M02",
+     "text": "2005M02"
+    },
+    {
+     "id": "2005M03",
+     "text": "2005M03"
+    },
+    {
+     "id": "2005M04",
+     "text": "2005M04"
+    },
+    {
+     "id": "2005M05",
+     "text": "2005M05"
+    },
+    {
+     "id": "2005M06",
+     "text": "2005M06"
+    },
+    {
+     "id": "2005M07",
+     "text": "2005M07"
+    },
+    {
+     "id": "2005M08",
+     "text": "2005M08"
+    },
+    {
+     "id": "2005M09",
+     "text": "2005M09"
+    },
+    {
+     "id": "2005M10",
+     "text": "2005M10"
+    },
+    {
+     "id": "2005M11",
+     "text": "2005M11"
+    },
+    {
+     "id": "2005M12",
+     "text": "2005M12"
+    },
+    {
+     "id": "2006M01",
+     "text": "2006M01"
+    },
+    {
+     "id": "2006M02",
+     "text": "2006M02"
+    },
+    {
+     "id": "2006M03",
+     "text": "2006M03"
+    },
+    {
+     "id": "2006M04",
+     "text": "2006M04"
+    },
+    {
+     "id": "2006M05",
+     "text": "2006M05"
+    },
+    {
+     "id": "2006M06",
+     "text": "2006M06"
+    },
+    {
+     "id": "2006M07",
+     "text": "2006M07"
+    },
+    {
+     "id": "2006M08",
+     "text": "2006M08"
+    },
+    {
+     "id": "2006M09",
+     "text": "2006M09"
+    },
+    {
+     "id": "2006M10",
+     "text": "2006M10"
+    },
+    {
+     "id": "2006M11",
+     "text": "2006M11"
+    },
+    {
+     "id": "2006M12",
+     "text": "2006M12"
+    },
+    {
+     "id": "2007M01",
+     "text": "2007M01"
+    },
+    {
+     "id": "2007M02",
+     "text": "2007M02"
+    },
+    {
+     "id": "2007M03",
+     "text": "2007M03"
+    },
+    {
+     "id": "2007M04",
+     "text": "2007M04"
+    },
+    {
+     "id": "2007M05",
+     "text": "2007M05"
+    },
+    {
+     "id": "2007M06",
+     "text": "2007M06"
+    },
+    {
+     "id": "2007M07",
+     "text": "2007M07"
+    },
+    {
+     "id": "2007M08",
+     "text": "2007M08"
+    },
+    {
+     "id": "2007M09",
+     "text": "2007M09"
+    },
+    {
+     "id": "2007M10",
+     "text": "2007M10"
+    },
+    {
+     "id": "2007M11",
+     "text": "2007M11"
+    },
+    {
+     "id": "2007M12",
+     "text": "2007M12"
+    },
+    {
+     "id": "2008M01",
+     "text": "2008M01"
+    },
+    {
+     "id": "2008M02",
+     "text": "2008M02"
+    },
+    {
+     "id": "2008M03",
+     "text": "2008M03"
+    },
+    {
+     "id": "2008M04",
+     "text": "2008M04"
+    },
+    {
+     "id": "2008M05",
+     "text": "2008M05"
+    },
+    {
+     "id": "2008M06",
+     "text": "2008M06"
+    },
+    {
+     "id": "2008M07",
+     "text": "2008M07"
+    },
+    {
+     "id": "2008M08",
+     "text": "2008M08"
+    },
+    {
+     "id": "2008M09",
+     "text": "2008M09"
+    },
+    {
+     "id": "2008M10",
+     "text": "2008M10"
+    },
+    {
+     "id": "2008M11",
+     "text": "2008M11"
+    },
+    {
+     "id": "2008M12",
+     "text": "2008M12"
+    },
+    {
+     "id": "2009M01",
+     "text": "2009M01"
+    },
+    {
+     "id": "2009M02",
+     "text": "2009M02"
+    },
+    {
+     "id": "2009M03",
+     "text": "2009M03"
+    },
+    {
+     "id": "2009M04",
+     "text": "2009M04"
+    },
+    {
+     "id": "2009M05",
+     "text": "2009M05"
+    },
+    {
+     "id": "2009M06",
+     "text": "2009M06"
+    },
+    {
+     "id": "2009M07",
+     "text": "2009M07"
+    },
+    {
+     "id": "2009M08",
+     "text": "2009M08"
+    },
+    {
+     "id": "2009M09",
+     "text": "2009M09"
+    },
+    {
+     "id": "2009M10",
+     "text": "2009M10"
+    },
+    {
+     "id": "2009M11",
+     "text": "2009M11"
+    },
+    {
+     "id": "2009M12",
+     "text": "2009M12"
+    },
+    {
+     "id": "2010M01",
+     "text": "2010M01"
+    },
+    {
+     "id": "2010M02",
+     "text": "2010M02"
+    },
+    {
+     "id": "2010M03",
+     "text": "2010M03"
+    },
+    {
+     "id": "2010M04",
+     "text": "2010M04"
+    },
+    {
+     "id": "2010M05",
+     "text": "2010M05"
+    },
+    {
+     "id": "2010M06",
+     "text": "2010M06"
+    },
+    {
+     "id": "2010M07",
+     "text": "2010M07"
+    },
+    {
+     "id": "2010M08",
+     "text": "2010M08"
+    },
+    {
+     "id": "2010M09",
+     "text": "2010M09"
+    },
+    {
+     "id": "2010M10",
+     "text": "2010M10"
+    },
+    {
+     "id": "2010M11",
+     "text": "2010M11"
+    },
+    {
+     "id": "2010M12",
+     "text": "2010M12"
+    },
+    {
+     "id": "2011M01",
+     "text": "2011M01"
+    },
+    {
+     "id": "2011M02",
+     "text": "2011M02"
+    },
+    {
+     "id": "2011M03",
+     "text": "2011M03"
+    },
+    {
+     "id": "2011M04",
+     "text": "2011M04"
+    },
+    {
+     "id": "2011M05",
+     "text": "2011M05"
+    },
+    {
+     "id": "2011M06",
+     "text": "2011M06"
+    },
+    {
+     "id": "2011M07",
+     "text": "2011M07"
+    },
+    {
+     "id": "2011M08",
+     "text": "2011M08"
+    },
+    {
+     "id": "2011M09",
+     "text": "2011M09"
+    },
+    {
+     "id": "2011M10",
+     "text": "2011M10"
+    },
+    {
+     "id": "2011M11",
+     "text": "2011M11"
+    },
+    {
+     "id": "2011M12",
+     "text": "2011M12"
+    },
+    {
+     "id": "2012M01",
+     "text": "2012M01"
+    },
+    {
+     "id": "2012M02",
+     "text": "2012M02"
+    },
+    {
+     "id": "2012M03",
+     "text": "2012M03"
+    },
+    {
+     "id": "2012M04",
+     "text": "2012M04"
+    },
+    {
+     "id": "2012M05",
+     "text": "2012M05"
+    },
+    {
+     "id": "2012M06",
+     "text": "2012M06"
+    },
+    {
+     "id": "2012M07",
+     "text": "2012M07"
+    },
+    {
+     "id": "2012M08",
+     "text": "2012M08"
+    },
+    {
+     "id": "2012M09",
+     "text": "2012M09"
+    },
+    {
+     "id": "2012M10",
+     "text": "2012M10"
+    },
+    {
+     "id": "2012M11",
+     "text": "2012M11"
+    },
+    {
+     "id": "2012M12",
+     "text": "2012M12"
+    },
+    {
+     "id": "2013M01",
+     "text": "2013M01"
+    },
+    {
+     "id": "2013M02",
+     "text": "2013M02"
+    },
+    {
+     "id": "2013M03",
+     "text": "2013M03"
+    },
+    {
+     "id": "2013M04",
+     "text": "2013M04"
+    },
+    {
+     "id": "2013M05",
+     "text": "2013M05"
+    },
+    {
+     "id": "2013M06",
+     "text": "2013M06"
+    },
+    {
+     "id": "2013M07",
+     "text": "2013M07"
+    },
+    {
+     "id": "2013M08",
+     "text": "2013M08"
+    },
+    {
+     "id": "2013M09",
+     "text": "2013M09"
+    },
+    {
+     "id": "2013M10",
+     "text": "2013M10"
+    },
+    {
+     "id": "2013M11",
+     "text": "2013M11"
+    },
+    {
+     "id": "2013M12",
+     "text": "2013M12"
+    },
+    {
+     "id": "2014M01",
+     "text": "2014M01"
+    },
+    {
+     "id": "2014M02",
+     "text": "2014M02"
+    },
+    {
+     "id": "2014M03",
+     "text": "2014M03"
+    },
+    {
+     "id": "2014M04",
+     "text": "2014M04"
+    },
+    {
+     "id": "2014M05",
+     "text": "2014M05"
+    },
+    {
+     "id": "2014M06",
+     "text": "2014M06"
+    },
+    {
+     "id": "2014M07",
+     "text": "2014M07"
+    },
+    {
+     "id": "2014M08",
+     "text": "2014M08"
+    },
+    {
+     "id": "2014M09",
+     "text": "2014M09"
+    },
+    {
+     "id": "2014M10",
+     "text": "2014M10"
+    },
+    {
+     "id": "2014M11",
+     "text": "2014M11"
+    },
+    {
+     "id": "2014M12",
+     "text": "2014M12"
+    },
+    {
+     "id": "2015M01",
+     "text": "2015M01"
+    },
+    {
+     "id": "2015M02",
+     "text": "2015M02"
+    },
+    {
+     "id": "2015M03",
+     "text": "2015M03"
+    },
+    {
+     "id": "2015M04",
+     "text": "2015M04"
+    },
+    {
+     "id": "2015M05",
+     "text": "2015M05"
+    },
+    {
+     "id": "2015M06",
+     "text": "2015M06"
+    },
+    {
+     "id": "2015M07",
+     "text": "2015M07"
+    },
+    {
+     "id": "2015M08",
+     "text": "2015M08"
+    },
+    {
+     "id": "2015M09",
+     "text": "2015M09"
+    },
+    {
+     "id": "2015M10",
+     "text": "2015M10"
+    },
+    {
+     "id": "2015M11",
+     "text": "2015M11"
+    },
+    {
+     "id": "2015M12",
+     "text": "2015M12"
+    },
+    {
+     "id": "2016M01",
+     "text": "2016M01"
+    },
+    {
+     "id": "2016M02",
+     "text": "2016M02"
+    },
+    {
+     "id": "2016M03",
+     "text": "2016M03"
+    },
+    {
+     "id": "2016M04",
+     "text": "2016M04"
+    },
+    {
+     "id": "2016M05",
+     "text": "2016M05"
+    },
+    {
+     "id": "2016M06",
+     "text": "2016M06"
+    },
+    {
+     "id": "2016M07",
+     "text": "2016M07"
+    },
+    {
+     "id": "2016M08",
+     "text": "2016M08"
+    },
+    {
+     "id": "2016M09",
+     "text": "2016M09"
+    },
+    {
+     "id": "2016M10",
+     "text": "2016M10"
+    },
+    {
+     "id": "2016M11",
+     "text": "2016M11"
+    },
+    {
+     "id": "2016M12",
+     "text": "2016M12"
+    },
+    {
+     "id": "2017M01",
+     "text": "2017M01"
+    },
+    {
+     "id": "2017M02",
+     "text": "2017M02"
+    },
+    {
+     "id": "2017M03",
+     "text": "2017M03"
+    },
+    {
+     "id": "2017M04",
+     "text": "2017M04"
+    },
+    {
+     "id": "2017M05",
+     "text": "2017M05"
+    },
+    {
+     "id": "2017M06",
+     "text": "2017M06"
+    },
+    {
+     "id": "2017M07",
+     "text": "2017M07"
+    },
+    {
+     "id": "2017M08",
+     "text": "2017M08"
+    },
+    {
+     "id": "2017M09",
+     "text": "2017M09"
+    },
+    {
+     "id": "2017M10",
+     "text": "2017M10"
+    },
+    {
+     "id": "2017M11",
+     "text": "2017M11"
+    },
+    {
+     "id": "2017M12",
+     "text": "2017M12"
+    },
+    {
+     "id": "2018M01",
+     "text": "2018M01"
+    },
+    {
+     "id": "2018M02",
+     "text": "2018M02"
+    },
+    {
+     "id": "2018M03",
+     "text": "2018M03"
+    },
+    {
+     "id": "2018M04",
+     "text": "2018M04"
+    },
+    {
+     "id": "2018M05",
+     "text": "2018M05"
+    },
+    {
+     "id": "2018M06",
+     "text": "2018M06"
+    },
+    {
+     "id": "2018M07",
+     "text": "2018M07"
+    },
+    {
+     "id": "2018M08",
+     "text": "2018M08"
+    },
+    {
+     "id": "2018M09",
+     "text": "2018M09"
+    },
+    {
+     "id": "2018M10",
+     "text": "2018M10"
+    },
+    {
+     "id": "2018M11",
+     "text": "2018M11"
+    },
+    {
+     "id": "2018M12",
+     "text": "2018M12"
+    },
+    {
+     "id": "2019M01",
+     "text": "2019M01"
+    },
+    {
+     "id": "2019M02",
+     "text": "2019M02"
+    },
+    {
+     "id": "2019M03",
+     "text": "2019M03"
+    },
+    {
+     "id": "2019M04",
+     "text": "2019M04"
+    },
+    {
+     "id": "2019M05",
+     "text": "2019M05"
+    },
+    {
+     "id": "2019M06",
+     "text": "2019M06"
+    },
+    {
+     "id": "2019M07",
+     "text": "2019M07"
+    },
+    {
+     "id": "2019M08",
+     "text": "2019M08"
+    },
+    {
+     "id": "2019M09",
+     "text": "2019M09"
+    },
+    {
+     "id": "2019M10",
+     "text": "2019M10"
+    },
+    {
+     "id": "2019M11",
+     "text": "2019M11"
+    },
+    {
+     "id": "2019M12",
+     "text": "2019M12"
+    },
+    {
+     "id": "2020M01",
+     "text": "2020M01"
+    },
+    {
+     "id": "2020M02",
+     "text": "2020M02"
+    },
+    {
+     "id": "2020M03",
+     "text": "2020M03"
+    },
+    {
+     "id": "2020M04",
+     "text": "2020M04"
+    },
+    {
+     "id": "2020M05",
+     "text": "2020M05"
+    },
+    {
+     "id": "2020M06",
+     "text": "2020M06"
+    },
+    {
+     "id": "2020M07",
+     "text": "2020M07"
+    },
+    {
+     "id": "2020M08",
+     "text": "2020M08"
+    },
+    {
+     "id": "2020M09",
+     "text": "2020M09"
+    },
+    {
+     "id": "2020M10",
+     "text": "2020M10"
+    },
+    {
+     "id": "2020M11",
+     "text": "2020M11"
+    },
+    {
+     "id": "2020M12",
+     "text": "2020M12"
+    },
+    {
+     "id": "2021M01",
+     "text": "2021M01"
+    },
+    {
+     "id": "2021M02",
+     "text": "2021M02"
+    },
+    {
+     "id": "2021M03",
+     "text": "2021M03"
+    },
+    {
+     "id": "2021M04",
+     "text": "2021M04"
+    },
+    {
+     "id": "2021M05",
+     "text": "2021M05"
+    },
+    {
+     "id": "2021M06",
+     "text": "2021M06"
+    },
+    {
+     "id": "2021M07",
+     "text": "2021M07"
+    },
+    {
+     "id": "2021M08",
+     "text": "2021M08"
+    },
+    {
+     "id": "2021M09",
+     "text": "2021M09"
+    },
+    {
+     "id": "2021M10",
+     "text": "2021M10"
+    },
+    {
+     "id": "2021M11",
+     "text": "2021M11"
+    },
+    {
+     "id": "2021M12",
+     "text": "2021M12"
+    },
+    {
+     "id": "2022M01",
+     "text": "2022M01"
+    },
+    {
+     "id": "2022M02",
+     "text": "2022M02"
+    },
+    {
+     "id": "2022M03",
+     "text": "2022M03"
+    },
+    {
+     "id": "2022M04",
+     "text": "2022M04"
+    },
+    {
+     "id": "2022M05",
+     "text": "2022M05"
+    },
+    {
+     "id": "2022M06",
+     "text": "2022M06"
+    },
+    {
+     "id": "2022M07",
+     "text": "2022M07"
+    },
+    {
+     "id": "2022M08",
+     "text": "2022M08"
+    },
+    {
+     "id": "2022M09",
+     "text": "2022M09"
+    },
+    {
+     "id": "2022M10",
+     "text": "2022M10"
+    },
+    {
+     "id": "2022M11",
+     "text": "2022M11"
+    },
+    {
+     "id": "2022M12",
+     "text": "2022M12"
+    },
+    {
+     "id": "2023M01",
+     "text": "2023M01"
+    },
+    {
+     "id": "2023M02",
+     "text": "2023M02"
+    },
+    {
+     "id": "2023M03",
+     "text": "2023M03"
+    },
+    {
+     "id": "2023M04",
+     "text": "2023M04"
+    },
+    {
+     "id": "2023M05",
+     "text": "2023M05"
+    },
+    {
+     "id": "2023M06",
+     "text": "2023M06"
+    },
+    {
+     "id": "2023M07",
+     "text": "2023M07"
+    },
+    {
+     "id": "2023M08",
+     "text": "2023M08"
+    },
+    {
+     "id": "2023M09",
+     "text": "2023M09"
+    },
+    {
+     "id": "2023M10",
+     "text": "2023M10"
+    },
+    {
+     "id": "2023M11",
+     "text": "2023M11"
+    },
+    {
+     "id": "2023M12",
+     "text": "2023M12"
+    },
+    {
+     "id": "2024M01",
+     "text": "2024M01"
+    },
+    {
+     "id": "2024M02",
+     "text": "2024M02"
+    },
+    {
+     "id": "2024M03",
+     "text": "2024M03"
+    },
+    {
+     "id": "2024M04",
+     "text": "2024M04"
+    },
+    {
+     "id": "2024M05",
+     "text": "2024M05"
+    },
+    {
+     "id": "2024M06",
+     "text": "2024M06"
+    },
+    {
+     "id": "2024M07",
+     "text": "2024M07"
+    },
+    {
+     "id": "2024M08",
+     "text": "2024M08"
+    },
+    {
+     "id": "2024M09",
+     "text": "2024M09"
+    },
+    {
+     "id": "2024M10",
+     "text": "2024M10"
+    },
+    {
+     "id": "2024M11",
+     "text": "2024M11"
+    },
+    {
+     "id": "2024M12",
+     "text": "2024M12"
+    },
+    {
+     "id": "2025M01",
+     "text": "2025M01"
+    },
+    {
+     "id": "2025M02",
+     "text": "2025M02"
+    },
+    {
+     "id": "2025M03",
+     "text": "2025M03"
+    },
+    {
+     "id": "2025M04",
+     "text": "2025M04"
+    },
+    {
+     "id": "2025M05",
+     "text": "2025M05"
+    },
+    {
+     "id": "2025M06",
+     "text": "2025M06"
+    },
+    {
+     "id": "2025M07",
+     "text": "2025M07"
+    },
+    {
+     "id": "2025M08",
+     "text": "2025M08"
+    },
+    {
+     "id": "2025M09",
+     "text": "2025M09"
+    },
+    {
+     "id": "2025M10",
+     "text": "2025M10"
+    },
+    {
+     "id": "2025M11",
+     "text": "2025M11"
+    },
+    {
+     "id": "2025M12",
+     "text": "2025M12"
+    },
+    {
+     "id": "2026M01",
+     "text": "2026M01"
+    },
+    {
+     "id": "2026M02",
+     "text": "2026M02"
+    },
+    {
+     "id": "2026M03",
+     "text": "2026M03"
+    },
+    {
+     "id": "2026M04",
+     "text": "2026M04"
+    },
+    {
+     "id": "2026M05",
+     "text": "2026M05"
+    },
+    {
+     "id": "2026M06",
+     "text": "2026M06"
+    },
+    {
+     "id": "2026M07",
+     "text": "2026M07"
+    },
+    {
+     "id": "2026M08",
+     "text": "2026M08"
+    }
+   ]
+  }
+ ]
+}

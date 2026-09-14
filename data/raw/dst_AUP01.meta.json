@@ -1,0 +1,1000 @@
+{
+ "id": "AUP01",
+ "text": "Unemployment in per cent of the labour force (provisional)",
+ "description": "Unemployment in per cent of the labour force (provisional) by region, age, sex and time",
+ "unit": "Per cent",
+ "suppressedDataValue": "0",
+ "updated": "2026-08-31T08:00:00",
+ "active": true,
+ "contacts": [
+  {
+   "name": "Carsten Bo Nielsen",
+   "phone": "+4523746017",
+   "mail": "can@dst.dk"
+  }
+ ],
+ "documentation": {
+  "id": "708fcaee-c0d5-465d-a3c1-6eea878321bc",
+  "url": "https://www.dst.dk/documentationofstatistics/708fcaee-c0d5-465d-a3c1-6eea878321bc"
+ },
+ "footnote": null,
+ "variables": [
+  {
+   "id": "OMRÅDE",
+   "text": "region",
+   "elimination": true,
+   "time": false,
+   "map": "denmark_municipality_07",
+   "values": [
+    {
+     "id": "000",
+     "text": "All Denmark"
+    },
+    {
+     "id": "084",
+     "text": "Region Hovedstaden"
+    },
+    {
+     "id": "01",
+     "text": "Province Byen København"
+    },
+    {
+     "id": "101",
+     "text": "Copenhagen"
+    },
+    {
+     "id": "147",
+     "text": "Frederiksberg"
+    },
+    {
+     "id": "155",
+     "text": "Dragør"
+    },
+    {
+     "id": "185",
+     "text": "Tårnby"
+    },
+    {
+     "id": "02",
+     "text": "Province Københavns omegn"
+    },
+    {
+     "id": "165",
+     "text": "Albertslund"
+    },
+    {
+     "id": "151",
+     "text": "Ballerup"
+    },
+    {
+     "id": "153",
+     "text": "Brøndby"
+    },
+    {
+     "id": "157",
+     "text": "Gentofte"
+    },
+    {
+     "id": "159",
+     "text": "Gladsaxe"
+    },
+    {
+     "id": "161",
+     "text": "Glostrup"
+    },
+    {
+     "id": "163",
+     "text": "Herlev"
+    },
+    {
+     "id": "167",
+     "text": "Hvidovre"
+    },
+    {
+     "id": "169",
+     "text": "Høje-Taastrup"
+    },
+    {
+     "id": "183",
+     "text": "Ishøj"
+    },
+    {
+     "id": "173",
+     "text": "Lyngby-Taarbæk"
+    },
+    {
+     "id": "175",
+     "text": "Rødovre"
+    },
+    {
+     "id": "187",
+     "text": "Vallensbæk"
+    },
+    {
+     "id": "03",
+     "text": "Province Nordsjælland"
+    },
+    {
+     "id": "201",
+     "text": "Allerød"
+    },
+    {
+     "id": "240",
+     "text": "Egedal"
+    },
+    {
+     "id": "210",
+     "text": "Fredensborg"
+    },
+    {
+     "id": "250",
+     "text": "Frederikssund"
+    },
+    {
+     "id": "190",
+     "text": "Furesø"
+    },
+    {
+     "id": "270",
+     "text": "Gribskov"
+    },
+    {
+     "id": "260",
+     "text": "Halsnæs"
+    },
+    {
+     "id": "217",
+     "text": "Helsingør"
+    },
+    {
+     "id": "219",
+     "text": "Hillerød"
+    },
+    {
+     "id": "223",
+     "text": "Hørsholm"
+    },
+    {
+     "id": "230",
+     "text": "Rudersdal"
+    },
+    {
+     "id": "04",
+     "text": "Province Bornholm"
+    },
+    {
+     "id": "400",
+     "text": "Bornholm"
+    },
+    {
+     "id": "085",
+     "text": "Region Sjælland"
+    },
+    {
+     "id": "05",
+     "text": "Province Østsjælland"
+    },
+    {
+     "id": "253",
+     "text": "Greve"
+    },
+    {
+     "id": "259",
+     "text": "Køge"
+    },
+    {
+     "id": "350",
+     "text": "Lejre"
+    },
+    {
+     "id": "265",
+     "text": "Roskilde"
+    },
+    {
+     "id": "269",
+     "text": "Solrød"
+    },
+    {
+     "id": "06",
+     "text": "Province Vest- og Sydsjælland"
+    },
+    {
+     "id": "320",
+     "text": "Faxe"
+    },
+    {
+     "id": "376",
+     "text": "Guldborgsund"
+    },
+    {
+     "id": "316",
+     "text": "Holbæk"
+    },
+    {
+     "id": "326",
+     "text": "Kalundborg"
+    },
+    {
+     "id": "360",
+     "text": "Lolland"
+    },
+    {
+     "id": "370",
+     "text": "Næstved"
+    },
+    {
+     "id": "306",
+     "text": "Odsherred"
+    },
+    {
+     "id": "329",
+     "text": "Ringsted"
+    },
+    {
+     "id": "330",
+     "text": "Slagelse"
+    },
+    {
+     "id": "340",
+     "text": "Sorø"
+    },
+    {
+     "id": "336",
+     "text": "Stevns"
+    },
+    {
+     "id": "390",
+     "text": "Vordingborg"
+    },
+    {
+     "id": "083",
+     "text": "Region Syddanmark"
+    },
+    {
+     "id": "07",
+     "text": "Province Fyn"
+    },
+    {
+     "id": "420",
+     "text": "Assens"
+    },
+    {
+     "id": "430",
+     "text": "Faaborg-Midtfyn"
+    },
+    {
+     "id": "440",
+     "text": "Kerteminde"
+    },
+    {
+     "id": "482",
+     "text": "Langeland"
+    },
+    {
+     "id": "410",
+     "text": "Middelfart"
+    },
+    {
+     "id": "480",
+     "text": "Nordfyns"
+    },
+    {
+     "id": "450",
+     "text": "Nyborg"
+    },
+    {
+     "id": "461",
+     "text": "Odense"
+    },
+    {
+     "id": "479",
+     "text": "Svendborg"
+    },
+    {
+     "id": "492",
+     "text": "Ærø"
+    },
+    {
+     "id": "08",
+     "text": "Province Sydjylland"
+    },
+    {
+     "id": "530",
+     "text": "Billund"
+    },
+    {
+     "id": "561",
+     "text": "Esbjerg"
+    },
+    {
+     "id": "563",
+     "text": "Fanø"
+    },
+    {
+     "id": "607",
+     "text": "Fredericia"
+    },
+    {
+     "id": "510",
+     "text": "Haderslev"
+    },
+    {
+     "id": "621",
+     "text": "Kolding"
+    },
+    {
+     "id": "540",
+     "text": "Sønderborg"
+    },
+    {
+     "id": "550",
+     "text": "Tønder"
+    },
+    {
+     "id": "573",
+     "text": "Varde"
+    },
+    {
+     "id": "575",
+     "text": "Vejen"
+    },
+    {
+     "id": "630",
+     "text": "Vejle"
+    },
+    {
+     "id": "580",
+     "text": "Aabenraa"
+    },
+    {
+     "id": "082",
+     "text": "Region Midtjylland"
+    },
+    {
+     "id": "09",
+     "text": "Province Østjylland"
+    },
+    {
+     "id": "710",
+     "text": "Favrskov"
+    },
+    {
+     "id": "766",
+     "text": "Hedensted"
+    },
+    {
+     "id": "615",
+     "text": "Horsens"
+    },
+    {
+     "id": "707",
+     "text": "Norddjurs"
+    },
+    {
+     "id": "727",
+     "text": "Odder"
+    },
+    {
+     "id": "730",
+     "text": "Randers"
+    },
+    {
+     "id": "741",
+     "text": "Samsø"
+    },
+    {
+     "id": "740",
+     "text": "Silkeborg"
+    },
+    {
+     "id": "746",
+     "text": "Skanderborg"
+    },
+    {
+     "id": "706",
+     "text": "Syddjurs"
+    },
+    {
+     "id": "751",
+     "text": "Aarhus"
+    },
+    {
+     "id": "10",
+     "text": "Province Vestjylland"
+    },
+    {
+     "id": "657",
+     "text": "Herning"
+    },
+    {
+     "id": "661",
+     "text": "Holstebro"
+    },
+    {
+     "id": "756",
+     "text": "Ikast-Brande"
+    },
+    {
+     "id": "665",
+     "text": "Lemvig"
+    },
+    {
+     "id": "760",
+     "text": "Ringkøbing-Skjern"
+    },
+    {
+     "id": "779",
+     "text": "Skive"
+    },
+    {
+     "id": "671",
+     "text": "Struer"
+    },
+    {
+     "id": "791",
+     "text": "Viborg"
+    },
+    {
+     "id": "081",
+     "text": "Region Nordjylland"
+    },
+    {
+     "id": "11",
+     "text": "Province Nordjylland"
+    },
+    {
+     "id": "810",
+     "text": "Brønderslev"
+    },
+    {
+     "id": "813",
+     "text": "Frederikshavn"
+    },
+    {
+     "id": "860",
+     "text": "Hjørring"
+    },
+    {
+     "id": "849",
+     "text": "Jammerbugt"
+    },
+    {
+     "id": "825",
+     "text": "Læsø"
+    },
+    {
+     "id": "846",
+     "text": "Mariagerfjord"
+    },
+    {
+     "id": "773",
+     "text": "Morsø"
+    },
+    {
+     "id": "840",
+     "text": "Rebild"
+    },
+    {
+     "id": "787",
+     "text": "Thisted"
+    },
+    {
+     "id": "820",
+     "text": "Vesthimmerlands"
+    },
+    {
+     "id": "851",
+     "text": "Aalborg"
+    },
+    {
+     "id": "998",
+     "text": "Not stated municipality"
+    },
+    {
+     "id": "997",
+     "text": "Abroad"
+    }
+   ]
+  },
+  {
+   "id": "ALDER",
+   "text": "age",
+   "elimination": true,
+   "time": false,
+   "values": [
+    {
+     "id": "TOT",
+     "text": "Age, total"
+    },
+    {
+     "id": "16-24",
+     "text": "16-24 years"
+    },
+    {
+     "id": "25-29",
+     "text": "25-29 years"
+    },
+    {
+     "id": "30-39",
+     "text": "30-39 years"
+    },
+    {
+     "id": "40-49",
+     "text": "40-49 years"
+    },
+    {
+     "id": "50-59",
+     "text": "50-59 years"
+    },
+    {
+     "id": "6099",
+     "text": "60 year and over"
+    }
+   ]
+  },
+  {
+   "id": "KØN",
+   "text": "sex",
+   "elimination": true,
+   "time": false,
+   "values": [
+    {
+     "id": "TOT",
+     "text": "Total"
+    },
+    {
+     "id": "M",
+     "text": "Men"
+    },
+    {
+     "id": "K",
+     "text": "Women"
+    }
+   ]
+  },
+  {
+   "id": "Tid",
+   "text": "time",
+   "elimination": false,
+   "time": true,
+   "values": [
+    {
+     "id": "2017M07",
+     "text": "2017M07"
+    },
+    {
+     "id": "2017M08",
+     "text": "2017M08"
+    },
+    {
+     "id": "2017M09",
+     "text": "2017M09"
+    },
+    {
+     "id": "2017M10",
+     "text": "2017M10"
+    },
+    {
+     "id": "2017M11",
+     "text": "2017M11"
+    },
+    {
+     "id": "2017M12",
+     "text": "2017M12"
+    },
+    {
+     "id": "2018M01",
+     "text": "2018M01"
+    },
+    {
+     "id": "2018M02",
+     "text": "2018M02"
+    },
+    {
+     "id": "2018M03",
+     "text": "2018M03"
+    },
+    {
+     "id": "2018M04",
+     "text": "2018M04"
+    },
+    {
+     "id": "2018M05",
+     "text": "2018M05"
+    },
+    {
+     "id": "2018M06",
+     "text": "2018M06"
+    },
+    {
+     "id": "2018M07",
+     "text": "2018M07"
+    },
+    {
+     "id": "2018M08",
+     "text": "2018M08"
+    },
+    {
+     "id": "2018M09",
+     "text": "2018M09"
+    },
+    {
+     "id": "2018M10",
+     "text": "2018M10"
+    },
+    {
+     "id": "2018M11",
+     "text": "2018M11"
+    },
+    {
+     "id": "2018M12",
+     "text": "2018M12"
+    },
+    {
+     "id": "2019M01",
+     "text": "2019M01"
+    },
+    {
+     "id": "2019M02",
+     "text": "2019M02"
+    },
+    {
+     "id": "2019M03",
+     "text": "2019M03"
+    },
+    {
+     "id": "2019M04",
+     "text": "2019M04"
+    },
+    {
+     "id": "2019M05",
+     "text": "2019M05"
+    },
+    {
+     "id": "2019M06",
+     "text": "2019M06"
+    },
+    {
+     "id": "2019M07",
+     "text": "2019M07"
+    },
+    {
+     "id": "2019M08",
+     "text": "2019M08"
+    },
+    {
+     "id": "2019M09",
+     "text": "2019M09"
+    },
+    {
+     "id": "2019M10",
+     "text": "2019M10"
+    },
+    {
+     "id": "2019M11",
+     "text": "2019M11"
+    },
+    {
+     "id": "2019M12",
+     "text": "2019M12"
+    },
+    {
+     "id": "2020M01",
+     "text": "2020M01"
+    },
+    {
+     "id": "2020M02",
+     "text": "2020M02"
+    },
+    {
+     "id": "2020M03",
+     "text": "2020M03"
+    },
+    {
+     "id": "2020M04",
+     "text": "2020M04"
+    },
+    {
+     "id": "2020M05",
+     "text": "2020M05"
+    },
+    {
+     "id": "2020M06",
+     "text": "2020M06"
+    },
+    {
+     "id": "2020M07",
+     "text": "2020M07"
+    },
+    {
+     "id": "2020M08",
+     "text": "2020M08"
+    },
+    {
+     "id": "2020M09",
+     "text": "2020M09"
+    },
+    {
+     "id": "2020M10",
+     "text": "2020M10"
+    },
+    {
+     "id": "2020M11",
+     "text": "2020M11"
+    },
+    {
+     "id": "2020M12",
+     "text": "2020M12"
+    },
+    {
+     "id": "2021M01",
+     "text": "2021M01"
+    },
+    {
+     "id": "2021M02",
+     "text": "2021M02"
+    },
+    {
+     "id": "2021M03",
+     "text": "2021M03"
+    },
+    {
+     "id": "2021M04",
+     "text": "2021M04"
+    },
+    {
+     "id": "2021M05",
+     "text": "2021M05"
+    },
+    {
+     "id": "2021M06",
+     "text": "2021M06"
+    },
+    {
+     "id": "2021M07",
+     "text": "2021M07"
+    },
+    {
+     "id": "2021M08",
+     "text": "2021M08"
+    },
+    {
+     "id": "2021M09",
+     "text": "2021M09"
+    },
+    {
+     "id": "2021M10",
+     "text": "2021M10"
+    },
+    {
+     "id": "2021M11",
+     "text": "2021M11"
+    },
+    {
+     "id": "2021M12",
+     "text": "2021M12"
+    },
+    {
+     "id": "2022M01",
+     "text": "2022M01"
+    },
+    {
+     "id": "2022M02",
+     "text": "2022M02"
+    },
+    {
+     "id": "2022M03",
+     "text": "2022M03"
+    },
+    {
+     "id": "2022M04",
+     "text": "2022M04"
+    },
+    {
+     "id": "2022M05",
+     "text": "2022M05"
+    },
+    {
+     "id": "2022M06",
+     "text": "2022M06"
+    },
+    {
+     "id": "2022M07",
+     "text": "2022M07"
+    },
+    {
+     "id": "2022M08",
+     "text": "2022M08"
+    },
+    {
+     "id": "2022M09",
+     "text": "2022M09"
+    },
+    {
+     "id": "2022M10",
+     "text": "2022M10"
+    },
+    {
+     "id": "2022M11",
+     "text": "2022M11"
+    },
+    {
+     "id": "2022M12",
+     "text": "2022M12"
+    },
+    {
+     "id": "2023M01",
+     "text": "2023M01"
+    },
+    {
+     "id": "2023M02",
+     "text": "2023M02"
+    },
+    {
+     "id": "2023M03",
+     "text": "2023M03"
+    },
+    {
+     "id": "2023M04",
+     "text": "2023M04"
+    },
+    {
+     "id": "2023M05",
+     "text": "2023M05"
+    },
+    {
+     "id": "2023M06",
+     "text": "2023M06"
+    },
+    {
+     "id": "2023M07",
+     "text": "2023M07"
+    },
+    {
+     "id": "2023M08",
+     "text": "2023M08"
+    },
+    {
+     "id": "2023M09",
+     "text": "2023M09"
+    },
+    {
+     "id": "2023M10",
+     "text": "2023M10"
+    },
+    {
+     "id": "2023M11",
+     "text": "2023M11"
+    },
+    {
+     "id": "2023M12",
+     "text": "2023M12"
+    },
+    {
+     "id": "2024M01",
+     "text": "2024M01"
+    },
+    {
+     "id": "2024M02",
+     "text": "2024M02"
+    },
+    {
+     "id": "2024M03",
+     "text": "2024M03"
+    },
+    {
+     "id": "2024M04",
+     "text": "2024M04"
+    },
+    {
+     "id": "2024M05",
+     "text": "2024M05"
+    },
+    {
+     "id": "2024M06",
+     "text": "2024M06"
+    },
+    {
+     "id": "2024M07",
+     "text": "2024M07"
+    },
+    {
+     "id": "2024M08",
+     "text": "2024M08"
+    },
+    {
+     "id": "2024M09",
+     "text": "2024M09"
+    },
+    {
+     "id": "2024M10",
+     "text": "2024M10"
+    },
+    {
+     "id": "2024M11",
+     "text": "2024M11"
+    },
+    {
+     "id": "2024M12",
+     "text": "2024M12"
+    },
+    {
+     "id": "2025M01",
+     "text": "2025M01"
+    },
+    {
+     "id": "2025M02",
+     "text": "2025M02"
+    },
+    {
+     "id": "2025M03",
+     "text": "2025M03"
+    },
+    {
+     "id": "2025M04",
+     "text": "2025M04"
+    },
+    {
+     "id": "2025M05",
+     "text": "2025M05"
+    },
+    {
+     "id": "2025M06",
+     "text": "2025M06"
+    },
+    {
+     "id": "2025M07",
+     "text": "2025M07"
+    },
+    {
+     "id": "2025M08",
+     "text": "2025M08"
+    },
+    {
+     "id": "2025M09",
+     "text": "2025M09"
+    },
+    {
+     "id": "2025M10",
+     "text": "2025M10"
+    },
+    {
+     "id": "2025M11",
+     "text": "2025M11"
+    },
+    {
+     "id": "2025M12",
+     "text": "2025M12"
+    },
+    {
+     "id": "2026M01",
+     "text": "2026M01"
+    },
+    {
+     "id": "2026M02",
+     "text": "2026M02"
+    },
+    {
+     "id": "2026M03",
+     "text": "2026M03"
+    },
+    {
+     "id": "2026M04",
+     "text": "2026M04"
+    },
+    {
+     "id": "2026M05",
+     "text": "2026M05"
+    },
+    {
+     "id": "2026M06",
+     "text": "2026M06"
+    },
+    {
+     "id": "2026M07",
+     "text": "2026M07"
+    }
+   ]
+  }
+ ]
+}

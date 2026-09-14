@@ -223,19 +223,29 @@ def main():
             muni = muni_code(koms[0]) if koms else None
             if not nr or nr.startswith("0"):  # skip special/PO-box codes if any
                 continue
-            areas[nr] = {"nr": nr, "name": pr.get("navn"), "muni": muni, "rings": rings_of(f["geometry"])}
+            areas[nr] = {"nr": nr, "name": pr.get("navn"), "muni": muni, "rings": rings_of(f["geometry"]),
+                         "codes": pr.get("codes") or [nr]}
     else:
         warnings.append("data/geo/postnumre.geojson missing — run scripts/fetch_geo_dawa.py; areas will be empty")
-    # postal-code population
+    # postal-code population (summed over merged street-level codes)
+    code2area = {c: a for a in areas.values() for c in a["codes"]}
     try:
         pn = rows("", "POSTNR1"); pp = latest_period(pn)
         for r in pn:
             if r["TID"] == pp and all(r[k] in TOTAL_CODES for k in dims(r) if k != "PNR20"):
-                a = areas.get(str(r["PNR20"]).strip()[:4])
-                if a:
-                    a["pop"] = r["INDHOLD"]
+                a = code2area.get(str(r["PNR20"]).strip()[:4])
+                if a and r["INDHOLD"] is not None:
+                    a["pop"] = (a.get("pop") or 0) + r["INDHOLD"]
     except FileNotFoundError as e:
         warnings.append(str(e))
+    popof = {}
+    try:
+        for r in pn:
+            if r["TID"] == pp and all(r[k] in TOTAL_CODES for k in dims(r) if k != "PNR20"):
+                popof[str(r["PNR20"]).strip()[:4]] = r["INDHOLD"] or 0
+    except NameError:
+        pass
+    MIN_POP_GROWTH = 300  # growth % on tiny postal codes is noise
 
     indicators_out = []
     for ind in c["indicators"]:
@@ -247,10 +257,27 @@ def main():
         asof = {}
         for geo, (vals, per) in res.items():
             asof[geo] = per
-            target = munis if geo == "kommune" else areas
-            for a, v in vals.items():
-                if a in target and v is not None:
-                    target[a][ind["key"]] = round(v, 2)
+            if geo == "kommune":
+                for a, v in vals.items():
+                    if a in munis and v is not None:
+                        munis[a][ind["key"]] = round(v, 2)
+            else:
+                # postal codes: population-weighted mean over an area's (merged) codes
+                acc = {}
+                for code, v in vals.items():
+                    a = code2area.get(code)
+                    if a is None or v is None:
+                        continue
+                    w = popof.get(code, 0) or 1
+                    s_, w_ = acc.get(a["nr"], (0.0, 0.0))
+                    acc[a["nr"]] = (s_ + v * w, w_ + w)
+                for nr, (s_, w_) in acc.items():
+                    if w_:
+                        areas[nr][ind["key"]] = round(s_ / w_, 2)
+                if ind["key"] == "growth":
+                    for a in areas.values():
+                        if (a.get("pop") or 0) < MIN_POP_GROWTH:
+                            a.pop("growth", None)
         indicators_out.append({k: ind[k] for k in ("key", "label", "short", "unit", "level", "hue") if k in ind} |
                               {"fmt": ind.get("fmt", "pct1"), "desc": ind.get("desc", ""), "source": ind.get("source", ""),
                                "warn": ind.get("warn", ""), "table_only": ind.get("table_only", False), "asof": asof})

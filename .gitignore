@@ -5,3 +5,7 @@ dist/fixture.html
 tests/fixture_*.json
 __pycache__/
 .DS_Store
+# local run logs
+validate.txt
+fetch.txt
+*.log

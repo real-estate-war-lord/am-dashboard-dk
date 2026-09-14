@@ -1,0 +1,196 @@
+{
+ "id": "HUS1",
+ "text": "Rent indices for housing",
+ "description": "Rent indices for housing by region, category of real property, unit and time",
+ "unit": "Index",
+ "suppressedDataValue": "0",
+ "updated": "2026-07-14T08:00:00",
+ "active": true,
+ "contacts": [
+  {
+   "name": "Martin Sædholm Nielsen",
+   "phone": "+4524497281",
+   "mail": "mne@dst.dk"
+  }
+ ],
+ "documentation": {
+  "id": "d9e4f8ac-49a7-4d7a-8c99-e276799cc8c1",
+  "url": "https://www.dst.dk/documentationofstatistics/d9e4f8ac-49a7-4d7a-8c99-e276799cc8c1"
+ },
+ "footnote": null,
+ "variables": [
+  {
+   "id": "REGION",
+   "text": "region",
+   "elimination": true,
+   "time": false,
+   "map": "Denmark_region_07",
+   "values": [
+    {
+     "id": "000",
+     "text": "All Denmark"
+    },
+    {
+     "id": "084",
+     "text": "Region Hovedstaden"
+    },
+    {
+     "id": "085",
+     "text": "Region Sjælland"
+    },
+    {
+     "id": "083",
+     "text": "Region Syddanmark"
+    },
+    {
+     "id": "082",
+     "text": "Region Midtjylland"
+    },
+    {
+     "id": "081",
+     "text": "Region Nordjylland"
+    }
+   ]
+  },
+  {
+   "id": "EJENDOMSKATE",
+   "text": "category of real property",
+   "elimination": true,
+   "time": false,
+   "values": [
+    {
+     "id": "550",
+     "text": "All Housing"
+    },
+    {
+     "id": "552",
+     "text": "Privately owned housing"
+    },
+    {
+     "id": "554",
+     "text": "Social housing"
+    },
+    {
+     "id": "556",
+     "text": "Cooperative housing"
+    }
+   ]
+  },
+  {
+   "id": "TAL",
+   "text": "unit",
+   "elimination": false,
+   "time": false,
+   "values": [
+    {
+     "id": "100",
+     "text": "Index"
+    },
+    {
+     "id": "210",
+     "text": "Percentage change compared to previous quarter"
+    },
+    {
+     "id": "310",
+     "text": "Percentage change compared to same quarter the year before"
+    }
+   ]
+  },
+  {
+   "id": "Tid",
+   "text": "time",
+   "elimination": false,
+   "time": true,
+   "values": [
+    {
+     "id": "2021K1",
+     "text": "2021Q1"
+    },
+    {
+     "id": "2021K2",
+     "text": "2021Q2"
+    },
+    {
+     "id": "2021K3",
+     "text": "2021Q3"
+    },
+    {
+     "id": "2021K4",
+     "text": "2021Q4"
+    },
+    {
+     "id": "2022K1",
+     "text": "2022Q1"
+    },
+    {
+     "id": "2022K2",
+     "text": "2022Q2"
+    },
+    {
+     "id": "2022K3",
+     "text": "2022Q3"
+    },
+    {
+     "id": "2022K4",
+     "text": "2022Q4"
+    },
+    {
+     "id": "2023K1",
+     "text": "2023Q1"
+    },
+    {
+     "id": "2023K2",
+     "text": "2023Q2"
+    },
+    {
+     "id": "2023K3",
+     "text": "2023Q3"
+    },
+    {
+     "id": "2023K4",
+     "text": "2023Q4"
+    },
+    {
+     "id": "2024K1",
+     "text": "2024Q1"
+    },
+    {
+     "id": "2024K2",
+     "text": "2024Q2"
+    },
+    {
+     "id": "2024K3",
+     "text": "2024Q3"
+    },
+    {
+     "id": "2024K4",
+     "text": "2024Q4"
+    },
+    {
+     "id": "2025K1",
+     "text": "2025Q1"
+    },
+    {
+     "id": "2025K2",
+     "text": "2025Q2"
+    },
+    {
+     "id": "2025K3",
+     "text": "2025Q3"
+    },
+    {
+     "id": "2025K4",
+     "text": "2025Q4"
+    },
+    {
+     "id": "2026K1",
+     "text": "2026Q1"
+    },
+    {
+     "id": "2026K2",
+     "text": "2026Q2"
+    }
+   ]
+  }
+ ]
+}

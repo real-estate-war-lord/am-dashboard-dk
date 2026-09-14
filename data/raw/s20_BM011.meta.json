@@ -1,0 +1,3045 @@
+{
+ "id": "BM011",
+ "text": "Property prices in housing market",
+ "description": "Property prices in housing market by postal code, property category, prices of completed transactions and time",
+ "unit": "DKK per m2",
+ "suppressedDataValue": "0",
+ "updated": "2026-06-18T08:00:00",
+ "active": true,
+ "contacts": [
+  {
+   "name": "Finans Danmark",
+   "phone": "+4533701258",
+   "mail": "stat@fida.dk"
+  }
+ ],
+ "documentation": null,
+ "footnote": null,
+ "variables": [
+  {
+   "id": "PNR20",
+   "text": "postal code",
+   "elimination": false,
+   "time": false,
+   "map": "denmark_zip_18",
+   "values": [
+    {
+     "id": "1000",
+     "text": "1000-1499 Kbh.K."
+    },
+    {
+     "id": "1500",
+     "text": "1500-1799 Kbh.V."
+    },
+    {
+     "id": "1800",
+     "text": "1800-1999 Frederiksberg C"
+    },
+    {
+     "id": "2000",
+     "text": "2000 Frederiksberg"
+    },
+    {
+     "id": "2100",
+     "text": "2100 København Ø"
+    },
+    {
+     "id": "2150",
+     "text": "2150 Nordhavn"
+    },
+    {
+     "id": "2200",
+     "text": "2200 København N"
+    },
+    {
+     "id": "2300",
+     "text": "2300 København S"
+    },
+    {
+     "id": "2400",
+     "text": "2400 København NV"
+    },
+    {
+     "id": "2450",
+     "text": "2450 København SV"
+    },
+    {
+     "id": "2500",
+     "text": "2500 Valby"
+    },
+    {
+     "id": "2600",
+     "text": "2600 Glostrup"
+    },
+    {
+     "id": "2605",
+     "text": "2605 Brøndby"
+    },
+    {
+     "id": "2610",
+     "text": "2610 Rødovre"
+    },
+    {
+     "id": "2620",
+     "text": "2620 Albertslund"
+    },
+    {
+     "id": "2625",
+     "text": "2625 Vallensbæk"
+    },
+    {
+     "id": "2630",
+     "text": "2630 Taastrup"
+    },
+    {
+     "id": "2635",
+     "text": "2635 Ishøj"
+    },
+    {
+     "id": "2640",
+     "text": "2640 Hedehusene"
+    },
+    {
+     "id": "2650",
+     "text": "2650 Hvidovre"
+    },
+    {
+     "id": "2660",
+     "text": "2660 Brøndby Strand"
+    },
+    {
+     "id": "2665",
+     "text": "2665 Vallensbæk Strand"
+    },
+    {
+     "id": "2670",
+     "text": "2670 Greve"
+    },
+    {
+     "id": "2680",
+     "text": "2680 Solrød Strand"
+    },
+    {
+     "id": "2690",
+     "text": "2690 Karlslunde"
+    },
+    {
+     "id": "2700",
+     "text": "2700 Brønshøj"
+    },
+    {
+     "id": "2720",
+     "text": "2720 Vanløse"
+    },
+    {
+     "id": "2730",
+     "text": "2730 Herlev"
+    },
+    {
+     "id": "2740",
+     "text": "2740 Skovlunde"
+    },
+    {
+     "id": "2750",
+     "text": "2750 Ballerup"
+    },
+    {
+     "id": "2760",
+     "text": "2760 Måløv"
+    },
+    {
+     "id": "2765",
+     "text": "2765 Smørum"
+    },
+    {
+     "id": "2770",
+     "text": "2770 Kastrup"
+    },
+    {
+     "id": "2791",
+     "text": "2791 Dragør"
+    },
+    {
+     "id": "2800",
+     "text": "2800 Kgs.Lyngby"
+    },
+    {
+     "id": "2820",
+     "text": "2820 Gentofte"
+    },
+    {
+     "id": "2830",
+     "text": "2830 Virum"
+    },
+    {
+     "id": "2840",
+     "text": "2840 Holte"
+    },
+    {
+     "id": "2850",
+     "text": "2850 Nærum"
+    },
+    {
+     "id": "2860",
+     "text": "2860 Søborg"
+    },
+    {
+     "id": "2870",
+     "text": "2870 Dyssegård"
+    },
+    {
+     "id": "2880",
+     "text": "2880 Bagsværd"
+    },
+    {
+     "id": "2900",
+     "text": "2900 Hellerup"
+    },
+    {
+     "id": "2920",
+     "text": "2920 Charlottenlund"
+    },
+    {
+     "id": "2930",
+     "text": "2930 Klampenborg"
+    },
+    {
+     "id": "2942",
+     "text": "2942 Skodsborg"
+    },
+    {
+     "id": "2950",
+     "text": "2950 Vedbæk"
+    },
+    {
+     "id": "2960",
+     "text": "2960 Rungsted Kyst"
+    },
+    {
+     "id": "2970",
+     "text": "2970 Hørsholm"
+    },
+    {
+     "id": "2980",
+     "text": "2980 Kokkedal"
+    },
+    {
+     "id": "2990",
+     "text": "2990 Nivå"
+    },
+    {
+     "id": "3000",
+     "text": "3000 Helsingør"
+    },
+    {
+     "id": "3050",
+     "text": "3050 Humlebæk"
+    },
+    {
+     "id": "3060",
+     "text": "3060 Espergærde"
+    },
+    {
+     "id": "3070",
+     "text": "3070 Snekkersten"
+    },
+    {
+     "id": "3080",
+     "text": "3080 Tikøb"
+    },
+    {
+     "id": "3100",
+     "text": "3100 Hornbæk"
+    },
+    {
+     "id": "3120",
+     "text": "3120 Dronningmølle"
+    },
+    {
+     "id": "3140",
+     "text": "3140 Ålsgårde"
+    },
+    {
+     "id": "3150",
+     "text": "3150 Hellebæk"
+    },
+    {
+     "id": "3200",
+     "text": "3200 Helsinge"
+    },
+    {
+     "id": "3210",
+     "text": "3210 Vejby"
+    },
+    {
+     "id": "3220",
+     "text": "3220 Tisvildeleje"
+    },
+    {
+     "id": "3230",
+     "text": "3230 Græsted"
+    },
+    {
+     "id": "3250",
+     "text": "3250 Gilleleje"
+    },
+    {
+     "id": "3300",
+     "text": "3300 Frederiksværk"
+    },
+    {
+     "id": "3310",
+     "text": "3310 Ølsted"
+    },
+    {
+     "id": "3320",
+     "text": "3320 Skævinge"
+    },
+    {
+     "id": "3330",
+     "text": "3330 Gørløse"
+    },
+    {
+     "id": "3360",
+     "text": "3360 Liseleje"
+    },
+    {
+     "id": "3370",
+     "text": "3370 Melby"
+    },
+    {
+     "id": "3390",
+     "text": "3390 Hundested"
+    },
+    {
+     "id": "3400",
+     "text": "3400 Hillerød"
+    },
+    {
+     "id": "3450",
+     "text": "3450 Allerød"
+    },
+    {
+     "id": "3460",
+     "text": "3460 Birkerød"
+    },
+    {
+     "id": "3480",
+     "text": "3480 Fredensborg"
+    },
+    {
+     "id": "3490",
+     "text": "3490 Kvistgård"
+    },
+    {
+     "id": "3500",
+     "text": "3500 Værløse"
+    },
+    {
+     "id": "3520",
+     "text": "3520 Farum"
+    },
+    {
+     "id": "3540",
+     "text": "3540 Lynge"
+    },
+    {
+     "id": "3550",
+     "text": "3550 Slangerup"
+    },
+    {
+     "id": "3600",
+     "text": "3600 Frederikssund"
+    },
+    {
+     "id": "3630",
+     "text": "3630 Jægerspris"
+    },
+    {
+     "id": "3650",
+     "text": "3650 Ølstykke"
+    },
+    {
+     "id": "3660",
+     "text": "3660 Stenløse"
+    },
+    {
+     "id": "3670",
+     "text": "3670 Veksø Sjælland"
+    },
+    {
+     "id": "3700",
+     "text": "3700 Rønne"
+    },
+    {
+     "id": "3720",
+     "text": "3720 Aakirkeby"
+    },
+    {
+     "id": "3730",
+     "text": "3730 Nexø"
+    },
+    {
+     "id": "3740",
+     "text": "3740 Svaneke"
+    },
+    {
+     "id": "3751",
+     "text": "3751 Østermarie"
+    },
+    {
+     "id": "3760",
+     "text": "3760 Gudhjem"
+    },
+    {
+     "id": "3770",
+     "text": "3770 Allinge"
+    },
+    {
+     "id": "3782",
+     "text": "3782 Klemensker"
+    },
+    {
+     "id": "3790",
+     "text": "3790 Hasle"
+    },
+    {
+     "id": "4000",
+     "text": "4000 Roskilde"
+    },
+    {
+     "id": "4030",
+     "text": "4030 Tune"
+    },
+    {
+     "id": "4040",
+     "text": "4040 Jyllinge"
+    },
+    {
+     "id": "4050",
+     "text": "4050 Skibby"
+    },
+    {
+     "id": "4060",
+     "text": "4060 Kirke Såby"
+    },
+    {
+     "id": "4070",
+     "text": "4070 Kirke Hyllinge"
+    },
+    {
+     "id": "4100",
+     "text": "4100 Ringsted"
+    },
+    {
+     "id": "4130",
+     "text": "4130 Viby Sjælland"
+    },
+    {
+     "id": "4140",
+     "text": "4140 Borup"
+    },
+    {
+     "id": "4160",
+     "text": "4160 Herlufmagle"
+    },
+    {
+     "id": "4171",
+     "text": "4171 Glumsø"
+    },
+    {
+     "id": "4173",
+     "text": "4173 Fjenneslev"
+    },
+    {
+     "id": "4174",
+     "text": "4174 Jystrup Midtsj"
+    },
+    {
+     "id": "4180",
+     "text": "4180 Sorø"
+    },
+    {
+     "id": "4190",
+     "text": "4190 Munke Bjergby"
+    },
+    {
+     "id": "4200",
+     "text": "4200 Slagelse"
+    },
+    {
+     "id": "4220",
+     "text": "4220 Korsør"
+    },
+    {
+     "id": "4230",
+     "text": "4230 Skælskør"
+    },
+    {
+     "id": "4241",
+     "text": "4241 Vemmelev"
+    },
+    {
+     "id": "4242",
+     "text": "4242 Boeslunde"
+    },
+    {
+     "id": "4243",
+     "text": "4243 Rude"
+    },
+    {
+     "id": "4244",
+     "text": "4244 Agersø"
+    },
+    {
+     "id": "4245",
+     "text": "4245 Omø"
+    },
+    {
+     "id": "4250",
+     "text": "4250 Fuglebjerg"
+    },
+    {
+     "id": "4261",
+     "text": "4261 Dalmose"
+    },
+    {
+     "id": "4262",
+     "text": "4262 Sandved"
+    },
+    {
+     "id": "4270",
+     "text": "4270 Høng"
+    },
+    {
+     "id": "4281",
+     "text": "4281 Gørlev"
+    },
+    {
+     "id": "4291",
+     "text": "4291 Ruds Vedby"
+    },
+    {
+     "id": "4293",
+     "text": "4293 Dianalund"
+    },
+    {
+     "id": "4295",
+     "text": "4295 Stenlille"
+    },
+    {
+     "id": "4296",
+     "text": "4296 Nyrup"
+    },
+    {
+     "id": "4300",
+     "text": "4300 Holbæk"
+    },
+    {
+     "id": "4305",
+     "text": "4305 Orø"
+    },
+    {
+     "id": "4320",
+     "text": "4320 Lejre"
+    },
+    {
+     "id": "4330",
+     "text": "4330 Hvalsø"
+    },
+    {
+     "id": "4340",
+     "text": "4340 Tølløse"
+    },
+    {
+     "id": "4350",
+     "text": "4350 Ugerløse"
+    },
+    {
+     "id": "4360",
+     "text": "4360 Kirke Eskilstrup"
+    },
+    {
+     "id": "4370",
+     "text": "4370 Store Merløse"
+    },
+    {
+     "id": "4390",
+     "text": "4390 Vipperød"
+    },
+    {
+     "id": "4400",
+     "text": "4400 Kalundborg"
+    },
+    {
+     "id": "4420",
+     "text": "4420 Regstrup"
+    },
+    {
+     "id": "4440",
+     "text": "4440 Mørkøv"
+    },
+    {
+     "id": "4450",
+     "text": "4450 Jyderup"
+    },
+    {
+     "id": "4460",
+     "text": "4460 Snertinge"
+    },
+    {
+     "id": "4470",
+     "text": "4470 Svebølle"
+    },
+    {
+     "id": "4480",
+     "text": "4480 Store Fuglede"
+    },
+    {
+     "id": "4490",
+     "text": "4490 Jerslev Sjælland"
+    },
+    {
+     "id": "4500",
+     "text": "4500 Nykøbing Sj"
+    },
+    {
+     "id": "4520",
+     "text": "4520 Svinninge"
+    },
+    {
+     "id": "4532",
+     "text": "4532 Gislinge"
+    },
+    {
+     "id": "4534",
+     "text": "4534 Hørve"
+    },
+    {
+     "id": "4540",
+     "text": "4540 Fårevejle"
+    },
+    {
+     "id": "4550",
+     "text": "4550 Asnæs"
+    },
+    {
+     "id": "4560",
+     "text": "4560 Vig"
+    },
+    {
+     "id": "4571",
+     "text": "4571 Grevinge"
+    },
+    {
+     "id": "4572",
+     "text": "4572 Nørre Asmindrup"
+    },
+    {
+     "id": "4573",
+     "text": "4573 Højby"
+    },
+    {
+     "id": "4581",
+     "text": "4581 Rørvig"
+    },
+    {
+     "id": "4583",
+     "text": "4583 Sjællands Odde"
+    },
+    {
+     "id": "4591",
+     "text": "4591 Føllenslev"
+    },
+    {
+     "id": "4592",
+     "text": "4592 Sejerø"
+    },
+    {
+     "id": "4593",
+     "text": "4593 Eskebjerg"
+    },
+    {
+     "id": "4600",
+     "text": "4600 Køge"
+    },
+    {
+     "id": "4621",
+     "text": "4621 Gadstrup"
+    },
+    {
+     "id": "4622",
+     "text": "4622 Havdrup"
+    },
+    {
+     "id": "4623",
+     "text": "4623 Lille Skensved"
+    },
+    {
+     "id": "4632",
+     "text": "4632 Bjæverskov"
+    },
+    {
+     "id": "4640",
+     "text": "4640 Faxe"
+    },
+    {
+     "id": "4652",
+     "text": "4652 Hårlev"
+    },
+    {
+     "id": "4653",
+     "text": "4653 Karise"
+    },
+    {
+     "id": "4654",
+     "text": "4654 Faxe Ladeplads"
+    },
+    {
+     "id": "4660",
+     "text": "4660 Store Heddinge"
+    },
+    {
+     "id": "4671",
+     "text": "4671 Strøby"
+    },
+    {
+     "id": "4672",
+     "text": "4672 Klippinge"
+    },
+    {
+     "id": "4673",
+     "text": "4673 Rødvig Stevns"
+    },
+    {
+     "id": "4681",
+     "text": "4681 Herfølge"
+    },
+    {
+     "id": "4682",
+     "text": "4682 Tureby"
+    },
+    {
+     "id": "4683",
+     "text": "4683 Rønnede"
+    },
+    {
+     "id": "4684",
+     "text": "4684 Holmegaard"
+    },
+    {
+     "id": "4690",
+     "text": "4690 Haslev"
+    },
+    {
+     "id": "4700",
+     "text": "4700 Næstved"
+    },
+    {
+     "id": "4720",
+     "text": "4720 Præstø"
+    },
+    {
+     "id": "4733",
+     "text": "4733 Tappernøje"
+    },
+    {
+     "id": "4735",
+     "text": "4735 Mern"
+    },
+    {
+     "id": "4736",
+     "text": "4736 Karrebæksminde"
+    },
+    {
+     "id": "4750",
+     "text": "4750 Lundby"
+    },
+    {
+     "id": "4760",
+     "text": "4760 Vordingborg"
+    },
+    {
+     "id": "4771",
+     "text": "4771 Kalvehave"
+    },
+    {
+     "id": "4772",
+     "text": "4772 Langebæk"
+    },
+    {
+     "id": "4773",
+     "text": "4773 Stensved"
+    },
+    {
+     "id": "4780",
+     "text": "4780 Stege"
+    },
+    {
+     "id": "4791",
+     "text": "4791 Borre"
+    },
+    {
+     "id": "4792",
+     "text": "4792 Askeby"
+    },
+    {
+     "id": "4793",
+     "text": "4793 Bogø By"
+    },
+    {
+     "id": "4800",
+     "text": "4800 Nykøbing F"
+    },
+    {
+     "id": "4840",
+     "text": "4840 Nørre Alslev"
+    },
+    {
+     "id": "4850",
+     "text": "4850 Stubbekøbing"
+    },
+    {
+     "id": "4862",
+     "text": "4862 Guldborg"
+    },
+    {
+     "id": "4863",
+     "text": "4863 Eskilstrup"
+    },
+    {
+     "id": "4871",
+     "text": "4871 Horbelev"
+    },
+    {
+     "id": "4872",
+     "text": "4872 Idestrup"
+    },
+    {
+     "id": "4873",
+     "text": "4873 Væggerløse"
+    },
+    {
+     "id": "4874",
+     "text": "4874 Gedser"
+    },
+    {
+     "id": "4880",
+     "text": "4880 Nysted"
+    },
+    {
+     "id": "4891",
+     "text": "4891 Toreby L"
+    },
+    {
+     "id": "4892",
+     "text": "4892 Kettinge"
+    },
+    {
+     "id": "4894",
+     "text": "4894 Øster Ulslev"
+    },
+    {
+     "id": "4895",
+     "text": "4895 Errindlev"
+    },
+    {
+     "id": "4900",
+     "text": "4900 Nakskov"
+    },
+    {
+     "id": "4912",
+     "text": "4912 Harpelunde"
+    },
+    {
+     "id": "4913",
+     "text": "4913 Horslunde"
+    },
+    {
+     "id": "4920",
+     "text": "4920 Søllested"
+    },
+    {
+     "id": "4930",
+     "text": "4930 Maribo"
+    },
+    {
+     "id": "4941",
+     "text": "4941 Bandholm"
+    },
+    {
+     "id": "4942",
+     "text": "4942 Askø"
+    },
+    {
+     "id": "4943",
+     "text": "4943 Torrig L"
+    },
+    {
+     "id": "4944",
+     "text": "4944 Fejø"
+    },
+    {
+     "id": "4945",
+     "text": "4945 Femø"
+    },
+    {
+     "id": "4951",
+     "text": "4951 Nørreballe"
+    },
+    {
+     "id": "4952",
+     "text": "4952 Stokkemarke"
+    },
+    {
+     "id": "4953",
+     "text": "4953 Vesterborg"
+    },
+    {
+     "id": "4960",
+     "text": "4960 Holeby"
+    },
+    {
+     "id": "4970",
+     "text": "4970 Rødby"
+    },
+    {
+     "id": "4983",
+     "text": "4983 Dannemare"
+    },
+    {
+     "id": "4990",
+     "text": "4990 Sakskøbing"
+    },
+    {
+     "id": "5000",
+     "text": "5000 Odense C"
+    },
+    {
+     "id": "5200",
+     "text": "5200 Odense V"
+    },
+    {
+     "id": "5210",
+     "text": "5210 Odense NV"
+    },
+    {
+     "id": "5220",
+     "text": "5220 Odense SØ"
+    },
+    {
+     "id": "5230",
+     "text": "5230 Odense M"
+    },
+    {
+     "id": "5240",
+     "text": "5240 Odense NØ"
+    },
+    {
+     "id": "5250",
+     "text": "5250 Odense SV"
+    },
+    {
+     "id": "5260",
+     "text": "5260 Odense S"
+    },
+    {
+     "id": "5270",
+     "text": "5270 Odense N"
+    },
+    {
+     "id": "5290",
+     "text": "5290 Marslev"
+    },
+    {
+     "id": "5300",
+     "text": "5300 Kerteminde"
+    },
+    {
+     "id": "5320",
+     "text": "5320 Agedrup"
+    },
+    {
+     "id": "5330",
+     "text": "5330 Munkebo"
+    },
+    {
+     "id": "5350",
+     "text": "5350 Rynkeby"
+    },
+    {
+     "id": "5370",
+     "text": "5370 Mesinge"
+    },
+    {
+     "id": "5380",
+     "text": "5380 Dalby"
+    },
+    {
+     "id": "5390",
+     "text": "5390 Martofte"
+    },
+    {
+     "id": "5400",
+     "text": "5400 Bogense"
+    },
+    {
+     "id": "5450",
+     "text": "5450 Otterup"
+    },
+    {
+     "id": "5462",
+     "text": "5462 Morud"
+    },
+    {
+     "id": "5463",
+     "text": "5463 Harndrup"
+    },
+    {
+     "id": "5464",
+     "text": "5464 Brenderup Fyn"
+    },
+    {
+     "id": "5466",
+     "text": "5466 Asperup"
+    },
+    {
+     "id": "5471",
+     "text": "5471 Søndersø"
+    },
+    {
+     "id": "5474",
+     "text": "5474 Veflinge"
+    },
+    {
+     "id": "5485",
+     "text": "5485 Skamby"
+    },
+    {
+     "id": "5491",
+     "text": "5491 Blommenslyst"
+    },
+    {
+     "id": "5492",
+     "text": "5492 Vissenbjerg"
+    },
+    {
+     "id": "5500",
+     "text": "5500 Middelfart"
+    },
+    {
+     "id": "5540",
+     "text": "5540 Ullerslev"
+    },
+    {
+     "id": "5550",
+     "text": "5550 Langeskov"
+    },
+    {
+     "id": "5560",
+     "text": "5560 Aarup"
+    },
+    {
+     "id": "5580",
+     "text": "5580 Nørre Aaby"
+    },
+    {
+     "id": "5591",
+     "text": "5591 Gelsted"
+    },
+    {
+     "id": "5592",
+     "text": "5592 Ejby"
+    },
+    {
+     "id": "5600",
+     "text": "5600 Faaborg"
+    },
+    {
+     "id": "5601",
+     "text": "5601 Lyø"
+    },
+    {
+     "id": "5602",
+     "text": "5602 Avernakø "
+    },
+    {
+     "id": "5603",
+     "text": "5603 Bjørnø"
+    },
+    {
+     "id": "5610",
+     "text": "5610 Assens"
+    },
+    {
+     "id": "5620",
+     "text": "5620 Glamsbjerg"
+    },
+    {
+     "id": "5631",
+     "text": "5631 Ebberup"
+    },
+    {
+     "id": "5642",
+     "text": "5642 Millinge"
+    },
+    {
+     "id": "5672",
+     "text": "5672 Broby"
+    },
+    {
+     "id": "5683",
+     "text": "5683 Haarby"
+    },
+    {
+     "id": "5690",
+     "text": "5690 Tommerup"
+    },
+    {
+     "id": "5700",
+     "text": "5700 Svendborg"
+    },
+    {
+     "id": "5750",
+     "text": "5750 Ringe"
+    },
+    {
+     "id": "5762",
+     "text": "5762 Vester Skerninge"
+    },
+    {
+     "id": "5771",
+     "text": "5771 Stenstrup"
+    },
+    {
+     "id": "5772",
+     "text": "5772 Kværndrup"
+    },
+    {
+     "id": "5792",
+     "text": "5792 Årslev"
+    },
+    {
+     "id": "5800",
+     "text": "5800 Nyborg"
+    },
+    {
+     "id": "5853",
+     "text": "5853 Ørbæk"
+    },
+    {
+     "id": "5854",
+     "text": "5854 Gislev"
+    },
+    {
+     "id": "5856",
+     "text": "5856 Ryslinge"
+    },
+    {
+     "id": "5863",
+     "text": "5863 Ferritslev Fyn"
+    },
+    {
+     "id": "5871",
+     "text": "5871 Frørup"
+    },
+    {
+     "id": "5874",
+     "text": "5874 Hesselager"
+    },
+    {
+     "id": "5881",
+     "text": "5881 Skårup Fyn"
+    },
+    {
+     "id": "5882",
+     "text": "5882 Vejstrup"
+    },
+    {
+     "id": "5883",
+     "text": "5883 Oure"
+    },
+    {
+     "id": "5884",
+     "text": "5884 Gudme"
+    },
+    {
+     "id": "5892",
+     "text": "5892 Gudbjerg Sydfyn"
+    },
+    {
+     "id": "5900",
+     "text": "5900 Rudkøbing"
+    },
+    {
+     "id": "5932",
+     "text": "5932 Humble"
+    },
+    {
+     "id": "5935",
+     "text": "5935 Bagenkop"
+    },
+    {
+     "id": "5943",
+     "text": "5943 Strynø"
+    },
+    {
+     "id": "5953",
+     "text": "5953 Tranekær"
+    },
+    {
+     "id": "5960",
+     "text": "5960 Marstal"
+    },
+    {
+     "id": "5965",
+     "text": "5965 Birkholm"
+    },
+    {
+     "id": "5970",
+     "text": "5970 Ærøskøbing"
+    },
+    {
+     "id": "5985",
+     "text": "5985 Søby Ærø"
+    },
+    {
+     "id": "6000",
+     "text": "6000 Kolding"
+    },
+    {
+     "id": "6040",
+     "text": "6040 Egtved"
+    },
+    {
+     "id": "6051",
+     "text": "6051 Almind"
+    },
+    {
+     "id": "6052",
+     "text": "6052 Viuf"
+    },
+    {
+     "id": "6064",
+     "text": "6064 Jordrup"
+    },
+    {
+     "id": "6070",
+     "text": "6070 Christiansfeld"
+    },
+    {
+     "id": "6091",
+     "text": "6091 Bjert"
+    },
+    {
+     "id": "6092",
+     "text": "6092 Sønder Stenderup"
+    },
+    {
+     "id": "6093",
+     "text": "6093 Sjølund"
+    },
+    {
+     "id": "6094",
+     "text": "6094 Hejls"
+    },
+    {
+     "id": "6100",
+     "text": "6100 Haderslev"
+    },
+    {
+     "id": "6210",
+     "text": "6210 Barsø"
+    },
+    {
+     "id": "6200",
+     "text": "6200 Aabenraa"
+    },
+    {
+     "id": "6230",
+     "text": "6230 Rødekro"
+    },
+    {
+     "id": "6240",
+     "text": "6240 Løgumkloster"
+    },
+    {
+     "id": "6261",
+     "text": "6261 Bredebro"
+    },
+    {
+     "id": "6270",
+     "text": "6270 Tønder"
+    },
+    {
+     "id": "6280",
+     "text": "6280 Højer"
+    },
+    {
+     "id": "6300",
+     "text": "6300 Gråsten"
+    },
+    {
+     "id": "6310",
+     "text": "6310 Broager"
+    },
+    {
+     "id": "6320",
+     "text": "6320 Egernsund"
+    },
+    {
+     "id": "6330",
+     "text": "6330 Padborg"
+    },
+    {
+     "id": "6340",
+     "text": "6340 Kruså"
+    },
+    {
+     "id": "6360",
+     "text": "6360 Tinglev"
+    },
+    {
+     "id": "6372",
+     "text": "6372 Bylderup-Bov"
+    },
+    {
+     "id": "6392",
+     "text": "6392 Bolderslev"
+    },
+    {
+     "id": "6400",
+     "text": "6400 Sønderborg"
+    },
+    {
+     "id": "6430",
+     "text": "6430 Nordborg"
+    },
+    {
+     "id": "6440",
+     "text": "6440 Augustenborg"
+    },
+    {
+     "id": "6470",
+     "text": "6470 Sydals"
+    },
+    {
+     "id": "6500",
+     "text": "6500 Vojens"
+    },
+    {
+     "id": "6510",
+     "text": "6510 Gram"
+    },
+    {
+     "id": "6520",
+     "text": "6520 Toftlund"
+    },
+    {
+     "id": "6534",
+     "text": "6534 Agerskov"
+    },
+    {
+     "id": "6535",
+     "text": "6535 Branderup J"
+    },
+    {
+     "id": "6541",
+     "text": "6541 Bevtoft"
+    },
+    {
+     "id": "6560",
+     "text": "6560 Sommersted"
+    },
+    {
+     "id": "6580",
+     "text": "6580 Vamdrup"
+    },
+    {
+     "id": "6600",
+     "text": "6600 Vejen"
+    },
+    {
+     "id": "6621",
+     "text": "6621 Gesten"
+    },
+    {
+     "id": "6622",
+     "text": "6622 Bække"
+    },
+    {
+     "id": "6623",
+     "text": "6623 Vorbasse"
+    },
+    {
+     "id": "6630",
+     "text": "6630 Rødding"
+    },
+    {
+     "id": "6640",
+     "text": "6640 Lunderskov"
+    },
+    {
+     "id": "6650",
+     "text": "6650 Brørup"
+    },
+    {
+     "id": "6660",
+     "text": "6660 Lintrup"
+    },
+    {
+     "id": "6670",
+     "text": "6670 Holsted"
+    },
+    {
+     "id": "6682",
+     "text": "6682 Hovborg"
+    },
+    {
+     "id": "6683",
+     "text": "6683 Føvling"
+    },
+    {
+     "id": "6690",
+     "text": "6690 Gørding"
+    },
+    {
+     "id": "6700",
+     "text": "6700 Esbjerg"
+    },
+    {
+     "id": "6705",
+     "text": "6705 Esbjerg Ø"
+    },
+    {
+     "id": "6710",
+     "text": "6710 Esbjerg V"
+    },
+    {
+     "id": "6715",
+     "text": "6715 Esbjerg N"
+    },
+    {
+     "id": "6720",
+     "text": "6720 Fanø"
+    },
+    {
+     "id": "6731",
+     "text": "6731 Tjæreborg"
+    },
+    {
+     "id": "6740",
+     "text": "6740 Bramming"
+    },
+    {
+     "id": "6752",
+     "text": "6752 Glejbjerg"
+    },
+    {
+     "id": "6753",
+     "text": "6753 Agerbæk"
+    },
+    {
+     "id": "6760",
+     "text": "6760 Ribe"
+    },
+    {
+     "id": "6771",
+     "text": "6771 Gredstedbro"
+    },
+    {
+     "id": "6780",
+     "text": "6780 Skærbæk"
+    },
+    {
+     "id": "6792",
+     "text": "6792 Rømø"
+    },
+    {
+     "id": "6800",
+     "text": "6800 Varde"
+    },
+    {
+     "id": "6818",
+     "text": "6818 Årre"
+    },
+    {
+     "id": "6823",
+     "text": "6823 Ansager"
+    },
+    {
+     "id": "6830",
+     "text": "6830 Nørre Nebel"
+    },
+    {
+     "id": "6840",
+     "text": "6840 Oksbøl"
+    },
+    {
+     "id": "6851",
+     "text": "6851 Janderup Vestj"
+    },
+    {
+     "id": "6852",
+     "text": "6852 Billum"
+    },
+    {
+     "id": "6853",
+     "text": "6853 Vejers Strand"
+    },
+    {
+     "id": "6854",
+     "text": "6854 Henne"
+    },
+    {
+     "id": "6855",
+     "text": "6855 Outrup"
+    },
+    {
+     "id": "6857",
+     "text": "6857 Blåvand"
+    },
+    {
+     "id": "6862",
+     "text": "6862 Tistrup"
+    },
+    {
+     "id": "6870",
+     "text": "6870 Ølgod"
+    },
+    {
+     "id": "6880",
+     "text": "6880 Tarm"
+    },
+    {
+     "id": "6893",
+     "text": "6893 Hemmet"
+    },
+    {
+     "id": "6900",
+     "text": "6900 Skjern"
+    },
+    {
+     "id": "6920",
+     "text": "6920 Videbæk"
+    },
+    {
+     "id": "6933",
+     "text": "6933 Kibæk"
+    },
+    {
+     "id": "6940",
+     "text": "6940 Lem St"
+    },
+    {
+     "id": "6950",
+     "text": "6950 Ringkøbing"
+    },
+    {
+     "id": "6960",
+     "text": "6960 Hvide Sande"
+    },
+    {
+     "id": "6971",
+     "text": "6971 Spjald"
+    },
+    {
+     "id": "6973",
+     "text": "6973 Ørnhøj"
+    },
+    {
+     "id": "6980",
+     "text": "6980 Tim"
+    },
+    {
+     "id": "6990",
+     "text": "6990 Ulfborg"
+    },
+    {
+     "id": "7000",
+     "text": "7000 Fredericia"
+    },
+    {
+     "id": "7080",
+     "text": "7080 Børkop"
+    },
+    {
+     "id": "7100",
+     "text": "7100 Vejle"
+    },
+    {
+     "id": "7120",
+     "text": "7120 Vejle Øst"
+    },
+    {
+     "id": "7130",
+     "text": "7130 Juelsminde"
+    },
+    {
+     "id": "7140",
+     "text": "7140 Stouby"
+    },
+    {
+     "id": "7150",
+     "text": "7150 Barrit"
+    },
+    {
+     "id": "7160",
+     "text": "7160 Tørring"
+    },
+    {
+     "id": "7171",
+     "text": "7171 Uldum"
+    },
+    {
+     "id": "7173",
+     "text": "7173 Vonge"
+    },
+    {
+     "id": "7182",
+     "text": "7182 Bredsten"
+    },
+    {
+     "id": "7183",
+     "text": "7183 Randbøl"
+    },
+    {
+     "id": "7184",
+     "text": "7184 Vandel"
+    },
+    {
+     "id": "7190",
+     "text": "7190 Billund"
+    },
+    {
+     "id": "7200",
+     "text": "7200 Grindsted"
+    },
+    {
+     "id": "7250",
+     "text": "7250 Hejnsvig"
+    },
+    {
+     "id": "7260",
+     "text": "7260 Sønder Omme"
+    },
+    {
+     "id": "7270",
+     "text": "7270 Stakroge"
+    },
+    {
+     "id": "7280",
+     "text": "7280 Sønder Felding"
+    },
+    {
+     "id": "7300",
+     "text": "7300 Jelling"
+    },
+    {
+     "id": "7321",
+     "text": "7321 Gadbjerg"
+    },
+    {
+     "id": "7323",
+     "text": "7323 Give"
+    },
+    {
+     "id": "7330",
+     "text": "7330 Brande"
+    },
+    {
+     "id": "7361",
+     "text": "7361 Ejstrupholm"
+    },
+    {
+     "id": "7362",
+     "text": "7362 Hampen"
+    },
+    {
+     "id": "7400",
+     "text": "7400 Herning"
+    },
+    {
+     "id": "7430",
+     "text": "7430 Ikast"
+    },
+    {
+     "id": "7441",
+     "text": "7441 Bording"
+    },
+    {
+     "id": "7442",
+     "text": "7442 Engesvang"
+    },
+    {
+     "id": "7451",
+     "text": "7451 Sunds"
+    },
+    {
+     "id": "7470",
+     "text": "7470 Karup J"
+    },
+    {
+     "id": "7480",
+     "text": "7480 Vildbjerg"
+    },
+    {
+     "id": "7490",
+     "text": "7490 Aulum"
+    },
+    {
+     "id": "7500",
+     "text": "7500 Holstebro"
+    },
+    {
+     "id": "7540",
+     "text": "7540 Haderup"
+    },
+    {
+     "id": "7550",
+     "text": "7550 Sørvad"
+    },
+    {
+     "id": "7560",
+     "text": "7560 Hjerm"
+    },
+    {
+     "id": "7570",
+     "text": "7570 Vemb"
+    },
+    {
+     "id": "7600",
+     "text": "7600 Struer"
+    },
+    {
+     "id": "7620",
+     "text": "7620 Lemvig"
+    },
+    {
+     "id": "7650",
+     "text": "7650 Bøvlingbjerg"
+    },
+    {
+     "id": "7660",
+     "text": "7660 Bækmarksbro"
+    },
+    {
+     "id": "7673",
+     "text": "7673 Harboøre"
+    },
+    {
+     "id": "7680",
+     "text": "7680 Thyborøn"
+    },
+    {
+     "id": "7700",
+     "text": "7700 Thisted"
+    },
+    {
+     "id": "7730",
+     "text": "7730 Hanstholm"
+    },
+    {
+     "id": "7741",
+     "text": "7741 Frøstrup"
+    },
+    {
+     "id": "7742",
+     "text": "7742 Vesløs"
+    },
+    {
+     "id": "7752",
+     "text": "7752 Snedsted"
+    },
+    {
+     "id": "7755",
+     "text": "7755 Bedsted Thy"
+    },
+    {
+     "id": "7760",
+     "text": "7760 Hurup Thy"
+    },
+    {
+     "id": "7770",
+     "text": "7770 Vestervig"
+    },
+    {
+     "id": "7790",
+     "text": "7790 Thyholm"
+    },
+    {
+     "id": "7800",
+     "text": "7800 Skive"
+    },
+    {
+     "id": "7830",
+     "text": "7830 Vinderup"
+    },
+    {
+     "id": "7840",
+     "text": "7840 Højslev"
+    },
+    {
+     "id": "7850",
+     "text": "7850 Stoholm Jyll"
+    },
+    {
+     "id": "7860",
+     "text": "7860 Spøttrup"
+    },
+    {
+     "id": "7870",
+     "text": "7870 Roslev"
+    },
+    {
+     "id": "7884",
+     "text": "7884 Fur"
+    },
+    {
+     "id": "7900",
+     "text": "7900 Nykøbing M"
+    },
+    {
+     "id": "7950",
+     "text": "7950 Erslev"
+    },
+    {
+     "id": "7960",
+     "text": "7960 Karby"
+    },
+    {
+     "id": "7970",
+     "text": "7970 Redsted M"
+    },
+    {
+     "id": "7980",
+     "text": "7980 Vils"
+    },
+    {
+     "id": "7990",
+     "text": "7990 Øster Assels"
+    },
+    {
+     "id": "8000",
+     "text": "8000 Århus C"
+    },
+    {
+     "id": "8200",
+     "text": "8200 Århus N"
+    },
+    {
+     "id": "8210",
+     "text": "8210 Århus V"
+    },
+    {
+     "id": "8220",
+     "text": "8220 Brabrand"
+    },
+    {
+     "id": "8230",
+     "text": "8230 Åbyhøj"
+    },
+    {
+     "id": "8240",
+     "text": "8240 Risskov"
+    },
+    {
+     "id": "8250",
+     "text": "8250 Egå"
+    },
+    {
+     "id": "8260",
+     "text": "8260 Viby J"
+    },
+    {
+     "id": "8270",
+     "text": "8270 Højbjerg"
+    },
+    {
+     "id": "8300",
+     "text": "8300 Odder"
+    },
+    {
+     "id": "8305",
+     "text": "8305 Samsø"
+    },
+    {
+     "id": "8310",
+     "text": "8310 Tranbjerg J"
+    },
+    {
+     "id": "8320",
+     "text": "8320 Mårslet"
+    },
+    {
+     "id": "8330",
+     "text": "8330 Beder"
+    },
+    {
+     "id": "8340",
+     "text": "8340 Malling"
+    },
+    {
+     "id": "8350",
+     "text": "8350 Hundslund"
+    },
+    {
+     "id": "8355",
+     "text": "8355 Solbjerg"
+    },
+    {
+     "id": "8361",
+     "text": "8361 Hasselager"
+    },
+    {
+     "id": "8362",
+     "text": "8362 Hørning"
+    },
+    {
+     "id": "8370",
+     "text": "8370 Hadsten"
+    },
+    {
+     "id": "8380",
+     "text": "8380 Trige"
+    },
+    {
+     "id": "8381",
+     "text": "8381 Tilst"
+    },
+    {
+     "id": "8382",
+     "text": "8382 Hinnerup"
+    },
+    {
+     "id": "8400",
+     "text": "8400 Ebeltoft"
+    },
+    {
+     "id": "8410",
+     "text": "8410 Rønde"
+    },
+    {
+     "id": "8420",
+     "text": "8420 Knebel"
+    },
+    {
+     "id": "8444",
+     "text": "8444 Balle"
+    },
+    {
+     "id": "8450",
+     "text": "8450 Hammel"
+    },
+    {
+     "id": "8462",
+     "text": "8462 Harlev J"
+    },
+    {
+     "id": "8464",
+     "text": "8464 Galten"
+    },
+    {
+     "id": "8471",
+     "text": "8471 Sabro"
+    },
+    {
+     "id": "8472",
+     "text": "8472 Sporup"
+    },
+    {
+     "id": "8500",
+     "text": "8500 Grenaa"
+    },
+    {
+     "id": "8520",
+     "text": "8520 Lystrup"
+    },
+    {
+     "id": "8530",
+     "text": "8530 Hjortshøj"
+    },
+    {
+     "id": "8541",
+     "text": "8541 Skødstrup"
+    },
+    {
+     "id": "8543",
+     "text": "8543 Hornslet"
+    },
+    {
+     "id": "8544",
+     "text": "8544 Mørke"
+    },
+    {
+     "id": "8550",
+     "text": "8550 Ryomgård"
+    },
+    {
+     "id": "8560",
+     "text": "8560 Kolind"
+    },
+    {
+     "id": "8570",
+     "text": "8570 Trustrup"
+    },
+    {
+     "id": "8581",
+     "text": "8581 Nimtofte"
+    },
+    {
+     "id": "8585",
+     "text": "8585 Glesborg"
+    },
+    {
+     "id": "8586",
+     "text": "8586 Ørum Djurs"
+    },
+    {
+     "id": "8592",
+     "text": "8592 Anholt"
+    },
+    {
+     "id": "8600",
+     "text": "8600 Silkeborg"
+    },
+    {
+     "id": "8620",
+     "text": "8620 Kjellerup"
+    },
+    {
+     "id": "8632",
+     "text": "8632 Lemming"
+    },
+    {
+     "id": "8641",
+     "text": "8641 Sorring"
+    },
+    {
+     "id": "8643",
+     "text": "8643 Ans By"
+    },
+    {
+     "id": "8653",
+     "text": "8653 Them"
+    },
+    {
+     "id": "8654",
+     "text": "8654 Bryrup"
+    },
+    {
+     "id": "8660",
+     "text": "8660 Skanderborg"
+    },
+    {
+     "id": "8670",
+     "text": "8670 Låsby"
+    },
+    {
+     "id": "8680",
+     "text": "8680 Ry"
+    },
+    {
+     "id": "8700",
+     "text": "8700 Horsens"
+    },
+    {
+     "id": "8721",
+     "text": "8721 Daugård"
+    },
+    {
+     "id": "8722",
+     "text": "8722 Hedensted"
+    },
+    {
+     "id": "8723",
+     "text": "8723 Løsning"
+    },
+    {
+     "id": "8732",
+     "text": "8732 Hovedgård"
+    },
+    {
+     "id": "8740",
+     "text": "8740 Brædstrup"
+    },
+    {
+     "id": "8751",
+     "text": "8751 Gedved"
+    },
+    {
+     "id": "8752",
+     "text": "8752 Østbirk"
+    },
+    {
+     "id": "8762",
+     "text": "8762 Flemming"
+    },
+    {
+     "id": "8763",
+     "text": "8763 Rask Mølle"
+    },
+    {
+     "id": "8765",
+     "text": "8765 Klovborg"
+    },
+    {
+     "id": "8766",
+     "text": "8766 Nørre Snede"
+    },
+    {
+     "id": "8781",
+     "text": "8781 Stenderup"
+    },
+    {
+     "id": "8783",
+     "text": "8783 Hornsyld"
+    },
+    {
+     "id": "8789",
+     "text": "8789 Endelave"
+    },
+    {
+     "id": "8799",
+     "text": "8799 Tunø"
+    },
+    {
+     "id": "8800",
+     "text": "8800 Viborg"
+    },
+    {
+     "id": "8830",
+     "text": "8830 Tjele"
+    },
+    {
+     "id": "8831",
+     "text": "8831 Løgstrup"
+    },
+    {
+     "id": "8832",
+     "text": "8832 Skals"
+    },
+    {
+     "id": "8840",
+     "text": "8840 Rødkærsbro"
+    },
+    {
+     "id": "8850",
+     "text": "8850 Bjerringbro"
+    },
+    {
+     "id": "8860",
+     "text": "8860 Ulstrup"
+    },
+    {
+     "id": "8870",
+     "text": "8870 Langå"
+    },
+    {
+     "id": "8881",
+     "text": "8881 Thorsø"
+    },
+    {
+     "id": "8882",
+     "text": "8882 Fårvang"
+    },
+    {
+     "id": "8883",
+     "text": "8883 Gjern"
+    },
+    {
+     "id": "8900",
+     "text": "8900 Randers C"
+    },
+    {
+     "id": "8920",
+     "text": "8920 Randers NV"
+    },
+    {
+     "id": "8930",
+     "text": "8930 Randers NØ"
+    },
+    {
+     "id": "8940",
+     "text": "8940 Randers SV"
+    },
+    {
+     "id": "8950",
+     "text": "8950 Ørsted"
+    },
+    {
+     "id": "8960",
+     "text": "8960 Randers SØ"
+    },
+    {
+     "id": "8961",
+     "text": "8961 Allingåbro"
+    },
+    {
+     "id": "8963",
+     "text": "8963 Auning"
+    },
+    {
+     "id": "8970",
+     "text": "8970 Havndal"
+    },
+    {
+     "id": "8981",
+     "text": "8981 Spentrup"
+    },
+    {
+     "id": "8983",
+     "text": "8983 Gjerlev J"
+    },
+    {
+     "id": "8990",
+     "text": "8990 Fårup"
+    },
+    {
+     "id": "9000",
+     "text": "9000 Aalborg"
+    },
+    {
+     "id": "9200",
+     "text": "9200 Aalborg SV"
+    },
+    {
+     "id": "9210",
+     "text": "9210 Aalborg SØ"
+    },
+    {
+     "id": "9220",
+     "text": "9220 Aalborg Øst"
+    },
+    {
+     "id": "9230",
+     "text": "9230 Svenstrup J"
+    },
+    {
+     "id": "9240",
+     "text": "9240 Nibe"
+    },
+    {
+     "id": "9260",
+     "text": "9260 Gistrup"
+    },
+    {
+     "id": "9270",
+     "text": "9270 Klarup"
+    },
+    {
+     "id": "9280",
+     "text": "9280 Storvorde"
+    },
+    {
+     "id": "9293",
+     "text": "9293 Kongerslev"
+    },
+    {
+     "id": "9300",
+     "text": "9300 Sæby"
+    },
+    {
+     "id": "9310",
+     "text": "9310 Vodskov"
+    },
+    {
+     "id": "9320",
+     "text": "9320 Hjallerup"
+    },
+    {
+     "id": "9330",
+     "text": "9330 Dronninglund"
+    },
+    {
+     "id": "9340",
+     "text": "9340 Asaa"
+    },
+    {
+     "id": "9352",
+     "text": "9352 Dybvad"
+    },
+    {
+     "id": "9362",
+     "text": "9362 Gandrup"
+    },
+    {
+     "id": "9370",
+     "text": "9370 Hals"
+    },
+    {
+     "id": "9380",
+     "text": "9380 Vestbjerg"
+    },
+    {
+     "id": "9381",
+     "text": "9381 Sulsted"
+    },
+    {
+     "id": "9382",
+     "text": "9382 Tylstrup"
+    },
+    {
+     "id": "9400",
+     "text": "9400 Nørresundby"
+    },
+    {
+     "id": "9430",
+     "text": "9430 Vadum"
+    },
+    {
+     "id": "9440",
+     "text": "9440 Aabybro"
+    },
+    {
+     "id": "9460",
+     "text": "9460 Brovst"
+    },
+    {
+     "id": "9480",
+     "text": "9480 Løkken"
+    },
+    {
+     "id": "9490",
+     "text": "9490 Pandrup"
+    },
+    {
+     "id": "9492",
+     "text": "9492 Blokhus"
+    },
+    {
+     "id": "9493",
+     "text": "9493 Saltum"
+    },
+    {
+     "id": "9500",
+     "text": "9500 Hobro"
+    },
+    {
+     "id": "9510",
+     "text": "9510 Arden"
+    },
+    {
+     "id": "9520",
+     "text": "9520 Skørping"
+    },
+    {
+     "id": "9530",
+     "text": "9530 Støvring"
+    },
+    {
+     "id": "9541",
+     "text": "9541 Suldrup"
+    },
+    {
+     "id": "9550",
+     "text": "9550 Mariager"
+    },
+    {
+     "id": "9560",
+     "text": "9560 Hadsund"
+    },
+    {
+     "id": "9574",
+     "text": "9574 Bælum"
+    },
+    {
+     "id": "9575",
+     "text": "9575 Terndrup"
+    },
+    {
+     "id": "9600",
+     "text": "9600 Aars"
+    },
+    {
+     "id": "9610",
+     "text": "9610 Nørager"
+    },
+    {
+     "id": "9620",
+     "text": "9620 Aalestrup"
+    },
+    {
+     "id": "9631",
+     "text": "9631 Gedsted"
+    },
+    {
+     "id": "9632",
+     "text": "9632 Møldrup"
+    },
+    {
+     "id": "9640",
+     "text": "9640 Farsø"
+    },
+    {
+     "id": "9670",
+     "text": "9670 Løgstør"
+    },
+    {
+     "id": "9681",
+     "text": "9681 Ranum"
+    },
+    {
+     "id": "9690",
+     "text": "9690 Fjerritslev"
+    },
+    {
+     "id": "9700",
+     "text": "9700 Brønderslev"
+    },
+    {
+     "id": "9740",
+     "text": "9740 Jerslev J"
+    },
+    {
+     "id": "9750",
+     "text": "9750 Østervrå"
+    },
+    {
+     "id": "9760",
+     "text": "9760 Vrå"
+    },
+    {
+     "id": "9800",
+     "text": "9800 Hjørring"
+    },
+    {
+     "id": "9830",
+     "text": "9830 Tårs"
+    },
+    {
+     "id": "9850",
+     "text": "9850 Hirtshals"
+    },
+    {
+     "id": "9870",
+     "text": "9870 Sindal"
+    },
+    {
+     "id": "9881",
+     "text": "9881 Bindslev"
+    },
+    {
+     "id": "9900",
+     "text": "9900 Frederikshavn"
+    },
+    {
+     "id": "9940",
+     "text": "9940 Læsø"
+    },
+    {
+     "id": "9970",
+     "text": "9970 Strandby"
+    },
+    {
+     "id": "9981",
+     "text": "9981 Jerup"
+    },
+    {
+     "id": "9982",
+     "text": "9982 Ålbæk"
+    },
+    {
+     "id": "9990",
+     "text": "9990 Skagen"
+    }
+   ]
+  },
+  {
+   "id": "EJKAT20",
+   "text": "property category",
+   "elimination": false,
+   "time": false,
+   "values": [
+    {
+     "id": "1",
+     "text": "Detached/terraced house"
+    },
+    {
+     "id": "2",
+     "text": "Owner-occupied flat"
+    },
+    {
+     "id": "3",
+     "text": "Holiday home"
+    }
+   ]
+  },
+  {
+   "id": "PRIS20",
+   "text": "prices of completed transactions",
+   "elimination": false,
+   "time": false,
+   "values": [
+    {
+     "id": "UDBUD",
+     "text": "Initial listing price"
+    },
+    {
+     "id": "NEDTAG",
+     "text": "Final listing price"
+    },
+    {
+     "id": "REAL",
+     "text": "Transaction price realised"
+    }
+   ]
+  },
+  {
+   "id": "Tid",
+   "text": "time",
+   "elimination": false,
+   "time": true,
+   "values": [
+    {
+     "id": "1992K1",
+     "text": "1992Q1"
+    },
+    {
+     "id": "1992K2",
+     "text": "1992Q2"
+    },
+    {
+     "id": "1992K3",
+     "text": "1992Q3"
+    },
+    {
+     "id": "1992K4",
+     "text": "1992Q4"
+    },
+    {
+     "id": "1993K1",
+     "text": "1993Q1"
+    },
+    {
+     "id": "1993K2",
+     "text": "1993Q2"
+    },
+    {
+     "id": "1993K3",
+     "text": "1993Q3"
+    },
+    {
+     "id": "1993K4",
+     "text": "1993Q4"
+    },
+    {
+     "id": "1994K1",
+     "text": "1994Q1"
+    },
+    {
+     "id": "1994K2",
+     "text": "1994Q2"
+    },
+    {
+     "id": "1994K3",
+     "text": "1994Q3"
+    },
+    {
+     "id": "1994K4",
+     "text": "1994Q4"
+    },
+    {
+     "id": "1995K1",
+     "text": "1995Q1"
+    },
+    {
+     "id": "1995K2",
+     "text": "1995Q2"
+    },
+    {
+     "id": "1995K3",
+     "text": "1995Q3"
+    },
+    {
+     "id": "1995K4",
+     "text": "1995Q4"
+    },
+    {
+     "id": "1996K1",
+     "text": "1996Q1"
+    },
+    {
+     "id": "1996K2",
+     "text": "1996Q2"
+    },
+    {
+     "id": "1996K3",
+     "text": "1996Q3"
+    },
+    {
+     "id": "1996K4",
+     "text": "1996Q4"
+    },
+    {
+     "id": "1997K1",
+     "text": "1997Q1"
+    },
+    {
+     "id": "1997K2",
+     "text": "1997Q2"
+    },
+    {
+     "id": "1997K3",
+     "text": "1997Q3"
+    },
+    {
+     "id": "1997K4",
+     "text": "1997Q4"
+    },
+    {
+     "id": "1998K1",
+     "text": "1998Q1"
+    },
+    {
+     "id": "1998K2",
+     "text": "1998Q2"
+    },
+    {
+     "id": "1998K3",
+     "text": "1998Q3"
+    },
+    {
+     "id": "1998K4",
+     "text": "1998Q4"
+    },
+    {
+     "id": "1999K1",
+     "text": "1999Q1"
+    },
+    {
+     "id": "1999K2",
+     "text": "1999Q2"
+    },
+    {
+     "id": "1999K3",
+     "text": "1999Q3"
+    },
+    {
+     "id": "1999K4",
+     "text": "1999Q4"
+    },
+    {
+     "id": "2000K1",
+     "text": "2000Q1"
+    },
+    {
+     "id": "2000K2",
+     "text": "2000Q2"
+    },
+    {
+     "id": "2000K3",
+     "text": "2000Q3"
+    },
+    {
+     "id": "2000K4",
+     "text": "2000Q4"
+    },
+    {
+     "id": "2001K1",
+     "text": "2001Q1"
+    },
+    {
+     "id": "2001K2",
+     "text": "2001Q2"
+    },
+    {
+     "id": "2001K3",
+     "text": "2001Q3"
+    },
+    {
+     "id": "2001K4",
+     "text": "2001Q4"
+    },
+    {
+     "id": "2002K1",
+     "text": "2002Q1"
+    },
+    {
+     "id": "2002K2",
+     "text": "2002Q2"
+    },
+    {
+     "id": "2002K3",
+     "text": "2002Q3"
+    },
+    {
+     "id": "2002K4",
+     "text": "2002Q4"
+    },
+    {
+     "id": "2003K1",
+     "text": "2003Q1"
+    },
+    {
+     "id": "2003K2",
+     "text": "2003Q2"
+    },
+    {
+     "id": "2003K3",
+     "text": "2003Q3"
+    },
+    {
+     "id": "2003K4",
+     "text": "2003Q4"
+    },
+    {
+     "id": "2004K1",
+     "text": "2004Q1"
+    },
+    {
+     "id": "2004K2",
+     "text": "2004Q2"
+    },
+    {
+     "id": "2004K3",
+     "text": "2004Q3"
+    },
+    {
+     "id": "2004K4",
+     "text": "2004Q4"
+    },
+    {
+     "id": "2005K1",
+     "text": "2005Q1"
+    },
+    {
+     "id": "2005K2",
+     "text": "2005Q2"
+    },
+    {
+     "id": "2005K3",
+     "text": "2005Q3"
+    },
+    {
+     "id": "2005K4",
+     "text": "2005Q4"
+    },
+    {
+     "id": "2006K1",
+     "text": "2006Q1"
+    },
+    {
+     "id": "2006K2",
+     "text": "2006Q2"
+    },
+    {
+     "id": "2006K3",
+     "text": "2006Q3"
+    },
+    {
+     "id": "2006K4",
+     "text": "2006Q4"
+    },
+    {
+     "id": "2007K1",
+     "text": "2007Q1"
+    },
+    {
+     "id": "2007K2",
+     "text": "2007Q2"
+    },
+    {
+     "id": "2007K3",
+     "text": "2007Q3"
+    },
+    {
+     "id": "2007K4",
+     "text": "2007Q4"
+    },
+    {
+     "id": "2008K1",
+     "text": "2008Q1"
+    },
+    {
+     "id": "2008K2",
+     "text": "2008Q2"
+    },
+    {
+     "id": "2008K3",
+     "text": "2008Q3"
+    },
+    {
+     "id": "2008K4",
+     "text": "2008Q4"
+    },
+    {
+     "id": "2009K1",
+     "text": "2009Q1"
+    },
+    {
+     "id": "2009K2",
+     "text": "2009Q2"
+    },
+    {
+     "id": "2009K3",
+     "text": "2009Q3"
+    },
+    {
+     "id": "2009K4",
+     "text": "2009Q4"
+    },
+    {
+     "id": "2010K1",
+     "text": "2010Q1"
+    },
+    {
+     "id": "2010K2",
+     "text": "2010Q2"
+    },
+    {
+     "id": "2010K3",
+     "text": "2010Q3"
+    },
+    {
+     "id": "2010K4",
+     "text": "2010Q4"
+    },
+    {
+     "id": "2011K1",
+     "text": "2011Q1"
+    },
+    {
+     "id": "2011K2",
+     "text": "2011Q2"
+    },
+    {
+     "id": "2011K3",
+     "text": "2011Q3"
+    },
+    {
+     "id": "2011K4",
+     "text": "2011Q4"
+    },
+    {
+     "id": "2012K1",
+     "text": "2012Q1"
+    },
+    {
+     "id": "2012K2",
+     "text": "2012Q2"
+    },
+    {
+     "id": "2012K3",
+     "text": "2012Q3"
+    },
+    {
+     "id": "2012K4",
+     "text": "2012Q4"
+    },
+    {
+     "id": "2013K1",
+     "text": "2013Q1"
+    },
+    {
+     "id": "2013K2",
+     "text": "2013Q2"
+    },
+    {
+     "id": "2013K3",
+     "text": "2013Q3"
+    },
+    {
+     "id": "2013K4",
+     "text": "2013Q4"
+    },
+    {
+     "id": "2014K1",
+     "text": "2014Q1"
+    },
+    {
+     "id": "2014K2",
+     "text": "2014Q2"
+    },
+    {
+     "id": "2014K3",
+     "text": "2014Q3"
+    },
+    {
+     "id": "2014K4",
+     "text": "2014Q4"
+    },
+    {
+     "id": "2015K1",
+     "text": "2015Q1"
+    },
+    {
+     "id": "2015K2",
+     "text": "2015Q2"
+    },
+    {
+     "id": "2015K3",
+     "text": "2015Q3"
+    },
+    {
+     "id": "2015K4",
+     "text": "2015Q4"
+    },
+    {
+     "id": "2016K1",
+     "text": "2016Q1"
+    },
+    {
+     "id": "2016K2",
+     "text": "2016Q2"
+    },
+    {
+     "id": "2016K3",
+     "text": "2016Q3"
+    },
+    {
+     "id": "2016K4",
+     "text": "2016Q4"
+    },
+    {
+     "id": "2017K1",
+     "text": "2017Q1"
+    },
+    {
+     "id": "2017K2",
+     "text": "2017Q2"
+    },
+    {
+     "id": "2017K3",
+     "text": "2017Q3"
+    },
+    {
+     "id": "2017K4",
+     "text": "2017Q4"
+    },
+    {
+     "id": "2018K1",
+     "text": "2018Q1"
+    },
+    {
+     "id": "2018K2",
+     "text": "2018Q2"
+    },
+    {
+     "id": "2018K3",
+     "text": "2018Q3"
+    },
+    {
+     "id": "2018K4",
+     "text": "2018Q4"
+    },
+    {
+     "id": "2019K1",
+     "text": "2019Q1"
+    },
+    {
+     "id": "2019K2",
+     "text": "2019Q2"
+    },
+    {
+     "id": "2019K3",
+     "text": "2019Q3"
+    },
+    {
+     "id": "2019K4",
+     "text": "2019Q4"
+    },
+    {
+     "id": "2020K1",
+     "text": "2020Q1"
+    },
+    {
+     "id": "2020K2",
+     "text": "2020Q2"
+    },
+    {
+     "id": "2020K3",
+     "text": "2020Q3"
+    },
+    {
+     "id": "2020K4",
+     "text": "2020Q4"
+    },
+    {
+     "id": "2021K1",
+     "text": "2021Q1"
+    },
+    {
+     "id": "2021K2",
+     "text": "2021Q2"
+    },
+    {
+     "id": "2021K3",
+     "text": "2021Q3"
+    },
+    {
+     "id": "2021K4",
+     "text": "2021Q4"
+    },
+    {
+     "id": "2022K1",
+     "text": "2022Q1"
+    },
+    {
+     "id": "2022K2",
+     "text": "2022Q2"
+    },
+    {
+     "id": "2022K3",
+     "text": "2022Q3"
+    },
+    {
+     "id": "2022K4",
+     "text": "2022Q4"
+    },
+    {
+     "id": "2023K1",
+     "text": "2023Q1"
+    },
+    {
+     "id": "2023K2",
+     "text": "2023Q2"
+    },
+    {
+     "id": "2023K3",
+     "text": "2023Q3"
+    },
+    {
+     "id": "2023K4",
+     "text": "2023Q4"
+    },
+    {
+     "id": "2024K1",
+     "text": "2024Q1"
+    },
+    {
+     "id": "2024K2",
+     "text": "2024Q2"
+    },
+    {
+     "id": "2024K3",
+     "text": "2024Q3"
+    },
+    {
+     "id": "2024K4",
+     "text": "2024Q4"
+    },
+    {
+     "id": "2025K1",
+     "text": "2025Q1"
+    },
+    {
+     "id": "2025K2",
+     "text": "2025Q2"
+    },
+    {
+     "id": "2025K3",
+     "text": "2025Q3"
+    },
+    {
+     "id": "2025K4",
+     "text": "2025Q4"
+    },
+    {
+     "id": "2026K1",
+     "text": "2026Q1"
+    }
+   ]
+  }
+ ]
+}

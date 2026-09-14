@@ -1,0 +1,4479 @@
+{
+ "id": "POSTNR1",
+ "text": "Population 1. January",
+ "description": "Population 1. January by postal code, sex, age and time",
+ "unit": "Number",
+ "suppressedDataValue": "0",
+ "updated": "2026-02-12T08:00:00",
+ "active": true,
+ "contacts": [
+  {
+   "name": "Dorthe Larsen",
+   "phone": "+4523498326",
+   "mail": "dla@dst.dk"
+  }
+ ],
+ "documentation": {
+  "id": "4a12721d-a8b0-4bde-82d7-1d1c6f319de3",
+  "url": "https://www.dst.dk/documentationofstatistics/4a12721d-a8b0-4bde-82d7-1d1c6f319de3"
+ },
+ "footnote": null,
+ "variables": [
+  {
+   "id": "PNR20",
+   "text": "postal code",
+   "elimination": true,
+   "time": false,
+   "values": [
+    {
+     "id": "0001",
+     "text": "Total"
+    },
+    {
+     "id": "1050",
+     "text": "1050 København K (København Municipality)"
+    },
+    {
+     "id": "1051",
+     "text": "1051 København K (København Municipality)"
+    },
+    {
+     "id": "1052",
+     "text": "1052 København K (København Municipality)"
+    },
+    {
+     "id": "1053",
+     "text": "1053 København K (København Municipality)"
+    },
+    {
+     "id": "1054",
+     "text": "1054 København K (København Municipality)"
+    },
+    {
+     "id": "1055",
+     "text": "1055 København K (København Municipality)"
+    },
+    {
+     "id": "1056",
+     "text": "1056 København K (København Municipality)"
+    },
+    {
+     "id": "1057",
+     "text": "1057 København K (København Municipality)"
+    },
+    {
+     "id": "1058",
+     "text": "1058 København K (København Municipality)"
+    },
+    {
+     "id": "1059",
+     "text": "1059 København K (København Municipality)"
+    },
+    {
+     "id": "1061",
+     "text": "1061 København K (København Municipality)"
+    },
+    {
+     "id": "1062",
+     "text": "1062 København K (København Municipality)"
+    },
+    {
+     "id": "1063",
+     "text": "1063 København K (København Municipality)"
+    },
+    {
+     "id": "1064",
+     "text": "1064 København K (København Municipality)"
+    },
+    {
+     "id": "1065",
+     "text": "1065 København K (København Municipality)"
+    },
+    {
+     "id": "1066",
+     "text": "1066 København K (København Municipality)"
+    },
+    {
+     "id": "1067",
+     "text": "1067 København K (København Municipality)"
+    },
+    {
+     "id": "1068",
+     "text": "1068 København K (København Municipality)"
+    },
+    {
+     "id": "1069",
+     "text": "1069 København K (København Municipality)"
+    },
+    {
+     "id": "1070",
+     "text": "1070 København K (København Municipality)"
+    },
+    {
+     "id": "1071",
+     "text": "1071 København K (København Municipality)"
+    },
+    {
+     "id": "1072",
+     "text": "1072 København K (København Municipality)"
+    },
+    {
+     "id": "1073",
+     "text": "1073 København K (København Municipality)"
+    },
+    {
+     "id": "1074",
+     "text": "1074 København K (København Municipality)"
+    },
+    {
+     "id": "1100",
+     "text": "1100 København K (København Municipality)"
+    },
+    {
+     "id": "1101",
+     "text": "1101 København K (København Municipality)"
+    },
+    {
+     "id": "1102",
+     "text": "1102 København K (København Municipality)"
+    },
+    {
+     "id": "1103",
+     "text": "1103 København K (København Municipality)"
+    },
+    {
+     "id": "1104",
+     "text": "1104 København K (København Municipality)"
+    },
+    {
+     "id": "1105",
+     "text": "1105 København K (København Municipality)"
+    },
+    {
+     "id": "1106",
+     "text": "1106 København K (København Municipality)"
+    },
+    {
+     "id": "1107",
+     "text": "1107 København K (København Municipality)"
+    },
+    {
+     "id": "1110",
+     "text": "1110 København K (København Municipality)"
+    },
+    {
+     "id": "1111",
+     "text": "1111 København K (København Municipality)"
+    },
+    {
+     "id": "1112",
+     "text": "1112 København K (København Municipality)"
+    },
+    {
+     "id": "1113",
+     "text": "1113 København K (København Municipality)"
+    },
+    {
+     "id": "1114",
+     "text": "1114 København K (København Municipality)"
+    },
+    {
+     "id": "1115",
+     "text": "1115 København K (København Municipality)"
+    },
+    {
+     "id": "1116",
+     "text": "1116 København K (København Municipality)"
+    },
+    {
+     "id": "1117",
+     "text": "1117 København K (København Municipality)"
+    },
+    {
+     "id": "1118",
+     "text": "1118 København K (København Municipality)"
+    },
+    {
+     "id": "1119",
+     "text": "1119 København K (København Municipality)"
+    },
+    {
+     "id": "1123",
+     "text": "1123 København K (København Municipality)"
+    },
+    {
+     "id": "1124",
+     "text": "1124 København K (København Municipality)"
+    },
+    {
+     "id": "1125",
+     "text": "1125 København K (København Municipality)"
+    },
+    {
+     "id": "1126",
+     "text": "1126 København K (København Municipality)"
+    },
+    {
+     "id": "1127",
+     "text": "1127 København K (København Municipality)"
+    },
+    {
+     "id": "1128",
+     "text": "1128 København K (København Municipality)"
+    },
+    {
+     "id": "1129",
+     "text": "1129 København K (København Municipality)"
+    },
+    {
+     "id": "1130",
+     "text": "1130 København K (København Municipality)"
+    },
+    {
+     "id": "1131",
+     "text": "1131 København K (København Municipality)"
+    },
+    {
+     "id": "1150",
+     "text": "1150 København K (København Municipality)"
+    },
+    {
+     "id": "1151",
+     "text": "1151 København K (København Municipality)"
+    },
+    {
+     "id": "1152",
+     "text": "1152 København K (København Municipality)"
+    },
+    {
+     "id": "1153",
+     "text": "1153 København K (København Municipality)"
+    },
+    {
+     "id": "1154",
+     "text": "1154 København K (København Municipality)"
+    },
+    {
+     "id": "1156",
+     "text": "1156 København K (København Municipality)"
+    },
+    {
+     "id": "1157",
+     "text": "1157 København K (København Municipality)"
+    },
+    {
+     "id": "1158",
+     "text": "1158 København K (København Municipality)"
+    },
+    {
+     "id": "1159",
+     "text": "1159 København K (København Municipality)"
+    },
+    {
+     "id": "1160",
+     "text": "1160 København K (København Municipality)"
+    },
+    {
+     "id": "1161",
+     "text": "1161 København K (København Municipality)"
+    },
+    {
+     "id": "1164",
+     "text": "1164 København K (København Municipality)"
+    },
+    {
+     "id": "1165",
+     "text": "1165 København K (København Municipality)"
+    },
+    {
+     "id": "1166",
+     "text": "1166 København K (København Municipality)"
+    },
+    {
+     "id": "1169",
+     "text": "1169 København K (København Municipality)"
+    },
+    {
+     "id": "1170",
+     "text": "1170 København K (København Municipality)"
+    },
+    {
+     "id": "1171",
+     "text": "1171 København K (København Municipality)"
+    },
+    {
+     "id": "1172",
+     "text": "1172 København K (København Municipality)"
+    },
+    {
+     "id": "1173",
+     "text": "1173 København K (København Municipality)"
+    },
+    {
+     "id": "1174",
+     "text": "1174 København K (København Municipality)"
+    },
+    {
+     "id": "1175",
+     "text": "1175 København K (København Municipality)"
+    },
+    {
+     "id": "1200",
+     "text": "1200 København K (København Municipality)"
+    },
+    {
+     "id": "1201",
+     "text": "1201 København K (København Municipality)"
+    },
+    {
+     "id": "1202",
+     "text": "1202 København K (København Municipality)"
+    },
+    {
+     "id": "1203",
+     "text": "1203 København K (København Municipality)"
+    },
+    {
+     "id": "1204",
+     "text": "1204 København K (København Municipality)"
+    },
+    {
+     "id": "1205",
+     "text": "1205 København K (København Municipality)"
+    },
+    {
+     "id": "1206",
+     "text": "1206 København K (København Municipality)"
+    },
+    {
+     "id": "1207",
+     "text": "1207 København K (København Municipality)"
+    },
+    {
+     "id": "1208",
+     "text": "1208 København K (København Municipality)"
+    },
+    {
+     "id": "1209",
+     "text": "1209 København K (København Municipality)"
+    },
+    {
+     "id": "1210",
+     "text": "1210 København K (København Municipality)"
+    },
+    {
+     "id": "1211",
+     "text": "1211 København K (København Municipality)"
+    },
+    {
+     "id": "1212",
+     "text": "1212 København K (København Municipality)"
+    },
+    {
+     "id": "1218",
+     "text": "1218 København K (København Municipality)"
+    },
+    {
+     "id": "1219",
+     "text": "1219 København K (København Municipality)"
+    },
+    {
+     "id": "1220",
+     "text": "1220 København K (København Municipality)"
+    },
+    {
+     "id": "1250",
+     "text": "1250 København K (København Municipality)"
+    },
+    {
+     "id": "1251",
+     "text": "1251 København K (København Municipality)"
+    },
+    {
+     "id": "1253",
+     "text": "1253 København K (København Municipality)"
+    },
+    {
+     "id": "1254",
+     "text": "1254 København K (København Municipality)"
+    },
+    {
+     "id": "1255",
+     "text": "1255 København K (København Municipality)"
+    },
+    {
+     "id": "1256",
+     "text": "1256 København K (København Municipality)"
+    },
+    {
+     "id": "1257",
+     "text": "1257 København K (København Municipality)"
+    },
+    {
+     "id": "1259",
+     "text": "1259 København K (København Municipality)"
+    },
+    {
+     "id": "1260",
+     "text": "1260 København K (København Municipality)"
+    },
+    {
+     "id": "1261",
+     "text": "1261 København K (København Municipality)"
+    },
+    {
+     "id": "1263",
+     "text": "1263 København K (København Municipality)"
+    },
+    {
+     "id": "1264",
+     "text": "1264 København K (København Municipality)"
+    },
+    {
+     "id": "1265",
+     "text": "1265 København K (København Municipality)"
+    },
+    {
+     "id": "1266",
+     "text": "1266 København K (København Municipality)"
+    },
+    {
+     "id": "1267",
+     "text": "1267 København K (København Municipality)"
+    },
+    {
+     "id": "1268",
+     "text": "1268 København K (København Municipality)"
+    },
+    {
+     "id": "1270",
+     "text": "1270 København K (København Municipality)"
+    },
+    {
+     "id": "1271",
+     "text": "1271 København K (København Municipality)"
+    },
+    {
+     "id": "1300",
+     "text": "1300 København K (København Municipality)"
+    },
+    {
+     "id": "1302",
+     "text": "1302 København K (København Municipality)"
+    },
+    {
+     "id": "1303",
+     "text": "1303 København K (København Municipality)"
+    },
+    {
+     "id": "1304",
+     "text": "1304 København K (København Municipality)"
+    },
+    {
+     "id": "1306",
+     "text": "1306 København K (København Municipality)"
+    },
+    {
+     "id": "1307",
+     "text": "1307 København K (København Municipality)"
+    },
+    {
+     "id": "1308",
+     "text": "1308 København K (København Municipality)"
+    },
+    {
+     "id": "1309",
+     "text": "1309 København K (København Municipality)"
+    },
+    {
+     "id": "1310",
+     "text": "1310 København K (København Municipality)"
+    },
+    {
+     "id": "1311",
+     "text": "1311 København K (København Municipality)"
+    },
+    {
+     "id": "1312",
+     "text": "1312 København K (København Municipality)"
+    },
+    {
+     "id": "1313",
+     "text": "1313 København K (København Municipality)"
+    },
+    {
+     "id": "1314",
+     "text": "1314 København K (København Municipality)"
+    },
+    {
+     "id": "1315",
+     "text": "1315 København K (København Municipality)"
+    },
+    {
+     "id": "1316",
+     "text": "1316 København K (København Municipality)"
+    },
+    {
+     "id": "1317",
+     "text": "1317 København K (København Municipality)"
+    },
+    {
+     "id": "1318",
+     "text": "1318 København K (København Municipality)"
+    },
+    {
+     "id": "1319",
+     "text": "1319 København K (København Municipality)"
+    },
+    {
+     "id": "1320",
+     "text": "1320 København K (København Municipality)"
+    },
+    {
+     "id": "1321",
+     "text": "1321 København K (København Municipality)"
+    },
+    {
+     "id": "1322",
+     "text": "1322 København K (København Municipality)"
+    },
+    {
+     "id": "1323",
+     "text": "1323 København K (København Municipality)"
+    },
+    {
+     "id": "1324",
+     "text": "1324 København K (København Municipality)"
+    },
+    {
+     "id": "1325",
+     "text": "1325 København K (København Municipality)"
+    },
+    {
+     "id": "1326",
+     "text": "1326 København K (København Municipality)"
+    },
+    {
+     "id": "1327",
+     "text": "1327 København K (København Municipality)"
+    },
+    {
+     "id": "1328",
+     "text": "1328 København K (København Municipality)"
+    },
+    {
+     "id": "1329",
+     "text": "1329 København K (København Municipality)"
+    },
+    {
+     "id": "1350",
+     "text": "1350 København K (København Municipality)"
+    },
+    {
+     "id": "1352",
+     "text": "1352 København K (København Municipality)"
+    },
+    {
+     "id": "1353",
+     "text": "1353 København K (København Municipality)"
+    },
+    {
+     "id": "1354",
+     "text": "1354 København K (København Municipality)"
+    },
+    {
+     "id": "1355",
+     "text": "1355 København K (København Municipality)"
+    },
+    {
+     "id": "1356",
+     "text": "1356 København K (København Municipality)"
+    },
+    {
+     "id": "1357",
+     "text": "1357 København K (København Municipality)"
+    },
+    {
+     "id": "1358",
+     "text": "1358 København K (København Municipality)"
+    },
+    {
+     "id": "1359",
+     "text": "1359 København K (København Municipality)"
+    },
+    {
+     "id": "1360",
+     "text": "1360 København K (København Municipality)"
+    },
+    {
+     "id": "1361",
+     "text": "1361 København K (København Municipality)"
+    },
+    {
+     "id": "1362",
+     "text": "1362 København K (København Municipality)"
+    },
+    {
+     "id": "1363",
+     "text": "1363 København K (København Municipality)"
+    },
+    {
+     "id": "1364",
+     "text": "1364 København K (København Municipality)"
+    },
+    {
+     "id": "1365",
+     "text": "1365 København K (København Municipality)"
+    },
+    {
+     "id": "1366",
+     "text": "1366 København K (København Municipality)"
+    },
+    {
+     "id": "1367",
+     "text": "1367 København K (København Municipality)"
+    },
+    {
+     "id": "1368",
+     "text": "1368 København K (København Municipality)"
+    },
+    {
+     "id": "1369",
+     "text": "1369 København K (København Municipality)"
+    },
+    {
+     "id": "1370",
+     "text": "1370 København K (København Municipality)"
+    },
+    {
+     "id": "1400",
+     "text": "1400 København K (København Municipality)"
+    },
+    {
+     "id": "1401",
+     "text": "1401 København K (København Municipality)"
+    },
+    {
+     "id": "1402",
+     "text": "1402 København K (København Municipality)"
+    },
+    {
+     "id": "1403",
+     "text": "1403 København K (København Municipality)"
+    },
+    {
+     "id": "1406",
+     "text": "1406 København K (København Municipality)"
+    },
+    {
+     "id": "1407",
+     "text": "1407 København K (København Municipality)"
+    },
+    {
+     "id": "1408",
+     "text": "1408 København K (København Municipality)"
+    },
+    {
+     "id": "1410",
+     "text": "1410 København K (København Municipality)"
+    },
+    {
+     "id": "1411",
+     "text": "1411 København K (København Municipality)"
+    },
+    {
+     "id": "1412",
+     "text": "1412 København K (København Municipality)"
+    },
+    {
+     "id": "1413",
+     "text": "1413 København K (København Municipality)"
+    },
+    {
+     "id": "1414",
+     "text": "1414 København K (København Municipality)"
+    },
+    {
+     "id": "1415",
+     "text": "1415 København K (København Municipality)"
+    },
+    {
+     "id": "1416",
+     "text": "1416 København K (København Municipality)"
+    },
+    {
+     "id": "1417",
+     "text": "1417 København K (København Municipality)"
+    },
+    {
+     "id": "1418",
+     "text": "1418 København K (København Municipality)"
+    },
+    {
+     "id": "1419",
+     "text": "1419 København K (København Municipality)"
+    },
+    {
+     "id": "1420",
+     "text": "1420 København K (København Municipality)"
+    },
+    {
+     "id": "1421",
+     "text": "1421 København K (København Municipality)"
+    },
+    {
+     "id": "1422",
+     "text": "1422 København K (København Municipality)"
+    },
+    {
+     "id": "1423",
+     "text": "1423 København K (København Municipality)"
+    },
+    {
+     "id": "1424",
+     "text": "1424 København K (København Municipality)"
+    },
+    {
+     "id": "1425",
+     "text": "1425 København K (København Municipality)"
+    },
+    {
+     "id": "1426",
+     "text": "1426 København K (København Municipality)"
+    },
+    {
+     "id": "1427",
+     "text": "1427 København K (København Municipality)"
+    },
+    {
+     "id": "1428",
+     "text": "1428 København K (København Municipality)"
+    },
+    {
+     "id": "1429",
+     "text": "1429 København K (København Municipality)"
+    },
+    {
+     "id": "1430",
+     "text": "1430 København K (København Municipality)"
+    },
+    {
+     "id": "1431",
+     "text": "1431 København K (København Municipality)"
+    },
+    {
+     "id": "1432",
+     "text": "1432 København K (København Municipality)"
+    },
+    {
+     "id": "1433",
+     "text": "1433 København K (København Municipality)"
+    },
+    {
+     "id": "1434",
+     "text": "1434 København K (København Municipality)"
+    },
+    {
+     "id": "1435",
+     "text": "1435 København K (København Municipality)"
+    },
+    {
+     "id": "1436",
+     "text": "1436 København K (København Municipality)"
+    },
+    {
+     "id": "1437",
+     "text": "1437 København K (København Municipality)"
+    },
+    {
+     "id": "1439",
+     "text": "1439 København K (København Municipality)"
+    },
+    {
+     "id": "1440",
+     "text": "1440 København K (København Municipality)"
+    },
+    {
+     "id": "1441",
+     "text": "1441 København K (København Municipality)"
+    },
+    {
+     "id": "1450",
+     "text": "1450 København K (København Municipality)"
+    },
+    {
+     "id": "1451",
+     "text": "1451 København K (København Municipality)"
+    },
+    {
+     "id": "1452",
+     "text": "1452 København K (København Municipality)"
+    },
+    {
+     "id": "1453",
+     "text": "1453 København K (København Municipality)"
+    },
+    {
+     "id": "1454",
+     "text": "1454 København K (København Municipality)"
+    },
+    {
+     "id": "1455",
+     "text": "1455 København K (København Municipality)"
+    },
+    {
+     "id": "1456",
+     "text": "1456 København K (København Municipality)"
+    },
+    {
+     "id": "1457",
+     "text": "1457 København K (København Municipality)"
+    },
+    {
+     "id": "1458",
+     "text": "1458 København K (København Municipality)"
+    },
+    {
+     "id": "1459",
+     "text": "1459 København K (København Municipality)"
+    },
+    {
+     "id": "1460",
+     "text": "1460 København K (København Municipality)"
+    },
+    {
+     "id": "1462",
+     "text": "1462 København K (København Municipality)"
+    },
+    {
+     "id": "1463",
+     "text": "1463 København K (København Municipality)"
+    },
+    {
+     "id": "1464",
+     "text": "1464 København K (København Municipality)"
+    },
+    {
+     "id": "1466",
+     "text": "1466 København K (København Municipality)"
+    },
+    {
+     "id": "1467",
+     "text": "1467 København K (København Municipality)"
+    },
+    {
+     "id": "1468",
+     "text": "1468 København K (København Municipality)"
+    },
+    {
+     "id": "1470",
+     "text": "1470 København K (København Municipality)"
+    },
+    {
+     "id": "1471",
+     "text": "1471 København K (København Municipality)"
+    },
+    {
+     "id": "1472",
+     "text": "1472 København K (København Municipality)"
+    },
+    {
+     "id": "1473",
+     "text": "1473 København K (København Municipality)"
+    },
+    {
+     "id": "1500",
+     "text": "1500 København V (København Municipality)"
+    },
+    {
+     "id": "1550",
+     "text": "1550 København V (København Municipality)"
+    },
+    {
+     "id": "1551",
+     "text": "1551 København V (København Municipality)"
+    },
+    {
+     "id": "1552",
+     "text": "1552 København V (København Municipality)"
+    },
+    {
+     "id": "1553",
+     "text": "1553 København V (København Municipality)"
+    },
+    {
+     "id": "1554",
+     "text": "1554 København V (København Municipality)"
+    },
+    {
+     "id": "1555",
+     "text": "1555 København V (København Municipality)"
+    },
+    {
+     "id": "1556",
+     "text": "1556 København V (København Municipality)"
+    },
+    {
+     "id": "1557",
+     "text": "1557 København V (København Municipality)"
+    },
+    {
+     "id": "1558",
+     "text": "1558 København V (København Municipality)"
+    },
+    {
+     "id": "1559",
+     "text": "1559 København V (København Municipality)"
+    },
+    {
+     "id": "1560",
+     "text": "1560 København V (København Municipality)"
+    },
+    {
+     "id": "1561",
+     "text": "1561 København V (København Municipality)"
+    },
+    {
+     "id": "1562",
+     "text": "1562 København V (København Municipality)"
+    },
+    {
+     "id": "1563",
+     "text": "1563 København V (København Municipality)"
+    },
+    {
+     "id": "1564",
+     "text": "1564 København V (København Municipality)"
+    },
+    {
+     "id": "1568",
+     "text": "1568 København V (København Municipality)"
+    },
+    {
+     "id": "1569",
+     "text": "1569 København V (København Municipality)"
+    },
+    {
+     "id": "1570",
+     "text": "1570 København V (København Municipality)"
+    },
+    {
+     "id": "1571",
+     "text": "1571 København V (København Municipality)"
+    },
+    {
+     "id": "1572",
+     "text": "1572 København V (København Municipality)"
+    },
+    {
+     "id": "1573",
+     "text": "1573 København V (København Municipality)"
+    },
+    {
+     "id": "1574",
+     "text": "1574 København V (København Municipality)"
+    },
+    {
+     "id": "1575",
+     "text": "1575 København V (København Municipality)"
+    },
+    {
+     "id": "1576",
+     "text": "1576 København V (København Municipality)"
+    },
+    {
+     "id": "1577",
+     "text": "1577 København V (København Municipality)"
+    },
+    {
+     "id": "1600",
+     "text": "1600 København V (København Municipality)"
+    },
+    {
+     "id": "1601",
+     "text": "1601 København V (København Municipality)"
+    },
+    {
+     "id": "1602",
+     "text": "1602 København V (København Municipality)"
+    },
+    {
+     "id": "1603",
+     "text": "1603 København V (København Municipality)"
+    },
+    {
+     "id": "1605",
+     "text": "1605 København V (København Municipality)"
+    },
+    {
+     "id": "1606",
+     "text": "1606 København V (København Municipality)"
+    },
+    {
+     "id": "1608",
+     "text": "1608 København V (København Municipality)"
+    },
+    {
+     "id": "1609",
+     "text": "1609 København V (København Municipality)"
+    },
+    {
+     "id": "1610",
+     "text": "1610 København V (København Municipality)"
+    },
+    {
+     "id": "1611",
+     "text": "1611 København V (København Municipality)"
+    },
+    {
+     "id": "1614",
+     "text": "1614 København V (København Municipality)"
+    },
+    {
+     "id": "1615",
+     "text": "1615 København V (København Municipality)"
+    },
+    {
+     "id": "1616",
+     "text": "1616 København V (København Municipality)"
+    },
+    {
+     "id": "1617",
+     "text": "1617 København V (København Municipality)"
+    },
+    {
+     "id": "1618",
+     "text": "1618 København V (København Municipality)"
+    },
+    {
+     "id": "1619",
+     "text": "1619 København V (København Municipality)"
+    },
+    {
+     "id": "1620",
+     "text": "1620 København V (København Municipality)"
+    },
+    {
+     "id": "1621",
+     "text": "1621 København V (København Municipality)"
+    },
+    {
+     "id": "1622",
+     "text": "1622 København V (København Municipality)"
+    },
+    {
+     "id": "1623",
+     "text": "1623 København V (København Municipality)"
+    },
+    {
+     "id": "1624",
+     "text": "1624 København V (København Municipality)"
+    },
+    {
+     "id": "1631",
+     "text": "1631 København V (København Municipality)"
+    },
+    {
+     "id": "1632",
+     "text": "1632 København V (København Municipality)"
+    },
+    {
+     "id": "1633",
+     "text": "1633 København V (København Municipality)"
+    },
+    {
+     "id": "1634",
+     "text": "1634 København V (København Municipality)"
+    },
+    {
+     "id": "1635",
+     "text": "1635 København V (København Municipality)"
+    },
+    {
+     "id": "1650",
+     "text": "1650 København V (København Municipality)"
+    },
+    {
+     "id": "1651",
+     "text": "1651 København V (København Municipality)"
+    },
+    {
+     "id": "1652",
+     "text": "1652 København V (København Municipality)"
+    },
+    {
+     "id": "1653",
+     "text": "1653 København V (København Municipality)"
+    },
+    {
+     "id": "1654",
+     "text": "1654 København V (København Municipality)"
+    },
+    {
+     "id": "1655",
+     "text": "1655 København V (København Municipality)"
+    },
+    {
+     "id": "1656",
+     "text": "1656 København V (København Municipality)"
+    },
+    {
+     "id": "1657",
+     "text": "1657 København V (København Municipality)"
+    },
+    {
+     "id": "1658",
+     "text": "1658 København V (København Municipality)"
+    },
+    {
+     "id": "1659",
+     "text": "1659 København V (København Municipality)"
+    },
+    {
+     "id": "1660",
+     "text": "1660 København V (København Municipality)"
+    },
+    {
+     "id": "1661",
+     "text": "1661 København V (København Municipality)"
+    },
+    {
+     "id": "1662",
+     "text": "1662 København V (København Municipality)"
+    },
+    {
+     "id": "1663",
+     "text": "1663 København V (København Municipality)"
+    },
+    {
+     "id": "1664",
+     "text": "1664 København V (København Municipality)"
+    },
+    {
+     "id": "1665",
+     "text": "1665 København V (København Municipality)"
+    },
+    {
+     "id": "1666",
+     "text": "1666 København V (København Municipality)"
+    },
+    {
+     "id": "1667",
+     "text": "1667 København V (København Municipality)"
+    },
+    {
+     "id": "1668",
+     "text": "1668 København V (København Municipality)"
+    },
+    {
+     "id": "1669",
+     "text": "1669 København V (København Municipality)"
+    },
+    {
+     "id": "1670",
+     "text": "1670 København V (København Municipality)"
+    },
+    {
+     "id": "1671",
+     "text": "1671 København V (København Municipality)"
+    },
+    {
+     "id": "1672",
+     "text": "1672 København V (København Municipality)"
+    },
+    {
+     "id": "1673",
+     "text": "1673 København V (København Municipality)"
+    },
+    {
+     "id": "1674",
+     "text": "1674 København V (København Municipality)"
+    },
+    {
+     "id": "1675",
+     "text": "1675 København V (København Municipality)"
+    },
+    {
+     "id": "1676",
+     "text": "1676 København V (København Municipality)"
+    },
+    {
+     "id": "1677",
+     "text": "1677 København V (København Municipality)"
+    },
+    {
+     "id": "1700",
+     "text": "1700 København V (København Municipality)"
+    },
+    {
+     "id": "1701",
+     "text": "1701 København V (København Municipality)"
+    },
+    {
+     "id": "1702",
+     "text": "1702 København V (København Municipality)"
+    },
+    {
+     "id": "1703",
+     "text": "1703 København V (København Municipality)"
+    },
+    {
+     "id": "1704",
+     "text": "1704 København V (København Municipality)"
+    },
+    {
+     "id": "1705",
+     "text": "1705 København V (København Municipality)"
+    },
+    {
+     "id": "1706",
+     "text": "1706 København V (København Municipality)"
+    },
+    {
+     "id": "1707",
+     "text": "1707 København V (København Municipality)"
+    },
+    {
+     "id": "1708",
+     "text": "1708 København V (København Municipality)"
+    },
+    {
+     "id": "1709",
+     "text": "1709 København V (København Municipality)"
+    },
+    {
+     "id": "1710",
+     "text": "1710 København V (København Municipality)"
+    },
+    {
+     "id": "1715",
+     "text": "1715 København V (København Municipality)"
+    },
+    {
+     "id": "1717",
+     "text": "1717 København V (København Municipality)"
+    },
+    {
+     "id": "1718",
+     "text": "1718 København V (København Municipality)"
+    },
+    {
+     "id": "1719",
+     "text": "1719 København V (København Municipality)"
+    },
+    {
+     "id": "1720",
+     "text": "1720 København V (København Municipality)"
+    },
+    {
+     "id": "1721",
+     "text": "1721 København V (København Municipality)"
+    },
+    {
+     "id": "1722",
+     "text": "1722 København V (København Municipality)"
+    },
+    {
+     "id": "1723",
+     "text": "1723 København V (København Municipality)"
+    },
+    {
+     "id": "1724",
+     "text": "1724 København V (København Municipality)"
+    },
+    {
+     "id": "1725",
+     "text": "1725 København V (København Municipality)"
+    },
+    {
+     "id": "1726",
+     "text": "1726 København V (København Municipality)"
+    },
+    {
+     "id": "1727",
+     "text": "1727 København V (København Municipality)"
+    },
+    {
+     "id": "1728",
+     "text": "1728 København V (København Municipality)"
+    },
+    {
+     "id": "1729",
+     "text": "1729 København V (København Municipality)"
+    },
+    {
+     "id": "1730",
+     "text": "1730 København V (København Municipality)"
+    },
+    {
+     "id": "1731",
+     "text": "1731 København V (København Municipality)"
+    },
+    {
+     "id": "1732",
+     "text": "1732 København V (København Municipality)"
+    },
+    {
+     "id": "1733",
+     "text": "1733 København V (København Municipality)"
+    },
+    {
+     "id": "1734",
+     "text": "1734 København V (København Municipality)"
+    },
+    {
+     "id": "1735",
+     "text": "1735 København V (København Municipality)"
+    },
+    {
+     "id": "1736",
+     "text": "1736 København V (København Municipality)"
+    },
+    {
+     "id": "1737",
+     "text": "1737 København V (København Municipality)"
+    },
+    {
+     "id": "1738",
+     "text": "1738 København V (København Municipality)"
+    },
+    {
+     "id": "1739",
+     "text": "1739 København V (København Municipality)"
+    },
+    {
+     "id": "1748",
+     "text": "1748 København V (København Municipality)"
+    },
+    {
+     "id": "1749",
+     "text": "1749 København V (København Municipality)"
+    },
+    {
+     "id": "1750",
+     "text": "1750 København V (København Municipality)"
+    },
+    {
+     "id": "1751",
+     "text": "1751 København V (København Municipality)"
+    },
+    {
+     "id": "1752",
+     "text": "1752 København V (København Municipality)"
+    },
+    {
+     "id": "1753",
+     "text": "1753 København V (København Municipality)"
+    },
+    {
+     "id": "1754",
+     "text": "1754 København V (København Municipality)"
+    },
+    {
+     "id": "1755",
+     "text": "1755 København V (København Municipality)"
+    },
+    {
+     "id": "1756",
+     "text": "1756 København V (København Municipality)"
+    },
+    {
+     "id": "1757",
+     "text": "1757 København V (København Municipality)"
+    },
+    {
+     "id": "1758",
+     "text": "1758 København V (København Municipality)"
+    },
+    {
+     "id": "1759",
+     "text": "1759 København V (København Municipality)"
+    },
+    {
+     "id": "1760",
+     "text": "1760 København V (København Municipality)"
+    },
+    {
+     "id": "1761",
+     "text": "1761 København V (København Municipality)"
+    },
+    {
+     "id": "1762",
+     "text": "1762 København V (København Municipality)"
+    },
+    {
+     "id": "1763",
+     "text": "1763 København V (København Municipality)"
+    },
+    {
+     "id": "1764",
+     "text": "1764 København V (København Municipality)"
+    },
+    {
+     "id": "1765",
+     "text": "1765 København V (København Municipality)"
+    },
+    {
+     "id": "1766",
+     "text": "1766 København V (København Municipality)"
+    },
+    {
+     "id": "1770",
+     "text": "1770 København V (København Municipality)"
+    },
+    {
+     "id": "1771",
+     "text": "1771 København V (København Municipality)"
+    },
+    {
+     "id": "1772",
+     "text": "1772 København V (København Municipality)"
+    },
+    {
+     "id": "1773",
+     "text": "1773 København V (København Municipality)"
+    },
+    {
+     "id": "1774",
+     "text": "1774 København V (København Municipality)"
+    },
+    {
+     "id": "1775",
+     "text": "1775 København V (København Municipality)"
+    },
+    {
+     "id": "1777",
+     "text": "1777 København V (København Municipality)"
+    },
+    {
+     "id": "1799",
+     "text": "1799 København V (København Municipality)"
+    },
+    {
+     "id": "1800",
+     "text": "1800 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1801",
+     "text": "1801 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1802",
+     "text": "1802 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1803",
+     "text": "1803 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1804",
+     "text": "1804 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1805",
+     "text": "1805 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1806",
+     "text": "1806 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1807",
+     "text": "1807 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1808",
+     "text": "1808 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1809",
+     "text": "1809 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1810",
+     "text": "1810 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1811",
+     "text": "1811 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1812",
+     "text": "1812 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1813",
+     "text": "1813 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1814",
+     "text": "1814 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1815",
+     "text": "1815 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1816",
+     "text": "1816 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1817",
+     "text": "1817 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1818",
+     "text": "1818 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1819",
+     "text": "1819 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1820",
+     "text": "1820 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1822",
+     "text": "1822 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1823",
+     "text": "1823 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1824",
+     "text": "1824 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1825",
+     "text": "1825 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1826",
+     "text": "1826 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1827",
+     "text": "1827 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1828",
+     "text": "1828 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1829",
+     "text": "1829 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1850",
+     "text": "1850 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1851",
+     "text": "1851 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1852",
+     "text": "1852 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1853",
+     "text": "1853 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1854",
+     "text": "1854 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1855",
+     "text": "1855 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1856",
+     "text": "1856 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1857",
+     "text": "1857 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1860",
+     "text": "1860 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1861",
+     "text": "1861 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1862",
+     "text": "1862 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1863",
+     "text": "1863 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1864",
+     "text": "1864 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1865",
+     "text": "1865 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1866",
+     "text": "1866 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1867",
+     "text": "1867 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1868",
+     "text": "1868 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1870",
+     "text": "1870 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1871",
+     "text": "1871 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1872",
+     "text": "1872 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1873",
+     "text": "1873 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1874",
+     "text": "1874 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1875",
+     "text": "1875 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1876",
+     "text": "1876 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1877",
+     "text": "1877 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1878",
+     "text": "1878 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1879",
+     "text": "1879 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1900",
+     "text": "1900 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1901",
+     "text": "1901 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1902",
+     "text": "1902 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1903",
+     "text": "1903 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1904",
+     "text": "1904 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1905",
+     "text": "1905 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1906",
+     "text": "1906 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1908",
+     "text": "1908 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1909",
+     "text": "1909 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1910",
+     "text": "1910 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1911",
+     "text": "1911 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1912",
+     "text": "1912 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1913",
+     "text": "1913 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1914",
+     "text": "1914 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1915",
+     "text": "1915 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1916",
+     "text": "1916 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1917",
+     "text": "1917 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1920",
+     "text": "1920 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1921",
+     "text": "1921 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1922",
+     "text": "1922 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1923",
+     "text": "1923 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1924",
+     "text": "1924 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1925",
+     "text": "1925 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1926",
+     "text": "1926 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1927",
+     "text": "1927 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1928",
+     "text": "1928 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1950",
+     "text": "1950 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1951",
+     "text": "1951 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1952",
+     "text": "1952 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1953",
+     "text": "1953 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1954",
+     "text": "1954 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1955",
+     "text": "1955 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1956",
+     "text": "1956 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1957",
+     "text": "1957 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1958",
+     "text": "1958 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1959",
+     "text": "1959 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1960",
+     "text": "1960 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1961",
+     "text": "1961 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1962",
+     "text": "1962 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1963",
+     "text": "1963 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1964",
+     "text": "1964 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1965",
+     "text": "1965 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1966",
+     "text": "1966 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1967",
+     "text": "1967 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1970",
+     "text": "1970 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1971",
+     "text": "1971 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1972",
+     "text": "1972 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1973",
+     "text": "1973 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "1974",
+     "text": "1974 Frederiksberg C (Frederiksberg Municipality)"
+    },
+    {
+     "id": "2000",
+     "text": "2000 Frederiksberg (København Municipality, Frederiksberg Municipality)"
+    },
+    {
+     "id": "2100",
+     "text": "2100 København Ø (København Municipality)"
+    },
+    {
+     "id": "2150",
+     "text": "2150 Nordhavn (København Municipality)"
+    },
+    {
+     "id": "2200",
+     "text": "2200 København N (København Municipality, Frederiksberg Municipality)"
+    },
+    {
+     "id": "2300",
+     "text": "2300 København S (København Municipality, Tårnby Municipality)"
+    },
+    {
+     "id": "2400",
+     "text": "2400 København NV (København Municipality)"
+    },
+    {
+     "id": "2450",
+     "text": "2450 København SV (København Municipality)"
+    },
+    {
+     "id": "2500",
+     "text": "2500 Valby (København Municipality)"
+    },
+    {
+     "id": "2600",
+     "text": "2600 Glostrup (Glostrup Municipality, Albertslund Municipality)"
+    },
+    {
+     "id": "2605",
+     "text": "2605 Brøndby (Brøndby Municipality, Glostrup Municipality)"
+    },
+    {
+     "id": "2610",
+     "text": "2610 Rødovre (København Municipality, Hvidovre Municipality, Rødovre Municipality)"
+    },
+    {
+     "id": "2620",
+     "text": "2620 Albertslund (Albertslund Municipality)"
+    },
+    {
+     "id": "2625",
+     "text": "2625 Vallensbæk (Vallensbæk Municipality)"
+    },
+    {
+     "id": "2630",
+     "text": "2630 Taastrup (Høje-Taastrup Municipality)"
+    },
+    {
+     "id": "2635",
+     "text": "2635 Ishøj (Ishøj Municipality)"
+    },
+    {
+     "id": "2640",
+     "text": "2640 Hedehusene (Høje-Taastrup Municipality, Ishøj Municipality, Greve Municipality, Roskilde Municipality)"
+    },
+    {
+     "id": "2650",
+     "text": "2650 Hvidovre (Brøndby Municipality, Hvidovre Municipality)"
+    },
+    {
+     "id": "2660",
+     "text": "2660 Brøndby Strand (Brøndby Municipality, Hvidovre Municipality)"
+    },
+    {
+     "id": "2665",
+     "text": "2665 Vallensbæk Strand (Vallensbæk Municipality)"
+    },
+    {
+     "id": "2670",
+     "text": "2670 Greve (Greve Municipality)"
+    },
+    {
+     "id": "2680",
+     "text": "2680 Solrød Strand (Solrød Municipality)"
+    },
+    {
+     "id": "2690",
+     "text": "2690 Karlslunde (Greve Municipality, Solrød Municipality)"
+    },
+    {
+     "id": "2700",
+     "text": "2700 Brønshøj (København Municipality)"
+    },
+    {
+     "id": "2720",
+     "text": "2720 Vanløse (København Municipality, Frederiksberg Municipality)"
+    },
+    {
+     "id": "2730",
+     "text": "2730 Herlev (Ballerup Municipality, Gladsaxe Municipality, Herlev Municipality)"
+    },
+    {
+     "id": "2740",
+     "text": "2740 Skovlunde (Ballerup Municipality, Herlev Municipality)"
+    },
+    {
+     "id": "2750",
+     "text": "2750 Ballerup (Ballerup Municipality, Albertslund Municipality, Egedal Municipality)"
+    },
+    {
+     "id": "2760",
+     "text": "2760 Måløv (Ballerup Municipality)"
+    },
+    {
+     "id": "2765",
+     "text": "2765 Smørum (Egedal Municipality)"
+    },
+    {
+     "id": "2770",
+     "text": "2770 Kastrup (København Municipality, Tårnby Municipality)"
+    },
+    {
+     "id": "2791",
+     "text": "2791 Dragør (Dragør Municipality, Tårnby Municipality)"
+    },
+    {
+     "id": "2800",
+     "text": "2800 Kgs. Lyngby (Gentofte Municipality, Gladsaxe Municipality, Lyngby-Taarbæk Municipality, Rudersdal Municipality)"
+    },
+    {
+     "id": "2820",
+     "text": "2820 Gentofte (Gentofte Municipality, Gladsaxe Municipality)"
+    },
+    {
+     "id": "2830",
+     "text": "2830 Virum (Lyngby-Taarbæk Municipality, Rudersdal Municipality)"
+    },
+    {
+     "id": "2840",
+     "text": "2840 Holte (Lyngby-Taarbæk Municipality, Rudersdal Municipality)"
+    },
+    {
+     "id": "2850",
+     "text": "2850 Nærum (Rudersdal Municipality)"
+    },
+    {
+     "id": "2860",
+     "text": "2860 Søborg (København Municipality, Gladsaxe Municipality)"
+    },
+    {
+     "id": "2870",
+     "text": "2870 Dyssegård (Gentofte Municipality)"
+    },
+    {
+     "id": "2880",
+     "text": "2880 Bagsværd (Gladsaxe Municipality, Herlev Municipality, Furesø Municipality)"
+    },
+    {
+     "id": "2900",
+     "text": "2900 Hellerup (København Municipality, Gentofte Municipality)"
+    },
+    {
+     "id": "2920",
+     "text": "2920 Charlottenlund (Gentofte Municipality)"
+    },
+    {
+     "id": "2930",
+     "text": "2930 Klampenborg (Gentofte Municipality, Lyngby-Taarbæk Municipality)"
+    },
+    {
+     "id": "2942",
+     "text": "2942 Skodsborg (Rudersdal Municipality)"
+    },
+    {
+     "id": "2950",
+     "text": "2950 Vedbæk (Hørsholm Municipality, Rudersdal Municipality)"
+    },
+    {
+     "id": "2960",
+     "text": "2960 Rungsted Kyst (Hørsholm Municipality)"
+    },
+    {
+     "id": "2970",
+     "text": "2970 Hørsholm (Fredensborg Municipality, Hørsholm Municipality, Rudersdal Municipality)"
+    },
+    {
+     "id": "2980",
+     "text": "2980 Kokkedal (Fredensborg Municipality, Hørsholm Municipality)"
+    },
+    {
+     "id": "2990",
+     "text": "2990 Nivå (Fredensborg Municipality)"
+    },
+    {
+     "id": "3000",
+     "text": "3000 Helsingør (Helsingør Municipality)"
+    },
+    {
+     "id": "3050",
+     "text": "3050 Humlebæk (Fredensborg Municipality, Helsingør Municipality)"
+    },
+    {
+     "id": "3060",
+     "text": "3060 Espergærde (Fredensborg Municipality, Helsingør Municipality)"
+    },
+    {
+     "id": "3070",
+     "text": "3070 Snekkersten (Helsingør Municipality)"
+    },
+    {
+     "id": "3080",
+     "text": "3080 Tikøb (Helsingør Municipality)"
+    },
+    {
+     "id": "3100",
+     "text": "3100 Hornbæk (Helsingør Municipality, Gribskov Municipality)"
+    },
+    {
+     "id": "3120",
+     "text": "3120 Dronningmølle (Gribskov Municipality)"
+    },
+    {
+     "id": "3140",
+     "text": "3140 Ålsgårde (Helsingør Municipality)"
+    },
+    {
+     "id": "3150",
+     "text": "3150 Hellebæk (Helsingør Municipality)"
+    },
+    {
+     "id": "3200",
+     "text": "3200 Helsinge (Hillerød Municipality, Gribskov Municipality)"
+    },
+    {
+     "id": "3210",
+     "text": "3210 Vejby (Gribskov Municipality)"
+    },
+    {
+     "id": "3220",
+     "text": "3220 Tisvildeleje (Gribskov Municipality)"
+    },
+    {
+     "id": "3230",
+     "text": "3230 Græsted (Helsingør Municipality, Hillerød Municipality, Gribskov Municipality)"
+    },
+    {
+     "id": "3250",
+     "text": "3250 Gilleleje (Gribskov Municipality)"
+    },
+    {
+     "id": "3300",
+     "text": "3300 Frederiksværk (Halsnæs Municipality, Gribskov Municipality)"
+    },
+    {
+     "id": "3310",
+     "text": "3310 Ølsted (Hillerød Municipality, Halsnæs Municipality)"
+    },
+    {
+     "id": "3320",
+     "text": "3320 Skævinge (Hillerød Municipality, Halsnæs Municipality)"
+    },
+    {
+     "id": "3330",
+     "text": "3330 Gørløse (Hillerød Municipality)"
+    },
+    {
+     "id": "3360",
+     "text": "3360 Liseleje (Halsnæs Municipality)"
+    },
+    {
+     "id": "3370",
+     "text": "3370 Melby (Halsnæs Municipality)"
+    },
+    {
+     "id": "3390",
+     "text": "3390 Hundested (Halsnæs Municipality)"
+    },
+    {
+     "id": "3400",
+     "text": "3400 Hillerød (Allerød Municipality, Fredensborg Municipality, Hillerød Municipality)"
+    },
+    {
+     "id": "3450",
+     "text": "3450 Allerød (Allerød Municipality, Fredensborg Municipality, Hillerød Municipality)"
+    },
+    {
+     "id": "3460",
+     "text": "3460 Birkerød (Furesø Municipality, Allerød Municipality, Rudersdal Municipality)"
+    },
+    {
+     "id": "3480",
+     "text": "3480 Fredensborg (Fredensborg Municipality, Helsingør Municipality, Hillerød Municipality)"
+    },
+    {
+     "id": "3490",
+     "text": "3490 Kvistgård (Fredensborg Municipality, Helsingør Municipality)"
+    },
+    {
+     "id": "3500",
+     "text": "3500 Værløse (Ballerup Municipality, Gladsaxe Municipality, Lyngby-Taarbæk Municipality, Furesø Municipality, Egedal Municipality)"
+    },
+    {
+     "id": "3520",
+     "text": "3520 Farum (Furesø Municipality, Allerød Municipality, Egedal Municipality)"
+    },
+    {
+     "id": "3540",
+     "text": "3540 Lynge (Furesø Municipality, Allerød Municipality, Hillerød Municipality, Egedal Municipality)"
+    },
+    {
+     "id": "3550",
+     "text": "3550 Slangerup (Allerød Municipality, Hillerød Municipality, Egedal Municipality, Frederikssund Municipality)"
+    },
+    {
+     "id": "3600",
+     "text": "3600 Frederikssund (Hillerød Municipality, Frederikssund Municipality, Halsnæs Municipality)"
+    },
+    {
+     "id": "3630",
+     "text": "3630 Jægerspris (Frederikssund Municipality)"
+    },
+    {
+     "id": "3650",
+     "text": "3650 Ølstykke (Egedal Municipality, Frederikssund Municipality)"
+    },
+    {
+     "id": "3660",
+     "text": "3660 Stenløse (Egedal Municipality)"
+    },
+    {
+     "id": "3670",
+     "text": "3670 Veksø Sjælland (Egedal Municipality, Roskilde Municipality)"
+    },
+    {
+     "id": "3700",
+     "text": "3700 Rønne (Bornholm Municipality)"
+    },
+    {
+     "id": "3720",
+     "text": "3720 Aakirkeby (Bornholm Municipality)"
+    },
+    {
+     "id": "3730",
+     "text": "3730 Nexø (Bornholm Municipality)"
+    },
+    {
+     "id": "3740",
+     "text": "3740 Svaneke (Bornholm Municipality)"
+    },
+    {
+     "id": "3751",
+     "text": "3751 Østermarie (Bornholm Municipality)"
+    },
+    {
+     "id": "3760",
+     "text": "3760 Gudhjem (Bornholm Municipality, Christiansø Municipality)"
+    },
+    {
+     "id": "3770",
+     "text": "3770 Allinge (Bornholm Municipality)"
+    },
+    {
+     "id": "3782",
+     "text": "3782 Klemensker (Bornholm Municipality)"
+    },
+    {
+     "id": "3790",
+     "text": "3790 Hasle (Bornholm Municipality)"
+    },
+    {
+     "id": "4000",
+     "text": "4000 Roskilde (Høje-Taastrup Municipality, Greve Municipality, Køge Municipality, Roskilde Municipality, Lejre Municipality)"
+    },
+    {
+     "id": "4030",
+     "text": "4030 Tune (Greve Municipality, Roskilde Municipality)"
+    },
+    {
+     "id": "4040",
+     "text": "4040 Jyllinge (Roskilde Municipality)"
+    },
+    {
+     "id": "4050",
+     "text": "4050 Skibby (Frederikssund Municipality)"
+    },
+    {
+     "id": "4060",
+     "text": "4060 Kirke Såby (Lejre Municipality)"
+    },
+    {
+     "id": "4070",
+     "text": "4070 Kirke Hyllinge (Lejre Municipality)"
+    },
+    {
+     "id": "4100",
+     "text": "4100 Ringsted (Køge Municipality, Holbæk Municipality, Faxe Municipality, Ringsted Municipality, Sorø Municipality, Næstved Municipality)"
+    },
+    {
+     "id": "4130",
+     "text": "4130 Viby Sjælland (Køge Municipality, Roskilde Municipality)"
+    },
+    {
+     "id": "4140",
+     "text": "4140 Borup (Køge Municipality, Roskilde Municipality, Ringsted Municipality, Lejre Municipality)"
+    },
+    {
+     "id": "4160",
+     "text": "4160 Herlufmagle (Faxe Municipality, Næstved Municipality)"
+    },
+    {
+     "id": "4171",
+     "text": "4171 Glumsø (Næstved Municipality)"
+    },
+    {
+     "id": "4173",
+     "text": "4173 Fjenneslev (Ringsted Municipality, Sorø Municipality)"
+    },
+    {
+     "id": "4174",
+     "text": "4174 Jystrup Midtsj (Køge Municipality, Ringsted Municipality)"
+    },
+    {
+     "id": "4180",
+     "text": "4180 Sorø (Ringsted Municipality, Slagelse Municipality, Sorø Municipality)"
+    },
+    {
+     "id": "4190",
+     "text": "4190 Munke Bjergby (Slagelse Municipality, Sorø Municipality)"
+    },
+    {
+     "id": "4200",
+     "text": "4200 Slagelse (Kalundborg Municipality, Slagelse Municipality, Sorø Municipality, Næstved Municipality)"
+    },
+    {
+     "id": "4220",
+     "text": "4220 Korsør (Slagelse Municipality)"
+    },
+    {
+     "id": "4230",
+     "text": "4230 Skælskør (Slagelse Municipality)"
+    },
+    {
+     "id": "4241",
+     "text": "4241 Vemmelev (Slagelse Municipality)"
+    },
+    {
+     "id": "4242",
+     "text": "4242 Boeslunde (Slagelse Municipality)"
+    },
+    {
+     "id": "4243",
+     "text": "4243 Rude (Slagelse Municipality, Næstved Municipality)"
+    },
+    {
+     "id": "4244",
+     "text": "4244 Agersø (Slagelse Municipality)"
+    },
+    {
+     "id": "4245",
+     "text": "4245 Omø (Slagelse Municipality)"
+    },
+    {
+     "id": "4250",
+     "text": "4250 Fuglebjerg (Slagelse Municipality, Næstved Municipality)"
+    },
+    {
+     "id": "4261",
+     "text": "4261 Dalmose (Slagelse Municipality, Næstved Municipality)"
+    },
+    {
+     "id": "4262",
+     "text": "4262 Sandved (Slagelse Municipality, Næstved Municipality)"
+    },
+    {
+     "id": "4270",
+     "text": "4270 Høng (Kalundborg Municipality, Slagelse Municipality)"
+    },
+    {
+     "id": "4281",
+     "text": "4281 Gørlev (Kalundborg Municipality)"
+    },
+    {
+     "id": "4291",
+     "text": "4291 Ruds Vedby (Kalundborg Municipality, Sorø Municipality)"
+    },
+    {
+     "id": "4293",
+     "text": "4293 Dianalund (Kalundborg Municipality, Sorø Municipality)"
+    },
+    {
+     "id": "4295",
+     "text": "4295 Stenlille (Holbæk Municipality, Sorø Municipality)"
+    },
+    {
+     "id": "4296",
+     "text": "4296 Nyrup (Holbæk Municipality, Sorø Municipality)"
+    },
+    {
+     "id": "4300",
+     "text": "4300 Holbæk (Holbæk Municipality)"
+    },
+    {
+     "id": "4305",
+     "text": "4305 Orø (Holbæk Municipality)"
+    },
+    {
+     "id": "4320",
+     "text": "4320 Lejre (Køge Municipality, Roskilde Municipality, Lejre Municipality)"
+    },
+    {
+     "id": "4330",
+     "text": "4330 Hvalsø (Holbæk Municipality, Ringsted Municipality, Lejre Municipality)"
+    },
+    {
+     "id": "4340",
+     "text": "4340 Tølløse (Holbæk Municipality, Lejre Municipality)"
+    },
+    {
+     "id": "4350",
+     "text": "4350 Ugerløse (Holbæk Municipality)"
+    },
+    {
+     "id": "4360",
+     "text": "4360 Kirke Eskilstrup (Holbæk Municipality, Ringsted Municipality)"
+    },
+    {
+     "id": "4370",
+     "text": "4370 Store Merløse (Holbæk Municipality, Ringsted Municipality, Sorø Municipality)"
+    },
+    {
+     "id": "4390",
+     "text": "4390 Vipperød (Holbæk Municipality)"
+    },
+    {
+     "id": "4400",
+     "text": "4400 Kalundborg (Kalundborg Municipality)"
+    },
+    {
+     "id": "4420",
+     "text": "4420 Regstrup (Holbæk Municipality)"
+    },
+    {
+     "id": "4440",
+     "text": "4440 Mørkøv (Holbæk Municipality)"
+    },
+    {
+     "id": "4450",
+     "text": "4450 Jyderup (Holbæk Municipality, Kalundborg Municipality)"
+    },
+    {
+     "id": "4460",
+     "text": "4460 Snertinge (Holbæk Municipality, Kalundborg Municipality)"
+    },
+    {
+     "id": "4470",
+     "text": "4470 Svebølle (Holbæk Municipality, Kalundborg Municipality)"
+    },
+    {
+     "id": "4480",
+     "text": "4480 Store Fuglede (Kalundborg Municipality)"
+    },
+    {
+     "id": "4490",
+     "text": "4490 Jerslev Sjælland (Kalundborg Municipality)"
+    },
+    {
+     "id": "4500",
+     "text": "4500 Nykøbing Sj (Odsherred Municipality)"
+    },
+    {
+     "id": "4520",
+     "text": "4520 Svinninge (Holbæk Municipality)"
+    },
+    {
+     "id": "4532",
+     "text": "4532 Gislinge (Holbæk Municipality)"
+    },
+    {
+     "id": "4534",
+     "text": "4534 Hørve (Odsherred Municipality, Kalundborg Municipality)"
+    },
+    {
+     "id": "4540",
+     "text": "4540 Fårevejle (Odsherred Municipality)"
+    },
+    {
+     "id": "4550",
+     "text": "4550 Asnæs (Odsherred Municipality)"
+    },
+    {
+     "id": "4560",
+     "text": "4560 Vig (Odsherred Municipality)"
+    },
+    {
+     "id": "4571",
+     "text": "4571 Grevinge (Odsherred Municipality)"
+    },
+    {
+     "id": "4572",
+     "text": "4572 Nørre Asmindrup (Odsherred Municipality)"
+    },
+    {
+     "id": "4573",
+     "text": "4573 Højby (Odsherred Municipality)"
+    },
+    {
+     "id": "4581",
+     "text": "4581 Rørvig (Odsherred Municipality)"
+    },
+    {
+     "id": "4583",
+     "text": "4583 Sjællands Odde (Odsherred Municipality)"
+    },
+    {
+     "id": "4591",
+     "text": "4591 Føllenslev (Odsherred Municipality, Kalundborg Municipality)"
+    },
+    {
+     "id": "4592",
+     "text": "4592 Sejerø (Kalundborg Municipality)"
+    },
+    {
+     "id": "4593",
+     "text": "4593 Eskebjerg (Kalundborg Municipality)"
+    },
+    {
+     "id": "4600",
+     "text": "4600 Køge (Køge Municipality, Stevns Municipality)"
+    },
+    {
+     "id": "4621",
+     "text": "4621 Gadstrup (Roskilde Municipality)"
+    },
+    {
+     "id": "4622",
+     "text": "4622 Havdrup (Roskilde Municipality, Solrød Municipality)"
+    },
+    {
+     "id": "4623",
+     "text": "4623 Lille Skensved (Køge Municipality, Roskilde Municipality, Solrød Municipality)"
+    },
+    {
+     "id": "4632",
+     "text": "4632 Bjæverskov (Køge Municipality)"
+    },
+    {
+     "id": "4640",
+     "text": "4640 Faxe (Faxe Municipality, Næstved Municipality)"
+    },
+    {
+     "id": "4652",
+     "text": "4652 Hårlev (Faxe Municipality, Stevns Municipality)"
+    },
+    {
+     "id": "4653",
+     "text": "4653 Karise (Faxe Municipality, Stevns Municipality)"
+    },
+    {
+     "id": "4654",
+     "text": "4654 Faxe Ladeplads (Faxe Municipality)"
+    },
+    {
+     "id": "4660",
+     "text": "4660 Store Heddinge (Stevns Municipality)"
+    },
+    {
+     "id": "4671",
+     "text": "4671 Strøby (Stevns Municipality)"
+    },
+    {
+     "id": "4672",
+     "text": "4672 Klippinge (Stevns Municipality)"
+    },
+    {
+     "id": "4673",
+     "text": "4673 Rødvig Stevns (Stevns Municipality)"
+    },
+    {
+     "id": "4681",
+     "text": "4681 Herfølge (Køge Municipality)"
+    },
+    {
+     "id": "4682",
+     "text": "4682 Tureby (Køge Municipality, Faxe Municipality, Stevns Municipality)"
+    },
+    {
+     "id": "4683",
+     "text": "4683 Rønnede (Faxe Municipality, Næstved Municipality)"
+    },
+    {
+     "id": "4684",
+     "text": "4684 Holmegaard (Faxe Municipality, Næstved Municipality)"
+    },
+    {
+     "id": "4690",
+     "text": "4690 Haslev (Faxe Municipality, Ringsted Municipality, Næstved Municipality)"
+    },
+    {
+     "id": "4700",
+     "text": "4700 Næstved (Næstved Municipality)"
+    },
+    {
+     "id": "4720",
+     "text": "4720 Præstø (Vordingborg Municipality)"
+    },
+    {
+     "id": "4733",
+     "text": "4733 Tappernøje (Faxe Municipality, Næstved Municipality, Vordingborg Municipality)"
+    },
+    {
+     "id": "4735",
+     "text": "4735 Mern (Vordingborg Municipality)"
+    },
+    {
+     "id": "4736",
+     "text": "4736 Karrebæksminde (Næstved Municipality)"
+    },
+    {
+     "id": "4750",
+     "text": "4750 Lundby (Næstved Municipality, Vordingborg Municipality)"
+    },
+    {
+     "id": "4760",
+     "text": "4760 Vordingborg (Vordingborg Municipality)"
+    },
+    {
+     "id": "4771",
+     "text": "4771 Kalvehave (Vordingborg Municipality)"
+    },
+    {
+     "id": "4772",
+     "text": "4772 Langebæk (Vordingborg Municipality)"
+    },
+    {
+     "id": "4773",
+     "text": "4773 Stensved (Vordingborg Municipality)"
+    },
+    {
+     "id": "4780",
+     "text": "4780 Stege (Vordingborg Municipality)"
+    },
+    {
+     "id": "4791",
+     "text": "4791 Borre (Vordingborg Municipality)"
+    },
+    {
+     "id": "4792",
+     "text": "4792 Askeby (Vordingborg Municipality)"
+    },
+    {
+     "id": "4793",
+     "text": "4793 Bogø By (Vordingborg Municipality)"
+    },
+    {
+     "id": "4800",
+     "text": "4800 Nykøbing F (Guldborgsund Municipality)"
+    },
+    {
+     "id": "4840",
+     "text": "4840 Nørre Alslev (Guldborgsund Municipality)"
+    },
+    {
+     "id": "4850",
+     "text": "4850 Stubbekøbing (Guldborgsund Municipality)"
+    },
+    {
+     "id": "4862",
+     "text": "4862 Guldborg (Guldborgsund Municipality)"
+    },
+    {
+     "id": "4863",
+     "text": "4863 Eskilstrup (Guldborgsund Municipality)"
+    },
+    {
+     "id": "4871",
+     "text": "4871 Horbelev (Guldborgsund Municipality)"
+    },
+    {
+     "id": "4872",
+     "text": "4872 Idestrup (Guldborgsund Municipality)"
+    },
+    {
+     "id": "4873",
+     "text": "4873 Væggerløse (Guldborgsund Municipality)"
+    },
+    {
+     "id": "4874",
+     "text": "4874 Gedser (Guldborgsund Municipality)"
+    },
+    {
+     "id": "4880",
+     "text": "4880 Nysted (Guldborgsund Municipality)"
+    },
+    {
+     "id": "4891",
+     "text": "4891 Toreby L (Guldborgsund Municipality)"
+    },
+    {
+     "id": "4892",
+     "text": "4892 Kettinge (Guldborgsund Municipality)"
+    },
+    {
+     "id": "4894",
+     "text": "4894 Øster Ulslev (Lolland Municipality, Guldborgsund Municipality)"
+    },
+    {
+     "id": "4895",
+     "text": "4895 Errindlev (Lolland Municipality)"
+    },
+    {
+     "id": "4900",
+     "text": "4900 Nakskov (Lolland Municipality)"
+    },
+    {
+     "id": "4912",
+     "text": "4912 Harpelunde (Lolland Municipality)"
+    },
+    {
+     "id": "4913",
+     "text": "4913 Horslunde (Lolland Municipality)"
+    },
+    {
+     "id": "4920",
+     "text": "4920 Søllested (Lolland Municipality)"
+    },
+    {
+     "id": "4930",
+     "text": "4930 Maribo (Lolland Municipality, Guldborgsund Municipality)"
+    },
+    {
+     "id": "4941",
+     "text": "4941 Bandholm (Lolland Municipality)"
+    },
+    {
+     "id": "4942",
+     "text": "4942 Askø (Lolland Municipality)"
+    },
+    {
+     "id": "4943",
+     "text": "4943 Torrig L (Lolland Municipality)"
+    },
+    {
+     "id": "4944",
+     "text": "4944 Fejø (Lolland Municipality)"
+    },
+    {
+     "id": "4945",
+     "text": "4945 Femø (Lolland Municipality)"
+    },
+    {
+     "id": "4951",
+     "text": "4951 Nørreballe (Lolland Municipality)"
+    },
+    {
+     "id": "4952",
+     "text": "4952 Stokkemarke (Lolland Municipality)"
+    },
+    {
+     "id": "4953",
+     "text": "4953 Vesterborg (Lolland Municipality)"
+    },
+    {
+     "id": "4960",
+     "text": "4960 Holeby (Lolland Municipality)"
+    },
+    {
+     "id": "4970",
+     "text": "4970 Rødby (Lolland Municipality)"
+    },
+    {
+     "id": "4983",
+     "text": "4983 Dannemare (Lolland Municipality)"
+    },
+    {
+     "id": "4990",
+     "text": "4990 Sakskøbing (Guldborgsund Municipality)"
+    },
+    {
+     "id": "5000",
+     "text": "5000 Odense C (Odense Municipality)"
+    },
+    {
+     "id": "5200",
+     "text": "5200 Odense V (Odense Municipality)"
+    },
+    {
+     "id": "5210",
+     "text": "5210 Odense NV (Odense Municipality)"
+    },
+    {
+     "id": "5220",
+     "text": "5220 Odense SØ (Odense Municipality)"
+    },
+    {
+     "id": "5230",
+     "text": "5230 Odense M (Odense Municipality)"
+    },
+    {
+     "id": "5240",
+     "text": "5240 Odense NØ (Odense Municipality)"
+    },
+    {
+     "id": "5250",
+     "text": "5250 Odense SV (Odense Municipality)"
+    },
+    {
+     "id": "5260",
+     "text": "5260 Odense S (Odense Municipality)"
+    },
+    {
+     "id": "5270",
+     "text": "5270 Odense N (Odense Municipality, Nordfyns Municipality)"
+    },
+    {
+     "id": "5290",
+     "text": "5290 Marslev (Kerteminde Municipality)"
+    },
+    {
+     "id": "5300",
+     "text": "5300 Kerteminde (Kerteminde Municipality)"
+    },
+    {
+     "id": "5320",
+     "text": "5320 Agedrup (Odense Municipality)"
+    },
+    {
+     "id": "5330",
+     "text": "5330 Munkebo (Kerteminde Municipality, Odense Municipality)"
+    },
+    {
+     "id": "5350",
+     "text": "5350 Rynkeby (Kerteminde Municipality)"
+    },
+    {
+     "id": "5370",
+     "text": "5370 Mesinge (Kerteminde Municipality)"
+    },
+    {
+     "id": "5380",
+     "text": "5380 Dalby (Kerteminde Municipality)"
+    },
+    {
+     "id": "5390",
+     "text": "5390 Martofte (Kerteminde Municipality)"
+    },
+    {
+     "id": "5400",
+     "text": "5400 Bogense (Nordfyns Municipality)"
+    },
+    {
+     "id": "5450",
+     "text": "5450 Otterup (Nordfyns Municipality)"
+    },
+    {
+     "id": "5462",
+     "text": "5462 Morud (Nordfyns Municipality)"
+    },
+    {
+     "id": "5463",
+     "text": "5463 Harndrup (Middelfart Municipality)"
+    },
+    {
+     "id": "5464",
+     "text": "5464 Brenderup Fyn (Middelfart Municipality)"
+    },
+    {
+     "id": "5466",
+     "text": "5466 Asperup (Middelfart Municipality)"
+    },
+    {
+     "id": "5471",
+     "text": "5471 Søndersø (Nordfyns Municipality)"
+    },
+    {
+     "id": "5474",
+     "text": "5474 Veflinge (Nordfyns Municipality)"
+    },
+    {
+     "id": "5485",
+     "text": "5485 Skamby (Nordfyns Municipality)"
+    },
+    {
+     "id": "5491",
+     "text": "5491 Blommenslyst (Odense Municipality, Nordfyns Municipality)"
+    },
+    {
+     "id": "5492",
+     "text": "5492 Vissenbjerg (Assens Municipality, Odense Municipality, Nordfyns Municipality)"
+    },
+    {
+     "id": "5500",
+     "text": "5500 Middelfart (Middelfart Municipality)"
+    },
+    {
+     "id": "5540",
+     "text": "5540 Ullerslev (Kerteminde Municipality, Nyborg Municipality)"
+    },
+    {
+     "id": "5550",
+     "text": "5550 Langeskov (Faaborg-Midtfyn Municipality, Kerteminde Municipality, Nyborg Municipality)"
+    },
+    {
+     "id": "5560",
+     "text": "5560 Aarup (Middelfart Municipality, Assens Municipality, Nordfyns Municipality)"
+    },
+    {
+     "id": "5580",
+     "text": "5580 Nørre Aaby (Middelfart Municipality)"
+    },
+    {
+     "id": "5591",
+     "text": "5591 Gelsted (Middelfart Municipality)"
+    },
+    {
+     "id": "5592",
+     "text": "5592 Ejby (Middelfart Municipality)"
+    },
+    {
+     "id": "5600",
+     "text": "5600 Faaborg (Faaborg-Midtfyn Municipality)"
+    },
+    {
+     "id": "5601",
+     "text": "5601 Lyø (Faaborg-Midtfyn Municipality)"
+    },
+    {
+     "id": "5602",
+     "text": "5602 Avernakø (Faaborg-Midtfyn Municipality)"
+    },
+    {
+     "id": "5603",
+     "text": "5603 Bjørnø (Faaborg-Midtfyn Municipality)"
+    },
+    {
+     "id": "5610",
+     "text": "5610 Assens (Assens Municipality)"
+    },
+    {
+     "id": "5620",
+     "text": "5620 Glamsbjerg (Assens Municipality)"
+    },
+    {
+     "id": "5631",
+     "text": "5631 Ebberup (Assens Municipality)"
+    },
+    {
+     "id": "5642",
+     "text": "5642 Millinge (Assens Municipality, Faaborg-Midtfyn Municipality)"
+    },
+    {
+     "id": "5672",
+     "text": "5672 Broby (Faaborg-Midtfyn Municipality)"
+    },
+    {
+     "id": "5683",
+     "text": "5683 Haarby (Assens Municipality)"
+    },
+    {
+     "id": "5690",
+     "text": "5690 Tommerup (Assens Municipality)"
+    },
+    {
+     "id": "5700",
+     "text": "5700 Svendborg (Svendborg Municipality)"
+    },
+    {
+     "id": "5750",
+     "text": "5750 Ringe (Faaborg-Midtfyn Municipality)"
+    },
+    {
+     "id": "5762",
+     "text": "5762 Vester Skerninge (Faaborg-Midtfyn Municipality, Svendborg Municipality)"
+    },
+    {
+     "id": "5771",
+     "text": "5771 Stenstrup (Faaborg-Midtfyn Municipality, Svendborg Municipality)"
+    },
+    {
+     "id": "5772",
+     "text": "5772 Kværndrup (Faaborg-Midtfyn Municipality, Svendborg Municipality)"
+    },
+    {
+     "id": "5792",
+     "text": "5792 Årslev (Faaborg-Midtfyn Municipality)"
+    },
+    {
+     "id": "5800",
+     "text": "5800 Nyborg (Nyborg Municipality)"
+    },
+    {
+     "id": "5853",
+     "text": "5853 Ørbæk (Faaborg-Midtfyn Municipality, Nyborg Municipality)"
+    },
+    {
+     "id": "5854",
+     "text": "5854 Gislev (Faaborg-Midtfyn Municipality)"
+    },
+    {
+     "id": "5856",
+     "text": "5856 Ryslinge (Faaborg-Midtfyn Municipality)"
+    },
+    {
+     "id": "5863",
+     "text": "5863 Ferritslev Fyn (Faaborg-Midtfyn Municipality)"
+    },
+    {
+     "id": "5871",
+     "text": "5871 Frørup (Nyborg Municipality)"
+    },
+    {
+     "id": "5874",
+     "text": "5874 Hesselager (Nyborg Municipality, Svendborg Municipality)"
+    },
+    {
+     "id": "5881",
+     "text": "5881 Skårup Fyn (Svendborg Municipality)"
+    },
+    {
+     "id": "5882",
+     "text": "5882 Vejstrup (Svendborg Municipality)"
+    },
+    {
+     "id": "5883",
+     "text": "5883 Oure (Svendborg Municipality)"
+    },
+    {
+     "id": "5884",
+     "text": "5884 Gudme (Svendborg Municipality)"
+    },
+    {
+     "id": "5892",
+     "text": "5892 Gudbjerg Sydfyn (Svendborg Municipality)"
+    },
+    {
+     "id": "5900",
+     "text": "5900 Rudkøbing (Langeland Municipality)"
+    },
+    {
+     "id": "5932",
+     "text": "5932 Humble (Langeland Municipality)"
+    },
+    {
+     "id": "5935",
+     "text": "5935 Bagenkop (Langeland Municipality)"
+    },
+    {
+     "id": "5943",
+     "text": "5943 Strynø (Langeland Municipality)"
+    },
+    {
+     "id": "5953",
+     "text": "5953 Tranekær (Langeland Municipality)"
+    },
+    {
+     "id": "5960",
+     "text": "5960 Marstal (Ærø Municipality)"
+    },
+    {
+     "id": "5965",
+     "text": "5965 Birkholm (Ærø Municipality)"
+    },
+    {
+     "id": "5970",
+     "text": "5970 Ærøskøbing (Ærø Municipality)"
+    },
+    {
+     "id": "5985",
+     "text": "5985 Søby Ærø (Ærø Municipality)"
+    },
+    {
+     "id": "6000",
+     "text": "6000 Kolding (Kolding Municipality)"
+    },
+    {
+     "id": "6040",
+     "text": "6040 Egtved (Kolding Municipality, Vejle Municipality)"
+    },
+    {
+     "id": "6051",
+     "text": "6051 Almind (Kolding Municipality)"
+    },
+    {
+     "id": "6052",
+     "text": "6052 Viuf (Kolding Municipality, Vejle Municipality)"
+    },
+    {
+     "id": "6064",
+     "text": "6064 Jordrup (Kolding Municipality)"
+    },
+    {
+     "id": "6070",
+     "text": "6070 Christiansfeld (Haderslev Municipality, Kolding Municipality)"
+    },
+    {
+     "id": "6091",
+     "text": "6091 Bjert (Kolding Municipality)"
+    },
+    {
+     "id": "6092",
+     "text": "6092 Sønder Stenderup (Kolding Municipality)"
+    },
+    {
+     "id": "6093",
+     "text": "6093 Sjølund (Kolding Municipality)"
+    },
+    {
+     "id": "6094",
+     "text": "6094 Hejls (Haderslev Municipality, Kolding Municipality)"
+    },
+    {
+     "id": "6100",
+     "text": "6100 Haderslev (Haderslev Municipality, Kolding Municipality)"
+    },
+    {
+     "id": "6200",
+     "text": "6200 Aabenraa (Aabenraa Municipality)"
+    },
+    {
+     "id": "6210",
+     "text": "6210 Barsø (Aabenraa Municipality)"
+    },
+    {
+     "id": "6230",
+     "text": "6230 Rødekro (Aabenraa Municipality)"
+    },
+    {
+     "id": "6240",
+     "text": "6240 Løgumkloster (Tønder Municipality)"
+    },
+    {
+     "id": "6261",
+     "text": "6261 Bredebro (Tønder Municipality)"
+    },
+    {
+     "id": "6270",
+     "text": "6270 Tønder (Tønder Municipality)"
+    },
+    {
+     "id": "6280",
+     "text": "6280 Højer (Tønder Municipality)"
+    },
+    {
+     "id": "6300",
+     "text": "6300 Gråsten (Sønderborg Municipality)"
+    },
+    {
+     "id": "6310",
+     "text": "6310 Broager (Sønderborg Municipality)"
+    },
+    {
+     "id": "6320",
+     "text": "6320 Egernsund (Sønderborg Municipality)"
+    },
+    {
+     "id": "6330",
+     "text": "6330 Padborg (Aabenraa Municipality)"
+    },
+    {
+     "id": "6340",
+     "text": "6340 Kruså (Aabenraa Municipality)"
+    },
+    {
+     "id": "6360",
+     "text": "6360 Tinglev (Aabenraa Municipality)"
+    },
+    {
+     "id": "6372",
+     "text": "6372 Bylderup-Bov (Aabenraa Municipality)"
+    },
+    {
+     "id": "6392",
+     "text": "6392 Bolderslev (Aabenraa Municipality)"
+    },
+    {
+     "id": "6400",
+     "text": "6400 Sønderborg (Sønderborg Municipality)"
+    },
+    {
+     "id": "6430",
+     "text": "6430 Nordborg (Sønderborg Municipality)"
+    },
+    {
+     "id": "6440",
+     "text": "6440 Augustenborg (Sønderborg Municipality)"
+    },
+    {
+     "id": "6470",
+     "text": "6470 Sydals (Sønderborg Municipality)"
+    },
+    {
+     "id": "6500",
+     "text": "6500 Vojens (Haderslev Municipality)"
+    },
+    {
+     "id": "6510",
+     "text": "6510 Gram (Haderslev Municipality, Esbjerg Municipality, Vejen Municipality)"
+    },
+    {
+     "id": "6520",
+     "text": "6520 Toftlund (Haderslev Municipality, Tønder Municipality)"
+    },
+    {
+     "id": "6534",
+     "text": "6534 Agerskov (Haderslev Municipality, Tønder Municipality, Aabenraa Municipality)"
+    },
+    {
+     "id": "6535",
+     "text": "6535 Branderup J (Tønder Municipality)"
+    },
+    {
+     "id": "6541",
+     "text": "6541 Bevtoft (Haderslev Municipality, Tønder Municipality)"
+    },
+    {
+     "id": "6560",
+     "text": "6560 Sommersted (Haderslev Municipality, Kolding Municipality)"
+    },
+    {
+     "id": "6580",
+     "text": "6580 Vamdrup (Kolding Municipality)"
+    },
+    {
+     "id": "6600",
+     "text": "6600 Vejen (Vejen Municipality)"
+    },
+    {
+     "id": "6621",
+     "text": "6621 Gesten (Vejen Municipality)"
+    },
+    {
+     "id": "6622",
+     "text": "6622 Bække (Vejen Municipality)"
+    },
+    {
+     "id": "6623",
+     "text": "6623 Vorbasse (Billund Municipality, Vejen Municipality, Vejle Municipality)"
+    },
+    {
+     "id": "6630",
+     "text": "6630 Rødding (Haderslev Municipality, Vejen Municipality)"
+    },
+    {
+     "id": "6640",
+     "text": "6640 Lunderskov (Kolding Municipality)"
+    },
+    {
+     "id": "6650",
+     "text": "6650 Brørup (Vejen Municipality)"
+    },
+    {
+     "id": "6660",
+     "text": "6660 Lintrup (Vejen Municipality)"
+    },
+    {
+     "id": "6670",
+     "text": "6670 Holsted (Esbjerg Municipality, Vejen Municipality)"
+    },
+    {
+     "id": "6682",
+     "text": "6682 Hovborg (Varde Municipality, Vejen Municipality)"
+    },
+    {
+     "id": "6683",
+     "text": "6683 Føvling (Esbjerg Municipality, Vejen Municipality)"
+    },
+    {
+     "id": "6690",
+     "text": "6690 Gørding (Esbjerg Municipality, Vejen Municipality)"
+    },
+    {
+     "id": "6700",
+     "text": "6700 Esbjerg (Esbjerg Municipality)"
+    },
+    {
+     "id": "6705",
+     "text": "6705 Esbjerg Ø (Esbjerg Municipality)"
+    },
+    {
+     "id": "6710",
+     "text": "6710 Esbjerg V (Esbjerg Municipality)"
+    },
+    {
+     "id": "6715",
+     "text": "6715 Esbjerg N (Esbjerg Municipality)"
+    },
+    {
+     "id": "6720",
+     "text": "6720 Fanø (Fanø Municipality)"
+    },
+    {
+     "id": "6731",
+     "text": "6731 Tjæreborg (Esbjerg Municipality)"
+    },
+    {
+     "id": "6740",
+     "text": "6740 Bramming (Esbjerg Municipality)"
+    },
+    {
+     "id": "6752",
+     "text": "6752 Glejbjerg (Vejen Municipality)"
+    },
+    {
+     "id": "6753",
+     "text": "6753 Agerbæk (Varde Municipality, Vejen Municipality)"
+    },
+    {
+     "id": "6760",
+     "text": "6760 Ribe (Esbjerg Municipality)"
+    },
+    {
+     "id": "6771",
+     "text": "6771 Gredstedbro (Esbjerg Municipality)"
+    },
+    {
+     "id": "6780",
+     "text": "6780 Skærbæk (Tønder Municipality)"
+    },
+    {
+     "id": "6792",
+     "text": "6792 Rømø (Tønder Municipality)"
+    },
+    {
+     "id": "6800",
+     "text": "6800 Varde (Varde Municipality)"
+    },
+    {
+     "id": "6818",
+     "text": "6818 Årre (Esbjerg Municipality, Varde Municipality)"
+    },
+    {
+     "id": "6823",
+     "text": "6823 Ansager (Billund Municipality, Varde Municipality)"
+    },
+    {
+     "id": "6830",
+     "text": "6830 Nørre Nebel (Varde Municipality, Ringkøbing-Skjern Municipality)"
+    },
+    {
+     "id": "6840",
+     "text": "6840 Oksbøl (Varde Municipality)"
+    },
+    {
+     "id": "6851",
+     "text": "6851 Janderup Vestj (Varde Municipality)"
+    },
+    {
+     "id": "6852",
+     "text": "6852 Billum (Varde Municipality)"
+    },
+    {
+     "id": "6853",
+     "text": "6853 Vejers Strand (Varde Municipality)"
+    },
+    {
+     "id": "6854",
+     "text": "6854 Henne (Varde Municipality)"
+    },
+    {
+     "id": "6855",
+     "text": "6855 Outrup (Varde Municipality)"
+    },
+    {
+     "id": "6857",
+     "text": "6857 Blåvand (Varde Municipality)"
+    },
+    {
+     "id": "6862",
+     "text": "6862 Tistrup (Varde Municipality)"
+    },
+    {
+     "id": "6870",
+     "text": "6870 Ølgod (Varde Municipality, Ringkøbing-Skjern Municipality)"
+    },
+    {
+     "id": "6880",
+     "text": "6880 Tarm (Varde Municipality, Ringkøbing-Skjern Municipality)"
+    },
+    {
+     "id": "6893",
+     "text": "6893 Hemmet (Ringkøbing-Skjern Municipality)"
+    },
+    {
+     "id": "6900",
+     "text": "6900 Skjern (Ringkøbing-Skjern Municipality)"
+    },
+    {
+     "id": "6920",
+     "text": "6920 Videbæk (Ringkøbing-Skjern Municipality)"
+    },
+    {
+     "id": "6933",
+     "text": "6933 Kibæk (Herning Municipality, Ringkøbing-Skjern Municipality)"
+    },
+    {
+     "id": "6940",
+     "text": "6940 Lem St (Ringkøbing-Skjern Municipality)"
+    },
+    {
+     "id": "6950",
+     "text": "6950 Ringkøbing (Ringkøbing-Skjern Municipality)"
+    },
+    {
+     "id": "6960",
+     "text": "6960 Hvide Sande (Ringkøbing-Skjern Municipality)"
+    },
+    {
+     "id": "6971",
+     "text": "6971 Spjald (Ringkøbing-Skjern Municipality)"
+    },
+    {
+     "id": "6973",
+     "text": "6973 Ørnhøj (Herning Municipality, Ringkøbing-Skjern Municipality)"
+    },
+    {
+     "id": "6980",
+     "text": "6980 Tim (Ringkøbing-Skjern Municipality)"
+    },
+    {
+     "id": "6990",
+     "text": "6990 Ulfborg (Herning Municipality, Holstebro Municipality, Lemvig Municipality, Ringkøbing-Skjern Municipality)"
+    },
+    {
+     "id": "7000",
+     "text": "7000 Fredericia (Fredericia Municipality, Vejle Municipality)"
+    },
+    {
+     "id": "7080",
+     "text": "7080 Børkop (Vejle Municipality)"
+    },
+    {
+     "id": "7100",
+     "text": "7100 Vejle (Vejle Municipality, Hedensted Municipality)"
+    },
+    {
+     "id": "7120",
+     "text": "7120 Vejle Øst (Vejle Municipality, Hedensted Municipality)"
+    },
+    {
+     "id": "7130",
+     "text": "7130 Juelsminde (Hedensted Municipality)"
+    },
+    {
+     "id": "7140",
+     "text": "7140 Stouby (Hedensted Municipality)"
+    },
+    {
+     "id": "7150",
+     "text": "7150 Barrit (Hedensted Municipality)"
+    },
+    {
+     "id": "7160",
+     "text": "7160 Tørring (Vejle Municipality, Hedensted Municipality)"
+    },
+    {
+     "id": "7171",
+     "text": "7171 Uldum (Hedensted Municipality)"
+    },
+    {
+     "id": "7173",
+     "text": "7173 Vonge (Vejle Municipality, Hedensted Municipality)"
+    },
+    {
+     "id": "7182",
+     "text": "7182 Bredsten (Vejle Municipality)"
+    },
+    {
+     "id": "7183",
+     "text": "7183 Randbøl (Vejle Municipality)"
+    },
+    {
+     "id": "7184",
+     "text": "7184 Vandel (Vejle Municipality)"
+    },
+    {
+     "id": "7190",
+     "text": "7190 Billund (Billund Municipality, Vejle Municipality)"
+    },
+    {
+     "id": "7200",
+     "text": "7200 Grindsted (Billund Municipality, Varde Municipality, Vejle Municipality)"
+    },
+    {
+     "id": "7250",
+     "text": "7250 Hejnsvig (Billund Municipality)"
+    },
+    {
+     "id": "7260",
+     "text": "7260 Sønder Omme (Billund Municipality, Herning Municipality)"
+    },
+    {
+     "id": "7270",
+     "text": "7270 Stakroge (Billund Municipality, Herning Municipality, Ringkøbing-Skjern Municipality)"
+    },
+    {
+     "id": "7280",
+     "text": "7280 Sønder Felding (Herning Municipality, Ringkøbing-Skjern Municipality)"
+    },
+    {
+     "id": "7300",
+     "text": "7300 Jelling (Vejle Municipality)"
+    },
+    {
+     "id": "7321",
+     "text": "7321 Gadbjerg (Vejle Municipality)"
+    },
+    {
+     "id": "7323",
+     "text": "7323 Give (Vejle Municipality, Ikast-Brande Municipality)"
+    },
+    {
+     "id": "7330",
+     "text": "7330 Brande (Vejle Municipality, Herning Municipality, Ikast-Brande Municipality)"
+    },
+    {
+     "id": "7361",
+     "text": "7361 Ejstrupholm (Vejle Municipality, Ikast-Brande Municipality)"
+    },
+    {
+     "id": "7362",
+     "text": "7362 Hampen (Silkeborg Municipality, Ikast-Brande Municipality)"
+    },
+    {
+     "id": "7400",
+     "text": "7400 Herning (Herning Municipality, Ikast-Brande Municipality, Ringkøbing-Skjern Municipality)"
+    },
+    {
+     "id": "7430",
+     "text": "7430 Ikast (Ikast-Brande Municipality)"
+    },
+    {
+     "id": "7441",
+     "text": "7441 Bording (Silkeborg Municipality, Ikast-Brande Municipality)"
+    },
+    {
+     "id": "7442",
+     "text": "7442 Engesvang (Silkeborg Municipality, Ikast-Brande Municipality)"
+    },
+    {
+     "id": "7451",
+     "text": "7451 Sunds (Herning Municipality, Ikast-Brande Municipality)"
+    },
+    {
+     "id": "7470",
+     "text": "7470 Karup J (Herning Municipality, Silkeborg Municipality, Viborg Municipality)"
+    },
+    {
+     "id": "7480",
+     "text": "7480 Vildbjerg (Herning Municipality, Ringkøbing-Skjern Municipality)"
+    },
+    {
+     "id": "7490",
+     "text": "7490 Aulum (Herning Municipality)"
+    },
+    {
+     "id": "7500",
+     "text": "7500 Holstebro (Herning Municipality, Holstebro Municipality, Struer Municipality)"
+    },
+    {
+     "id": "7540",
+     "text": "7540 Haderup (Herning Municipality, Holstebro Municipality)"
+    },
+    {
+     "id": "7550",
+     "text": "7550 Sørvad (Herning Municipality)"
+    },
+    {
+     "id": "7560",
+     "text": "7560 Hjerm (Holstebro Municipality, Struer Municipality)"
+    },
+    {
+     "id": "7570",
+     "text": "7570 Vemb (Holstebro Municipality, Lemvig Municipality)"
+    },
+    {
+     "id": "7600",
+     "text": "7600 Struer (Holstebro Municipality, Lemvig Municipality, Struer Municipality)"
+    },
+    {
+     "id": "7620",
+     "text": "7620 Lemvig (Lemvig Municipality)"
+    },
+    {
+     "id": "7650",
+     "text": "7650 Bøvlingbjerg (Lemvig Municipality)"
+    },
+    {
+     "id": "7660",
+     "text": "7660 Bækmarksbro (Lemvig Municipality, Struer Municipality)"
+    },
+    {
+     "id": "7673",
+     "text": "7673 Harboøre (Lemvig Municipality)"
+    },
+    {
+     "id": "7680",
+     "text": "7680 Thyborøn (Lemvig Municipality)"
+    },
+    {
+     "id": "7700",
+     "text": "7700 Thisted (Thisted Municipality)"
+    },
+    {
+     "id": "7730",
+     "text": "7730 Hanstholm (Thisted Municipality)"
+    },
+    {
+     "id": "7741",
+     "text": "7741 Frøstrup (Thisted Municipality)"
+    },
+    {
+     "id": "7742",
+     "text": "7742 Vesløs (Thisted Municipality)"
+    },
+    {
+     "id": "7752",
+     "text": "7752 Snedsted (Thisted Municipality)"
+    },
+    {
+     "id": "7755",
+     "text": "7755 Bedsted Thy (Thisted Municipality)"
+    },
+    {
+     "id": "7760",
+     "text": "7760 Hurup Thy (Struer Municipality, Thisted Municipality)"
+    },
+    {
+     "id": "7770",
+     "text": "7770 Vestervig (Thisted Municipality)"
+    },
+    {
+     "id": "7790",
+     "text": "7790 Thyholm (Struer Municipality)"
+    },
+    {
+     "id": "7800",
+     "text": "7800 Skive (Holstebro Municipality, Skive Municipality, Viborg Municipality)"
+    },
+    {
+     "id": "7830",
+     "text": "7830 Vinderup (Holstebro Municipality, Struer Municipality, Skive Municipality)"
+    },
+    {
+     "id": "7840",
+     "text": "7840 Højslev (Skive Municipality, Viborg Municipality)"
+    },
+    {
+     "id": "7850",
+     "text": "7850 Stoholm Jyll (Viborg Municipality)"
+    },
+    {
+     "id": "7860",
+     "text": "7860 Spøttrup (Skive Municipality)"
+    },
+    {
+     "id": "7870",
+     "text": "7870 Roslev (Skive Municipality)"
+    },
+    {
+     "id": "7884",
+     "text": "7884 Fur (Skive Municipality)"
+    },
+    {
+     "id": "7900",
+     "text": "7900 Nykøbing M (Morsø Municipality)"
+    },
+    {
+     "id": "7950",
+     "text": "7950 Erslev (Morsø Municipality)"
+    },
+    {
+     "id": "7960",
+     "text": "7960 Karby (Morsø Municipality)"
+    },
+    {
+     "id": "7970",
+     "text": "7970 Redsted M (Morsø Municipality)"
+    },
+    {
+     "id": "7980",
+     "text": "7980 Vils (Morsø Municipality)"
+    },
+    {
+     "id": "7990",
+     "text": "7990 Øster Assels (Morsø Municipality)"
+    },
+    {
+     "id": "8000",
+     "text": "8000 Aarhus C (Århus Municipality)"
+    },
+    {
+     "id": "8200",
+     "text": "8200 Aarhus N (Århus Municipality)"
+    },
+    {
+     "id": "8210",
+     "text": "8210 Aarhus V (Århus Municipality)"
+    },
+    {
+     "id": "8220",
+     "text": "8220 Brabrand (Århus Municipality)"
+    },
+    {
+     "id": "8230",
+     "text": "8230 Åbyhøj (Århus Municipality)"
+    },
+    {
+     "id": "8240",
+     "text": "8240 Risskov (Århus Municipality)"
+    },
+    {
+     "id": "8250",
+     "text": "8250 Egå (Århus Municipality)"
+    },
+    {
+     "id": "8260",
+     "text": "8260 Viby J (Århus Municipality)"
+    },
+    {
+     "id": "8270",
+     "text": "8270 Højbjerg (Århus Municipality)"
+    },
+    {
+     "id": "8300",
+     "text": "8300 Odder (Horsens Municipality, Odder Municipality, Århus Municipality)"
+    },
+    {
+     "id": "8305",
+     "text": "8305 Samsø (Samsø Municipality)"
+    },
+    {
+     "id": "8310",
+     "text": "8310 Tranbjerg J (Århus Municipality)"
+    },
+    {
+     "id": "8320",
+     "text": "8320 Mårslet (Århus Municipality)"
+    },
+    {
+     "id": "8330",
+     "text": "8330 Beder (Århus Municipality)"
+    },
+    {
+     "id": "8340",
+     "text": "8340 Malling (Odder Municipality, Århus Municipality)"
+    },
+    {
+     "id": "8350",
+     "text": "8350 Hundslund (Odder Municipality)"
+    },
+    {
+     "id": "8355",
+     "text": "8355 Solbjerg (Århus Municipality)"
+    },
+    {
+     "id": "8361",
+     "text": "8361 Hasselager (Århus Municipality)"
+    },
+    {
+     "id": "8362",
+     "text": "8362 Hørning (Skanderborg Municipality, Århus Municipality)"
+    },
+    {
+     "id": "8370",
+     "text": "8370 Hadsten (Syddjurs Municipality, Favrskov Municipality)"
+    },
+    {
+     "id": "8380",
+     "text": "8380 Trige (Favrskov Municipality, Århus Municipality)"
+    },
+    {
+     "id": "8381",
+     "text": "8381 Tilst (Århus Municipality)"
+    },
+    {
+     "id": "8382",
+     "text": "8382 Hinnerup (Favrskov Municipality, Århus Municipality)"
+    },
+    {
+     "id": "8400",
+     "text": "8400 Ebeltoft (Syddjurs Municipality)"
+    },
+    {
+     "id": "8410",
+     "text": "8410 Rønde (Syddjurs Municipality)"
+    },
+    {
+     "id": "8420",
+     "text": "8420 Knebel (Syddjurs Municipality)"
+    },
+    {
+     "id": "8444",
+     "text": "8444 Balle (Syddjurs Municipality, Norddjurs Municipality)"
+    },
+    {
+     "id": "8450",
+     "text": "8450 Hammel (Favrskov Municipality, Silkeborg Municipality)"
+    },
+    {
+     "id": "8462",
+     "text": "8462 Harlev J (Århus Municipality)"
+    },
+    {
+     "id": "8464",
+     "text": "8464 Galten (Favrskov Municipality, Skanderborg Municipality, Århus Municipality)"
+    },
+    {
+     "id": "8471",
+     "text": "8471 Sabro (Favrskov Municipality, Skanderborg Municipality, Århus Municipality)"
+    },
+    {
+     "id": "8472",
+     "text": "8472 Sporup (Favrskov Municipality, Silkeborg Municipality, Skanderborg Municipality)"
+    },
+    {
+     "id": "8500",
+     "text": "8500 Grenaa (Norddjurs Municipality)"
+    },
+    {
+     "id": "8520",
+     "text": "8520 Lystrup (Århus Municipality)"
+    },
+    {
+     "id": "8530",
+     "text": "8530 Hjortshøj (Århus Municipality)"
+    },
+    {
+     "id": "8541",
+     "text": "8541 Skødstrup (Århus Municipality)"
+    },
+    {
+     "id": "8543",
+     "text": "8543 Hornslet (Syddjurs Municipality, Århus Municipality)"
+    },
+    {
+     "id": "8544",
+     "text": "8544 Mørke (Syddjurs Municipality, Norddjurs Municipality)"
+    },
+    {
+     "id": "8550",
+     "text": "8550 Ryomgård (Syddjurs Municipality, Norddjurs Municipality)"
+    },
+    {
+     "id": "8560",
+     "text": "8560 Kolind (Syddjurs Municipality, Norddjurs Municipality)"
+    },
+    {
+     "id": "8570",
+     "text": "8570 Trustrup (Syddjurs Municipality, Norddjurs Municipality)"
+    },
+    {
+     "id": "8581",
+     "text": "8581 Nimtofte (Syddjurs Municipality, Norddjurs Municipality)"
+    },
+    {
+     "id": "8585",
+     "text": "8585 Glesborg (Norddjurs Municipality)"
+    },
+    {
+     "id": "8586",
+     "text": "8586 Ørum Djurs (Norddjurs Municipality)"
+    },
+    {
+     "id": "8592",
+     "text": "8592 Anholt (Norddjurs Municipality)"
+    },
+    {
+     "id": "8600",
+     "text": "8600 Silkeborg (Silkeborg Municipality, Skanderborg Municipality, Ikast-Brande Municipality)"
+    },
+    {
+     "id": "8620",
+     "text": "8620 Kjellerup (Silkeborg Municipality, Viborg Municipality)"
+    },
+    {
+     "id": "8632",
+     "text": "8632 Lemming (Silkeborg Municipality)"
+    },
+    {
+     "id": "8641",
+     "text": "8641 Sorring (Favrskov Municipality, Silkeborg Municipality)"
+    },
+    {
+     "id": "8643",
+     "text": "8643 Ans By (Silkeborg Municipality, Viborg Municipality)"
+    },
+    {
+     "id": "8653",
+     "text": "8653 Them (Silkeborg Municipality)"
+    },
+    {
+     "id": "8654",
+     "text": "8654 Bryrup (Horsens Municipality, Silkeborg Municipality, Ikast-Brande Municipality)"
+    },
+    {
+     "id": "8660",
+     "text": "8660 Skanderborg (Horsens Municipality, Odder Municipality, Skanderborg Municipality, Århus Municipality)"
+    },
+    {
+     "id": "8670",
+     "text": "8670 Låsby (Skanderborg Municipality)"
+    },
+    {
+     "id": "8680",
+     "text": "8680 Ry (Horsens Municipality, Silkeborg Municipality, Skanderborg Municipality)"
+    },
+    {
+     "id": "8700",
+     "text": "8700 Horsens (Horsens Municipality, Hedensted Municipality)"
+    },
+    {
+     "id": "8721",
+     "text": "8721 Daugård (Vejle Municipality, Hedensted Municipality)"
+    },
+    {
+     "id": "8722",
+     "text": "8722 Hedensted (Vejle Municipality, Hedensted Municipality)"
+    },
+    {
+     "id": "8723",
+     "text": "8723 Løsning (Hedensted Municipality)"
+    },
+    {
+     "id": "8732",
+     "text": "8732 Hovedgård (Horsens Municipality)"
+    },
+    {
+     "id": "8740",
+     "text": "8740 Brædstrup (Horsens Municipality, Silkeborg Municipality)"
+    },
+    {
+     "id": "8751",
+     "text": "8751 Gedved (Horsens Municipality, Skanderborg Municipality)"
+    },
+    {
+     "id": "8752",
+     "text": "8752 Østbirk (Horsens Municipality)"
+    },
+    {
+     "id": "8762",
+     "text": "8762 Flemming (Horsens Municipality, Hedensted Municipality)"
+    },
+    {
+     "id": "8763",
+     "text": "8763 Rask Mølle (Hedensted Municipality)"
+    },
+    {
+     "id": "8765",
+     "text": "8765 Klovborg (Horsens Municipality, Ikast-Brande Municipality)"
+    },
+    {
+     "id": "8766",
+     "text": "8766 Nørre Snede (Ikast-Brande Municipality, Hedensted Municipality)"
+    },
+    {
+     "id": "8781",
+     "text": "8781 Stenderup (Horsens Municipality, Hedensted Municipality)"
+    },
+    {
+     "id": "8783",
+     "text": "8783 Hornsyld (Horsens Municipality, Hedensted Municipality)"
+    },
+    {
+     "id": "8789",
+     "text": "8789 Endelave (Horsens Municipality)"
+    },
+    {
+     "id": "8799",
+     "text": "8799 Tunø (Odder Municipality)"
+    },
+    {
+     "id": "8800",
+     "text": "8800 Viborg (Silkeborg Municipality, Viborg Municipality)"
+    },
+    {
+     "id": "8830",
+     "text": "8830 Tjele (Viborg Municipality)"
+    },
+    {
+     "id": "8831",
+     "text": "8831 Løgstrup (Viborg Municipality)"
+    },
+    {
+     "id": "8832",
+     "text": "8832 Skals (Viborg Municipality)"
+    },
+    {
+     "id": "8840",
+     "text": "8840 Rødkærsbro (Silkeborg Municipality, Viborg Municipality)"
+    },
+    {
+     "id": "8850",
+     "text": "8850 Bjerringbro (Favrskov Municipality, Viborg Municipality)"
+    },
+    {
+     "id": "8860",
+     "text": "8860 Ulstrup (Favrskov Municipality, Randers Municipality, Viborg Municipality)"
+    },
+    {
+     "id": "8870",
+     "text": "8870 Langå (Favrskov Municipality, Randers Municipality)"
+    },
+    {
+     "id": "8881",
+     "text": "8881 Thorsø (Favrskov Municipality, Silkeborg Municipality)"
+    },
+    {
+     "id": "8882",
+     "text": "8882 Fårvang (Favrskov Municipality, Silkeborg Municipality)"
+    },
+    {
+     "id": "8883",
+     "text": "8883 Gjern (Silkeborg Municipality)"
+    },
+    {
+     "id": "8900",
+     "text": "8900 Randers C (Favrskov Municipality, Randers Municipality, Viborg Municipality)"
+    },
+    {
+     "id": "8920",
+     "text": "8920 Randers NV (Randers Municipality, Viborg Municipality)"
+    },
+    {
+     "id": "8930",
+     "text": "8930 Randers NØ (Randers Municipality)"
+    },
+    {
+     "id": "8940",
+     "text": "8940 Randers SV (Favrskov Municipality, Randers Municipality)"
+    },
+    {
+     "id": "8950",
+     "text": "8950 Ørsted (Norddjurs Municipality)"
+    },
+    {
+     "id": "8960",
+     "text": "8960 Randers SØ (Favrskov Municipality, Randers Municipality)"
+    },
+    {
+     "id": "8961",
+     "text": "8961 Allingåbro (Norddjurs Municipality)"
+    },
+    {
+     "id": "8963",
+     "text": "8963 Auning (Syddjurs Municipality, Norddjurs Municipality)"
+    },
+    {
+     "id": "8970",
+     "text": "8970 Havndal (Randers Municipality, Mariagerfjord Municipality)"
+    },
+    {
+     "id": "8981",
+     "text": "8981 Spentrup (Randers Municipality)"
+    },
+    {
+     "id": "8983",
+     "text": "8983 Gjerlev J (Randers Municipality)"
+    },
+    {
+     "id": "8990",
+     "text": "8990 Fårup (Randers Municipality, Mariagerfjord Municipality)"
+    },
+    {
+     "id": "9000",
+     "text": "9000 Aalborg (Aalborg Municipality)"
+    },
+    {
+     "id": "9200",
+     "text": "9200 Aalborg SV (Aalborg Municipality)"
+    },
+    {
+     "id": "9210",
+     "text": "9210 Aalborg SØ (Aalborg Municipality)"
+    },
+    {
+     "id": "9220",
+     "text": "9220 Aalborg Øst (Aalborg Municipality)"
+    },
+    {
+     "id": "9230",
+     "text": "9230 Svenstrup J (Rebild Municipality, Aalborg Municipality)"
+    },
+    {
+     "id": "9240",
+     "text": "9240 Nibe (Vesthimmerlands Municipality, Rebild Municipality, Aalborg Municipality)"
+    },
+    {
+     "id": "9260",
+     "text": "9260 Gistrup (Rebild Municipality, Aalborg Municipality)"
+    },
+    {
+     "id": "9270",
+     "text": "9270 Klarup (Aalborg Municipality)"
+    },
+    {
+     "id": "9280",
+     "text": "9280 Storvorde (Aalborg Municipality)"
+    },
+    {
+     "id": "9293",
+     "text": "9293 Kongerslev (Rebild Municipality, Aalborg Municipality)"
+    },
+    {
+     "id": "9300",
+     "text": "9300 Sæby (Frederikshavn Municipality)"
+    },
+    {
+     "id": "9310",
+     "text": "9310 Vodskov (Aalborg Municipality)"
+    },
+    {
+     "id": "9320",
+     "text": "9320 Hjallerup (Brønderslev Municipality, Aalborg Municipality)"
+    },
+    {
+     "id": "9330",
+     "text": "9330 Dronninglund (Brønderslev Municipality, Frederikshavn Municipality)"
+    },
+    {
+     "id": "9340",
+     "text": "9340 Asaa (Brønderslev Municipality, Frederikshavn Municipality)"
+    },
+    {
+     "id": "9352",
+     "text": "9352 Dybvad (Brønderslev Municipality, Frederikshavn Municipality)"
+    },
+    {
+     "id": "9362",
+     "text": "9362 Gandrup (Aalborg Municipality)"
+    },
+    {
+     "id": "9370",
+     "text": "9370 Hals (Brønderslev Municipality, Aalborg Municipality)"
+    },
+    {
+     "id": "9380",
+     "text": "9380 Vestbjerg (Aalborg Municipality)"
+    },
+    {
+     "id": "9381",
+     "text": "9381 Sulsted (Jammerbugt Municipality, Aalborg Municipality)"
+    },
+    {
+     "id": "9382",
+     "text": "9382 Tylstrup (Brønderslev Municipality, Jammerbugt Municipality, Aalborg Municipality)"
+    },
+    {
+     "id": "9400",
+     "text": "9400 Nørresundby (Aalborg Municipality)"
+    },
+    {
+     "id": "9430",
+     "text": "9430 Vadum (Jammerbugt Municipality, Aalborg Municipality)"
+    },
+    {
+     "id": "9440",
+     "text": "9440 Aabybro (Brønderslev Municipality, Jammerbugt Municipality, Aalborg Municipality)"
+    },
+    {
+     "id": "9460",
+     "text": "9460 Brovst (Jammerbugt Municipality)"
+    },
+    {
+     "id": "9480",
+     "text": "9480 Løkken (Brønderslev Municipality, Jammerbugt Municipality, Hjørring Municipality)"
+    },
+    {
+     "id": "9490",
+     "text": "9490 Pandrup (Jammerbugt Municipality)"
+    },
+    {
+     "id": "9492",
+     "text": "9492 Blokhus (Jammerbugt Municipality)"
+    },
+    {
+     "id": "9493",
+     "text": "9493 Saltum (Jammerbugt Municipality)"
+    },
+    {
+     "id": "9500",
+     "text": "9500 Hobro (Viborg Municipality, Rebild Municipality, Mariagerfjord Municipality)"
+    },
+    {
+     "id": "9510",
+     "text": "9510 Arden (Rebild Municipality, Mariagerfjord Municipality)"
+    },
+    {
+     "id": "9520",
+     "text": "9520 Skørping (Rebild Municipality)"
+    },
+    {
+     "id": "9530",
+     "text": "9530 Støvring (Rebild Municipality, Aalborg Municipality)"
+    },
+    {
+     "id": "9541",
+     "text": "9541 Suldrup (Vesthimmerlands Municipality, Rebild Municipality)"
+    },
+    {
+     "id": "9550",
+     "text": "9550 Mariager (Randers Municipality, Mariagerfjord Municipality)"
+    },
+    {
+     "id": "9560",
+     "text": "9560 Hadsund (Rebild Municipality, Mariagerfjord Municipality)"
+    },
+    {
+     "id": "9574",
+     "text": "9574 Bælum (Rebild Municipality)"
+    },
+    {
+     "id": "9575",
+     "text": "9575 Terndrup (Rebild Municipality)"
+    },
+    {
+     "id": "9600",
+     "text": "9600 Aars (Vesthimmerlands Municipality, Rebild Municipality)"
+    },
+    {
+     "id": "9610",
+     "text": "9610 Nørager (Vesthimmerlands Municipality, Rebild Municipality)"
+    },
+    {
+     "id": "9620",
+     "text": "9620 Aalestrup (Viborg Municipality, Vesthimmerlands Municipality, Rebild Municipality, Mariagerfjord Municipality)"
+    },
+    {
+     "id": "9631",
+     "text": "9631 Gedsted (Viborg Municipality, Vesthimmerlands Municipality)"
+    },
+    {
+     "id": "9632",
+     "text": "9632 Møldrup (Viborg Municipality, Mariagerfjord Municipality)"
+    },
+    {
+     "id": "9640",
+     "text": "9640 Farsø (Vesthimmerlands Municipality)"
+    },
+    {
+     "id": "9670",
+     "text": "9670 Løgstør (Vesthimmerlands Municipality, Jammerbugt Municipality)"
+    },
+    {
+     "id": "9681",
+     "text": "9681 Ranum (Vesthimmerlands Municipality)"
+    },
+    {
+     "id": "9690",
+     "text": "9690 Fjerritslev (Jammerbugt Municipality)"
+    },
+    {
+     "id": "9700",
+     "text": "9700 Brønderslev (Brønderslev Municipality, Jammerbugt Municipality)"
+    },
+    {
+     "id": "9740",
+     "text": "9740 Jerslev J (Brønderslev Municipality, Hjørring Municipality)"
+    },
+    {
+     "id": "9750",
+     "text": "9750 Østervrå (Brønderslev Municipality, Frederikshavn Municipality, Hjørring Municipality)"
+    },
+    {
+     "id": "9760",
+     "text": "9760 Vrå (Brønderslev Municipality, Hjørring Municipality)"
+    },
+    {
+     "id": "9800",
+     "text": "9800 Hjørring (Hjørring Municipality)"
+    },
+    {
+     "id": "9830",
+     "text": "9830 Tårs (Frederikshavn Municipality, Hjørring Municipality)"
+    },
+    {
+     "id": "9850",
+     "text": "9850 Hirtshals (Hjørring Municipality)"
+    },
+    {
+     "id": "9870",
+     "text": "9870 Sindal (Frederikshavn Municipality, Hjørring Municipality)"
+    },
+    {
+     "id": "9881",
+     "text": "9881 Bindslev (Frederikshavn Municipality, Hjørring Municipality)"
+    },
+    {
+     "id": "9900",
+     "text": "9900 Frederikshavn (Frederikshavn Municipality, Hjørring Municipality)"
+    },
+    {
+     "id": "9940",
+     "text": "9940 Læsø (Læsø Municipality)"
+    },
+    {
+     "id": "9970",
+     "text": "9970 Strandby (Frederikshavn Municipality)"
+    },
+    {
+     "id": "9981",
+     "text": "9981 Jerup (Frederikshavn Municipality)"
+    },
+    {
+     "id": "9982",
+     "text": "9982 Ålbæk (Frederikshavn Municipality, Hjørring Municipality)"
+    },
+    {
+     "id": "9990",
+     "text": "9990 Skagen (Frederikshavn Municipality)"
+    },
+    {
+     "id": "9999",
+     "text": "9999 Unknown"
+    }
+   ]
+  },
+  {
+   "id": "KØN",
+   "text": "sex",
+   "elimination": true,
+   "time": false,
+   "values": [
+    {
+     "id": "TOT",
+     "text": "Total"
+    },
+    {
+     "id": "1",
+     "text": "Men"
+    },
+    {
+     "id": "2",
+     "text": "Women"
+    }
+   ]
+  },
+  {
+   "id": "ALDER",
+   "text": "age",
+   "elimination": true,
+   "time": false,
+   "values": [
+    {
+     "id": "IALT",
+     "text": "Age, total"
+    },
+    {
+     "id": "0-4",
+     "text": "0-4 years"
+    },
+    {
+     "id": "5-9",
+     "text": "5-9 years"
+    },
+    {
+     "id": "10-14",
+     "text": "10-14 years"
+    },
+    {
+     "id": "15-19",
+     "text": "15-19 years"
+    },
+    {
+     "id": "20-24",
+     "text": "20-24 years"
+    },
+    {
+     "id": "25-29",
+     "text": "25-29 years"
+    },
+    {
+     "id": "30-34",
+     "text": "30-34 years"
+    },
+    {
+     "id": "35-39",
+     "text": "35-39 years"
+    },
+    {
+     "id": "40-44",
+     "text": "40-44 years"
+    },
+    {
+     "id": "45-49",
+     "text": "45-49 years"
+    },
+    {
+     "id": "50-54",
+     "text": "50-54 years"
+    },
+    {
+     "id": "55-59",
+     "text": "55-59 years"
+    },
+    {
+     "id": "60-64",
+     "text": "60-64 years"
+    },
+    {
+     "id": "65-69",
+     "text": "65-69 years"
+    },
+    {
+     "id": "70-74",
+     "text": "70-74 years"
+    },
+    {
+     "id": "75-79",
+     "text": "75-79 years"
+    },
+    {
+     "id": "80-84",
+     "text": "80-84 years"
+    },
+    {
+     "id": "85-89",
+     "text": "85-89 years"
+    },
+    {
+     "id": "90-94",
+     "text": "90-94 years"
+    },
+    {
+     "id": "95-99",
+     "text": "95-99 years"
+    },
+    {
+     "id": "100OV",
+     "text": "100 years and over"
+    }
+   ]
+  },
+  {
+   "id": "Tid",
+   "text": "time",
+   "elimination": false,
+   "time": true,
+   "values": [
+    {
+     "id": "2010",
+     "text": "2010"
+    },
+    {
+     "id": "2011",
+     "text": "2011"
+    },
+    {
+     "id": "2012",
+     "text": "2012"
+    },
+    {
+     "id": "2013",
+     "text": "2013"
+    },
+    {
+     "id": "2014",
+     "text": "2014"
+    },
+    {
+     "id": "2015",
+     "text": "2015"
+    },
+    {
+     "id": "2016",
+     "text": "2016"
+    },
+    {
+     "id": "2017",
+     "text": "2017"
+    },
+    {
+     "id": "2018",
+     "text": "2018"
+    },
+    {
+     "id": "2019",
+     "text": "2019"
+    },
+    {
+     "id": "2020",
+     "text": "2020"
+    },
+    {
+     "id": "2021",
+     "text": "2021"
+    },
+    {
+     "id": "2022",
+     "text": "2022"
+    },
+    {
+     "id": "2023",
+     "text": "2023"
+    },
+    {
+     "id": "2024",
+     "text": "2024"
+    },
+    {
+     "id": "2025",
+     "text": "2025"
+    },
+    {
+     "id": "2026",
+     "text": "2026"
+    }
+   ]
+  }
+ ]
+}

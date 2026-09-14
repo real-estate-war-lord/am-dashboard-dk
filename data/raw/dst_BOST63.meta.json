@@ -1,0 +1,680 @@
+{
+ "id": "BOST63",
+ "text": "Housing benefit",
+ "description": "Housing benefit by region, type of benefits, month, unit and time",
+ "unit": "-",
+ "suppressedDataValue": "0",
+ "updated": "2026-03-13T08:00:00",
+ "active": true,
+ "contacts": [
+  {
+   "name": "Morten Steenbjerg Kristensen",
+   "phone": "+4520403873",
+   "mail": "mrt@dst.dk"
+  }
+ ],
+ "documentation": null,
+ "footnote": {
+  "text": "Because of problems with the data quality in 2022 there is a slightly greater uncertainty.",
+  "mandatory": true
+ },
+ "variables": [
+  {
+   "id": "OMRÅDE",
+   "text": "region",
+   "elimination": true,
+   "time": false,
+   "map": "denmark_municipality_07",
+   "values": [
+    {
+     "id": "000",
+     "text": "All Denmark"
+    },
+    {
+     "id": "101",
+     "text": "Copenhagen"
+    },
+    {
+     "id": "147",
+     "text": "Frederiksberg"
+    },
+    {
+     "id": "155",
+     "text": "Dragør"
+    },
+    {
+     "id": "185",
+     "text": "Tårnby"
+    },
+    {
+     "id": "165",
+     "text": "Albertslund"
+    },
+    {
+     "id": "151",
+     "text": "Ballerup"
+    },
+    {
+     "id": "153",
+     "text": "Brøndby"
+    },
+    {
+     "id": "157",
+     "text": "Gentofte"
+    },
+    {
+     "id": "159",
+     "text": "Gladsaxe"
+    },
+    {
+     "id": "161",
+     "text": "Glostrup"
+    },
+    {
+     "id": "163",
+     "text": "Herlev"
+    },
+    {
+     "id": "167",
+     "text": "Hvidovre"
+    },
+    {
+     "id": "169",
+     "text": "Høje-Taastrup"
+    },
+    {
+     "id": "183",
+     "text": "Ishøj"
+    },
+    {
+     "id": "173",
+     "text": "Lyngby-Taarbæk"
+    },
+    {
+     "id": "175",
+     "text": "Rødovre"
+    },
+    {
+     "id": "187",
+     "text": "Vallensbæk"
+    },
+    {
+     "id": "201",
+     "text": "Allerød"
+    },
+    {
+     "id": "240",
+     "text": "Egedal"
+    },
+    {
+     "id": "210",
+     "text": "Fredensborg"
+    },
+    {
+     "id": "250",
+     "text": "Frederikssund"
+    },
+    {
+     "id": "190",
+     "text": "Furesø"
+    },
+    {
+     "id": "270",
+     "text": "Gribskov"
+    },
+    {
+     "id": "260",
+     "text": "Halsnæs"
+    },
+    {
+     "id": "217",
+     "text": "Helsingør"
+    },
+    {
+     "id": "219",
+     "text": "Hillerød"
+    },
+    {
+     "id": "223",
+     "text": "Hørsholm"
+    },
+    {
+     "id": "230",
+     "text": "Rudersdal"
+    },
+    {
+     "id": "400",
+     "text": "Bornholm"
+    },
+    {
+     "id": "253",
+     "text": "Greve"
+    },
+    {
+     "id": "259",
+     "text": "Køge"
+    },
+    {
+     "id": "350",
+     "text": "Lejre"
+    },
+    {
+     "id": "265",
+     "text": "Roskilde"
+    },
+    {
+     "id": "269",
+     "text": "Solrød"
+    },
+    {
+     "id": "320",
+     "text": "Faxe"
+    },
+    {
+     "id": "376",
+     "text": "Guldborgsund"
+    },
+    {
+     "id": "316",
+     "text": "Holbæk"
+    },
+    {
+     "id": "326",
+     "text": "Kalundborg"
+    },
+    {
+     "id": "360",
+     "text": "Lolland"
+    },
+    {
+     "id": "370",
+     "text": "Næstved"
+    },
+    {
+     "id": "306",
+     "text": "Odsherred"
+    },
+    {
+     "id": "329",
+     "text": "Ringsted"
+    },
+    {
+     "id": "330",
+     "text": "Slagelse"
+    },
+    {
+     "id": "340",
+     "text": "Sorø"
+    },
+    {
+     "id": "336",
+     "text": "Stevns"
+    },
+    {
+     "id": "390",
+     "text": "Vordingborg"
+    },
+    {
+     "id": "420",
+     "text": "Assens"
+    },
+    {
+     "id": "430",
+     "text": "Faaborg-Midtfyn"
+    },
+    {
+     "id": "440",
+     "text": "Kerteminde"
+    },
+    {
+     "id": "482",
+     "text": "Langeland"
+    },
+    {
+     "id": "410",
+     "text": "Middelfart"
+    },
+    {
+     "id": "480",
+     "text": "Nordfyns"
+    },
+    {
+     "id": "450",
+     "text": "Nyborg"
+    },
+    {
+     "id": "461",
+     "text": "Odense"
+    },
+    {
+     "id": "479",
+     "text": "Svendborg"
+    },
+    {
+     "id": "492",
+     "text": "Ærø"
+    },
+    {
+     "id": "530",
+     "text": "Billund"
+    },
+    {
+     "id": "561",
+     "text": "Esbjerg"
+    },
+    {
+     "id": "563",
+     "text": "Fanø"
+    },
+    {
+     "id": "607",
+     "text": "Fredericia"
+    },
+    {
+     "id": "510",
+     "text": "Haderslev"
+    },
+    {
+     "id": "621",
+     "text": "Kolding"
+    },
+    {
+     "id": "540",
+     "text": "Sønderborg"
+    },
+    {
+     "id": "550",
+     "text": "Tønder"
+    },
+    {
+     "id": "573",
+     "text": "Varde"
+    },
+    {
+     "id": "575",
+     "text": "Vejen"
+    },
+    {
+     "id": "630",
+     "text": "Vejle"
+    },
+    {
+     "id": "580",
+     "text": "Aabenraa"
+    },
+    {
+     "id": "710",
+     "text": "Favrskov"
+    },
+    {
+     "id": "766",
+     "text": "Hedensted"
+    },
+    {
+     "id": "615",
+     "text": "Horsens"
+    },
+    {
+     "id": "707",
+     "text": "Norddjurs"
+    },
+    {
+     "id": "727",
+     "text": "Odder"
+    },
+    {
+     "id": "730",
+     "text": "Randers"
+    },
+    {
+     "id": "741",
+     "text": "Samsø"
+    },
+    {
+     "id": "740",
+     "text": "Silkeborg"
+    },
+    {
+     "id": "746",
+     "text": "Skanderborg"
+    },
+    {
+     "id": "706",
+     "text": "Syddjurs"
+    },
+    {
+     "id": "751",
+     "text": "Aarhus"
+    },
+    {
+     "id": "657",
+     "text": "Herning"
+    },
+    {
+     "id": "661",
+     "text": "Holstebro"
+    },
+    {
+     "id": "756",
+     "text": "Ikast-Brande"
+    },
+    {
+     "id": "665",
+     "text": "Lemvig"
+    },
+    {
+     "id": "760",
+     "text": "Ringkøbing-Skjern"
+    },
+    {
+     "id": "779",
+     "text": "Skive"
+    },
+    {
+     "id": "671",
+     "text": "Struer"
+    },
+    {
+     "id": "791",
+     "text": "Viborg"
+    },
+    {
+     "id": "810",
+     "text": "Brønderslev"
+    },
+    {
+     "id": "813",
+     "text": "Frederikshavn"
+    },
+    {
+     "id": "860",
+     "text": "Hjørring"
+    },
+    {
+     "id": "849",
+     "text": "Jammerbugt"
+    },
+    {
+     "id": "825",
+     "text": "Læsø"
+    },
+    {
+     "id": "846",
+     "text": "Mariagerfjord"
+    },
+    {
+     "id": "773",
+     "text": "Morsø"
+    },
+    {
+     "id": "840",
+     "text": "Rebild"
+    },
+    {
+     "id": "787",
+     "text": "Thisted"
+    },
+    {
+     "id": "820",
+     "text": "Vesthimmerlands"
+    },
+    {
+     "id": "851",
+     "text": "Aalborg"
+    },
+    {
+     "id": "997",
+     "text": "Abroad"
+    }
+   ]
+  },
+  {
+   "id": "YDELSESTYPE",
+   "text": "type of benefits",
+   "elimination": true,
+   "time": false,
+   "values": [
+    {
+     "id": "1000",
+     "text": "All types of housing benefit"
+    },
+    {
+     "id": "1010",
+     "text": "Housing subsidy, all housing types"
+    },
+    {
+     "id": "1020",
+     "text": "Housing subsidy, ordinary rental"
+    },
+    {
+     "id": "1030",
+     "text": "Housing subsidy, cooperative housing"
+    },
+    {
+     "id": "1040",
+     "text": "Housing subsidy, owner"
+    },
+    {
+     "id": "1050",
+     "text": "Housing subsidy, other housing"
+    },
+    {
+     "id": "1060",
+     "text": "Early retirees, all housing types"
+    },
+    {
+     "id": "1070",
+     "text": "Early retirees, ordinary rental"
+    },
+    {
+     "id": "1080",
+     "text": "Early retirees, cooperative housing"
+    },
+    {
+     "id": "1090",
+     "text": "Early retirees, owner"
+    },
+    {
+     "id": "1100",
+     "text": "Early retirees, other housing"
+    },
+    {
+     "id": "1110",
+     "text": "Early retirees, senior housing"
+    },
+    {
+     "id": "1120",
+     "text": "Housing allowance, all housing types"
+    },
+    {
+     "id": "1130",
+     "text": "Housing allowance, ordinary rental"
+    },
+    {
+     "id": "1140",
+     "text": "Housing allowance, cooperative housing"
+    },
+    {
+     "id": "1150",
+     "text": "Housing allowance, owner"
+    },
+    {
+     "id": "1160",
+     "text": "Housing allowance, other housing"
+    },
+    {
+     "id": "1170",
+     "text": "Housing allowance, senior housing"
+    }
+   ]
+  },
+  {
+   "id": "MND",
+   "text": "month",
+   "elimination": false,
+   "time": false,
+   "values": [
+    {
+     "id": "001",
+     "text": "January"
+    },
+    {
+     "id": "002",
+     "text": "february"
+    },
+    {
+     "id": "003",
+     "text": "March"
+    },
+    {
+     "id": "004",
+     "text": "April"
+    },
+    {
+     "id": "005",
+     "text": "May"
+    },
+    {
+     "id": "006",
+     "text": "June"
+    },
+    {
+     "id": "007",
+     "text": "July"
+    },
+    {
+     "id": "008",
+     "text": "August"
+    },
+    {
+     "id": "009",
+     "text": "September"
+    },
+    {
+     "id": "010",
+     "text": "October"
+    },
+    {
+     "id": "011",
+     "text": "November"
+    },
+    {
+     "id": "012",
+     "text": "December"
+    }
+   ]
+  },
+  {
+   "id": "ENHED",
+   "text": "unit",
+   "elimination": true,
+   "time": false,
+   "values": [
+    {
+     "id": "3000",
+     "text": "Number of households"
+    },
+    {
+     "id": "3010",
+     "text": "Average benefit amount (DKK)"
+    },
+    {
+     "id": "3020",
+     "text": "Lower quantile of benefit amount (DKK)"
+    },
+    {
+     "id": "3030",
+     "text": "Median of benefit amount (DKK)"
+    },
+    {
+     "id": "3040",
+     "text": "Upper quantile of benefit amount (DKK)"
+    }
+   ]
+  },
+  {
+   "id": "Tid",
+   "text": "time",
+   "elimination": false,
+   "time": true,
+   "values": [
+    {
+     "id": "2007",
+     "text": "2007"
+    },
+    {
+     "id": "2008",
+     "text": "2008"
+    },
+    {
+     "id": "2009",
+     "text": "2009"
+    },
+    {
+     "id": "2010",
+     "text": "2010"
+    },
+    {
+     "id": "2011",
+     "text": "2011"
+    },
+    {
+     "id": "2012",
+     "text": "2012"
+    },
+    {
+     "id": "2013",
+     "text": "2013"
+    },
+    {
+     "id": "2014",
+     "text": "2014"
+    },
+    {
+     "id": "2015",
+     "text": "2015"
+    },
+    {
+     "id": "2016",
+     "text": "2016"
+    },
+    {
+     "id": "2017",
+     "text": "2017"
+    },
+    {
+     "id": "2018",
+     "text": "2018"
+    },
+    {
+     "id": "2019",
+     "text": "2019"
+    },
+    {
+     "id": "2020",
+     "text": "2020"
+    },
+    {
+     "id": "2021",
+     "text": "2021"
+    },
+    {
+     "id": "2022",
+     "text": "2022"
+    },
+    {
+     "id": "2023",
+     "text": "2023"
+    },
+    {
+     "id": "2024",
+     "text": "2024"
+    },
+    {
+     "id": "2025",
+     "text": "2025"
+    }
+   ]
+  }
+ ]
+}

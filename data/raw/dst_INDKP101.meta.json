@@ -1,0 +1,843 @@
+{
+ "id": "INDKP101",
+ "text": "People",
+ "description": "People by region, unit, sex, type of income and time",
+ "unit": "-",
+ "suppressedDataValue": "0",
+ "updated": "2025-12-01T08:00:00",
+ "active": true,
+ "contacts": [
+  {
+   "name": "Uwe Pedersen",
+   "phone": "+4523726569",
+   "mail": "uwp@dst.dk"
+  }
+ ],
+ "documentation": {
+  "id": "807ba2cb-a9ca-4400-9c6a-3400bfff2359",
+  "url": "https://www.dst.dk/documentationofstatistics/807ba2cb-a9ca-4400-9c6a-3400bfff2359"
+ },
+ "footnote": {
+  "text": "13th of Nov. 2019: 2018-Data on tax-free cash benefits, and thus overall transfers and total income has been corrected since the September release.",
+  "mandatory": false
+ },
+ "variables": [
+  {
+   "id": "OMRÅDE",
+   "text": "region",
+   "elimination": true,
+   "time": false,
+   "map": "denmark_municipality_07",
+   "values": [
+    {
+     "id": "000",
+     "text": "All Denmark"
+    },
+    {
+     "id": "01",
+     "text": "Province Byen København"
+    },
+    {
+     "id": "101",
+     "text": "Copenhagen"
+    },
+    {
+     "id": "147",
+     "text": "Frederiksberg"
+    },
+    {
+     "id": "155",
+     "text": "Dragør"
+    },
+    {
+     "id": "185",
+     "text": "Tårnby"
+    },
+    {
+     "id": "02",
+     "text": "Province Københavns omegn"
+    },
+    {
+     "id": "165",
+     "text": "Albertslund"
+    },
+    {
+     "id": "151",
+     "text": "Ballerup"
+    },
+    {
+     "id": "153",
+     "text": "Brøndby"
+    },
+    {
+     "id": "157",
+     "text": "Gentofte"
+    },
+    {
+     "id": "159",
+     "text": "Gladsaxe"
+    },
+    {
+     "id": "161",
+     "text": "Glostrup"
+    },
+    {
+     "id": "163",
+     "text": "Herlev"
+    },
+    {
+     "id": "167",
+     "text": "Hvidovre"
+    },
+    {
+     "id": "169",
+     "text": "Høje-Taastrup"
+    },
+    {
+     "id": "183",
+     "text": "Ishøj"
+    },
+    {
+     "id": "173",
+     "text": "Lyngby-Taarbæk"
+    },
+    {
+     "id": "175",
+     "text": "Rødovre"
+    },
+    {
+     "id": "187",
+     "text": "Vallensbæk"
+    },
+    {
+     "id": "03",
+     "text": "Province Nordsjælland"
+    },
+    {
+     "id": "201",
+     "text": "Allerød"
+    },
+    {
+     "id": "240",
+     "text": "Egedal"
+    },
+    {
+     "id": "210",
+     "text": "Fredensborg"
+    },
+    {
+     "id": "250",
+     "text": "Frederikssund"
+    },
+    {
+     "id": "190",
+     "text": "Furesø"
+    },
+    {
+     "id": "270",
+     "text": "Gribskov"
+    },
+    {
+     "id": "260",
+     "text": "Halsnæs"
+    },
+    {
+     "id": "217",
+     "text": "Helsingør"
+    },
+    {
+     "id": "219",
+     "text": "Hillerød"
+    },
+    {
+     "id": "223",
+     "text": "Hørsholm"
+    },
+    {
+     "id": "230",
+     "text": "Rudersdal"
+    },
+    {
+     "id": "04",
+     "text": "Province Bornholm"
+    },
+    {
+     "id": "400",
+     "text": "Bornholm"
+    },
+    {
+     "id": "05",
+     "text": "Province Østsjælland"
+    },
+    {
+     "id": "253",
+     "text": "Greve"
+    },
+    {
+     "id": "259",
+     "text": "Køge"
+    },
+    {
+     "id": "350",
+     "text": "Lejre"
+    },
+    {
+     "id": "265",
+     "text": "Roskilde"
+    },
+    {
+     "id": "269",
+     "text": "Solrød"
+    },
+    {
+     "id": "06",
+     "text": "Province Vest- og Sydsjælland"
+    },
+    {
+     "id": "320",
+     "text": "Faxe"
+    },
+    {
+     "id": "376",
+     "text": "Guldborgsund"
+    },
+    {
+     "id": "316",
+     "text": "Holbæk"
+    },
+    {
+     "id": "326",
+     "text": "Kalundborg"
+    },
+    {
+     "id": "360",
+     "text": "Lolland"
+    },
+    {
+     "id": "370",
+     "text": "Næstved"
+    },
+    {
+     "id": "306",
+     "text": "Odsherred"
+    },
+    {
+     "id": "329",
+     "text": "Ringsted"
+    },
+    {
+     "id": "330",
+     "text": "Slagelse"
+    },
+    {
+     "id": "340",
+     "text": "Sorø"
+    },
+    {
+     "id": "336",
+     "text": "Stevns"
+    },
+    {
+     "id": "390",
+     "text": "Vordingborg"
+    },
+    {
+     "id": "07",
+     "text": "Province Fyn"
+    },
+    {
+     "id": "420",
+     "text": "Assens"
+    },
+    {
+     "id": "430",
+     "text": "Faaborg-Midtfyn"
+    },
+    {
+     "id": "440",
+     "text": "Kerteminde"
+    },
+    {
+     "id": "482",
+     "text": "Langeland"
+    },
+    {
+     "id": "410",
+     "text": "Middelfart"
+    },
+    {
+     "id": "480",
+     "text": "Nordfyns"
+    },
+    {
+     "id": "450",
+     "text": "Nyborg"
+    },
+    {
+     "id": "461",
+     "text": "Odense"
+    },
+    {
+     "id": "479",
+     "text": "Svendborg"
+    },
+    {
+     "id": "492",
+     "text": "Ærø"
+    },
+    {
+     "id": "08",
+     "text": "Province Sydjylland"
+    },
+    {
+     "id": "530",
+     "text": "Billund"
+    },
+    {
+     "id": "561",
+     "text": "Esbjerg"
+    },
+    {
+     "id": "563",
+     "text": "Fanø"
+    },
+    {
+     "id": "607",
+     "text": "Fredericia"
+    },
+    {
+     "id": "510",
+     "text": "Haderslev"
+    },
+    {
+     "id": "621",
+     "text": "Kolding"
+    },
+    {
+     "id": "540",
+     "text": "Sønderborg"
+    },
+    {
+     "id": "550",
+     "text": "Tønder"
+    },
+    {
+     "id": "573",
+     "text": "Varde"
+    },
+    {
+     "id": "575",
+     "text": "Vejen"
+    },
+    {
+     "id": "630",
+     "text": "Vejle"
+    },
+    {
+     "id": "580",
+     "text": "Aabenraa"
+    },
+    {
+     "id": "09",
+     "text": "Province Østjylland"
+    },
+    {
+     "id": "710",
+     "text": "Favrskov"
+    },
+    {
+     "id": "766",
+     "text": "Hedensted"
+    },
+    {
+     "id": "615",
+     "text": "Horsens"
+    },
+    {
+     "id": "707",
+     "text": "Norddjurs"
+    },
+    {
+     "id": "727",
+     "text": "Odder"
+    },
+    {
+     "id": "730",
+     "text": "Randers"
+    },
+    {
+     "id": "741",
+     "text": "Samsø"
+    },
+    {
+     "id": "740",
+     "text": "Silkeborg"
+    },
+    {
+     "id": "746",
+     "text": "Skanderborg"
+    },
+    {
+     "id": "706",
+     "text": "Syddjurs"
+    },
+    {
+     "id": "751",
+     "text": "Aarhus"
+    },
+    {
+     "id": "10",
+     "text": "Province Vestjylland"
+    },
+    {
+     "id": "657",
+     "text": "Herning"
+    },
+    {
+     "id": "661",
+     "text": "Holstebro"
+    },
+    {
+     "id": "756",
+     "text": "Ikast-Brande"
+    },
+    {
+     "id": "665",
+     "text": "Lemvig"
+    },
+    {
+     "id": "760",
+     "text": "Ringkøbing-Skjern"
+    },
+    {
+     "id": "779",
+     "text": "Skive"
+    },
+    {
+     "id": "671",
+     "text": "Struer"
+    },
+    {
+     "id": "791",
+     "text": "Viborg"
+    },
+    {
+     "id": "11",
+     "text": "Province Nordjylland"
+    },
+    {
+     "id": "810",
+     "text": "Brønderslev"
+    },
+    {
+     "id": "813",
+     "text": "Frederikshavn"
+    },
+    {
+     "id": "860",
+     "text": "Hjørring"
+    },
+    {
+     "id": "849",
+     "text": "Jammerbugt"
+    },
+    {
+     "id": "825",
+     "text": "Læsø"
+    },
+    {
+     "id": "846",
+     "text": "Mariagerfjord"
+    },
+    {
+     "id": "773",
+     "text": "Morsø"
+    },
+    {
+     "id": "840",
+     "text": "Rebild"
+    },
+    {
+     "id": "787",
+     "text": "Thisted"
+    },
+    {
+     "id": "820",
+     "text": "Vesthimmerlands"
+    },
+    {
+     "id": "851",
+     "text": "Aalborg"
+    }
+   ]
+  },
+  {
+   "id": "ENHED",
+   "text": "unit",
+   "elimination": false,
+   "time": false,
+   "values": [
+    {
+     "id": "101",
+     "text": "People with type of income (number)"
+    },
+    {
+     "id": "110",
+     "text": "Amount of income (DKK 1.000)"
+    },
+    {
+     "id": "116",
+     "text": "Average income for all people (DKK)"
+    },
+    {
+     "id": "121",
+     "text": "Average income for people with type of income (DKK)"
+    }
+   ]
+  },
+  {
+   "id": "KOEN",
+   "text": "sex",
+   "elimination": true,
+   "time": false,
+   "values": [
+    {
+     "id": "MOK",
+     "text": "Men and women, total"
+    },
+    {
+     "id": "M",
+     "text": "Men"
+    },
+    {
+     "id": "K",
+     "text": "Women"
+    }
+   ]
+  },
+  {
+   "id": "INDKOMSTTYPE",
+   "text": "type of income",
+   "elimination": false,
+   "time": false,
+   "values": [
+    {
+     "id": "100",
+     "text": "1 Disposable income (2+30-31-32-35)"
+    },
+    {
+     "id": "105",
+     "text": "2 Pre-tax Income, total (3+7+22+26+29)"
+    },
+    {
+     "id": "110",
+     "text": "3 Primary income (4+5+6)"
+    },
+    {
+     "id": "115",
+     "text": "4 Wages and salaries etc., total"
+    },
+    {
+     "id": "120",
+     "text": "5 Entrepreneurial income, total"
+    },
+    {
+     "id": "125",
+     "text": "6 Received fees subject to labour market contributions"
+    },
+    {
+     "id": "130",
+     "text": "7 Public transfer incomes(8+14+19)"
+    },
+    {
+     "id": "135",
+     "text": "8 Unemployment and cash benefits (9+10+11+12+13)"
+    },
+    {
+     "id": "140",
+     "text": "9 Unemployment benefits"
+    },
+    {
+     "id": "145",
+     "text": "10 Other benefits from unemployment funds"
+    },
+    {
+     "id": "150",
+     "text": "11 Cash benefits"
+    },
+    {
+     "id": "155",
+     "text": "12 Job training & Limited employment benefits"
+    },
+    {
+     "id": "160",
+     "text": "13 Sickness- & parental leave"
+    },
+    {
+     "id": "165",
+     "text": "14 Other transfers(15+16+17+18)"
+    },
+    {
+     "id": "170",
+     "text": "15 Public educational grants"
+    },
+    {
+     "id": "175",
+     "text": "16 Housing benefits"
+    },
+    {
+     "id": "180",
+     "text": "17 Child benefits"
+    },
+    {
+     "id": "185",
+     "text": "18 Green check"
+    },
+    {
+     "id": "190",
+     "text": "19 Public pensions(20+21)"
+    },
+    {
+     "id": "195",
+     "text": "20 Early retirement pay"
+    },
+    {
+     "id": "200",
+     "text": "21 Disability and old age pensions"
+    },
+    {
+     "id": "205",
+     "text": "22 Private pensions(23+24+25)"
+    },
+    {
+     "id": "210",
+     "text": "23 Public servants pension"
+    },
+    {
+     "id": "215",
+     "text": "24 Pension from the ATP (Labour Market Supplementary Pension Scheme)"
+    },
+    {
+     "id": "220",
+     "text": "25 Labour market and private pensions (Annuities only)"
+    },
+    {
+     "id": "225",
+     "text": "26 Capital income, gross (27+28)"
+    },
+    {
+     "id": "230",
+     "text": "27 Interest received"
+    },
+    {
+     "id": "235",
+     "text": "28 Other property income (From stocks etc.)"
+    },
+    {
+     "id": "240",
+     "text": "29 Other personal income"
+    },
+    {
+     "id": "245",
+     "text": "30 Imputed rent"
+    },
+    {
+     "id": "250",
+     "text": "31 Interest expenses"
+    },
+    {
+     "id": "255",
+     "text": "32 Tax, total (33+34)"
+    },
+    {
+     "id": "260",
+     "text": "33 Income taxes"
+    },
+    {
+     "id": "265",
+     "text": "34 Labour market contributions etc."
+    },
+    {
+     "id": "270",
+     "text": "35 Paid alimonies"
+    },
+    {
+     "id": "275",
+     "text": "Equivalised Disposable income"
+    },
+    {
+     "id": "280",
+     "text": "Land tax home owners"
+    },
+    {
+     "id": "285",
+     "text": "Land tax, tenants"
+    },
+    {
+     "id": "290",
+     "text": "Taxable income"
+    }
+   ]
+  },
+  {
+   "id": "Tid",
+   "text": "time",
+   "elimination": false,
+   "time": true,
+   "values": [
+    {
+     "id": "1987",
+     "text": "1987"
+    },
+    {
+     "id": "1988",
+     "text": "1988"
+    },
+    {
+     "id": "1989",
+     "text": "1989"
+    },
+    {
+     "id": "1990",
+     "text": "1990"
+    },
+    {
+     "id": "1991",
+     "text": "1991"
+    },
+    {
+     "id": "1992",
+     "text": "1992"
+    },
+    {
+     "id": "1993",
+     "text": "1993"
+    },
+    {
+     "id": "1994",
+     "text": "1994"
+    },
+    {
+     "id": "1995",
+     "text": "1995"
+    },
+    {
+     "id": "1996",
+     "text": "1996"
+    },
+    {
+     "id": "1997",
+     "text": "1997"
+    },
+    {
+     "id": "1998",
+     "text": "1998"
+    },
+    {
+     "id": "1999",
+     "text": "1999"
+    },
+    {
+     "id": "2000",
+     "text": "2000"
+    },
+    {
+     "id": "2001",
+     "text": "2001"
+    },
+    {
+     "id": "2002",
+     "text": "2002"
+    },
+    {
+     "id": "2003",
+     "text": "2003"
+    },
+    {
+     "id": "2004",
+     "text": "2004"
+    },
+    {
+     "id": "2005",
+     "text": "2005"
+    },
+    {
+     "id": "2006",
+     "text": "2006"
+    },
+    {
+     "id": "2007",
+     "text": "2007"
+    },
+    {
+     "id": "2008",
+     "text": "2008"
+    },
+    {
+     "id": "2009",
+     "text": "2009"
+    },
+    {
+     "id": "2010",
+     "text": "2010"
+    },
+    {
+     "id": "2011",
+     "text": "2011"
+    },
+    {
+     "id": "2012",
+     "text": "2012"
+    },
+    {
+     "id": "2013",
+     "text": "2013"
+    },
+    {
+     "id": "2014",
+     "text": "2014"
+    },
+    {
+     "id": "2015",
+     "text": "2015"
+    },
+    {
+     "id": "2016",
+     "text": "2016"
+    },
+    {
+     "id": "2017",
+     "text": "2017"
+    },
+    {
+     "id": "2018",
+     "text": "2018"
+    },
+    {
+     "id": "2019",
+     "text": "2019"
+    },
+    {
+     "id": "2020",
+     "text": "2020"
+    },
+    {
+     "id": "2021",
+     "text": "2021"
+    },
+    {
+     "id": "2022",
+     "text": "2022"
+    },
+    {
+     "id": "2023",
+     "text": "2023"
+    },
+    {
+     "id": "2024",
+     "text": "2024"
+    }
+   ]
+  }
+ ]
+}

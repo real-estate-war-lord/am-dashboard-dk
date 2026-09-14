@@ -126,10 +126,12 @@ const chips = () => `<div class="seg">${IND.filter(i => !i.table_only).map(i =>
 const mainRing = a => (a.rings || []).slice().sort((x, y) => y.length - x.length)[0] || [];
 const centroid = ring => ring.reduce((o, p) => [o[0] + p[0] / ring.length, o[1] + p[1] / ring.length], [0, 0]);
 function muniAreas(code) { return AREAS.filter(a => a.muni === code); }
-function zoomToMuni(code) {
-  if (!LF.map) return;
-  const pts = []; muniAreas(code).forEach(a => (a.rings || []).forEach(r => r.forEach(p => pts.push(p))));
-  if (pts.length) { LF.map.fitBounds(L.latLngBounds(pts), { padding: [12, 12] }); }
+function zoomToMuni(code) { LF.pendingFit = code; }
+function applyPendingFit() {
+  if (!LF.map || !LF.pendingFit) return;
+  const pts = []; muniAreas(LF.pendingFit).forEach(a => (a.rings || []).forEach(r => r.forEach(p => pts.push(p))));
+  LF.pendingFit = null;
+  if (pts.length) LF.map.fitBounds(L.latLngBounds(pts), { padding: [12, 12] });
 }
 
 /* ---------- Macro map view ---------- */
@@ -185,7 +187,7 @@ function muniTable() {
 function areaTable(muni) {
   const ind = curInd();
   const areas = muniAreas(muni.code).slice().sort((a, b) => ((b[ind.key] ?? muni[ind.key]) ?? -1e9) - ((a[ind.key] ?? muni[ind.key]) ?? -1e9));
-  const cols = IND;
+  const cols = IND.filter(i => i.level === "postnr").concat(IND.filter(i => i.level !== "postnr"));
   return `<div class="card">
     <div class="card-head"><h3>${esc(muni.name)} by postal code</h3><span class="hint">sorted by ${esc(ind.label.toLowerCase())} · ° = municipality value (no postal-code statistic)</span></div>
     <div class="scrollx"><table class="tbl compact wraphead" data-sortable><thead><tr><th>Area</th><th>Postal code</th><th class="num">Population</th>
@@ -242,7 +244,7 @@ function lfLayers() {
       ma.forEach(a => { const c = centroid(mainRing(a)); const ww = a.pop || 1; x += c[0] * ww; y += c[1] * ww; w += ww; });
       if (!w) return;
       const t = sc.t(m[ind.key]), dark = t != null && t > .55;
-      if (zoom < 8 && (m.pop || 0) < 60000) return; /* declutter at national zoom */
+      if (zoom < 8 && (m.pop || 0) < 90000) return; /* declutter at national zoom */
       labs.push(L.marker([x / w, y / w], { interactive: false, icon: L.divIcon({
         className: "lflab" + (dark ? " lflab-dark" : ""), iconSize: null,
         html: `<b>${esc(m.name)}</b><br>${m[ind.key] != null ? fmtOf(ind)(m[ind.key]) : "–"}` }) }));
@@ -271,6 +273,7 @@ function lfInit() {
   L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", { maxZoom: 18, attribution: "© OpenStreetMap, © CARTO · Boundaries: DAGI, Klimadatastyrelsen" }).addTo(map);
   map.on("moveend zoomend", () => { const c = map.getCenter(); LF.center = [c.lat, c.lng]; LF.zoom = map.getZoom(); lfLayers(); });
   lfLayers();
+  applyPendingFit();
 }
 
 /* ---------- Market view (Denmark-only panel) ---------- */

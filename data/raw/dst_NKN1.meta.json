@@ -1,0 +1,795 @@
+{
+ "id": "NKN1",
+ "text": "Demand and supply",
+ "description": "Demand and supply by transaction, price unit, seasonal adjustment and time",
+ "unit": "-",
+ "suppressedDataValue": "0",
+ "updated": "2026-08-20T08:00:00",
+ "active": true,
+ "contacts": [
+  {
+   "name": "Jonas Dan Petersen",
+   "phone": "+4530571826",
+   "mail": "jop@dst.dk"
+  }
+ ],
+ "documentation": {
+  "id": "444519f3-2c60-4fcf-aeed-b1bd69b7e652",
+  "url": "https://www.dst.dk/documentationofstatistics/444519f3-2c60-4fcf-aeed-b1bd69b7e652"
+ },
+ "footnote": null,
+ "variables": [
+  {
+   "id": "TRANSAKT",
+   "text": "transaction",
+   "elimination": false,
+   "time": false,
+   "values": [
+    {
+     "id": "B1GQK",
+     "text": "B.1*g Gross domestic product"
+    },
+    {
+     "id": "P7K",
+     "text": "P.7 Imports of goods and services"
+    },
+    {
+     "id": "P71K",
+     "text": "P.71 Import of goods"
+    },
+    {
+     "id": "P72K",
+     "text": "P.72 Import of services"
+    },
+    {
+     "id": "TFSPR",
+     "text": "Supply"
+    },
+    {
+     "id": "P6D",
+     "text": "P.6 Exports of goods and services"
+    },
+    {
+     "id": "P61D",
+     "text": "P.61 Export of goods"
+    },
+    {
+     "id": "P62D",
+     "text": "P.62 Export of services"
+    },
+    {
+     "id": "P31S1MD",
+     "text": "P.31 Private consumption"
+    },
+    {
+     "id": "P31S14D",
+     "text": "P.31 Household consumption expenditure"
+    },
+    {
+     "id": "P311AD",
+     "text": "Purchase of vehicles"
+    },
+    {
+     "id": "P311B_3D",
+     "text": "Other goods"
+    },
+    {
+     "id": "P314A33S34D",
+     "text": "Services incl. tourism"
+    },
+    {
+     "id": "P314D",
+     "text": "Services"
+    },
+    {
+     "id": "P33D",
+     "text": "Final consumption expenditure of resident households in the rest of the world"
+    },
+    {
+     "id": "P34D",
+     "text": "Final consumption expenditure of non-resident households on the economic territory"
+    },
+    {
+     "id": "P31S15D",
+     "text": "P.31 Non-profit institutions serving households (NPISH) consumption expenditure"
+    },
+    {
+     "id": "P3S13D",
+     "text": "P.3 Government consumption expenditure"
+    },
+    {
+     "id": "P5GD",
+     "text": "P.5g Gross capital formation"
+    },
+    {
+     "id": "P51GD",
+     "text": "P.51g Gross fixed capital formation"
+    },
+    {
+     "id": "P51GD_N111",
+     "text": "N.111 Dwellings"
+    },
+    {
+     "id": "P51GD_N112",
+     "text": "N.112 Other buildings and structures"
+    },
+    {
+     "id": "P51GD_N11N",
+     "text": "N.113-N.115 Machinery, transport equipment etc."
+    },
+    {
+     "id": "P51GD_N117",
+     "text": "N.117 Intellectual property products"
+    },
+    {
+     "id": "P52_53D",
+     "text": "P.52+P.53 Changes in inventories etc."
+    },
+    {
+     "id": "P52D",
+     "text": "P.52 Changes in inventories"
+    },
+    {
+     "id": "P53D",
+     "text": "P.53 Acquisitions less disposals of valuables"
+    },
+    {
+     "id": "TFUPRXP6",
+     "text": "Final domestic demand"
+    },
+    {
+     "id": "TFUPR",
+     "text": "Final demand"
+    },
+    {
+     "id": "EMPH_DC",
+     "text": "Total actual hours worked (million hours)"
+    },
+    {
+     "id": "EMPM_DC",
+     "text": "Total employment (1,000 persons)"
+    }
+   ]
+  },
+  {
+   "id": "PRISENHED",
+   "text": "price unit",
+   "elimination": false,
+   "time": false,
+   "values": [
+    {
+     "id": "V_M",
+     "text": "Current prices, (bill. DKK.)"
+    },
+    {
+     "id": "L_V",
+     "text": "Period-to-period real growth (per cent) "
+    },
+    {
+     "id": "V_C",
+     "text": "Pr. capita. Current prices, (1000 DKK.)"
+    },
+    {
+     "id": "LKV_M",
+     "text": "2020-prices, chained values, (bill. DKK.)"
+    },
+    {
+     "id": "L_VB",
+     "text": "Contribution to GDP growth, (percentage point)"
+    },
+    {
+     "id": "LKV_C",
+     "text": "Pr. capita, 2020-prices, chained values, (1000 DKK.)"
+    }
+   ]
+  },
+  {
+   "id": "SÆSON",
+   "text": "seasonal adjustment",
+   "elimination": false,
+   "time": false,
+   "values": [
+    {
+     "id": "N",
+     "text": "Non-seasonally adjusted"
+    },
+    {
+     "id": "Y",
+     "text": "Seasonally adjusted"
+    }
+   ]
+  },
+  {
+   "id": "Tid",
+   "text": "time",
+   "elimination": false,
+   "time": true,
+   "values": [
+    {
+     "id": "1990K1",
+     "text": "1990Q1"
+    },
+    {
+     "id": "1990K2",
+     "text": "1990Q2"
+    },
+    {
+     "id": "1990K3",
+     "text": "1990Q3"
+    },
+    {
+     "id": "1990K4",
+     "text": "1990Q4"
+    },
+    {
+     "id": "1991K1",
+     "text": "1991Q1"
+    },
+    {
+     "id": "1991K2",
+     "text": "1991Q2"
+    },
+    {
+     "id": "1991K3",
+     "text": "1991Q3"
+    },
+    {
+     "id": "1991K4",
+     "text": "1991Q4"
+    },
+    {
+     "id": "1992K1",
+     "text": "1992Q1"
+    },
+    {
+     "id": "1992K2",
+     "text": "1992Q2"
+    },
+    {
+     "id": "1992K3",
+     "text": "1992Q3"
+    },
+    {
+     "id": "1992K4",
+     "text": "1992Q4"
+    },
+    {
+     "id": "1993K1",
+     "text": "1993Q1"
+    },
+    {
+     "id": "1993K2",
+     "text": "1993Q2"
+    },
+    {
+     "id": "1993K3",
+     "text": "1993Q3"
+    },
+    {
+     "id": "1993K4",
+     "text": "1993Q4"
+    },
+    {
+     "id": "1994K1",
+     "text": "1994Q1"
+    },
+    {
+     "id": "1994K2",
+     "text": "1994Q2"
+    },
+    {
+     "id": "1994K3",
+     "text": "1994Q3"
+    },
+    {
+     "id": "1994K4",
+     "text": "1994Q4"
+    },
+    {
+     "id": "1995K1",
+     "text": "1995Q1"
+    },
+    {
+     "id": "1995K2",
+     "text": "1995Q2"
+    },
+    {
+     "id": "1995K3",
+     "text": "1995Q3"
+    },
+    {
+     "id": "1995K4",
+     "text": "1995Q4"
+    },
+    {
+     "id": "1996K1",
+     "text": "1996Q1"
+    },
+    {
+     "id": "1996K2",
+     "text": "1996Q2"
+    },
+    {
+     "id": "1996K3",
+     "text": "1996Q3"
+    },
+    {
+     "id": "1996K4",
+     "text": "1996Q4"
+    },
+    {
+     "id": "1997K1",
+     "text": "1997Q1"
+    },
+    {
+     "id": "1997K2",
+     "text": "1997Q2"
+    },
+    {
+     "id": "1997K3",
+     "text": "1997Q3"
+    },
+    {
+     "id": "1997K4",
+     "text": "1997Q4"
+    },
+    {
+     "id": "1998K1",
+     "text": "1998Q1"
+    },
+    {
+     "id": "1998K2",
+     "text": "1998Q2"
+    },
+    {
+     "id": "1998K3",
+     "text": "1998Q3"
+    },
+    {
+     "id": "1998K4",
+     "text": "1998Q4"
+    },
+    {
+     "id": "1999K1",
+     "text": "1999Q1"
+    },
+    {
+     "id": "1999K2",
+     "text": "1999Q2"
+    },
+    {
+     "id": "1999K3",
+     "text": "1999Q3"
+    },
+    {
+     "id": "1999K4",
+     "text": "1999Q4"
+    },
+    {
+     "id": "2000K1",
+     "text": "2000Q1"
+    },
+    {
+     "id": "2000K2",
+     "text": "2000Q2"
+    },
+    {
+     "id": "2000K3",
+     "text": "2000Q3"
+    },
+    {
+     "id": "2000K4",
+     "text": "2000Q4"
+    },
+    {
+     "id": "2001K1",
+     "text": "2001Q1"
+    },
+    {
+     "id": "2001K2",
+     "text": "2001Q2"
+    },
+    {
+     "id": "2001K3",
+     "text": "2001Q3"
+    },
+    {
+     "id": "2001K4",
+     "text": "2001Q4"
+    },
+    {
+     "id": "2002K1",
+     "text": "2002Q1"
+    },
+    {
+     "id": "2002K2",
+     "text": "2002Q2"
+    },
+    {
+     "id": "2002K3",
+     "text": "2002Q3"
+    },
+    {
+     "id": "2002K4",
+     "text": "2002Q4"
+    },
+    {
+     "id": "2003K1",
+     "text": "2003Q1"
+    },
+    {
+     "id": "2003K2",
+     "text": "2003Q2"
+    },
+    {
+     "id": "2003K3",
+     "text": "2003Q3"
+    },
+    {
+     "id": "2003K4",
+     "text": "2003Q4"
+    },
+    {
+     "id": "2004K1",
+     "text": "2004Q1"
+    },
+    {
+     "id": "2004K2",
+     "text": "2004Q2"
+    },
+    {
+     "id": "2004K3",
+     "text": "2004Q3"
+    },
+    {
+     "id": "2004K4",
+     "text": "2004Q4"
+    },
+    {
+     "id": "2005K1",
+     "text": "2005Q1"
+    },
+    {
+     "id": "2005K2",
+     "text": "2005Q2"
+    },
+    {
+     "id": "2005K3",
+     "text": "2005Q3"
+    },
+    {
+     "id": "2005K4",
+     "text": "2005Q4"
+    },
+    {
+     "id": "2006K1",
+     "text": "2006Q1"
+    },
+    {
+     "id": "2006K2",
+     "text": "2006Q2"
+    },
+    {
+     "id": "2006K3",
+     "text": "2006Q3"
+    },
+    {
+     "id": "2006K4",
+     "text": "2006Q4"
+    },
+    {
+     "id": "2007K1",
+     "text": "2007Q1"
+    },
+    {
+     "id": "2007K2",
+     "text": "2007Q2"
+    },
+    {
+     "id": "2007K3",
+     "text": "2007Q3"
+    },
+    {
+     "id": "2007K4",
+     "text": "2007Q4"
+    },
+    {
+     "id": "2008K1",
+     "text": "2008Q1"
+    },
+    {
+     "id": "2008K2",
+     "text": "2008Q2"
+    },
+    {
+     "id": "2008K3",
+     "text": "2008Q3"
+    },
+    {
+     "id": "2008K4",
+     "text": "2008Q4"
+    },
+    {
+     "id": "2009K1",
+     "text": "2009Q1"
+    },
+    {
+     "id": "2009K2",
+     "text": "2009Q2"
+    },
+    {
+     "id": "2009K3",
+     "text": "2009Q3"
+    },
+    {
+     "id": "2009K4",
+     "text": "2009Q4"
+    },
+    {
+     "id": "2010K1",
+     "text": "2010Q1"
+    },
+    {
+     "id": "2010K2",
+     "text": "2010Q2"
+    },
+    {
+     "id": "2010K3",
+     "text": "2010Q3"
+    },
+    {
+     "id": "2010K4",
+     "text": "2010Q4"
+    },
+    {
+     "id": "2011K1",
+     "text": "2011Q1"
+    },
+    {
+     "id": "2011K2",
+     "text": "2011Q2"
+    },
+    {
+     "id": "2011K3",
+     "text": "2011Q3"
+    },
+    {
+     "id": "2011K4",
+     "text": "2011Q4"
+    },
+    {
+     "id": "2012K1",
+     "text": "2012Q1"
+    },
+    {
+     "id": "2012K2",
+     "text": "2012Q2"
+    },
+    {
+     "id": "2012K3",
+     "text": "2012Q3"
+    },
+    {
+     "id": "2012K4",
+     "text": "2012Q4"
+    },
+    {
+     "id": "2013K1",
+     "text": "2013Q1"
+    },
+    {
+     "id": "2013K2",
+     "text": "2013Q2"
+    },
+    {
+     "id": "2013K3",
+     "text": "2013Q3"
+    },
+    {
+     "id": "2013K4",
+     "text": "2013Q4"
+    },
+    {
+     "id": "2014K1",
+     "text": "2014Q1"
+    },
+    {
+     "id": "2014K2",
+     "text": "2014Q2"
+    },
+    {
+     "id": "2014K3",
+     "text": "2014Q3"
+    },
+    {
+     "id": "2014K4",
+     "text": "2014Q4"
+    },
+    {
+     "id": "2015K1",
+     "text": "2015Q1"
+    },
+    {
+     "id": "2015K2",
+     "text": "2015Q2"
+    },
+    {
+     "id": "2015K3",
+     "text": "2015Q3"
+    },
+    {
+     "id": "2015K4",
+     "text": "2015Q4"
+    },
+    {
+     "id": "2016K1",
+     "text": "2016Q1"
+    },
+    {
+     "id": "2016K2",
+     "text": "2016Q2"
+    },
+    {
+     "id": "2016K3",
+     "text": "2016Q3"
+    },
+    {
+     "id": "2016K4",
+     "text": "2016Q4"
+    },
+    {
+     "id": "2017K1",
+     "text": "2017Q1"
+    },
+    {
+     "id": "2017K2",
+     "text": "2017Q2"
+    },
+    {
+     "id": "2017K3",
+     "text": "2017Q3"
+    },
+    {
+     "id": "2017K4",
+     "text": "2017Q4"
+    },
+    {
+     "id": "2018K1",
+     "text": "2018Q1"
+    },
+    {
+     "id": "2018K2",
+     "text": "2018Q2"
+    },
+    {
+     "id": "2018K3",
+     "text": "2018Q3"
+    },
+    {
+     "id": "2018K4",
+     "text": "2018Q4"
+    },
+    {
+     "id": "2019K1",
+     "text": "2019Q1"
+    },
+    {
+     "id": "2019K2",
+     "text": "2019Q2"
+    },
+    {
+     "id": "2019K3",
+     "text": "2019Q3"
+    },
+    {
+     "id": "2019K4",
+     "text": "2019Q4"
+    },
+    {
+     "id": "2020K1",
+     "text": "2020Q1"
+    },
+    {
+     "id": "2020K2",
+     "text": "2020Q2"
+    },
+    {
+     "id": "2020K3",
+     "text": "2020Q3"
+    },
+    {
+     "id": "2020K4",
+     "text": "2020Q4"
+    },
+    {
+     "id": "2021K1",
+     "text": "2021Q1"
+    },
+    {
+     "id": "2021K2",
+     "text": "2021Q2"
+    },
+    {
+     "id": "2021K3",
+     "text": "2021Q3"
+    },
+    {
+     "id": "2021K4",
+     "text": "2021Q4"
+    },
+    {
+     "id": "2022K1",
+     "text": "2022Q1"
+    },
+    {
+     "id": "2022K2",
+     "text": "2022Q2"
+    },
+    {
+     "id": "2022K3",
+     "text": "2022Q3"
+    },
+    {
+     "id": "2022K4",
+     "text": "2022Q4"
+    },
+    {
+     "id": "2023K1",
+     "text": "2023Q1"
+    },
+    {
+     "id": "2023K2",
+     "text": "2023Q2"
+    },
+    {
+     "id": "2023K3",
+     "text": "2023Q3"
+    },
+    {
+     "id": "2023K4",
+     "text": "2023Q4"
+    },
+    {
+     "id": "2024K1",
+     "text": "2024Q1"
+    },
+    {
+     "id": "2024K2",
+     "text": "2024Q2"
+    },
+    {
+     "id": "2024K3",
+     "text": "2024Q3"
+    },
+    {
+     "id": "2024K4",
+     "text": "2024Q4"
+    },
+    {
+     "id": "2025K1",
+     "text": "2025Q1"
+    },
+    {
+     "id": "2025K2",
+     "text": "2025Q2"
+    },
+    {
+     "id": "2025K3",
+     "text": "2025Q3"
+    },
+    {
+     "id": "2025K4",
+     "text": "2025Q4"
+    },
+    {
+     "id": "2026K1",
+     "text": "2026Q1"
+    },
+    {
+     "id": "2026K2",
+     "text": "2026Q2"
+    }
+   ]
+  }
+ ]
+}

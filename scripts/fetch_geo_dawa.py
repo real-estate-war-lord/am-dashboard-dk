@@ -29,7 +29,7 @@ BASE = "https://api.dataforsyningen.dk"
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / "data" / "geo"
 UA = {"User-Agent": "am-dashboard-dk/0.1"}
-KEEP = {"kommuner": ["kode", "navn", "regionskode"], "postnumre": ["nr", "navn", "kommuner"],
+KEEP = {"kommuner": ["kode", "navn", "regionskode"], "postnumre": ["nr", "navn", "kommuner", "codes"],
         "sogne": ["kode", "navn"], "landsdele": ["nuts3", "navn"], "regioner": ["kode", "navn"]}
 
 
@@ -73,32 +73,72 @@ def feature_id(layer, props):
 
 
 def attach_municipalities(postnumre):
-    """Fill properties.kommuner = [codes, dominant first] by area of overlap with
-    data/geo/raw/kommuner.geojson (DAWA's GeoJSON output omits this link)."""
+    """Post-process postal codes with shapely (DAWA's GeoJSON omits the municipality link
+    and its postal polygons extend into the sea):
+      1. properties.kommuner = [codes, dominant first] by overlap area with raw/kommuner.geojson
+      2. geometry clipped to the union of the overlapping municipalities (removes sea)
+      3. street-level codes (nr < 2000, central Copenhagen) merged by (name, dominant
+         municipality) into one area: nr = lowest code, properties.codes = all merged codes
+    Returns the new feature list."""
     komp = OUT / "raw" / "kommuner.geojson"
     if not komp.exists():
-        log("    WARNING: raw/kommuner.geojson missing — cannot attach municipalities"); return
+        log("    WARNING: raw/kommuner.geojson missing — cannot attach municipalities"); return postnumre
     try:
-        from shapely.geometry import shape
+        from shapely.geometry import shape, mapping
+        from shapely.ops import unary_union
         from shapely.strtree import STRtree
     except ImportError:
-        log("    WARNING: shapely not installed — cannot attach municipalities (pip3 install shapely)"); return
+        log("    WARNING: shapely not installed — cannot attach municipalities (pip3 install shapely)"); return postnumre
     koms = json.loads(komp.read_text(encoding="utf-8"))["features"]
     kgeoms = [shape(k["geometry"]).buffer(0) for k in koms]
     kcodes = [k["properties"]["kode"] for k in koms]
     tree = STRtree(kgeoms)
-    done = 0
+    out, done = [], 0
     for f in postnumre:
         g = shape(f["geometry"]).buffer(0)
         shares = []
         for idx in tree.query(g):
             a = g.intersection(kgeoms[idx]).area
             if a > 0:
-                shares.append((a, kcodes[idx]))
+                shares.append((a, idx))
         shares.sort(reverse=True)
-        f["properties"]["kommuner"] = [{"kode": c} for _, c in shares]
-        done += bool(shares)
-    log(f"    municipalities attached for {done}/{len(postnumre)} postal codes (dominant first, by overlap area)")
+        if shares:
+            clipped = g.intersection(unary_union([kgeoms[i] for _, i in shares]))
+            if clipped.geom_type == "GeometryCollection":  # drop stray lines/points
+                clipped = unary_union([x for x in clipped.geoms if x.geom_type in ("Polygon", "MultiPolygon")])
+            if not clipped.is_empty:
+                g = clipped
+            done += 1
+        f["properties"]["kommuner"] = [{"kode": kcodes[i]} for _, i in shares]
+        f["properties"]["codes"] = [f["properties"]["nr"]]
+        f["geometry"] = mapping(g)
+        out.append(f)
+    log(f"    municipalities attached and geometry clipped for {done}/{len(postnumre)} postal codes")
+    # merge street-level codes (< 2000) by name + dominant municipality
+    groups, keep = {}, []
+    for f in out:
+        pr = f["properties"]
+        try:
+            nr = int(pr["nr"])
+        except (TypeError, ValueError):
+            keep.append(f); continue
+        dom = pr["kommuner"][0]["kode"] if pr["kommuner"] else None
+        if nr < 2000 and dom:
+            groups.setdefault((pr["navn"], dom), []).append(f)
+        else:
+            keep.append(f)
+    for (navn, dom), fs in groups.items():
+        fs.sort(key=lambda x: int(x["properties"]["nr"]))
+        if len(fs) == 1:
+            keep.append(fs[0]); continue
+        g = unary_union([shape(x["geometry"]).buffer(0) for x in fs])
+        base = fs[0]
+        base["properties"]["codes"] = [x["properties"]["nr"] for x in fs]
+        base["geometry"] = mapping(g)
+        keep.append(base)
+        log(f"    merged {len(fs)} street-level codes → {base['properties']['nr']} {navn}")
+    keep.sort(key=lambda x: str(x["properties"]["nr"]))
+    return keep
 
 
 def collect(layer, kommunekoder):
@@ -159,7 +199,7 @@ def main():
                 continue
             rawp.write_text(json.dumps({"type": "FeatureCollection", "features": raw}, ensure_ascii=False))
         if layer == "postnumre":
-            attach_municipalities(raw)
+            raw = attach_municipalities(raw)
         feats = []
         for f in raw:
             props = {k: f["properties"].get(k) for k in KEEP[layer]}

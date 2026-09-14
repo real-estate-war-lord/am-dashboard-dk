@@ -1,0 +1,1085 @@
+{
+ "id": "BM010",
+ "text": "Property prices in housing market",
+ "description": "Property prices in housing market by area, property category, prices of completed transactions and time",
+ "unit": "DKK per m2",
+ "suppressedDataValue": "0",
+ "updated": "2026-06-18T08:00:00",
+ "active": true,
+ "contacts": [
+  {
+   "name": "Finans Danmark",
+   "phone": "+4533701258",
+   "mail": "stat@fida.dk"
+  }
+ ],
+ "documentation": null,
+ "footnote": null,
+ "variables": [
+  {
+   "id": "OMR20",
+   "text": "area",
+   "elimination": true,
+   "time": false,
+   "map": "denmark_municipality_07",
+   "values": [
+    {
+     "id": "00",
+     "text": "All Denmark"
+    },
+    {
+     "id": "084",
+     "text": "Capital region"
+    },
+    {
+     "id": "01",
+     "text": "Subregion Copenhagen City"
+    },
+    {
+     "id": "101",
+     "text": "Copenhagen"
+    },
+    {
+     "id": "147",
+     "text": "Frederiksberg"
+    },
+    {
+     "id": "155",
+     "text": "Dragør"
+    },
+    {
+     "id": "185",
+     "text": "Tårnby"
+    },
+    {
+     "id": "02",
+     "text": "Subregion Copenhagen suburbs"
+    },
+    {
+     "id": "165",
+     "text": "Albertslund"
+    },
+    {
+     "id": "151",
+     "text": "Ballerup"
+    },
+    {
+     "id": "153",
+     "text": "Brøndby"
+    },
+    {
+     "id": "157",
+     "text": "Gentofte"
+    },
+    {
+     "id": "159",
+     "text": "Gladsaxe"
+    },
+    {
+     "id": "161",
+     "text": "Glostrup"
+    },
+    {
+     "id": "163",
+     "text": "Herlev"
+    },
+    {
+     "id": "167",
+     "text": "Hvidovre"
+    },
+    {
+     "id": "169",
+     "text": "Høje-Taastrup"
+    },
+    {
+     "id": "183",
+     "text": "Ishøj"
+    },
+    {
+     "id": "173",
+     "text": "Lyngby-Taarbæk"
+    },
+    {
+     "id": "175",
+     "text": "Rødovre"
+    },
+    {
+     "id": "187",
+     "text": "Vallensbæk"
+    },
+    {
+     "id": "03",
+     "text": "Subregion North Zealand"
+    },
+    {
+     "id": "201",
+     "text": "Allerød"
+    },
+    {
+     "id": "240",
+     "text": "Egedal"
+    },
+    {
+     "id": "210",
+     "text": "Fredensborg"
+    },
+    {
+     "id": "250",
+     "text": "Frederikssund"
+    },
+    {
+     "id": "190",
+     "text": "Furesø"
+    },
+    {
+     "id": "270",
+     "text": "Gribskov"
+    },
+    {
+     "id": "260",
+     "text": "Halsnæs"
+    },
+    {
+     "id": "217",
+     "text": "Helsingør"
+    },
+    {
+     "id": "219",
+     "text": "Hillerød"
+    },
+    {
+     "id": "223",
+     "text": "Hørsholm"
+    },
+    {
+     "id": "230",
+     "text": "Rudersdal"
+    },
+    {
+     "id": "04",
+     "text": "Subregion Bornholm"
+    },
+    {
+     "id": "400",
+     "text": "Bornholm"
+    },
+    {
+     "id": "085",
+     "text": "Region Zealand"
+    },
+    {
+     "id": "05",
+     "text": "Subregion East Zealand"
+    },
+    {
+     "id": "253",
+     "text": "Greve"
+    },
+    {
+     "id": "259",
+     "text": "Køge"
+    },
+    {
+     "id": "350",
+     "text": "Lejre"
+    },
+    {
+     "id": "265",
+     "text": "Roskilde"
+    },
+    {
+     "id": "269",
+     "text": "Solrød"
+    },
+    {
+     "id": "06",
+     "text": "Subregion West and South Zealand"
+    },
+    {
+     "id": "320",
+     "text": "Faxe"
+    },
+    {
+     "id": "376",
+     "text": "Guldborgsund"
+    },
+    {
+     "id": "316",
+     "text": "Holbæk"
+    },
+    {
+     "id": "326",
+     "text": "Kalundborg"
+    },
+    {
+     "id": "360",
+     "text": "Lolland"
+    },
+    {
+     "id": "370",
+     "text": "Næstved"
+    },
+    {
+     "id": "306",
+     "text": "Odsherred"
+    },
+    {
+     "id": "329",
+     "text": "Ringsted"
+    },
+    {
+     "id": "330",
+     "text": "Slagelse"
+    },
+    {
+     "id": "340",
+     "text": "Sorø"
+    },
+    {
+     "id": "336",
+     "text": "Stevns"
+    },
+    {
+     "id": "390",
+     "text": "Vordingborg"
+    },
+    {
+     "id": "083",
+     "text": "Region of Southern Denmark"
+    },
+    {
+     "id": "07",
+     "text": "Subregion Funen"
+    },
+    {
+     "id": "420",
+     "text": "Assens"
+    },
+    {
+     "id": "430",
+     "text": "Faaborg-Central Funen"
+    },
+    {
+     "id": "440",
+     "text": "Kerteminde"
+    },
+    {
+     "id": "482",
+     "text": "Langeland"
+    },
+    {
+     "id": "410",
+     "text": "Middelfart"
+    },
+    {
+     "id": "480",
+     "text": "North Funen"
+    },
+    {
+     "id": "450",
+     "text": "Nyborg"
+    },
+    {
+     "id": "461",
+     "text": "Odense"
+    },
+    {
+     "id": "479",
+     "text": "Svendborg"
+    },
+    {
+     "id": "492",
+     "text": "Ærø"
+    },
+    {
+     "id": "08",
+     "text": "Subregion South Jutland"
+    },
+    {
+     "id": "530",
+     "text": "Billund"
+    },
+    {
+     "id": "561",
+     "text": "Esbjerg"
+    },
+    {
+     "id": "563",
+     "text": "Fanø"
+    },
+    {
+     "id": "607",
+     "text": "Fredericia"
+    },
+    {
+     "id": "510",
+     "text": "Haderslev"
+    },
+    {
+     "id": "621",
+     "text": "Kolding"
+    },
+    {
+     "id": "540",
+     "text": "Sønderborg"
+    },
+    {
+     "id": "550",
+     "text": "Tønder"
+    },
+    {
+     "id": "573",
+     "text": "Varde"
+    },
+    {
+     "id": "575",
+     "text": "Vejen"
+    },
+    {
+     "id": "630",
+     "text": "Vejle"
+    },
+    {
+     "id": "580",
+     "text": "Aabenraa"
+    },
+    {
+     "id": "082",
+     "text": "Central Denmark Region"
+    },
+    {
+     "id": "09",
+     "text": "Subregion East Jutland"
+    },
+    {
+     "id": "710",
+     "text": "Favrskov"
+    },
+    {
+     "id": "766",
+     "text": "Hedensted"
+    },
+    {
+     "id": "615",
+     "text": "Horsens"
+    },
+    {
+     "id": "707",
+     "text": "Norddjurs"
+    },
+    {
+     "id": "727",
+     "text": "Odder"
+    },
+    {
+     "id": "730",
+     "text": "Randers"
+    },
+    {
+     "id": "741",
+     "text": "Samsø"
+    },
+    {
+     "id": "740",
+     "text": "Silkeborg"
+    },
+    {
+     "id": "746",
+     "text": "Skanderborg"
+    },
+    {
+     "id": "706",
+     "text": "Syddjurs"
+    },
+    {
+     "id": "751",
+     "text": "Århus"
+    },
+    {
+     "id": "10",
+     "text": "Subregion West Jutland"
+    },
+    {
+     "id": "657",
+     "text": "Herning"
+    },
+    {
+     "id": "661",
+     "text": "Holstebro"
+    },
+    {
+     "id": "756",
+     "text": "Ikast-Brande"
+    },
+    {
+     "id": "665",
+     "text": "Lemvig"
+    },
+    {
+     "id": "760",
+     "text": "Ringkøbing-Skjern"
+    },
+    {
+     "id": "779",
+     "text": "Skive"
+    },
+    {
+     "id": "671",
+     "text": "Struer"
+    },
+    {
+     "id": "791",
+     "text": "Viborg"
+    },
+    {
+     "id": "081",
+     "text": "Region of North Jutland"
+    },
+    {
+     "id": "11",
+     "text": "Subregion North Jutland"
+    },
+    {
+     "id": "810",
+     "text": "Brønderslev"
+    },
+    {
+     "id": "813",
+     "text": "Frederikshavn"
+    },
+    {
+     "id": "860",
+     "text": "Hjørring"
+    },
+    {
+     "id": "849",
+     "text": "Jammerbugt"
+    },
+    {
+     "id": "825",
+     "text": "Læsø"
+    },
+    {
+     "id": "846",
+     "text": "Mariagerfjord"
+    },
+    {
+     "id": "773",
+     "text": "Morsø"
+    },
+    {
+     "id": "840",
+     "text": "Rebild"
+    },
+    {
+     "id": "787",
+     "text": "Thisted"
+    },
+    {
+     "id": "820",
+     "text": "Vesthimmerlands"
+    },
+    {
+     "id": "851",
+     "text": "Aalborg"
+    }
+   ]
+  },
+  {
+   "id": "EJKAT20",
+   "text": "property category",
+   "elimination": false,
+   "time": false,
+   "values": [
+    {
+     "id": "1",
+     "text": "Detached/terraced house"
+    },
+    {
+     "id": "2",
+     "text": "Owner-occupied flat"
+    },
+    {
+     "id": "3",
+     "text": "Holiday home"
+    }
+   ]
+  },
+  {
+   "id": "PRIS20",
+   "text": "prices of completed transactions",
+   "elimination": false,
+   "time": false,
+   "values": [
+    {
+     "id": "UDBUD",
+     "text": "Initial listing price"
+    },
+    {
+     "id": "NEDTAG",
+     "text": "Final listing price"
+    },
+    {
+     "id": "REAL",
+     "text": "Transaction price realised"
+    }
+   ]
+  },
+  {
+   "id": "Tid",
+   "text": "time",
+   "elimination": false,
+   "time": true,
+   "values": [
+    {
+     "id": "1992K1",
+     "text": "1992Q1"
+    },
+    {
+     "id": "1992K2",
+     "text": "1992Q2"
+    },
+    {
+     "id": "1992K3",
+     "text": "1992Q3"
+    },
+    {
+     "id": "1992K4",
+     "text": "1992Q4"
+    },
+    {
+     "id": "1993K1",
+     "text": "1993Q1"
+    },
+    {
+     "id": "1993K2",
+     "text": "1993Q2"
+    },
+    {
+     "id": "1993K3",
+     "text": "1993Q3"
+    },
+    {
+     "id": "1993K4",
+     "text": "1993Q4"
+    },
+    {
+     "id": "1994K1",
+     "text": "1994Q1"
+    },
+    {
+     "id": "1994K2",
+     "text": "1994Q2"
+    },
+    {
+     "id": "1994K3",
+     "text": "1994Q3"
+    },
+    {
+     "id": "1994K4",
+     "text": "1994Q4"
+    },
+    {
+     "id": "1995K1",
+     "text": "1995Q1"
+    },
+    {
+     "id": "1995K2",
+     "text": "1995Q2"
+    },
+    {
+     "id": "1995K3",
+     "text": "1995Q3"
+    },
+    {
+     "id": "1995K4",
+     "text": "1995Q4"
+    },
+    {
+     "id": "1996K1",
+     "text": "1996Q1"
+    },
+    {
+     "id": "1996K2",
+     "text": "1996Q2"
+    },
+    {
+     "id": "1996K3",
+     "text": "1996Q3"
+    },
+    {
+     "id": "1996K4",
+     "text": "1996Q4"
+    },
+    {
+     "id": "1997K1",
+     "text": "1997Q1"
+    },
+    {
+     "id": "1997K2",
+     "text": "1997Q2"
+    },
+    {
+     "id": "1997K3",
+     "text": "1997Q3"
+    },
+    {
+     "id": "1997K4",
+     "text": "1997Q4"
+    },
+    {
+     "id": "1998K1",
+     "text": "1998Q1"
+    },
+    {
+     "id": "1998K2",
+     "text": "1998Q2"
+    },
+    {
+     "id": "1998K3",
+     "text": "1998Q3"
+    },
+    {
+     "id": "1998K4",
+     "text": "1998Q4"
+    },
+    {
+     "id": "1999K1",
+     "text": "1999Q1"
+    },
+    {
+     "id": "1999K2",
+     "text": "1999Q2"
+    },
+    {
+     "id": "1999K3",
+     "text": "1999Q3"
+    },
+    {
+     "id": "1999K4",
+     "text": "1999Q4"
+    },
+    {
+     "id": "2000K1",
+     "text": "2000Q1"
+    },
+    {
+     "id": "2000K2",
+     "text": "2000Q2"
+    },
+    {
+     "id": "2000K3",
+     "text": "2000Q3"
+    },
+    {
+     "id": "2000K4",
+     "text": "2000Q4"
+    },
+    {
+     "id": "2001K1",
+     "text": "2001Q1"
+    },
+    {
+     "id": "2001K2",
+     "text": "2001Q2"
+    },
+    {
+     "id": "2001K3",
+     "text": "2001Q3"
+    },
+    {
+     "id": "2001K4",
+     "text": "2001Q4"
+    },
+    {
+     "id": "2002K1",
+     "text": "2002Q1"
+    },
+    {
+     "id": "2002K2",
+     "text": "2002Q2"
+    },
+    {
+     "id": "2002K3",
+     "text": "2002Q3"
+    },
+    {
+     "id": "2002K4",
+     "text": "2002Q4"
+    },
+    {
+     "id": "2003K1",
+     "text": "2003Q1"
+    },
+    {
+     "id": "2003K2",
+     "text": "2003Q2"
+    },
+    {
+     "id": "2003K3",
+     "text": "2003Q3"
+    },
+    {
+     "id": "2003K4",
+     "text": "2003Q4"
+    },
+    {
+     "id": "2004K1",
+     "text": "2004Q1"
+    },
+    {
+     "id": "2004K2",
+     "text": "2004Q2"
+    },
+    {
+     "id": "2004K3",
+     "text": "2004Q3"
+    },
+    {
+     "id": "2004K4",
+     "text": "2004Q4"
+    },
+    {
+     "id": "2005K1",
+     "text": "2005Q1"
+    },
+    {
+     "id": "2005K2",
+     "text": "2005Q2"
+    },
+    {
+     "id": "2005K3",
+     "text": "2005Q3"
+    },
+    {
+     "id": "2005K4",
+     "text": "2005Q4"
+    },
+    {
+     "id": "2006K1",
+     "text": "2006Q1"
+    },
+    {
+     "id": "2006K2",
+     "text": "2006Q2"
+    },
+    {
+     "id": "2006K3",
+     "text": "2006Q3"
+    },
+    {
+     "id": "2006K4",
+     "text": "2006Q4"
+    },
+    {
+     "id": "2007K1",
+     "text": "2007Q1"
+    },
+    {
+     "id": "2007K2",
+     "text": "2007Q2"
+    },
+    {
+     "id": "2007K3",
+     "text": "2007Q3"
+    },
+    {
+     "id": "2007K4",
+     "text": "2007Q4"
+    },
+    {
+     "id": "2008K1",
+     "text": "2008Q1"
+    },
+    {
+     "id": "2008K2",
+     "text": "2008Q2"
+    },
+    {
+     "id": "2008K3",
+     "text": "2008Q3"
+    },
+    {
+     "id": "2008K4",
+     "text": "2008Q4"
+    },
+    {
+     "id": "2009K1",
+     "text": "2009Q1"
+    },
+    {
+     "id": "2009K2",
+     "text": "2009Q2"
+    },
+    {
+     "id": "2009K3",
+     "text": "2009Q3"
+    },
+    {
+     "id": "2009K4",
+     "text": "2009Q4"
+    },
+    {
+     "id": "2010K1",
+     "text": "2010Q1"
+    },
+    {
+     "id": "2010K2",
+     "text": "2010Q2"
+    },
+    {
+     "id": "2010K3",
+     "text": "2010Q3"
+    },
+    {
+     "id": "2010K4",
+     "text": "2010Q4"
+    },
+    {
+     "id": "2011K1",
+     "text": "2011Q1"
+    },
+    {
+     "id": "2011K2",
+     "text": "2011Q2"
+    },
+    {
+     "id": "2011K3",
+     "text": "2011Q3"
+    },
+    {
+     "id": "2011K4",
+     "text": "2011Q4"
+    },
+    {
+     "id": "2012K1",
+     "text": "2012Q1"
+    },
+    {
+     "id": "2012K2",
+     "text": "2012Q2"
+    },
+    {
+     "id": "2012K3",
+     "text": "2012Q3"
+    },
+    {
+     "id": "2012K4",
+     "text": "2012Q4"
+    },
+    {
+     "id": "2013K1",
+     "text": "2013Q1"
+    },
+    {
+     "id": "2013K2",
+     "text": "2013Q2"
+    },
+    {
+     "id": "2013K3",
+     "text": "2013Q3"
+    },
+    {
+     "id": "2013K4",
+     "text": "2013Q4"
+    },
+    {
+     "id": "2014K1",
+     "text": "2014Q1"
+    },
+    {
+     "id": "2014K2",
+     "text": "2014Q2"
+    },
+    {
+     "id": "2014K3",
+     "text": "2014Q3"
+    },
+    {
+     "id": "2014K4",
+     "text": "2014Q4"
+    },
+    {
+     "id": "2015K1",
+     "text": "2015Q1"
+    },
+    {
+     "id": "2015K2",
+     "text": "2015Q2"
+    },
+    {
+     "id": "2015K3",
+     "text": "2015Q3"
+    },
+    {
+     "id": "2015K4",
+     "text": "2015Q4"
+    },
+    {
+     "id": "2016K1",
+     "text": "2016Q1"
+    },
+    {
+     "id": "2016K2",
+     "text": "2016Q2"
+    },
+    {
+     "id": "2016K3",
+     "text": "2016Q3"
+    },
+    {
+     "id": "2016K4",
+     "text": "2016Q4"
+    },
+    {
+     "id": "2017K1",
+     "text": "2017Q1"
+    },
+    {
+     "id": "2017K2",
+     "text": "2017Q2"
+    },
+    {
+     "id": "2017K3",
+     "text": "2017Q3"
+    },
+    {
+     "id": "2017K4",
+     "text": "2017Q4"
+    },
+    {
+     "id": "2018K1",
+     "text": "2018Q1"
+    },
+    {
+     "id": "2018K2",
+     "text": "2018Q2"
+    },
+    {
+     "id": "2018K3",
+     "text": "2018Q3"
+    },
+    {
+     "id": "2018K4",
+     "text": "2018Q4"
+    },
+    {
+     "id": "2019K1",
+     "text": "2019Q1"
+    },
+    {
+     "id": "2019K2",
+     "text": "2019Q2"
+    },
+    {
+     "id": "2019K3",
+     "text": "2019Q3"
+    },
+    {
+     "id": "2019K4",
+     "text": "2019Q4"
+    },
+    {
+     "id": "2020K1",
+     "text": "2020Q1"
+    },
+    {
+     "id": "2020K2",
+     "text": "2020Q2"
+    },
+    {
+     "id": "2020K3",
+     "text": "2020Q3"
+    },
+    {
+     "id": "2020K4",
+     "text": "2020Q4"
+    },
+    {
+     "id": "2021K1",
+     "text": "2021Q1"
+    },
+    {
+     "id": "2021K2",
+     "text": "2021Q2"
+    },
+    {
+     "id": "2021K3",
+     "text": "2021Q3"
+    },
+    {
+     "id": "2021K4",
+     "text": "2021Q4"
+    },
+    {
+     "id": "2022K1",
+     "text": "2022Q1"
+    },
+    {
+     "id": "2022K2",
+     "text": "2022Q2"
+    },
+    {
+     "id": "2022K3",
+     "text": "2022Q3"
+    },
+    {
+     "id": "2022K4",
+     "text": "2022Q4"
+    },
+    {
+     "id": "2023K1",
+     "text": "2023Q1"
+    },
+    {
+     "id": "2023K2",
+     "text": "2023Q2"
+    },
+    {
+     "id": "2023K3",
+     "text": "2023Q3"
+    },
+    {
+     "id": "2023K4",
+     "text": "2023Q4"
+    },
+    {
+     "id": "2024K1",
+     "text": "2024Q1"
+    },
+    {
+     "id": "2024K2",
+     "text": "2024Q2"
+    },
+    {
+     "id": "2024K3",
+     "text": "2024Q3"
+    },
+    {
+     "id": "2024K4",
+     "text": "2024Q4"
+    },
+    {
+     "id": "2025K1",
+     "text": "2025Q1"
+    },
+    {
+     "id": "2025K2",
+     "text": "2025Q2"
+    },
+    {
+     "id": "2025K3",
+     "text": "2025Q3"
+    },
+    {
+     "id": "2025K4",
+     "text": "2025Q4"
+    },
+    {
+     "id": "2026K1",
+     "text": "2026Q1"
+    }
+   ]
+  }
+ ]
+}
