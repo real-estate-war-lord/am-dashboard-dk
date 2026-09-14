@@ -48,36 +48,38 @@ def apply_select(rs, select):
 
 # ---------- calcs: each returns {area_code: value} ----------
 
+def sum_by_area(rs, col, period=None):
+    """Sum INDHOLD per area (over every other dimension) for one period."""
+    out = {}
+    for r in rs:
+        if period is not None and r["TID"] != period:
+            continue
+        if r["INDHOLD"] is None:
+            continue
+        a = norm_area(col, r[col])
+        out[a] = out.get(a, 0) + r["INDHOLD"]
+    return out
+
+
 def calc_passthrough(rs, src):
+    """Latest period; if several codes were fetched for a dimension they are summed."""
     rs = apply_select(rs, src.get("select"))
     col = area_col(rs[0]); p = latest_period(rs)
-    return {norm_area(col, r[col]): r["INDHOLD"] for r in rs if r["TID"] == p}, p
+    return sum_by_area(rs, col, p), p
 
 
 def calc_share_of_total(rs, src):
-    """sum(parts)/total*100 where one var has several codes incl. a total code."""
+    """src.share = {"var": V, "num": [codes], "den": [codes] (optional → all rows)}.
+    Result = sum(num rows) / sum(den rows) * 100 per area, latest period."""
     rs = apply_select(rs, src.get("select"))
+    sh = src.get("share")
+    if not sh:
+        raise ValueError(f"share_of_total: source {src['table']} has no 'share' spec")
     col = area_col(rs[0]); p = latest_period(rs)
     rs = [r for r in rs if r["TID"] == p]
-    part_var = None
-    for v, vals in src["vars"].items():
-        if v != "Tid" and v != col and len(vals) > 1:
-            part_var = v
-    if not part_var:
-        raise ValueError(f"share_of_total: no multi-valued variable in {src['table']}")
-    tot = [c for c in src["vars"][part_var] if c in TOTAL_CODES]
-    parts = [c for c in src["vars"][part_var] if c not in TOTAL_CODES]
-    if not tot:
-        raise ValueError(f"share_of_total: no total code among {src['vars'][part_var]}")
-    out = {}
-    by = {}
-    for r in rs:
-        by.setdefault(norm_area(col, r[col]), {})[r[part_var]] = r["INDHOLD"]
-    for a, d in by.items():
-        t = d.get(tot[0]); s = [d.get(c) for c in parts]
-        if t and all(x is not None for x in s):
-            out[a] = sum(s) / t * 100
-    return out, p
+    num = sum_by_area([r for r in rs if r[sh["var"]] in sh["num"]], col)
+    den = sum_by_area([r for r in rs if r[sh["var"]] in sh["den"]], col) if sh.get("den") else sum_by_area(rs, col)
+    return {a: v / den[a] * 100 for a, v in num.items() if den.get(a)}, p
 
 
 def calc_yoy_pct(rs, src):
@@ -118,16 +120,11 @@ def calc_discount_pct(rs, src):
 
 
 def dwellings():
-    """Total dwellings per municipality from BOL101 (all-total rows)."""
-    rs = rows("", "BOL101")
+    """Total dwellings per municipality: BOL101 rows summed over every fetched
+    dimension (the 'flats' pull fetches all uses with BEBO=1000+2000)."""
+    rs = rows("", "BOL101", "BOL101_stock")
     col = area_col(rs[0]); p = latest_period(rs)
-    out = {}
-    for r in rs:
-        if r["TID"] != p:
-            continue
-        if all(r[k] in TOTAL_CODES for k in dims(r) if k != col):
-            out[norm_area(col, r[col])] = r["INDHOLD"]
-    return out
+    return sum_by_area(rs, col, p)
 
 
 def calc_per_1000_dwellings(rs, src):
@@ -175,8 +172,8 @@ def compute(ind):
     res = {}
     srcs = ind["sources"]
     if ind["calc"] == "ratio_pct":
-        numr, p = calc_passthrough(rows(srcs[0].get("db", ""), srcs[0]["table"]), srcs[0])
-        den, _ = calc_passthrough(rows(srcs[1].get("db", ""), srcs[1]["table"]), srcs[1])
+        numr, p = calc_passthrough(rows(srcs[0].get("db", ""), srcs[0]["table"], srcs[0].get("pull")), srcs[0])
+        den, _ = calc_passthrough(rows(srcs[1].get("db", ""), srcs[1]["table"], srcs[1].get("pull")), srcs[1])
         res[srcs[0]["geo"]] = ({a: v / den[a] * 100 for a, v in numr.items() if v is not None and den.get(a)}, p)
         return res
     for s in srcs:
@@ -185,7 +182,7 @@ def compute(ind):
             if ext:
                 res[s["geo"]] = (ext, s.get("asof", "external file"))
             continue
-        rs = rows(s.get("db", ""), s["table"])
+        rs = rows(s.get("db", ""), s["table"], s.get("pull"))
         vals, p = CALCS[ind["calc"]](rs, s)
         res[s["geo"]] = (vals, p)
     return res

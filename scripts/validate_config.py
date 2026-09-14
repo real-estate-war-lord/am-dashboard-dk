@@ -34,19 +34,42 @@ def check(db, table, variables, show, cache):
     if not info:
         return
     vars_ = {v["id"]: v for v in info.get("variables", [])}
-    print(f"• {db or 'dst'}/{table} — updated {info.get('updated')} · vars: {', '.join(vars_)}")
+    elim = [v for v, d in vars_.items() if d.get("elimination")]
+    print(f"• {db or 'dst'}/{table} — updated {info.get('updated')} · vars: {', '.join(vars_)} · summable (elimination): {elim}")
+    for var in vars_:
+        if var not in variables and var != "Tid" and not vars_[var].get("elimination"):
+            print(f"    ✗ variable {var!r} is not in config and cannot be summed by the API — add it")
     for var, values in variables.items():
         if var not in vars_:
             print(f"    ✗ variable {var!r} not in table; available: {list(vars_)}")
             continue
         codes = {x["id"]: x["text"] for x in vars_[var]["values"]}
         for val in values:
-            if val == "*" or val.startswith("(") or val.startswith("*"):
+            if val.startswith("(") or val.startswith("*"):
+                if val == "*":
+                    sample = "; ".join(f"{c!r}={t}" for c, t in list(codes.items())[:4])
+                    print(f"    · {var}=* ({len(codes)} codes) e.g. {sample}")
+                continue
+            if val == "SUM":
+                if vars_[var].get("elimination"):
+                    print(f"    ✓ {var}=SUM (omitted from request → API total)")
+                else:
+                    print(f"    ✗ {var}=SUM but the API cannot sum this variable (elimination=false) — list codes instead")
                 continue
             if val not in codes:
-                print(f"    ✗ {var}={val!r} not found. First {show} codes:")
-                for cid, txt in list(codes.items())[:show]:
-                    print(f"        {cid!r:14} {txt}")
+                if val.startswith("TODO:"):
+                    q = val[5:].lower()
+                    hits = [(c, t) for c, t in codes.items() if q in t.lower()]
+                    print(f"    ✗ {var}={val!r} — codes matching {q!r} ({len(hits)}):")
+                    for cid, txt in hits[:show]:
+                        print(f"        {cid!r:14} {txt}")
+                    if not hits:
+                        for cid, txt in list(codes.items())[:show]:
+                            print(f"        {cid!r:14} {txt}")
+                else:
+                    print(f"    ✗ {var}={val!r} not found. First {show} codes:")
+                    for cid, txt in list(codes.items())[:show]:
+                        print(f"        {cid!r:14} {txt}")
             else:
                 print(f"    ✓ {var}={val!r} → {codes[val]}")
 

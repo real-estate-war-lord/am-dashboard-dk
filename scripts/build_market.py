@@ -24,13 +24,17 @@ def main():
             warnings.append(f"{m['key']}: unresolved TODO codes — skipped")
             continue
         try:
-            rs = rows(m.get("db", ""), m["table"])
+            rs = rows(m.get("db", ""), m["table"], m.get("pull"))
         except FileNotFoundError as e:
             warnings.append(str(e)); continue
         # keep rows matching all single-valued selections
-        sel = {k: v[0] for k, v in m["vars"].items() if k != "Tid" and len(v) == 1 and v[0] != "*"}
+        sel = {k: v[0] for k, v in m["vars"].items() if k != "Tid" and len(v) == 1 and v[0] not in ("*", "SUM")}
         rs = [r for r in rs if all(r.get(k) == v for k, v in sel.items())]
-        s = sorted(({"t": r["TID"], "v": r["INDHOLD"]} for r in rs if r["INDHOLD"] is not None), key=lambda p: period_key(p["t"]))
+        byp = {}
+        for r in rs:  # several codes fetched for one dimension → summed per period
+            if r["INDHOLD"] is not None:
+                byp[r["TID"]] = byp.get(r["TID"], 0) + r["INDHOLD"]
+        s = sorted(({"t": t, "v": v} for t, v in byp.items()), key=lambda p: period_key(p["t"]))
         if not s:
             warnings.append(f"{m['key']}: no rows after selection {sel}"); continue
         series[m["key"]] = s

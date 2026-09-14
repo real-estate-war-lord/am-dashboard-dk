@@ -7,19 +7,19 @@ import re
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 RAW = ROOT / "data" / "raw"
 CFG = ROOT / "config" / "indicators.json"
-AREA_VARS = {"OMRÅDE", "BOPOMR", "REGION", "KOMMUNE", "PNR20", "SOGN", "BYER"}
+AREA_VARS = {"OMRÅDE", "BOPOMR", "REGION", "KOMMUNE", "KOMMUNEDK", "OMR20", "PNR20", "SOGN", "BYER"}
 
 
 def cfg() -> dict:
     return json.loads(CFG.read_text(encoding="utf-8"))
 
 
-def tag(db: str, table: str) -> str:
-    return f"{db or 'dst'}_{table}"
+def tag(db: str, table: str, pull: str | None = None) -> str:
+    return f"{db or 'dst'}_{pull or table}"
 
 
-def latest_raw(db: str, table: str) -> pathlib.Path | None:
-    files = sorted(RAW.glob(f"{tag(db, table)}_*.csv"))
+def latest_raw(db: str, table: str, pull: str | None = None) -> pathlib.Path | None:
+    files = sorted(RAW.glob(f"{tag(db, table, pull)}_20*.csv"))
     return files[-1] if files else None
 
 
@@ -46,12 +46,12 @@ def num(s):
         return None
 
 
-def rows(db: str, table: str) -> list[dict]:
+def rows(db: str, table: str, pull: str | None = None) -> list[dict]:
     """Parse the latest raw CSV (semicolon, valuePresentation=Code) into dicts.
     Keys = variable codes as in the header, plus TID and INDHOLD (float|None)."""
-    p = latest_raw(db, table)
+    p = latest_raw(db, table, pull)
     if not p:
-        raise FileNotFoundError(f"no raw pull for {tag(db, table)} — run scripts/fetch_statbank.py --table {table}")
+        raise FileNotFoundError(f"no raw pull for {tag(db, table, pull)} — run scripts/fetch_statbank.py --table {table}")
     out = []
     with p.open(encoding="utf-8-sig", newline="") as f:
         rd = csv.DictReader(f, delimiter=";")

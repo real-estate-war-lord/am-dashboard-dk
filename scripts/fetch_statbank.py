@@ -45,7 +45,8 @@ def data(db: str, table: str, variables: dict, fmt: str = "CSV") -> str:
         "format": fmt,
         "lang": "en",
         "valuePresentation": "Code",
-        "variables": [{"code": k, "values": v} for k, v in variables.items()],
+        # "SUM" = leave the variable out so the API returns its total (needs elimination=true)
+        "variables": [{"code": k, "values": v} for k, v in variables.items() if v != ["SUM"]],
     }
     req = urllib.request.Request(f"{base(db)}/data", data=json.dumps(body).encode("utf-8"),
                                  headers=UA, method="POST")
@@ -57,9 +58,9 @@ def jobs(cfg: dict):
     for ind in cfg["indicators"]:
         for s in ind["sources"]:
             if s.get("db") in ("", "s20", "s30") and "vars" in s:
-                yield s.get("db", ""), s["table"], s["vars"], ind["key"]
+                yield s.get("db", ""), s["table"], s["vars"], ind["key"], s.get("pull")
     for m in cfg["macro"]:
-        yield m.get("db", ""), m["table"], m["vars"], m["key"]
+        yield m.get("db", ""), m["table"], m["vars"], m["key"], m.get("pull")
 
 
 def main():
@@ -72,20 +73,22 @@ def main():
     today = dt.date.today().isoformat()
     seen = set()
     failures = []
-    for db, table, variables, key in jobs(cfg):
+    for db, table, variables, key, pull in jobs(cfg):
         if args.table and table != args.table:
             continue
         sig = (db, table, json.dumps(variables, sort_keys=True))
         if sig in seen:
             continue
         seen.add(sig)
-        tag = f"{db or 'dst'}_{table}"
+        tag = f"{db or 'dst'}_{pull or table}"
+        if any(v.startswith("TODO") for vals in variables.values() for v in vals):
+            print(f"→ {tag} ({key}) skipped — unresolved TODO codes"); continue
         print(f"→ {tag} ({key}) vars={variables}")
         if args.dry_run:
             continue
         try:
             meta = tableinfo(db, table)
-            (RAW / f"{tag}.meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=1))
+            (RAW / f"{db or 'dst'}_{table}.meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=1))
             csv = data(db, table, variables)
             (RAW / f"{tag}_{today}.csv").write_text(csv)
             print(f"  ok · updated {meta.get('updated')} · {csv.count(chr(10))} rows")

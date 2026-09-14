@@ -1,5 +1,5 @@
 {
- "_doc": "Indicator registry for the Danish makro view. `db` = '' (Statistics Denmark), 's20' (Finans Danmark) or 's30' (Copenhagen). `level` = finest geography the indicator natively exists at. `calc` describes the post-processing in build_makro.py. `hue` = RGB target for the choropleth ramp (paper #EFF2EE → hue).",
+ "_doc": "Indicator registry for the Danish makro view. `db` = '' (Statistics Denmark), 's20' (Finans Danmark) or 's30' (Copenhagen). `level` = finest geography the indicator natively exists at. `calc` describes the post-processing in build_makro.py. `hue` = RGB target for the choropleth ramp (paper #EFF2EE → hue). `pull` names a raw file when one table is fetched with several selections. `SUM` = omit the variable so the API returns its total. `TODO:word` = placeholder; validate_config.py lists codes whose label contains the word.",
  "indicators": [
   {
    "key": "growth",
@@ -114,11 +114,11 @@
      "db": "",
      "table": "IFOR22",
      "vars": {
-      "OMRÅDE": [
+      "KOMMUNEDK": [
        "*"
       ],
-      "DECIL": [
-       "5"
+      "DECILGR": [
+       "5DC"
       ],
       "Tid": [
        "(1)"
@@ -128,9 +128,8 @@
     }
    ],
    "calc": "value_div_1000",
-   "note": "Check DECIL/ENHED codes against tableinfo before first run",
    "fmt": "kdkk",
-   "desc": "Median equivalised disposable income (5th decile upper bound).",
+   "desc": "Median equivalised disposable income (5th decile).",
    "source": "DST IFOR22"
   },
   {
@@ -157,15 +156,51 @@
       ],
       "ALDER": [
        "IALT",
-       "20-24",
-       "25-29",
-       "30-34"
+       "20",
+       "21",
+       "22",
+       "23",
+       "24",
+       "25",
+       "26",
+       "27",
+       "28",
+       "29",
+       "30",
+       "31",
+       "32",
+       "33",
+       "34"
       ],
       "Tid": [
        "(1)"
       ]
      },
-     "geo": "kommune"
+     "geo": "kommune",
+     "pull": "FOLK1A_ages",
+     "share": {
+      "var": "ALDER",
+      "num": [
+       "20",
+       "21",
+       "22",
+       "23",
+       "24",
+       "25",
+       "26",
+       "27",
+       "28",
+       "29",
+       "30",
+       "31",
+       "32",
+       "33",
+       "34"
+      ],
+      "den": [
+       "IALT"
+      ]
+     }
     },
     {
      "db": "",
@@ -187,7 +222,19 @@
        "(1)"
       ]
      },
-     "geo": "postnr"
+     "geo": "postnr",
+     "pull": "POSTNR1_ages",
+     "share": {
+      "var": "ALDER",
+      "num": [
+       "20-24",
+       "25-29",
+       "30-34"
+      ],
+      "den": [
+       "IALT"
+      ]
+     }
     }
    ],
    "calc": "share_of_total",
@@ -215,21 +262,26 @@
        "*"
       ],
       "HUSTYP": [
-       "TOT",
-       "M",
-       "K"
+       "*"
       ],
       "HUSSTØR": [
-       "TOT"
+       "SUM"
       ],
-      "BØRN": [
-       "TOT"
+      "ANTBORNH": [
+       "SUM"
       ],
       "Tid": [
        "(1)"
       ]
      },
-     "geo": "kommune"
+     "geo": "kommune",
+     "share": {
+      "var": "HUSTYP",
+      "num": [
+       "M",
+       "K"
+      ]
+     }
     }
    ],
    "calc": "share_of_total",
@@ -279,13 +331,13 @@
        "*"
       ],
       "HUSTYP": [
-       "TOT"
+       "*"
       ],
       "HUSSTØR": [
-       "TOT"
+       "SUM"
       ],
-      "BØRN": [
-       "TOT"
+      "ANTBORNH": [
+       "SUM"
       ],
       "Tid": [
        "(1)"
@@ -373,23 +425,33 @@
        "1000"
       ],
       "ANVENDELSE": [
-       "TOT"
+       "SUM"
       ],
       "UDLFORH": [
-       "TOT",
-       "LEJ"
+       "*"
       ],
       "EJER": [
-       "TOT"
+       "SUM"
       ],
       "OPFØRELSESÅR": [
-       "TOT"
+       "SUM"
       ],
       "Tid": [
        "(1)"
       ]
      },
-     "geo": "kommune"
+     "geo": "kommune",
+     "pull": "BOL101_tenure",
+     "share": {
+      "var": "UDLFORH",
+      "num": [
+       "LEJ"
+      ],
+      "den": [
+       "EJ",
+       "LEJ"
+      ]
+     }
     }
    ],
    "calc": "share_of_total",
@@ -474,7 +536,20 @@
        "(1)"
       ]
      },
-     "geo": "kommune"
+     "geo": "kommune",
+     "share": {
+      "var": "HFUDD",
+      "num": [
+       "H40",
+       "H50",
+       "H60",
+       "H70",
+       "H80"
+      ],
+      "den": [
+       "TOT"
+      ]
+     }
     }
    ],
    "calc": "share_of_total",
@@ -502,26 +577,33 @@
        "*"
       ],
       "BEBO": [
-       "TOT"
+       "1000",
+       "2000"
       ],
       "ANVENDELSE": [
-       "TOT",
-       "140"
+       "*"
       ],
       "UDLFORH": [
-       "TOT"
+       "SUM"
       ],
       "EJER": [
-       "TOT"
+       "SUM"
       ],
       "OPFØRELSESÅR": [
-       "TOT"
+       "SUM"
       ],
       "Tid": [
        "(1)"
       ]
      },
-     "geo": "kommune"
+     "geo": "kommune",
+     "pull": "BOL101_stock",
+     "share": {
+      "var": "ANVENDELSE",
+      "num": [
+       "140"
+      ]
+     }
     }
    ],
    "calc": "share_of_total",
@@ -550,8 +632,10 @@
       ],
       "HERKOMST": [
        "TOT",
-       "3",
-       "4"
+       "24",
+       "25",
+       "34",
+       "35"
       ],
       "ALDER": [
        "IALT"
@@ -563,11 +647,22 @@
        "(1)"
       ]
      },
-     "geo": "kommune"
+     "geo": "kommune",
+     "share": {
+      "var": "HERKOMST",
+      "num": [
+       "24",
+       "25",
+       "34",
+       "35"
+      ],
+      "den": [
+       "TOT"
+      ]
+     }
     }
    ],
    "calc": "share_of_total",
-   "note": "Confirm HERKOMST codes (immigrants / descendants) from tableinfo",
    "fmt": "pct1",
    "desc": "Immigrants and descendants as % of population.",
    "source": "DST FOLK1E"
@@ -588,11 +683,11 @@
      "db": "s20",
      "table": "BM010",
      "vars": {
-      "OMRÅDE": [
+      "OMR20": [
        "*"
       ],
       "EJKAT20": [
-       "Ejerlejlighed"
+       "2"
       ],
       "PRIS20": [
        "REAL"
@@ -611,7 +706,7 @@
        "*"
       ],
       "EJKAT20": [
-       "Ejerlejlighed"
+       "2"
       ],
       "PRIS20": [
        "REAL"
@@ -624,7 +719,6 @@
     }
    ],
    "calc": "last4q_mean",
-   "note": "Check value codes for EJKAT20/OMRÅDE via s20/tableinfo; '..' and 0 → null",
    "fmt": "dkk0",
    "desc": "Realised sale price of owner-occupied flats, DKK/m², mean of last 4 quarters.",
    "source": "Finans Danmark BM010 / BM011",
@@ -650,7 +744,7 @@
        "*"
       ],
       "EJKAT20": [
-       "Ejerlejlighed"
+       "2"
       ],
       "PRIS20": [
        "UDBUD",
@@ -660,7 +754,29 @@
        "(-n+4)"
       ]
      },
-     "geo": "postnr"
+     "geo": "postnr",
+     "pull": "BM011_disc"
+    },
+    {
+     "db": "s20",
+     "table": "BM010",
+     "vars": {
+      "OMR20": [
+       "*"
+      ],
+      "EJKAT20": [
+       "2"
+      ],
+      "PRIS20": [
+       "UDBUD",
+       "REAL"
+      ],
+      "Tid": [
+       "(-n+4)"
+      ]
+     },
+     "geo": "kommune",
+     "pull": "BM010_disc"
     }
    ],
    "calc": "discount_pct",
@@ -684,11 +800,11 @@
      "db": "s20",
      "table": "BM030",
      "vars": {
-      "OMRÅDE": [
+      "OMR20": [
        "*"
       ],
       "EJKAT20": [
-       "Ejerlejlighed"
+       "2"
       ],
       "Tid": [
        "(-n+4)"
@@ -704,7 +820,7 @@
        "*"
       ],
       "EJKAT20": [
-       "Ejerlejlighed"
+       "2"
       ],
       "Tid": [
        "(-n+4)"
@@ -734,8 +850,15 @@
      "db": "s20",
      "table": "UDB010",
      "vars": {
-      "OMRÅDE": [
+      "OMR20": [
        "*"
+      ],
+      "EJKAT20": [
+       "1",
+       "2"
+      ],
+      "BOLA20": [
+       "6"
       ],
       "Tid": [
        "(1)"
@@ -745,7 +868,6 @@
     }
    ],
    "calc": "per_1000_dwellings",
-   "note": "Denominator = BOL101 total dwellings",
    "fmt": "per1000",
    "desc": "Homes listed for sale per 1,000 dwellings (latest month).",
    "source": "Finans Danmark UDB010 / DST BOL101"
@@ -770,26 +892,22 @@
        "*"
       ],
       "BYGFASE": [
-       "*"
+       "3"
       ],
-      "ANVENDELSE": [
-       "TOT"
+      "ANVEND": [
+       "SUM"
       ],
       "BYGHERRE": [
-       "TOT"
+       "SUM"
       ],
       "Tid": [
        "(-n+4)"
       ]
      },
-     "geo": "kommune",
-     "select": {
-      "BYGFASE": "TODO_completed_code"
-     }
+     "geo": "kommune"
     }
    ],
    "calc": "sum4q_per_1000",
-   "note": "Run validate_config.py and replace select.BYGFASE with the code for 'completed' (fuldført).",
    "fmt": "per1000",
    "desc": "Dwellings completed in the last 4 quarters per 1,000 dwellings.",
    "source": "DST BYGV33",
@@ -815,26 +933,33 @@
        "*"
       ],
       "BEBO": [
-       "TOT"
+       "1000",
+       "2000"
       ],
       "ANVENDELSE": [
-       "TOT"
+       "SUM"
       ],
       "UDLFORH": [
-       "TOT"
+       "SUM"
       ],
       "EJER": [
-       "TOT",
-       "20"
+       "*"
       ],
       "OPFØRELSESÅR": [
-       "TOT"
+       "SUM"
       ],
       "Tid": [
        "(1)"
       ]
      },
-     "geo": "kommune"
+     "geo": "kommune",
+     "pull": "BOL101_owner",
+     "share": {
+      "var": "EJER",
+      "num": [
+       "20"
+      ]
+     }
     }
    ],
    "calc": "share_of_total",
@@ -862,6 +987,12 @@
       "OMRÅDE": [
        "*"
       ],
+      "ENHED": [
+       "GNSAB"
+      ],
+      "ANVENDELSE": [
+       "TOT"
+      ],
       "Tid": [
        "(1)"
       ]
@@ -883,6 +1014,9 @@
     "VAREGR": [
      "000000"
     ],
+    "ENHED": [
+     "100"
+    ],
     "Tid": [
      "(-n+36)"
     ]
@@ -896,9 +1030,13 @@
   {
    "key": "cpi_rent",
    "table": "PRIS01",
+   "pull": "PRIS01_rent",
    "vars": {
     "VAREGR": [
-     "041000"
+     "041"
+    ],
+    "ENHED": [
+     "100"
     ],
     "Tid": [
      "(-n+36)"
@@ -915,7 +1053,10 @@
    "table": "PRIS04",
    "vars": {
     "VAREGR": [
-     "000000"
+     "000005"
+    ],
+    "ENHED": [
+     "100"
     ],
     "Tid": [
      "(-n+36)"
@@ -930,6 +1071,7 @@
   {
    "key": "rent_index",
    "table": "HUS1",
+   "pull": "HUS1_priv",
    "vars": {
     "REGION": [
      "000"
@@ -953,6 +1095,7 @@
   {
    "key": "rent_index_social",
    "table": "HUS1",
+   "pull": "HUS1_soc",
    "vars": {
     "REGION": [
      "000"
@@ -981,10 +1124,10 @@
      "000"
     ],
     "EJENDOMSKATE": [
-     "TODO_flats"
+     "2103"
     ],
     "TAL": [
-     "TODO_index"
+     "100"
     ],
     "Tid": [
      "(-n+16)"
@@ -994,16 +1137,23 @@
    "unit": "idx",
    "dec": 1,
    "yoy": true,
-   "src": "DST EJ56",
-   "note": "validate codes"
+   "src": "DST EJ56"
   },
   {
    "key": "supply_dk",
    "db": "s20",
    "table": "UDB010",
+   "pull": "UDB010_dk",
    "vars": {
-    "OMRÅDE": [
-     "TODO_DK"
+    "OMR20": [
+     "00"
+    ],
+    "EJKAT20": [
+     "1",
+     "2"
+    ],
+    "BOLA20": [
+     "6"
     ],
     "Tid": [
      "(-n+36)"
@@ -1013,24 +1163,24 @@
    "unit": "",
    "dec": 0,
    "yoy": true,
-   "src": "Finans Danmark UDB010",
-   "note": "validate OMRÅDE code for all Denmark and any category var"
+   "src": "Finans Danmark UDB010"
   },
   {
    "key": "completions",
    "table": "BYGV33",
+   "pull": "BYGV33_dk",
    "vars": {
     "OMRÅDE": [
      "000"
     ],
     "BYGFASE": [
-     "TODO_completed_code"
+     "3"
     ],
-    "ANVENDELSE": [
-     "TOT"
+    "ANVEND": [
+     "SUM"
     ],
     "BYGHERRE": [
-     "TOT"
+     "SUM"
     ],
     "Tid": [
      "(-n+16)"
@@ -1045,32 +1195,46 @@
   {
    "key": "rate_policy",
    "table": "DNRENTM",
+   "pull": "DNRENTM_policy",
    "vars": {
     "INSTRUMENT": [
-     "TODO_policy_rate"
+     "OIBNAA"
+    ],
+    "LAND": [
+     "DK"
+    ],
+    "OPGOER": [
+     "A"
     ],
     "Tid": [
      "(-n+36)"
     ]
    },
-   "label": "Nationalbank policy rate",
+   "label": "Nationalbank certificates of deposit rate",
    "unit": "%",
    "dec": 2,
    "yoy": false,
    "src": "Danmarks Nationalbank via DST DNRENTM"
   },
   {
-   "key": "rate_mortgage30",
+   "key": "rate_lending",
    "table": "DNRENTM",
+   "pull": "DNRENTM_lending",
    "vars": {
     "INSTRUMENT": [
-     "TODO_30y_bond"
+     "OIRNAA"
+    ],
+    "LAND": [
+     "DK"
+    ],
+    "OPGOER": [
+     "A"
     ],
     "Tid": [
      "(-n+36)"
     ]
    },
-   "label": "30-year mortgage bond yield",
+   "label": "Nationalbank lending rate",
    "unit": "%",
    "dec": 2,
    "yoy": false,
@@ -1080,6 +1244,12 @@
    "key": "unemp_dk",
    "table": "AUS07",
    "vars": {
+    "YD": [
+     "TOT"
+    ],
+    "SAESONFAK": [
+     "9"
+    ],
     "Tid": [
      "(-n+36)"
     ]
@@ -1094,6 +1264,15 @@
    "key": "gdp",
    "table": "NKN1",
    "vars": {
+    "TRANSAKT": [
+     "B1GQK"
+    ],
+    "PRISENHED": [
+     "LKV_M"
+    ],
+    "SÆSON": [
+     "Y"
+    ],
     "Tid": [
      "(-n+12)"
     ]
@@ -1102,13 +1281,15 @@
    "unit": "bn DKK",
    "dec": 0,
    "yoy": true,
-   "src": "DST NKN1",
-   "note": "validate TRANSAKT/PRISENHED codes"
+   "src": "DST NKN1"
   },
   {
    "key": "forced_sales",
    "table": "TVANG1",
    "vars": {
+    "TYPE": [
+     "5520010001"
+    ],
     "Tid": [
      "(-n+36)"
     ]

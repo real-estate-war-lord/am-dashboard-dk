@@ -1,0 +1,191 @@
+python3 scripts/validate_config.py
+• dst/FOLK1A — updated 2026-08-10T08:00:00 · vars: OMRÅDE, KØN, ALDER, CIVILSTAND, Tid · summable (elimination): ['OMRÅDE', 'KØN', 'ALDER', 'CIVILSTAND']
+    · OMRÅDE=* (105 codes) e.g. '000'=All Denmark; '084'=Region Hovedstaden; '101'=Copenhagen; '147'=Frederiksberg
+    ✓ KØN='TOT' → Total
+    ✓ ALDER='IALT' → Age, total
+• dst/POSTNR1 — updated 2026-02-12T08:00:00 · vars: PNR20, KØN, ALDER, Tid · summable (elimination): ['PNR20', 'KØN', 'ALDER']
+    · PNR20=* (1064 codes) e.g. '0001'=Total; '1050'=1050 København K (København Municipality); '1051'=1051 København K (København Municipality); '1052'=1052 København K (København Municipality)
+    ✓ KØN='TOT' → Total
+    ✓ ALDER='IALT' → Age, total
+• dst/INDKP101 — updated 2025-12-01T08:00:00 · vars: OMRÅDE, ENHED, KOEN, INDKOMSTTYPE, Tid · summable (elimination): ['OMRÅDE', 'KOEN']
+    · OMRÅDE=* (110 codes) e.g. '000'=All Denmark; '01'=Province Byen København; '101'=Copenhagen; '147'=Frederiksberg
+    ✓ ENHED='116' → Average income for all people (DKK)
+    ✓ INDKOMSTTYPE='100' → 1 Disposable income (2+30-31-32-35)
+    ✓ KOEN='MOK' → Men and women, total
+• dst/IFOR22 — updated 2025-12-01T08:00:00 · vars: DECILGR, KOMMUNEDK, Tid · summable (elimination): ['KOMMUNEDK']
+    · KOMMUNEDK=* (99 codes) e.g. '000'=All Denmark; '101'=Copenhagen; '147'=Frederiksberg; '155'=Dragør
+    ✓ DECILGR='5DC' → Fifth decil
+• dst/FOLK1A — updated 2026-08-10T08:00:00 · vars: OMRÅDE, KØN, ALDER, CIVILSTAND, Tid · summable (elimination): ['OMRÅDE', 'KØN', 'ALDER', 'CIVILSTAND']
+    · OMRÅDE=* (105 codes) e.g. '000'=All Denmark; '084'=Region Hovedstaden; '101'=Copenhagen; '147'=Frederiksberg
+    ✓ KØN='TOT' → Total
+    ✓ ALDER='IALT' → Age, total
+    ✓ ALDER='20' → 20 years
+    ✓ ALDER='21' → 21 years
+    ✓ ALDER='22' → 22 years
+    ✓ ALDER='23' → 23 years
+    ✓ ALDER='24' → 24 years
+    ✓ ALDER='25' → 25 years
+    ✓ ALDER='26' → 26 years
+    ✓ ALDER='27' → 27 years
+    ✓ ALDER='28' → 28 years
+    ✓ ALDER='29' → 29 years
+    ✓ ALDER='30' → 30 years
+    ✓ ALDER='31' → 31 years
+    ✓ ALDER='32' → 32 years
+    ✓ ALDER='33' → 33 years
+    ✓ ALDER='34' → 34 years
+• dst/POSTNR1 — updated 2026-02-12T08:00:00 · vars: PNR20, KØN, ALDER, Tid · summable (elimination): ['PNR20', 'KØN', 'ALDER']
+    · PNR20=* (1064 codes) e.g. '0001'=Total; '1050'=1050 København K (København Municipality); '1051'=1051 København K (København Municipality); '1052'=1052 København K (København Municipality)
+    ✓ KØN='TOT' → Total
+    ✓ ALDER='IALT' → Age, total
+    ✓ ALDER='20-24' → 20-24 years
+    ✓ ALDER='25-29' → 25-29 years
+    ✓ ALDER='30-34' → 30-34 years
+• dst/FAM55N — updated 2026-02-13T08:00:00 · vars: OMRÅDE, HUSTYP, HUSSTØR, ANTBORNH, Tid · summable (elimination): ['OMRÅDE', 'HUSTYP', 'HUSSTØR', 'ANTBORNH']
+    · OMRÅDE=* (105 codes) e.g. '000'=All Denmark; '084'=Region Hovedstaden; '101'=Copenhagen; '147'=Frederiksberg
+    · HUSTYP=* (6 codes) e.g. 'M'=Single men; 'K'=Single women; 'PAR'=Married couple; 'PA'=Other couples
+    ✓ HUSSTØR=SUM (omitted from request → API total)
+    ✓ ANTBORNH=SUM (omitted from request → API total)
+• dst/BOST63 — updated 2026-03-13T08:00:00 · vars: OMRÅDE, YDELSESTYPE, MND, ENHED, Tid · summable (elimination): ['OMRÅDE', 'YDELSESTYPE', 'ENHED']
+    · OMRÅDE=* (100 codes) e.g. '000'=All Denmark; '101'=Copenhagen; '147'=Frederiksberg; '155'=Dragør
+    ✓ YDELSESTYPE='1000' → All types of housing benefit
+    ✓ ENHED='3000' → Number of households
+    ✓ MND='012' → December
+• dst/FAM55N — updated 2026-02-13T08:00:00 · vars: OMRÅDE, HUSTYP, HUSSTØR, ANTBORNH, Tid · summable (elimination): ['OMRÅDE', 'HUSTYP', 'HUSSTØR', 'ANTBORNH']
+    · OMRÅDE=* (105 codes) e.g. '000'=All Denmark; '084'=Region Hovedstaden; '101'=Copenhagen; '147'=Frederiksberg
+    · HUSTYP=* (6 codes) e.g. 'M'=Single men; 'K'=Single women; 'PAR'=Married couple; 'PA'=Other couples
+    ✓ HUSSTØR=SUM (omitted from request → API total)
+    ✓ ANTBORNH=SUM (omitted from request → API total)
+• dst/BOL101 — updated 2026-04-08T08:00:00 · vars: OMRÅDE, BEBO, ANVENDELSE, UDLFORH, EJER, OPFØRELSESÅR, Tid · summable (elimination): ['OMRÅDE', 'ANVENDELSE', 'UDLFORH', 'EJER', 'OPFØRELSESÅR']
+    · OMRÅDE=* (116 codes) e.g. '000'=All Denmark; '084'=Region Hovedstaden; '01'=Province Byen København; '101'=Copenhagen
+    ✓ BEBO='1000' → Dwellings with registered population
+    ✓ ANVENDELSE=SUM (omitted from request → API total)
+    · UDLFORH=* (4 codes) e.g. 'EJ'=Occupied by the owner; 'LEJ'=Occupied by the tenant; 'IB'=Unoccupied; 'UOPL'=Not stated
+    ✓ EJER=SUM (omitted from request → API total)
+    ✓ OPFØRELSESÅR=SUM (omitted from request → API total)
+• dst/AUP01 — updated 2026-08-31T08:00:00 · vars: OMRÅDE, ALDER, KØN, Tid · summable (elimination): ['OMRÅDE', 'ALDER', 'KØN']
+    · OMRÅDE=* (117 codes) e.g. '000'=All Denmark; '084'=Region Hovedstaden; '01'=Province Byen København; '101'=Copenhagen
+    ✓ ALDER='TOT' → Age, total
+    ✓ KØN='TOT' → Total
+• dst/HFUDD11 — updated 2026-04-01T08:00:00 · vars: BOPOMR, HERKOMST, HFUDD, ALDER, KØN, Tid · summable (elimination): ['BOPOMR', 'HERKOMST', 'HFUDD', 'ALDER', 'KØN']
+    · BOPOMR=* (105 codes) e.g. '000'=All Denmark; '084'=Region Hovedstaden; '101'=Copenhagen; '147'=Frederiksberg
+    ✓ HFUDD='TOT' → Total
+    ✓ HFUDD='H40' → H40 Short cycle higher education
+    ✓ HFUDD='H50' → H50 Vocational bachelors educations
+    ✓ HFUDD='H60' → H60 Bachelors programs
+    ✓ HFUDD='H70' → H70 Masters programs
+    ✓ HFUDD='H80' → H80 PhD programs
+    ✓ ALDER='TOT' → Age, total
+    ✓ KØN='TOT' → Total
+    ✓ HERKOMST='TOT' → Total
+• dst/BOL101 — updated 2026-04-08T08:00:00 · vars: OMRÅDE, BEBO, ANVENDELSE, UDLFORH, EJER, OPFØRELSESÅR, Tid · summable (elimination): ['OMRÅDE', 'ANVENDELSE', 'UDLFORH', 'EJER', 'OPFØRELSESÅR']
+    · OMRÅDE=* (116 codes) e.g. '000'=All Denmark; '084'=Region Hovedstaden; '01'=Province Byen København; '101'=Copenhagen
+    ✓ BEBO='1000' → Dwellings with registered population
+    ✓ BEBO='2000' → Dwellings without registered population
+    · ANVENDELSE=* (7 codes) e.g. '125'=Detached houses/farmhouses; '130'=Terraced, linked or semi-detached houses; '140'=Multi-dwelling houses; '150'=Student hostels
+    ✓ UDLFORH=SUM (omitted from request → API total)
+    ✓ EJER=SUM (omitted from request → API total)
+    ✓ OPFØRELSESÅR=SUM (omitted from request → API total)
+• dst/FOLK1E — updated 2026-08-10T08:00:00 · vars: OMRÅDE, KØN, ALDER, HERKOMST, Tid · summable (elimination): ['OMRÅDE', 'KØN', 'ALDER', 'HERKOMST']
+    · OMRÅDE=* (105 codes) e.g. '000'=All Denmark; '084'=Region Hovedstaden; '101'=Copenhagen; '147'=Frederiksberg
+    ✓ HERKOMST='TOT' → Total
+    ✓ HERKOMST='24' → Immigrants from western countries
+    ✓ HERKOMST='25' → Immigrants from non-western countries
+    ✓ HERKOMST='34' → Descendants from western countries
+    ✓ HERKOMST='35' → Descendants from non-western countries
+    ✓ ALDER='IALT' → Age, total
+    ✓ KØN='TOT' → Total
+• s20/BM010 — updated 2026-06-18T08:00:00 · vars: OMR20, EJKAT20, PRIS20, Tid · summable (elimination): ['OMR20']
+    · OMR20=* (115 codes) e.g. '00'=All Denmark; '084'=Capital region; '01'=Subregion Copenhagen City; '101'=Copenhagen
+    ✓ EJKAT20='2' → Owner-occupied flat
+    ✓ PRIS20='REAL' → Transaction price realised
+• s20/BM011 — updated 2026-06-18T08:00:00 · vars: PNR20, EJKAT20, PRIS20, Tid · summable (elimination): []
+    · PNR20=* (605 codes) e.g. '1000'=1000-1499 Kbh.K.; '1500'=1500-1799 Kbh.V.; '1800'=1800-1999 Frederiksberg C; '2000'=2000 Frederiksberg
+    ✓ EJKAT20='2' → Owner-occupied flat
+    ✓ PRIS20='REAL' → Transaction price realised
+• s20/BM011 — updated 2026-06-18T08:00:00 · vars: PNR20, EJKAT20, PRIS20, Tid · summable (elimination): []
+    · PNR20=* (605 codes) e.g. '1000'=1000-1499 Kbh.K.; '1500'=1500-1799 Kbh.V.; '1800'=1800-1999 Frederiksberg C; '2000'=2000 Frederiksberg
+    ✓ EJKAT20='2' → Owner-occupied flat
+    ✓ PRIS20='UDBUD' → Initial listing price
+    ✓ PRIS20='REAL' → Transaction price realised
+• s20/BM010 — updated 2026-06-18T08:00:00 · vars: OMR20, EJKAT20, PRIS20, Tid · summable (elimination): ['OMR20']
+    · OMR20=* (115 codes) e.g. '00'=All Denmark; '084'=Capital region; '01'=Subregion Copenhagen City; '101'=Copenhagen
+    ✓ EJKAT20='2' → Owner-occupied flat
+    ✓ PRIS20='UDBUD' → Initial listing price
+    ✓ PRIS20='REAL' → Transaction price realised
+• s20/BM030 — updated 2026-06-18T08:00:00 · vars: OMR20, EJKAT20, Tid · summable (elimination): ['OMR20']
+    · OMR20=* (115 codes) e.g. '00'=All Denmark; '084'=Capital Region; '01'=Subregion Copenhagen City; '101'=Copenhagen
+    ✓ EJKAT20='2' → Owner-occupied flat
+• s20/BM031 — updated 2026-06-18T08:00:00 · vars: PNR20, EJKAT20, Tid · summable (elimination): []
+    · PNR20=* (604 codes) e.g. '1000'=1000-1499 Kbh.K.; '1500'=1500-1799 Kbh.V.; '1800'=1800-1999 Frederiksberg C; '2000'=2000 Frederiksberg
+    ✓ EJKAT20='2' → Owner-occupied flat
+• s20/UDB010 — updated 2026-09-08T08:00:00 · vars: OMR20, EJKAT20, BOLA20, Tid · summable (elimination): ['OMR20', 'EJKAT20']
+    · OMR20=* (115 codes) e.g. '00'=All Denmark; '084'=Capital region; '01'=Subregion Copenhagen City; '101'=Copenhagen
+    ✓ EJKAT20='1' → Detached/terraced house 
+    ✓ EJKAT20='2' → Owner-occupied flat 
+    ✓ BOLA20='6' → Dwellings for sale, end of period
+• dst/BYGV33 — updated 2026-08-14T08:00:00 · vars: OMRÅDE, BYGFASE, ANVEND, BYGHERRE, Tid · summable (elimination): ['OMRÅDE', 'ANVEND', 'BYGHERRE']
+    · OMRÅDE=* (116 codes) e.g. '000'=All Denmark; '084'=Region Hovedstaden; '01'=Province Byen København; '101'=Copenhagen
+    ✓ BYGFASE='3' → Completed
+    ✓ ANVEND=SUM (omitted from request → API total)
+    ✓ BYGHERRE=SUM (omitted from request → API total)
+• dst/BOL101 — updated 2026-04-08T08:00:00 · vars: OMRÅDE, BEBO, ANVENDELSE, UDLFORH, EJER, OPFØRELSESÅR, Tid · summable (elimination): ['OMRÅDE', 'ANVENDELSE', 'UDLFORH', 'EJER', 'OPFØRELSESÅR']
+    · OMRÅDE=* (116 codes) e.g. '000'=All Denmark; '084'=Region Hovedstaden; '01'=Province Byen København; '101'=Copenhagen
+    ✓ BEBO='1000' → Dwellings with registered population
+    ✓ BEBO='2000' → Dwellings without registered population
+    ✓ ANVENDELSE=SUM (omitted from request → API total)
+    ✓ UDLFORH=SUM (omitted from request → API total)
+    · EJER=* (6 codes) e.g. '10'=Individuals inclusive partnerships; '20'=Non-profit building society; '30'=Limited liability company, etc.; '41'=Housing societies
+    ✓ OPFØRELSESÅR=SUM (omitted from request → API total)
+• dst/BOL106 — updated 2026-04-08T08:00:00 · vars: OMRÅDE, ENHED, ANVENDELSE, Tid · summable (elimination): ['OMRÅDE', 'ANVENDELSE']
+    · OMRÅDE=* (116 codes) e.g. '000'=All Denmark; '084'=Region Hovedstaden; '01'=Province Byen København; '101'=Copenhagen
+    ✓ ENHED='GNSAB' → Average dwelling area per dwelling (m2)
+    ✓ ANVENDELSE='TOT' → Total
+• dst/PRIS01 — updated 2026-09-10T08:00:00 · vars: VAREGR, ENHED, Tid · summable (elimination): ['VAREGR']
+    ✓ VAREGR='000000' → 00 Consumer price index, total
+    ✓ ENHED='100' → Index
+• dst/PRIS01 — updated 2026-09-10T08:00:00 · vars: VAREGR, ENHED, Tid · summable (elimination): ['VAREGR']
+    ✓ VAREGR='041' → 04.1 Actual rental payments made for housing
+    ✓ ENHED='100' → Index
+• dst/PRIS04 — updated 2026-09-10T08:00:00 · vars: VAREGR, ENHED, Tid · summable (elimination): ['VAREGR']
+    ✓ VAREGR='000005' → 00 Index of net prices, total
+    ✓ ENHED='100' → Index
+• dst/HUS1 — updated 2026-07-14T08:00:00 · vars: REGION, EJENDOMSKATE, TAL, Tid · summable (elimination): ['REGION', 'EJENDOMSKATE']
+    ✓ REGION='000' → All Denmark
+    ✓ EJENDOMSKATE='552' → Privately owned housing
+    ✓ TAL='100' → Index
+• dst/HUS1 — updated 2026-07-14T08:00:00 · vars: REGION, EJENDOMSKATE, TAL, Tid · summable (elimination): ['REGION', 'EJENDOMSKATE']
+    ✓ REGION='000' → All Denmark
+    ✓ EJENDOMSKATE='554' → Social housing
+    ✓ TAL='100' → Index
+• dst/EJ56 — updated 2026-08-28T08:00:00 · vars: OMRÅDE, EJENDOMSKATE, TAL, Tid · summable (elimination): ['OMRÅDE']
+    ✓ OMRÅDE='000' → All Denmark
+    ✓ EJENDOMSKATE='2103' → Owner-occupied flats, total
+    ✓ TAL='100' → Index
+• s20/UDB010 — updated 2026-09-08T08:00:00 · vars: OMR20, EJKAT20, BOLA20, Tid · summable (elimination): ['OMR20', 'EJKAT20']
+    ✓ OMR20='00' → All Denmark
+    ✓ EJKAT20='1' → Detached/terraced house 
+    ✓ EJKAT20='2' → Owner-occupied flat 
+    ✓ BOLA20='6' → Dwellings for sale, end of period
+• dst/BYGV33 — updated 2026-08-14T08:00:00 · vars: OMRÅDE, BYGFASE, ANVEND, BYGHERRE, Tid · summable (elimination): ['OMRÅDE', 'ANVEND', 'BYGHERRE']
+    ✓ OMRÅDE='000' → All Denmark
+    ✓ BYGFASE='3' → Completed
+    ✓ ANVEND=SUM (omitted from request → API total)
+    ✓ BYGHERRE=SUM (omitted from request → API total)
+• dst/DNRENTM — updated 2026-09-01T08:00:00 · vars: INSTRUMENT, LAND, OPGOER, Tid · summable (elimination): ['LAND']
+    ✓ INSTRUMENT='OIBNAA' → The Nationalbanks official rates - Certificates of deposit (Apr. 1992-)
+    ✓ LAND='DK' → DK: Denmark
+    ✓ OPGOER='A' → Monthly average
+• dst/DNRENTM — updated 2026-09-01T08:00:00 · vars: INSTRUMENT, LAND, OPGOER, Tid · summable (elimination): ['LAND']
+    ✓ INSTRUMENT='OIRNAA' → The Nationalbanks official rates - Lending (Apr. 1992-)
+    ✓ LAND='DK' → DK: Denmark
+    ✓ OPGOER='A' → Monthly average
+• dst/AUS07 — updated 2026-08-31T08:00:00 · vars: YD, SAESONFAK, Tid · summable (elimination): []
+    ✓ YD='TOT' → Gross unemployment
+    ✓ SAESONFAK='9' → Seasonally adjusted figures in percent of the labour force
+• dst/NKN1 — updated 2026-08-20T08:00:00 · vars: TRANSAKT, PRISENHED, SÆSON, Tid · summable (elimination): []
+    ✓ TRANSAKT='B1GQK' → B.1*g Gross domestic product
+    ✓ PRISENHED='LKV_M' → 2020-prices, chained values, (bill. DKK.)
+    ✓ SÆSON='Y' → Seasonally adjusted
+• dst/TVANG1 — updated 2026-09-04T08:00:00 · vars: TYPE, Tid · summable (elimination): []
+    ✓ TYPE='5520010001' → Forced sales of real property total
