@@ -1151,3 +1151,22 @@ aside{background:linear-gradient(178deg,#131C16 0%,#0D140F 100%)}
 #lfmap{position:relative;z-index:0;isolation:isolate}
 .tbl thead th.hi{color:var(--ink);border-bottom-color:var(--ink)}
 .imtip{display:none}
+
+/* basemap: OpenStreetMap desaturated to sit under the pale palette (CARTO now needs an API key) */
+.leaflet-tile-pane{filter:grayscale(1) contrast(.85) opacity(.55)}
+.lfpop{max-width:280px}
+.lfrow{display:flex;justify-content:space-between;gap:12px;font-size:12px;line-height:1.35}
+.lfsec{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:6px 0 2px}
+
+/* indicator selector + explanation panel + table filters */
+.indsel{font-family:var(--mono);font-size:11px;padding:5px 28px 5px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel2) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%238A8C81'/></svg>") no-repeat right 10px center;color:var(--ink);appearance:none;-webkit-appearance:none;max-width:360px;cursor:pointer}
+.indsel:focus{outline:2px solid rgba(10,125,99,.3);border-color:var(--ink)}
+.indx{background:var(--panel2);border-left:3px solid var(--ink);padding:9px 12px;margin:0 0 12px;font-size:12.5px;line-height:1.5}
+.indx-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px}
+.indx-head b{font-family:var(--disp);font-size:14px}
+.indx p{margin:0}
+.indx em{font-style:normal;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-right:3px}
+.indx .warnline{color:var(--warn);font-size:12px;margin-top:3px}
+.tfilters{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 10px}
+.tfilters input[type=search]{font:inherit;font-size:12.5px;padding:5px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);min-width:260px}
+.tfilters input[type=number]{font:inherit;font-family:var(--mono);font-size:11px;padding:3px 6px;border:1px solid var(--line);border-radius:6px;background:var(--panel)}

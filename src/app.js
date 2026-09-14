@@ -29,7 +29,9 @@ const FMT = {
 const fmtOf = i => FMT[i.fmt] || FMT.pct1;
 const byCode = {}; MUNI.forEach(m => byCode[m.code] = m);
 const S = { view: "makro", win: 0 };
-const MK = { ind: (IND[0] || {}).key, muni: null, own: false, sortKey: null, sortDir: -1 };
+const MK = { ind: (IND[0] || {}).key, muni: null, own: false, mode: "map" };
+const T = { q: "", level: "kommune", region: "", minPop: 0 };   /* table-mode filters */
+const REGIONS = ["Hovedstaden", "Sjælland", "Syddanmark", "Midtjylland", "Nordjylland"];
 const LF = { map: null, center: [56.0, 10.5], zoom: 7 };
 const MICRO_ZOOM = 10;
 
@@ -65,11 +67,24 @@ document.addEventListener("click", e => {
   let el;
   if ((el = g("[data-view]"))) { S.view = el.dataset.view; MK.muni = null; render(); return; }
   if ((el = g("[data-mkind]"))) { MK.ind = el.dataset.mkind; renderKeep(); return; }
+  if ((el = g("[data-mkmode]"))) { MK.mode = el.dataset.mkmode; renderKeep(); return; }
+  if ((el = g("[data-tlevel]"))) { T.level = el.dataset.tlevel; renderKeep(); return; }
+  if (g("[data-csv]")) { exportCsv(); return; }
   if (g("[data-mkown]")) { MK.own = !MK.own; renderKeep(); return; }
   if (g("[data-mkback]")) { MK.muni = null; renderKeep(); return; }
   if ((el = g("[data-mkmuni]"))) { MK.muni = el.dataset.mkmuni; zoomToMuni(MK.muni); renderKeep(); return; }
   if ((el = g(".im"))) { tipToggle(el); return; }
   tipHide();
+});
+
+document.addEventListener("change", e => {
+  const el = e.target;
+  if (el.id === "indsel") { MK.ind = el.value; renderKeep(); }
+  if (el.id === "tregion") { T.region = el.value; renderTableBody(); }
+  if (el.id === "tminpop") { T.minPop = Number(el.value) || 0; renderTableBody(); }
+});
+document.addEventListener("input", e => {
+  if (e.target.id === "tq") { T.q = e.target.value.trim().toLowerCase(); renderTableBody(); }
 });
 
 /* ---------- info tooltips (ⓘ) ---------- */
@@ -119,8 +134,23 @@ function mkScale(list, key) {
   return { t: v => v == null || isNaN(v) ? null : (hi > lo ? (v - lo) / (hi - lo) : .5), lo, hi };
 }
 const curInd = () => IND.find(i => i.key === MK.ind) || IND[0] || { key: "", label: "", fmt: "pct1" };
-const chips = () => `<div class="seg">${IND.filter(i => !i.table_only).map(i =>
-  `<button class="sg ${MK.ind === i.key ? "on" : ""}" data-mkind="${i.key}" title="${esc(i.label)}${i.unit ? ", " + esc(i.unit) : ""}${i.level === "postnr" ? " · postal-code level" : " · municipality level"}">${esc(i.short || i.label)}</button>`).join("")}</div>`;
+const GROUP_ORDER = ["Demographics", "Income & jobs", "Housing stock", "Rents", "Prices & market", "Construction"];
+function indSelect() {
+  const groups = GROUP_ORDER.filter(gname => IND.some(i => (i.group || "Other") === gname)).concat(IND.some(i => !GROUP_ORDER.includes(i.group || "Other")) ? ["Other"] : []);
+  return `<select id="indsel" class="indsel" aria-label="Indicator">${groups.map(gname => `<optgroup label="${esc(gname)}">${IND.filter(i => (i.group || "Other") === gname).map(i =>
+    `<option value="${i.key}" ${MK.ind === i.key ? "selected" : ""}>${esc(i.label)}${i.unit ? " · " + esc(i.unit) : ""}</option>`).join("")}</optgroup>`).join("")}</select>`;
+}
+function indExplain(i) {
+  const asof = i.asof ? Object.entries(i.asof).map(([g, p]) => `${g === "postnr" ? "postal codes" : "municipalities"}: ${esc(p)}`).join(" · ") : "";
+  const has = MUNI.filter(m => m[i.key] != null).length;
+  return `<div class="indx">
+    <div class="indx-head"><b>${esc(i.label)}</b><span class="tag">${i.level === "postnr" ? "postal-code level" : "municipality level"}</span><span class="tag">${esc(i.unit || "")}</span></div>
+    <p>${esc(i.desc || "")}</p>
+    <p class="dim"><em>Source</em> ${esc(i.source || "–")}${asof ? ` · <em>As of</em> ${asof}` : ""} · <em>Coverage</em> ${has}/${MUNI.length} municipalities${i.level === "postnr" ? `, ${AREAS.filter(a => a[i.key] != null).length}/${AREAS.length} postal codes` : ""}</p>
+    ${i.warn ? `<p class="warnline">⚠ ${esc(i.warn)}</p>` : ""}
+  </div>`;
+}
+const modeSeg = () => `<div class="seg"><button class="sg ${MK.mode === "map" ? "on" : ""}" data-mkmode="map">Map</button><button class="sg ${MK.mode === "table" ? "on" : ""}" data-mkmode="table">Table</button></div>`;
 
 /* geometry helpers: largest ring, centroid, bounds */
 const mainRing = a => (a.rings || []).slice().sort((x, y) => y.length - x.length)[0] || [];
@@ -145,14 +175,16 @@ function srcNote() {
 function vMakro() {
   if (!AREAS.length || !MUNI.length) return `<div class="card"><p class="empty">No macro data built yet — run <code>python scripts/fetch_statbank.py</code>, <code>python scripts/fetch_geo_dawa.py</code> and <code>python scripts/build_makro.py</code>, then <code>python scripts/build_dashboard.py</code>.</p></div>`;
   const ind = curInd();
+  if (MK.mode === "table") return vTable(ind);
   setTimeout(lfInit, 0);
   const legend = [0, .25, .5, .75, 1].map(x => `<i style="background:${mkShade(x, ind.key)}"></i>`).join("");
   const muni = MK.muni ? byCode[MK.muni] : null;
   return `
   ${muni ? `<div class="back"><button data-mkback>‹ All municipalities</button></div>` : ""}
   <div class="card accent">
-    <div class="card-head"><h3>${muni ? esc(muni.name) + " — postal codes" : "Macro map"} ${M(ind.key)}</h3>
-      <div class="tools">${D.portfolio ? `<button class="lk mini ${MK.own ? "primary" : ""}" data-mkown>● Own properties</button>` : ""}${chips()}</div></div>
+    <div class="card-head"><h3>${muni ? esc(muni.name) + " — postal codes" : "Macro map"}</h3>
+      <div class="tools">${modeSeg()}${indSelect()}${D.portfolio ? `<button class="lk mini ${MK.own ? "primary" : ""}" data-mkown>● Own properties</button>` : ""}</div></div>
+    ${indExplain(ind)}
     <div id="lfmap"></div>
     <div class="mklegend"><span>low</span>${legend}<span>high</span>
       <span class="dim">· ${esc(ind.label)}${ind.unit ? ", " + esc(ind.unit) : ""} · scaled to the visible level</span>
@@ -198,22 +230,83 @@ function areaTable(muni) {
   </div>`;
 }
 
+/* ---------- Table mode ---------- */
+function tableRows() {
+  const q = T.q;
+  if (T.level === "kommune") {
+    return MUNI.filter(m => (!T.region || m.region === T.region) && (m.pop || 0) >= T.minPop &&
+      (!q || m.name.toLowerCase().includes(q) || m.code.includes(q)));
+  }
+  return AREAS.filter(a => { const m = byCode[a.muni] || {};
+    return (!T.region || m.region === T.region) && (a.pop || 0) >= T.minPop &&
+      (!q || (a.name || "").toLowerCase().includes(q) || a.nr.includes(q) || (m.name || "").toLowerCase().includes(q)); });
+}
+function tableCols() { return T.level === "postnr" ? IND.filter(i => i.level === "postnr").concat(IND.filter(i => i.level !== "postnr")) : IND; }
+function tableBodyHtml() {
+  const ind = curInd(), cols = tableCols();
+  const rows = tableRows().slice().sort((a, b) => ((b[ind.key] ?? (byCode[b.muni] || {})[ind.key]) ?? -1e9) - ((a[ind.key] ?? (byCode[a.muni] || {})[ind.key]) ?? -1e9));
+  if (!rows.length) return `<tr><td colspan="${cols.length + 4}" class="empty">no rows match the filters</td></tr>`;
+  return rows.map(r => {
+    const m = T.level === "postnr" ? (byCode[r.muni] || {}) : r;
+    return `<tr ${T.level === "kommune" ? `class="clickrow" data-mkmuni="${esc(r.code)}"` : ""}>
+      <th>${esc(r.name)}</th><td class="dim">${T.level === "postnr" ? esc(r.nr) : esc(r.code)}</td><td class="dim">${T.level === "postnr" ? esc(m.name || "") : esc(r.region || "")}</td>
+      <td class="num dim" data-v="${r.pop || 0}">${r.pop != null ? nf(r.pop, 0) : "–"}</td>
+      ${cols.map(i => { const own = r[i.key]; return own != null ? fmtCell(i, own, false) : (T.level === "postnr" ? fmtCell(i, m[i.key], true) : fmtCell(i, null, false)); }).join("")}</tr>`; }).join("");
+}
+function renderTableBody() {
+  const tb = document.getElementById("tbody"); if (!tb) return;
+  tb.innerHTML = tableBodyHtml();
+  const n = document.getElementById("tcount"); if (n) n.textContent = `${tableRows().length} rows`;
+}
+function vTable(ind) {
+  const cols = tableCols();
+  return `
+  <div class="card accent">
+    <div class="card-head"><h3>Macro table</h3>
+      <div class="tools">${modeSeg()}${indSelect()}</div></div>
+    ${indExplain(ind)}
+    <div class="tfilters">
+      <input id="tq" type="search" placeholder="Search municipality, postal code or name…" value="${esc(T.q)}">
+      <div class="seg"><button class="sg ${T.level === "kommune" ? "on" : ""}" data-tlevel="kommune">Municipalities (${MUNI.length})</button><button class="sg ${T.level === "postnr" ? "on" : ""}" data-tlevel="postnr">Postal codes (${AREAS.length})</button></div>
+      <select id="tregion" class="indsel"><option value="">All regions</option>${REGIONS.map(r => `<option value="${r}" ${T.region === r ? "selected" : ""}>${r}</option>`).join("")}</select>
+      <label class="hint">min. population <input id="tminpop" type="number" min="0" step="1000" value="${T.minPop}" style="width:90px"></label>
+      <span class="hint" id="tcount">${tableRows().length} rows</span>
+      <button class="lk mini" data-csv>⤓ Export CSV</button>
+    </div>
+    <div class="scrollx"><table class="tbl compact wraphead" data-sortable><thead><tr>
+      <th>${T.level === "postnr" ? "Area" : "Municipality"}</th><th>${T.level === "postnr" ? "Postal code" : "Code"}</th><th>${T.level === "postnr" ? "Municipality" : "Region"}</th><th class="num">Population</th>
+      ${cols.map(i => `<th class="num ${i.key === ind.key ? "hi" : ""}">${esc(i.label)}<br><span class="dim">${esc(i.unit || "")}</span></th>`).join("")}</tr></thead>
+      <tbody id="tbody">${tableBodyHtml()}</tbody></table></div>
+    <p class="cap">Sorted by the selected indicator; click any column header to re-sort. ° = municipality value shown on a postal code. Rows: ${T.level === "postnr" ? "postal codes (street-level codes in central Copenhagen merged by name)" : "municipalities"}.</p>
+    ${srcNote()}
+  </div>`;
+}
+function exportCsv() {
+  const cols = tableCols(), rows = tableRows();
+  const head = [T.level === "postnr" ? "area" : "municipality", T.level === "postnr" ? "postal_code" : "code", T.level === "postnr" ? "municipality" : "region", "population"].concat(cols.map(i => i.key));
+  const lines = [head.join(";")].concat(rows.map(r => { const m = T.level === "postnr" ? (byCode[r.muni] || {}) : r;
+    return [r.name, T.level === "postnr" ? r.nr : r.code, T.level === "postnr" ? (m.name || "") : (r.region || ""), r.pop ?? ""].concat(cols.map(i => r[i.key] ?? (T.level === "postnr" ? (m[i.key] ?? "") : ""))).map(v => String(v).replace(/;/g, ",")).join(";"); }));
+  const blob = new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+  a.download = `am-dashboard-dk_${T.level}_${(D.meta && D.meta.built) || "data"}.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
 /* ---------- Leaflet layers ---------- */
 function lfPopup(a, muni) {
-  const rows = IND.map(i => {
-    const own = a[i.key] != null, v = own ? a[i.key] : (muni ? muni[i.key] : null);
-    if (v == null) return "";
-    return `<span style="display:flex;justify-content:space-between;gap:14px"><span>${esc(i.label)}</span><b>${fmtOf(i)(v)}${own ? "" : " °"}</b></span>`;
-  }).join("");
+  const row = (i, v, own) => `<span class="lfrow"><span>${esc(i.short || i.label)}</span><b>${fmtOf(i)(v)}${own ? "" : " °"}</b></span>`;
+  const native = IND.filter(i => a[i.key] != null).map(i => row(i, a[i.key], true)).join("");
+  const inherited = IND.filter(i => a[i.key] == null && muni && muni[i.key] != null).map(i => row(i, muni[i.key], false)).join("");
   return `<div class="lfpop"><b>${esc(a.nr)} ${esc(a.name)}</b>
-    <span class="dim">${muni ? esc(muni.name) : ""}${a.pop != null ? " · " + nf(a.pop, 0) + " inhabitants" : ""}</span>${rows}
-    <span class="dim" style="font-size:10px">° = municipality value</span></div>`;
+    <span class="dim">${muni ? esc(muni.name) : ""}${a.pop != null ? " · " + nf(a.pop, 0) + " inhabitants" : ""}</span>
+    ${native ? `<span class="lfsec">Postal code</span>${native}` : ""}
+    ${inherited ? `<span class="lfsec">Municipality °</span>${inherited}` : ""}</div>`;
 }
 function lfLayers() {
   if (!LF.map) return;
   const zoom = LF.map.getZoom();
   const ind = curInd();
   const micro = zoom >= MICRO_ZOOM && ind.level === "postnr";
+  LF.level = zoom >= MICRO_ZOOM ? "micro" : zoom < 8 ? "national" : "macro";
   if (LF.areaG) LF.map.removeLayer(LF.areaG);
   if (LF.labG) LF.map.removeLayer(LF.labG);
   const areas = MK.muni ? muniAreas(MK.muni) : AREAS;
@@ -226,7 +319,7 @@ function lfLayers() {
     const t = src ? sc.t(src[ind.key]) : null;
     const p = L.polygon(a.rings, { color: "#FFFFFF", weight: zoom >= MICRO_ZOOM ? 1.4 : 0.8,
       fillColor: t == null ? "#C4CBC4" : mkShade(t, ind.key), fillOpacity: .72, smoothFactor: 1 });
-    p.bindPopup(lfPopup(a, m));
+    p.bindPopup(lfPopup(a, m), { maxWidth: 300, maxHeight: 340, autoPanPadding: [24, 24] });
     polys.push(p);
   });
   if (zoom >= MICRO_ZOOM) {
@@ -270,8 +363,14 @@ function lfInit() {
   if (LF.map) { try { LF.map.remove(); } catch (e) {} LF.map = null; }
   const map = L.map(el, { center: LF.center, zoom: LF.zoom, scrollWheelZoom: true });
   LF.map = map;
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", { maxZoom: 18, attribution: "© OpenStreetMap, © CARTO · Boundaries: DAGI, Klimadatastyrelsen" }).addTo(map);
-  map.on("moveend zoomend", () => { const c = map.getCenter(); LF.center = [c.lat, c.lng]; LF.zoom = map.getZoom(); lfLayers(); });
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, className: "basemap",
+    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · Boundaries: DAGI, Klimadatastyrelsen' }).addTo(map);
+  map.on("moveend", () => { const c = map.getCenter(); LF.center = [c.lat, c.lng]; LF.zoom = map.getZoom(); });
+  map.on("zoomend", () => {
+    /* rebuild polygons only when the display level changes — rebuilding on every pan would kill open popups */
+    const z = map.getZoom(), lvl = z >= MICRO_ZOOM ? "micro" : z < 8 ? "national" : "macro";
+    if (lvl !== LF.level) lfLayers();
+  });
   lfLayers();
   applyPendingFit();
 }

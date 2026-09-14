@@ -208,11 +208,13 @@ def main():
     names = labels("", "FOLK1A", col)
     kom_geo = load_geo("kommuner")
     geo_names = {muni_code(f["properties"]["kode"]): f["properties"]["navn"] for f in kom_geo["features"]} if kom_geo else {}
+    REGIONS = {"1081": "Nordjylland", "1082": "Midtjylland", "1083": "Syddanmark", "1084": "Hovedstaden", "1085": "Sjælland"}
+    geo_region = {muni_code(f["properties"]["kode"]): REGIONS.get(str(f["properties"].get("regionskode")), "") for f in kom_geo["features"]} if kom_geo else {}
     munis = {}
     for r in folk:
         code = muni_code(r[col])
         if r["TID"] == p and code.isdigit() and int(code) >= 101 and all(r[k] in TOTAL_CODES for k in dims(r) if k != col):
-            munis[code] = {"code": code, "name": geo_names.get(code) or names.get(r[col], code), "pop": r["INDHOLD"], "asof": {"pop": p}}
+            munis[code] = {"code": code, "name": geo_names.get(code) or names.get(r[col], code), "region": geo_region.get(code, ""), "pop": r["INDHOLD"], "asof": {"pop": p}}
     # postal-code areas from geometry
     areas = {}
     pn_geo = load_geo("postnumre")
@@ -278,7 +280,7 @@ def main():
                     for a in areas.values():
                         if (a.get("pop") or 0) < MIN_POP_GROWTH:
                             a.pop("growth", None)
-        indicators_out.append({k: ind[k] for k in ("key", "label", "short", "unit", "level", "hue") if k in ind} |
+        indicators_out.append({k: ind[k] for k in ("key", "label", "short", "unit", "level", "hue", "group") if k in ind} |
                               {"fmt": ind.get("fmt", "pct1"), "desc": ind.get("desc", ""), "source": ind.get("source", ""),
                                "warn": ind.get("warn", ""), "table_only": ind.get("table_only", False), "asof": asof})
 

@@ -55,7 +55,8 @@
    "calc": "yoy_pct",
    "fmt": "signpct1",
    "desc": "Population change over the last 12 months, % (same period previous year).",
-   "source": "DST FOLK1A (municipality, quarterly) · POSTNR1 (postal code, 1 Jan)"
+   "source": "DST FOLK1A (municipality, quarterly) · POSTNR1 (postal code, 1 Jan)",
+   "group": "Demographics"
   },
   {
    "key": "income",
@@ -96,7 +97,8 @@
    "fmt": "kdkk",
    "desc": "Average disposable income per person, DKK/yr (INDKP101, all persons).",
    "source": "DST INDKP101",
-   "warn": "Published with ~11-month lag."
+   "warn": "Published with ~11-month lag.",
+   "group": "Income & jobs"
   },
   {
    "key": "income_med",
@@ -130,7 +132,8 @@
    "calc": "value_div_1000",
    "fmt": "kdkk",
    "desc": "Median equivalised disposable income (5th decile).",
-   "source": "DST IFOR22"
+   "source": "DST IFOR22",
+   "group": "Income & jobs"
   },
   {
    "key": "young",
@@ -240,7 +243,8 @@
    "calc": "share_of_total",
    "fmt": "pct0",
    "desc": "Residents aged 20–34 as % of population.",
-   "source": "DST FOLK1A · POSTNR1"
+   "source": "DST FOLK1A · POSTNR1",
+   "group": "Demographics"
   },
   {
    "key": "single",
@@ -287,7 +291,8 @@
    "calc": "share_of_total",
    "fmt": "pct0",
    "desc": "Single-person households as % of all households.",
-   "source": "DST FAM55N"
+   "source": "DST FAM55N",
+   "group": "Demographics"
   },
   {
    "key": "benefit",
@@ -350,7 +355,8 @@
    "calc": "ratio_pct",
    "fmt": "pct0",
    "desc": "Households receiving housing benefit (boligsikring/boligydelse, December) as % of households.",
-   "source": "DST BOST63 / FAM55N"
+   "source": "DST BOST63 / FAM55N",
+   "group": "Income & jobs"
   },
   {
    "key": "rent_private",
@@ -376,7 +382,8 @@
    "fmt": "dkk0",
    "desc": "Average rent DKK/m²/yr in private rental buildings with ≥3 dwellings.",
    "source": "Social- og Boligstyrelsen, boligstat.dk",
-   "warn": "Computed from the housing-benefit register × BBR (87 % coverage); skews to the cheaper end — market rents are typically higher."
+   "warn": "Computed from the housing-benefit register × BBR (87 % coverage); skews to the cheaper end — market rents are typically higher.",
+   "group": "Rents"
   },
   {
    "key": "rent_social",
@@ -400,7 +407,8 @@
    "calc": "passthrough",
    "fmt": "dkk0",
    "desc": "Average rent DKK/m²/yr in social (almene) family dwellings.",
-   "source": "Landsbyggefonden, Huslejestatistik"
+   "source": "Landsbyggefonden, Huslejestatistik",
+   "group": "Rents"
   },
   {
    "key": "renters",
@@ -457,7 +465,8 @@
    "calc": "share_of_total",
    "fmt": "pct0",
    "desc": "Rented dwellings as % of occupied dwellings.",
-   "source": "DST BOL101"
+   "source": "DST BOL101",
+   "group": "Housing stock"
   },
   {
    "key": "unemp",
@@ -494,7 +503,8 @@
    "calc": "passthrough",
    "fmt": "pct1",
    "desc": "Registered unemployed as % of the labour force (provisional, latest month).",
-   "source": "DST AUP01"
+   "source": "DST AUP01",
+   "group": "Income & jobs"
   },
   {
    "key": "higher_ed",
@@ -555,7 +565,8 @@
    "calc": "share_of_total",
    "fmt": "pct0",
    "desc": "Residents 15–69 with short-, medium- or long-cycle higher education, %.",
-   "source": "DST HFUDD11"
+   "source": "DST HFUDD11",
+   "group": "Income & jobs"
   },
   {
    "key": "flats",
@@ -609,7 +620,8 @@
    "calc": "share_of_total",
    "fmt": "pct0",
    "desc": "Dwellings in multi-dwelling buildings as % of all dwellings.",
-   "source": "DST BOL101"
+   "source": "DST BOL101",
+   "group": "Housing stock"
   },
   {
    "key": "foreign",
@@ -665,7 +677,8 @@
    "calc": "share_of_total",
    "fmt": "pct1",
    "desc": "Immigrants and descendants as % of population.",
-   "source": "DST FOLK1E"
+   "source": "DST FOLK1E",
+   "group": "Demographics"
   },
   {
    "key": "price_m2",
@@ -722,7 +735,8 @@
    "fmt": "dkk0",
    "desc": "Realised sale price of owner-occupied flats, DKK/m², mean of last 4 quarters.",
    "source": "Finans Danmark BM010 / BM011",
-   "warn": "Postal codes with few trades are suppressed by the source; small-n quarters are noisy."
+   "warn": "Postal codes with few trades are suppressed by the source; small-n quarters are noisy.",
+   "group": "Prices & market"
   },
   {
    "key": "discount",
@@ -782,7 +796,8 @@
    "calc": "discount_pct",
    "fmt": "pct1",
    "desc": "(first asking price − realised price) / asking price, %, mean of last 4 quarters.",
-   "source": "Finans Danmark BM011"
+   "source": "Finans Danmark BM011",
+   "group": "Prices & market"
   },
   {
    "key": "dom",
@@ -832,7 +847,8 @@
    "calc": "last4q_mean",
    "fmt": "days",
    "desc": "Days on market of sold owner-occupied flats, mean of last 4 quarters.",
-   "source": "Finans Danmark BM030 / BM031"
+   "source": "Finans Danmark BM030 / BM031",
+   "group": "Prices & market"
   },
   {
    "key": "supply",
@@ -870,7 +886,8 @@
    "calc": "per_1000_dwellings",
    "fmt": "per1000",
    "desc": "Homes listed for sale per 1,000 dwellings (latest month).",
-   "source": "Finans Danmark UDB010 / DST BOL101"
+   "source": "Finans Danmark UDB010 / DST BOL101",
+   "group": "Prices & market"
   },
   {
    "key": "pipeline",
@@ -911,7 +928,8 @@
    "fmt": "per1000",
    "desc": "Dwellings completed in the last 4 quarters per 1,000 dwellings.",
    "source": "DST BYGV33",
-   "warn": "Not adjusted for reporting delays — recent quarters are revised upward."
+   "warn": "Not adjusted for reporting delays — recent quarters are revised upward.",
+   "group": "Construction"
   },
   {
    "key": "almene",
@@ -965,7 +983,8 @@
    "calc": "share_of_total",
    "fmt": "pct0",
    "desc": "Social housing (almene boliger) as % of all dwellings.",
-   "source": "DST BOL101"
+   "source": "DST BOL101",
+   "group": "Housing stock"
   },
   {
    "key": "avg_m2",
@@ -1003,7 +1022,8 @@
    "calc": "passthrough",
    "fmt": "m2",
    "desc": "Average floor area per dwelling.",
-   "source": "DST BOL106"
+   "source": "DST BOL106",
+   "group": "Housing stock"
   }
  ],
  "macro": [

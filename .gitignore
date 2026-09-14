@@ -9,3 +9,4 @@ __pycache__/
 validate.txt
 fetch.txt
 *.log
+dist/index.html
