@@ -1,69 +1,73 @@
 # AM Dashboard — Denmark Edition
 
-Open-data macro & market layer for a residential asset-management dashboard, built for the Danish market. Same design and logic as the Finnish edition (choropleth map with indicator chips, municipality → postal-code drill-down, comparison tables, source notes) — but every number comes from **Danish open sources**, and the code base is English.
+**Live:** https://real-estate-war-lord.github.io/am-dashboard-dk/
+
+An open-data market map for residential asset management in Denmark: 20 indicators for all 98 municipalities and ~600 postal-code areas — demographics, income, jobs, housing stock, rents, owner-occupied prices, days on market, supply and construction — plus a national macro panel (CPI, net price index, rent indices, house price index, interest rates, unemployment, GDP, forced sales). Every number comes from a public Danish source and is traceable back to the exact table and period.
+
+![Macro map — private rental rent by municipality, 2026](docs/screenshot.png)
+
+## What you get
+
+- **Macro map** — choropleth by municipality, zoom in for postal codes; pick any indicator from a grouped selector; an explanation panel shows definition, source table, period, coverage and caveats. Click a polygon for all its values.
+- **Table mode** — the same data as a sortable table with search, region filter, minimum population, municipality/postal-code level, and CSV export.
+- **Market** — KPI tiles and series for the national picture.
+- **Sources** — every table with its "updated" stamp, plus indicator definitions.
+
+## Data sources (all free, no key unless noted)
+
+| layer | source | tables |
+|---|---|---|
+| Population, households, income, unemployment, education, ancestry, housing stock, housing benefit, construction | Statistics Denmark, StatBank API | FOLK1A, POSTNR1, FAM55N, INDKP101, IFOR22, AUP01, HFUDD11, FOLK1E, BOL101, BOL106, BOST63, BYGV33 |
+| Realised prices DKK/m², asking-price discount, days on market, homes for sale | Finans Danmark, Boligmarkedsstatistikken (via `api.statbank.dk/v1/s20`) | BM010, BM011, BM030, BM031, UDB010 |
+| Private rental rent DKK/m²/yr | Social- og Boligstyrelsen, boligstat.dk (housing-benefit register × BBR) | Huslejestatistik 2026 |
+| Social housing rent DKK/m²/yr | Landsbyggefonden, Huslejestatistik 2026 | Tabel 7 |
+| Macro series | Statistics Denmark incl. Danmarks Nationalbank mirrors | PRIS01, PRIS04, HUS1, EJ56, DNRENTM, AUS07, NKN1, TVANG1 |
+| Boundaries | Klimadatastyrelsen, DAGI (via DAWA, vendored 2026-09-14) | kommuner, postnumre, sogne |
+
+Full catalogue, indicator mapping and verification log: [`docs/DATA_MAP.md`](docs/DATA_MAP.md).
+
+## Run it yourself
+
+Python 3.10+, no packages required (`shapely` and `openpyxl` optional for geometry and the LBF import).
+
+```bash
+git clone https://github.com/real-estate-war-lord/am-dashboard-dk.git && cd am-dashboard-dk
+make validate   # check every table/value code against the live API
+make fetch      # ~36 pulls to data/raw (no key)
+make build      # raw → data/processed → dist/index.html
+make serve      # http://localhost:8080
+```
+
+`make geo` re-vendors boundaries (DAWA closed 2026-10-01 — see `docs/GEO.md` for the Datafordeler route). Rents are updated yearly with `scripts/import_lbf.py` and `scripts/import_boligstat.py` (see `data/external/SOURCES.md`).
+
+Every push to `main` rebuilds and deploys to GitHub Pages; on the 3rd of each month the workflow also refreshes the data.
 
 ## Documentation
 
 | doc | read it when |
 |---|---|
-| [`docs/RUNBOOK.md`](docs/RUNBOOK.md) | you are about to run something — step by step, expected output, troubleshooting |
-| [`docs/DATA_FOLDERS.md`](docs/DATA_FOLDERS.md) | you wonder where a file belongs, what is committed, how a number is traced to its source |
-| [`docs/DATA_MAP.md`](docs/DATA_MAP.md) | you need the source catalogue, indicator mapping (FI → DK), verification log |
-| [`docs/BUILD_PLAN.md`](docs/BUILD_PLAN.md) | you want the phases from empty repo to public GitHub Pages |
-| [`docs/GEO.md`](docs/GEO.md) | boundaries: DAWA now, Datafordeler after 2026-10-01 |
+| [`docs/RUNBOOK.md`](docs/RUNBOOK.md) | you are about to run something — steps, expected output, troubleshooting |
+| [`docs/DATA_FOLDERS.md`](docs/DATA_FOLDERS.md) | where a file belongs, what is committed, how a number is traced to its source |
+| [`docs/DATA_MAP.md`](docs/DATA_MAP.md) | source catalogue, Finnish → Danish indicator mapping, verification log |
+| [`docs/BUILD_PLAN.md`](docs/BUILD_PLAN.md) | phases done and the roadmap |
+| [`docs/GEO.md`](docs/GEO.md) | boundary pipeline |
 | [`CHANGELOG.md`](CHANGELOG.md) | what changed in which version |
 
-## ⚠ Do this before 1 October 2026
+`config/indicators.json` is the single registry: key, label, unit, table, query, calculation, native geography, colour. Adding an indicator is one entry there — no code changes.
 
-Klimadatastyrelsen closes the DAWA API on **2026-10-01 10:00**. The boundary polygons the map needs (postal codes, municipalities, parishes) are vendored from it:
+## Design
 
-```bash
-python scripts/fetch_geo_dawa.py --simplify 0.0005   # shapely optional
-git add data/geo && git commit -m "Vendor DAGI boundaries (DAWA, $(date +%F))"
-```
+The UI is a port of a Finnish asset-management dashboard's market section: same palette, typography, choropleth colour model and interaction pattern, rebuilt in English for Danish data. Leaflet (BSD-2) for the map, OpenStreetMap tiles.
 
-After that date, boundaries come from Datafordeler (free API key, GPKG → `ogr2ogr`), see `docs/DATA_MAP.md` §2.
+## Caveats worth knowing
 
-## Data sources (all free, no key unless noted)
+- Rent levels come from housing-benefit households and skew low; market asking rents are typically higher.
+- Cooperative dwellings (andelsboliger) count as rented in DST's tenure statistic.
+- Finans Danmark suppresses cells with few trades; small municipalities and most rural postal codes show no price.
+- Street-level postal codes in central Copenhagen (1000–1999) are merged by name.
 
-| layer | source |
-|---|---|
-| Demographics, income, jobs, education, housing stock, housing benefit, construction | Statistics Denmark StatBank API |
-| Prices, sales, days on market, supply (municipality + postal code) | Finans Danmark Boligmarkedsstatistik via `api.statbank.dk/v1/s20` |
-| Rents | boligstat.dk (private, from housing-benefit register × BBR), Landsbyggefonden (social housing), DST rent index |
-| Boundaries | DAGI (Klimadatastyrelsen) |
-| Buildings & units | BBR via Datafordeler GraphQL (free key) |
-| Copenhagen sub-areas | Københavns Kommune statbank via `api.statbank.dk/v1/s30` |
-| Macro | DST, Danmarks Nationalbank mirrors, Eurostat NUTS3 |
+## Licence and attribution
 
-## Run it
+Code: MIT. Data: each source's own terms (all permit reuse with attribution). When you reuse the data or the map, credit: *Danmarks Statistik · Finans Danmark, Boligmarkedsstatistikken · Social- og Boligstyrelsen, boligstat.dk · Landsbyggefonden · Indeholder data fra Klimadatastyrelsen (DAGI) · Danmarks Nationalbank.*
 
-```bash
-make validate   # 1. check config codes against the live API (fix TODO_* codes first)
-make geo        # 2. vendor DAGI boundaries — before 2026-10-01
-make fetch      # 3. pull ~40 tables to data/raw (no key)
-make build      # 4. raw → processed → dist/index.html
-make serve      # 5. http://localhost:8080
-```
-
-`make fixture` renders the design with synthetic numbers (dist/fixture.html) — for development only.
-
-```
-scripts/fetch_geo_dawa.py   →  data/geo/*.geojson
-scripts/fetch_statbank.py   →  data/raw/*.csv (+ .meta.json with "updated" stamps)
-scripts/build_makro.py      →  data/processed/makro.json   (municipalities + postal-code areas)
-scripts/build_market.py     →  data/processed/market.json  (national macro series)
-scripts/build_dashboard.py  →  dist/index.html             (self-contained, opens from disk)
-```
-
-Plan and phases: [`docs/BUILD_PLAN.md`](docs/BUILD_PLAN.md).
-
-`config/indicators.json` is the single registry: key, label, unit, table, query, native geography level, choropleth hue.
-
-## Attribution
-
-Map footer and source notes must carry: *Danmarks Statistik · Finans Danmark, Boligmarkedsstatistikken · Social- og Boligstyrelsen, boligstat.dk · Landsbyggefonden · Indeholder data fra Klimadatastyrelsen (DAGI) · Danmarks Nationalbank.*
-
-## Status
-
-v0.2 — data map, pipeline scripts and the dashboard template (design ported from the Finnish edition). No real data built yet — run the pipeline.
+To cite: *AM Dashboard — Denmark Edition, v1.0 (2026), https://github.com/real-estate-war-lord/am-dashboard-dk.*
