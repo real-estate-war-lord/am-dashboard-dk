@@ -1170,3 +1170,6 @@ aside{background:linear-gradient(178deg,#131C16 0%,#0D140F 100%)}
 .tfilters{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 10px}
 .tfilters input[type=search]{font:inherit;font-size:12.5px;padding:5px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);min-width:260px}
 .tfilters input[type=number]{font:inherit;font-family:var(--mono);font-size:11px;padding:3px 6px;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
+
+.tbl td.pin{cursor:pointer;color:var(--dim);font-size:13px;width:18px;text-align:center}
+.tbl td.pin.on,.tbl td.pin:hover{color:var(--ink)}

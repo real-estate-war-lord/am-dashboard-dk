@@ -11,6 +11,7 @@ Run scripts/validate_config.py before the first build to confirm value codes.
 import datetime as dt
 import json
 import pathlib
+import re
 import statistics
 import sys
 
@@ -38,6 +39,34 @@ def latest_period(rs):
 
 def periods_sorted(rs):
     return sorted({r["TID"] for r in rs}, key=period_key)
+
+
+def period_parts(t):
+    """'2026K3' -> (2026, 'K', 3); '2026M07' -> (2026, 'M', 7); '2026' -> (2026, None, 0)"""
+    m = re.match(r"(\d{4})(?:([KQM])(\d{1,2}))?", t or "")
+    return (int(m.group(1)), m.group(2), int(m.group(3) or 0)) if m else (0, None, 0)
+
+
+SAME_SUB_CALCS = {"passthrough", "value_div_1000", "share_of_total", "yoy_pct", "per_1000_dwellings", "ratio_pct"}
+
+
+def rows_for_year(rs, year, calc):
+    """Rows usable for reference year `year`: everything up to the latest available
+    sub-period (quarter/month) of the newest year. For point-in-time calcs only the
+    same sub-period is kept so 2024 vs 2026 compare like with like."""
+    if not rs:
+        return rs
+    latest = max((r["TID"] for r in rs), key=period_key)
+    ly, kind, lsub = period_parts(latest)
+    out = []
+    for r in rs:
+        y, k, sub = period_parts(r["TID"])
+        if y > year or (y == year and kind and sub > lsub):
+            continue
+        if kind and calc in SAME_SUB_CALCS and sub != lsub:
+            continue
+        out.append(r)
+    return out
 
 
 def apply_select(rs, select):
@@ -119,10 +148,15 @@ def calc_discount_pct(rs, src):
     return {a: statistics.fmean(v) for a, v in acc.items()}, f"{ps[0]}–{ps[-1]}"
 
 
+CURRENT_YEAR = None  # set by main() while computing history
+
+
 def dwellings():
     """Total dwellings per municipality: BOL101 rows summed over every fetched
     dimension (the 'flats' pull fetches all uses with BEBO=1000+2000)."""
     rs = rows("", "BOL101", "BOL101_stock")
+    if CURRENT_YEAR:
+        rs = rows_for_year(rs, CURRENT_YEAR, "passthrough")
     col = area_col(rs[0]); p = latest_period(rs)
     return sum_by_area(rs, col, p)
 
@@ -167,23 +201,30 @@ def external_csv(name):
     return out
 
 
-def compute(ind):
-    """Returns {geo: ({area: value}, period)} for one indicator."""
+def compute(ind, year=None):
+    """Returns {geo: ({area: value}, period)} for one indicator, optionally for a
+    reference year (rows after that year are dropped; see rows_for_year)."""
     res = {}
     srcs = ind["sources"]
-    if ind["calc"] == "ratio_pct":
-        numr, p = calc_passthrough(rows(srcs[0].get("db", ""), srcs[0]["table"], srcs[0].get("pull")), srcs[0])
-        den, _ = calc_passthrough(rows(srcs[1].get("db", ""), srcs[1]["table"], srcs[1].get("pull")), srcs[1])
+    calc = ind["calc"]
+    sel = (lambda rs: rows_for_year(rs, year, calc)) if year else (lambda rs: rs)
+    if calc == "ratio_pct":
+        numr, p = calc_passthrough(sel(rows(srcs[0].get("db", ""), srcs[0]["table"], srcs[0].get("pull"))), srcs[0])
+        den, _ = calc_passthrough(sel(rows(srcs[1].get("db", ""), srcs[1]["table"], srcs[1].get("pull"))), srcs[1])
         res[srcs[0]["geo"]] = ({a: v / den[a] * 100 for a, v in numr.items() if v is not None and den.get(a)}, p)
         return res
     for s in srcs:
         if s.get("db") in ("boligstat", "lbf"):
+            if year:
+                continue  # external files: latest year only (add raw/<name>_<year> later)
             ext = external_csv(ind["key"])
             if ext:
                 res[s["geo"]] = (ext, s.get("asof", "external file"))
             continue
-        rs = rows(s.get("db", ""), s["table"], s.get("pull"))
-        vals, p = CALCS[ind["calc"]](rs, s)
+        rs = sel(rows(s.get("db", ""), s["table"], s.get("pull")))
+        if not rs:
+            continue
+        vals, p = CALCS[calc](rs, s)
         res[s["geo"]] = (vals, p)
     return res
 
@@ -250,7 +291,46 @@ def main():
     MIN_POP_GROWTH = 300  # growth % on tiny postal codes is noise
 
     indicators_out = []
+    global CURRENT_YEAR
+    n_hist = int(c.get("history_years", 4))
+    latest_year = period_parts(p)[0]
+    years = list(range(latest_year - n_hist + 1, latest_year + 1))
+    for m in munis.values():
+        m["hist"] = {}
+    for a in areas.values():
+        a["hist"] = {}
     for ind in c["indicators"]:
+        # history: same calc, rows cut at each reference year
+        hist_asof = {}
+        for y in years:
+            CURRENT_YEAR = y
+            try:
+                res_y = compute(ind, y)
+            except Exception as e:  # noqa: BLE001
+                continue
+            for geo, (vals, per) in res_y.items():
+                # file the value under the year the data actually refers to (a source whose
+                # latest year is 2024 must not repeat 2024 under 2025/2026)
+                ay = str(period_parts(str(per).replace("→", "–").split("–")[-1].strip())[0])
+                if ay != str(y):
+                    continue
+                hist_asof.setdefault(ay, {})[geo] = per
+                if geo == "kommune":
+                    for a_, v in vals.items():
+                        if a_ in munis and v is not None:
+                            munis[a_]["hist"].setdefault(ind["key"], {})[ay] = round(v, 2)
+                else:
+                    acc = {}
+                    for code, v in vals.items():
+                        ar = code2area.get(code)
+                        if ar is None or v is None:
+                            continue
+                        w = popof.get(code, 0) or 1
+                        s_, w_ = acc.get(ar["nr"], (0.0, 0.0)); acc[ar["nr"]] = (s_ + v * w, w_ + w)
+                    for nr, (s_, w_) in acc.items():
+                        if w_ and not (ind["key"] == "growth" and (areas[nr].get("pop") or 0) < MIN_POP_GROWTH):
+                            areas[nr]["hist"].setdefault(ind["key"], {})[ay] = round(s_ / w_, 2)
+        CURRENT_YEAR = None
         try:
             res = compute(ind)
         except Exception as e:  # noqa: BLE001
@@ -282,7 +362,8 @@ def main():
                             a.pop("growth", None)
         indicators_out.append({k: ind[k] for k in ("key", "label", "short", "unit", "level", "hue", "group") if k in ind} |
                               {"fmt": ind.get("fmt", "pct1"), "desc": ind.get("desc", ""), "source": ind.get("source", ""),
-                               "warn": ind.get("warn", ""), "table_only": ind.get("table_only", False), "asof": asof})
+                               "warn": ind.get("warn", ""), "table_only": ind.get("table_only", False), "asof": asof,
+                               "hist_asof": hist_asof})
 
     sources = []
     seen = set()
@@ -303,7 +384,7 @@ def main():
     attribution = ["Danmarks Statistik", "Finans Danmark, Boligmarkedsstatistikken", "Social- og Boligstyrelsen", "Landsbyggefonden",
                    "Indeholder data fra Klimadatastyrelsen (DAGI)", "Danmarks Nationalbank"]
     out = {
-        "meta": {"built": dt.date.today().isoformat(), "sources": sources, "attribution": attribution,
+        "meta": {"built": dt.date.today().isoformat(), "sources": sources, "attribution": attribution, "years": [str(y) for y in years], "latest_year": str(latest_year),
                  "note": "Postal codes take their dominant municipality. Cells with too few observations are suppressed by the source and shown as –.",
                  "warnings": warnings},
         "indicators": indicators_out,

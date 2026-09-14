@@ -44,6 +44,10 @@ make fetch
 **Good:** one `ok · updated <date> · <n> rows` line per table, no `FAILED:` block, and `ls data/raw | wc -l` ≈ 80 (CSV + meta per table).
 **If not:** the script prints the failing table and the API's error text; paste it.
 
+## Step 3b — History window
+
+`config/indicators.json` → `history_years` (default 11 = 2016–2026) controls how many years `make fetch` pulls and `build_makro.py` computes. Fetch windows per table type are set in the same file (`Tid`: quarterly `(-n+45)`, monthly `(-n+121)`, annual `(-n+11)`). Values are filed under the year the data refers to, so a source whose latest year is 2024 shows 2014–2024.
+
 ## Step 4 — Build (no network)
 
 ```bash

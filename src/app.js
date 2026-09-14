@@ -29,7 +29,12 @@ const FMT = {
 const fmtOf = i => FMT[i.fmt] || FMT.pct1;
 const byCode = {}; MUNI.forEach(m => byCode[m.code] = m);
 const S = { view: "makro", win: 0 };
-const MK = { ind: (IND[0] || {}).key, muni: null, own: false, mode: "map" };
+const YEARS = (D.meta && D.meta.years) || [];
+const LATEST = (D.meta && D.meta.latest_year) || (YEARS[YEARS.length - 1] || "");
+const MK = { ind: (IND[0] || {}).key, muni: null, own: false, mode: "map", year: LATEST, pins: [] };
+/* value of indicator k for municipality/area o in the selected year (latest = live field, else history) */
+const V = (o, k, y) => { const yr = y || MK.year; if (!o) return null; if (!yr || yr === LATEST) return o[k] ?? null; const h = o.hist && o.hist[k]; return h && h[yr] != null ? h[yr] : null; };
+const yearsFor = k => YEARS.filter(y => y === LATEST || MUNI.some(m => m.hist && m.hist[k] && m.hist[k][y] != null));
 const T = { q: "", level: "kommune", region: "", minPop: 0 };   /* table-mode filters */
 const REGIONS = ["Hovedstaden", "Sjælland", "Syddanmark", "Midtjylland", "Nordjylland"];
 const LF = { map: null, center: [56.0, 10.5], zoom: 7 };
@@ -72,6 +77,7 @@ document.addEventListener("click", e => {
   if (g("[data-csv]")) { exportCsv(); return; }
   if (g("[data-mkown]")) { MK.own = !MK.own; renderKeep(); return; }
   if (g("[data-mkback]")) { MK.muni = null; renderKeep(); return; }
+  if ((el = g("[data-pin]"))) { const c = el.dataset.pin; MK.pins = MK.pins.includes(c) ? MK.pins.filter(x => x !== c) : MK.pins.concat(c).slice(-6); renderKeep(); return; }
   if ((el = g("[data-mkmuni]"))) { MK.muni = el.dataset.mkmuni; zoomToMuni(MK.muni); renderKeep(); return; }
   if ((el = g(".im"))) { tipToggle(el); return; }
   tipHide();
@@ -79,7 +85,8 @@ document.addEventListener("click", e => {
 
 document.addEventListener("change", e => {
   const el = e.target;
-  if (el.id === "indsel") { MK.ind = el.value; renderKeep(); }
+  if (el.id === "indsel") { MK.ind = el.value; if (!yearsFor(MK.ind).includes(MK.year)) MK.year = LATEST; renderKeep(); }
+  if (el.id === "yearsel") { MK.year = el.value; renderKeep(); }
   if (el.id === "tregion") { T.region = el.value; renderTableBody(); }
   if (el.id === "tminpop") { T.minPop = Number(el.value) || 0; renderTableBody(); }
 });
@@ -141,14 +148,23 @@ function indSelect() {
     `<option value="${i.key}" ${MK.ind === i.key ? "selected" : ""}>${esc(i.label)}${i.unit ? " · " + esc(i.unit) : ""}</option>`).join("")}</optgroup>`).join("")}</select>`;
 }
 function indExplain(i) {
-  const asof = i.asof ? Object.entries(i.asof).map(([g, p]) => `${g === "postnr" ? "postal codes" : "municipalities"}: ${esc(p)}`).join(" · ") : "";
+  const asofSrc = (MK.year !== LATEST && i.hist_asof && i.hist_asof[MK.year]) ? i.hist_asof[MK.year] : i.asof;
+  const asof = asofSrc ? Object.entries(asofSrc).map(([g, p]) => `${g === "postnr" ? "postal codes" : "municipalities"}: ${esc(p)}`).join(" · ") : "";
   const has = MUNI.filter(m => m[i.key] != null).length;
   return `<div class="indx">
     <div class="indx-head"><b>${esc(i.label)}</b><span class="tag">${i.level === "postnr" ? "postal-code level" : "municipality level"}</span><span class="tag">${esc(i.unit || "")}</span></div>
     <p>${esc(i.desc || "")}</p>
-    <p class="dim"><em>Source</em> ${esc(i.source || "–")}${asof ? ` · <em>As of</em> ${asof}` : ""} · <em>Coverage</em> ${has}/${MUNI.length} municipalities${i.level === "postnr" ? `, ${AREAS.filter(a => a[i.key] != null).length}/${AREAS.length} postal codes` : ""}</p>
+    <p class="dim"><em>Source</em> ${esc(i.source || "–")}${asof ? ` · <em>As of</em> ${asof}` : ""} · <em>Coverage</em> ${has}/${MUNI.length} municipalities${i.level === "postnr" ? `, ${AREAS.filter(a => a[i.key] != null).length}/${AREAS.length} postal codes` : ""}${yearsFor(i.key).length > 1 ? ` · <em>History</em> ${yearsFor(i.key)[0]}–${LATEST}` : ""}</p>
     ${i.warn ? `<p class="warnline">⚠ ${esc(i.warn)}</p>` : ""}
   </div>`;
+}
+function yearSelect() {
+  const ys = yearsFor(MK.ind);
+  if (ys.length < 2) return "";
+  const hy = ys.filter(y => y !== LATEST); const lastHist = hy[hy.length - 1];
+  /* the live value is always the newest available period; if the source lags (e.g. income 2024) say so */
+  const label = y => y === LATEST ? (lastHist && lastHist !== LATEST && !MUNI.some(m => m.hist && m.hist[MK.ind] && m.hist[MK.ind][LATEST] != null) ? `latest (${lastHist} data)` : `${y} (latest)`) : y;
+  return `<select id="yearsel" class="indsel" aria-label="Year">${ys.filter(y => !(y === lastHist && label(LATEST).startsWith("latest ("))).map(y => `<option value="${y}" ${MK.year === y ? "selected" : ""}>${label(y)}</option>`).join("")}</select>`;
 }
 const modeSeg = () => `<div class="seg"><button class="sg ${MK.mode === "map" ? "on" : ""}" data-mkmode="map">Map</button><button class="sg ${MK.mode === "table" ? "on" : ""}" data-mkmode="table">Table</button></div>`;
 
@@ -183,7 +199,7 @@ function vMakro() {
   ${muni ? `<div class="back"><button data-mkback>‹ All municipalities</button></div>` : ""}
   <div class="card accent">
     <div class="card-head"><h3>${muni ? esc(muni.name) + " — postal codes" : "Macro map"}</h3>
-      <div class="tools">${modeSeg()}${indSelect()}${D.portfolio ? `<button class="lk mini ${MK.own ? "primary" : ""}" data-mkown>● Own properties</button>` : ""}</div></div>
+      <div class="tools">${modeSeg()}${indSelect()}${yearSelect()}${D.portfolio ? `<button class="lk mini ${MK.own ? "primary" : ""}" data-mkown>● Own properties</button>` : ""}</div></div>
     ${indExplain(ind)}
     <div id="lfmap"></div>
     <div class="mklegend"><span>low</span>${legend}<span>high</span>
@@ -192,40 +208,81 @@ function vMakro() {
     ${srcNote()}
     <p class="cap">Boundaries: DAGI, Klimadatastyrelsen (simplified). Basemap loads from the network (CARTO / OpenStreetMap). Click a polygon for all its indicators.</p>
   </div>
+  ${trendCard(ind)}
   ${muni ? areaTable(muni) : muniTable()}`;
+}
+
+/* ---------- Trend card: selected indicator over the years for pinned / largest municipalities ---------- */
+const SERIES_COLORS = ["#1C6B5C", "#B07A1E", "#5C5F52", "#B0331B", "#40547F", "#82346C", "#6E8C5E"];
+function trendCard(ind) {
+  const ys = yearsFor(ind.key);
+  if (ys.length < 2) return "";
+  const pick = MK.pins.length ? MK.pins.map(c => byCode[c]).filter(Boolean)
+    : (MK.muni && byCode[MK.muni] ? [byCode[MK.muni]] : MUNI.slice().sort((a, b) => (b.pop || 0) - (a.pop || 0)).slice(0, 5));
+  const series = pick.map((m, k) => ({ name: m.name, code: m.code, color: SERIES_COLORS[k % SERIES_COLORS.length], pts: ys.map(y => ({ y, v: V(m, ind.key, y) })) }));
+  const all = series.flatMap(s => s.pts.map(p => p.v)).filter(v => v != null);
+  if (!all.length) return "";
+  const W = 900, H = 220, L0 = 78, R = 16, T = 14, B = 26;
+  const lo = Math.min(...all), hi = Math.max(...all), sp = (hi - lo) || 1;
+  const x = i => L0 + i / (ys.length - 1) * (W - L0 - R), y = v => T + (1 - (v - lo) / sp) * (H - T - B);
+  const ticks = [lo, lo + sp / 2, hi];
+  const paths = series.map(s => { const pts = s.pts.map((p, i) => p.v == null ? null : `${x(i).toFixed(1)},${y(p.v).toFixed(1)}`); let d = "", open = false;
+    pts.forEach(p => { if (!p) { open = false; return; } d += (open ? "L" : "M") + p; open = true; });
+    return `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2"/>` + s.pts.map((p, i) => p.v == null ? "" : `<circle cx="${x(i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="2.6" fill="${s.color}"><title>${esc(s.name)} ${p.y}: ${fmtOf(ind)(p.v)}</title></circle>`).join(""); }).join("");
+  const selX = ys.indexOf(MK.year) >= 0 ? `<line x1="${x(ys.indexOf(MK.year)).toFixed(1)}" x2="${x(ys.indexOf(MK.year)).toFixed(1)}" y1="${T}" y2="${H - B}" class="splitline"/>` : "";
+  return `<div class="card">
+    <div class="card-head"><h3>Trend — ${esc(ind.label)}</h3><span class="hint">${ys[0]}–${ys[ys.length - 1]} · ${MK.pins.length ? "pinned municipalities (☆ in the table)" : MK.muni ? "selected municipality" : "five largest municipalities — pin others with ☆"}</span></div>
+    <svg class="chart" viewBox="0 0 ${W} ${H}">
+      ${ticks.map(t => `<line class="grid" x1="${L0}" x2="${W - R}" y1="${y(t).toFixed(1)}" y2="${y(t).toFixed(1)}"/><text class="ax" x="${L0 - 6}" y="${(y(t) + 3).toFixed(1)}" text-anchor="end">${fmtOf(ind)(t)}</text>`).join("")}
+      ${ys.map((yy, i) => `<text class="ax" x="${x(i).toFixed(1)}" y="${H - 8}" text-anchor="middle">${yy}</text>`).join("")}
+      ${selX}${paths}</svg>
+    <div class="bleg">${series.map(s => `<span><i style="display:inline-block;width:10px;height:10px;background:${s.color};margin-right:5px;border-radius:2px"></i>${esc(s.name)}${s.pts[s.pts.length - 1].v != null ? ` <b>${fmtOf(ind)(s.pts[s.pts.length - 1].v)}</b>` : ""}${MK.pins.includes(s.code) ? ` <button class="lk mini" data-pin="${esc(s.code)}">✕</button>` : ""}</span>`).join("")}</div>
+    <p class="cap">Same sub-period each year (e.g. Q3 or July) so years compare like with like; rolling 4-quarter means for prices and days on market. Hover a point for the value.</p>
+  </div>`;
 }
 function fmtCell(i, v, fallback) {
   if (v == null || isNaN(v)) return `<td class="num">–</td>`;
   return `<td class="num" data-v="${v}">${fmtOf(i)(v)}${fallback ? " °" : ""}</td>`;
 }
+const firstYear = k => yearsFor(k)[0];
+function deltaCell(o, i) {
+  const y0 = firstYear(i.key); if (!y0 || y0 === MK.year) return `<td class="num dim">–</td>`;
+  const a = V(o, i.key, y0), b = V(o, i.key); if (a == null || b == null) return `<td class="num dim">–</td>`;
+  const pct = i.fmt.startsWith("pct") || i.fmt === "signpct1";
+  const d = pct ? b - a : (a ? (b / a - 1) * 100 : null); if (d == null) return `<td class="num dim">–</td>`;
+  return `<td class="num ${d > 0 ? "good" : d < 0 ? "bad" : ""}" data-v="${d}">${sign(d, x => nf(x, 1))}${pct ? " pp" : " %"}</td>`;
+}
 function muniTable() {
   const ind = curInd();
   const cols = IND;
-  const rows = MUNI.slice().sort((a, b) => (b[ind.key] ?? -1e9) - (a[ind.key] ?? -1e9));
+  const rows = MUNI.slice().sort((a, b) => (V(b, ind.key) ?? -1e9) - (V(a, ind.key) ?? -1e9));
   const port = D.portfolio && D.portfolio.properties;
+  const y0 = firstYear(ind.key);
   return `<div class="card">
-    <div class="card-head"><h3>Municipalities compared</h3><span class="hint">sorted by ${esc(ind.label.toLowerCase())} · click a row to drill into postal codes</span></div>
-    <div class="scrollx"><table class="tbl compact wraphead" data-sortable><thead><tr><th>Municipality</th><th class="num">Population</th>
-      ${cols.map(i => `<th class="num ${i.key === ind.key ? "hi" : ""}">${esc(i.label)}<br><span class="dim">${esc(i.unit || "")}</span></th>`).join("")}
+    <div class="card-head"><h3>Municipalities compared${MK.year !== LATEST ? " · " + MK.year : ""}</h3><span class="hint">sorted by ${esc(ind.label.toLowerCase())} · click a row to drill into postal codes · ☆ pins a municipality in the trend chart</span></div>
+    <div class="scrollx"><table class="tbl compact wraphead" data-sortable><thead><tr><th></th><th>Municipality</th><th class="num">Population</th>
+      <th class="num hi">${esc(ind.label)}<br><span class="dim">${esc(ind.unit || "")}</span></th>${y0 && y0 !== MK.year ? `<th class="num">Δ since ${y0}<br><span class="dim">${ind.fmt.startsWith("pct") || ind.fmt === "signpct1" ? "pp" : "%"}</span></th>` : ""}
+      ${cols.filter(i => i.key !== ind.key).map(i => `<th class="num">${esc(i.label)}<br><span class="dim">${esc(i.unit || "")}</span></th>`).join("")}
       ${port ? `<th class="num">Properties</th><th class="num">Units</th>` : ""}</tr></thead>
     <tbody>${rows.map(m => {
       const ps = port ? port.filter(p => p.muni === m.code) : [];
-      return `<tr class="clickrow" data-mkmuni="${esc(m.code)}"><th>${esc(m.name)}</th><td class="num dim" data-v="${m.pop || 0}">${m.pop != null ? nf(m.pop / 1000, 0) + " k" : "–"}</td>
-        ${cols.map(i => fmtCell(i, m[i.key], false)).join("")}
+      return `<tr class="clickrow" data-mkmuni="${esc(m.code)}"><td class="pin ${MK.pins.includes(m.code) ? "on" : ""}" data-pin="${esc(m.code)}" title="pin in trend chart">${MK.pins.includes(m.code) ? "★" : "☆"}</td><th>${esc(m.name)}</th><td class="num dim" data-v="${m.pop || 0}">${m.pop != null ? nf(m.pop / 1000, 0) + " k" : "–"}</td>
+        ${fmtCell(ind, V(m, ind.key), false)}${y0 && y0 !== MK.year ? deltaCell(m, ind) : ""}
+        ${cols.filter(i => i.key !== ind.key).map(i => fmtCell(i, V(m, i.key), false)).join("")}
         ${port ? `<td class="num">${ps.length || "–"}</td><td class="num">${ps.reduce((s, p) => s + (p.units || 0), 0) || "–"}</td>` : ""}</tr>`; }).join("")}</tbody></table></div>
     ${srcNote()}
   </div>`;
 }
 function areaTable(muni) {
   const ind = curInd();
-  const areas = muniAreas(muni.code).slice().sort((a, b) => ((b[ind.key] ?? muni[ind.key]) ?? -1e9) - ((a[ind.key] ?? muni[ind.key]) ?? -1e9));
+  const areas = muniAreas(muni.code).slice().sort((a, b) => ((V(b, ind.key) ?? V(muni, ind.key)) ?? -1e9) - ((V(a, ind.key) ?? V(muni, ind.key)) ?? -1e9));
   const cols = IND.filter(i => i.level === "postnr").concat(IND.filter(i => i.level !== "postnr"));
   return `<div class="card">
     <div class="card-head"><h3>${esc(muni.name)} by postal code</h3><span class="hint">sorted by ${esc(ind.label.toLowerCase())} · ° = municipality value (no postal-code statistic)</span></div>
     <div class="scrollx"><table class="tbl compact wraphead" data-sortable><thead><tr><th>Area</th><th>Postal code</th><th class="num">Population</th>
       ${cols.map(i => `<th class="num ${i.key === ind.key ? "hi" : ""}">${esc(i.label)}<br><span class="dim">${esc(i.unit || "")}</span></th>`).join("")}</tr></thead>
     <tbody>${areas.map(a => `<tr><th>${esc(a.name)}</th><td class="dim">${esc(a.nr)}</td><td class="num dim" data-v="${a.pop || 0}">${a.pop != null ? nf(a.pop, 0) : "–"}</td>
-      ${cols.map(i => { const own = a[i.key]; return own != null ? fmtCell(i, own, false) : fmtCell(i, muni[i.key], true); }).join("")}</tr>`).join("")}</tbody></table></div>
+      ${cols.map(i => { const own = V(a, i.key); return own != null ? fmtCell(i, own, false) : fmtCell(i, V(muni, i.key), true); }).join("")}</tr>`).join("")}</tbody></table></div>
     <p class="cap">${areas.length} postal-code areas. Postal codes that span several municipalities are attributed to their dominant municipality.</p>
   </div>`;
 }
@@ -244,14 +301,14 @@ function tableRows() {
 function tableCols() { return T.level === "postnr" ? IND.filter(i => i.level === "postnr").concat(IND.filter(i => i.level !== "postnr")) : IND; }
 function tableBodyHtml() {
   const ind = curInd(), cols = tableCols();
-  const rows = tableRows().slice().sort((a, b) => ((b[ind.key] ?? (byCode[b.muni] || {})[ind.key]) ?? -1e9) - ((a[ind.key] ?? (byCode[a.muni] || {})[ind.key]) ?? -1e9));
+  const rows = tableRows().slice().sort((a, b) => ((V(b, ind.key) ?? V(byCode[b.muni], ind.key)) ?? -1e9) - ((V(a, ind.key) ?? V(byCode[a.muni], ind.key)) ?? -1e9));
   if (!rows.length) return `<tr><td colspan="${cols.length + 4}" class="empty">no rows match the filters</td></tr>`;
   return rows.map(r => {
     const m = T.level === "postnr" ? (byCode[r.muni] || {}) : r;
     return `<tr ${T.level === "kommune" ? `class="clickrow" data-mkmuni="${esc(r.code)}"` : ""}>
       <th>${esc(r.name)}</th><td class="dim">${T.level === "postnr" ? esc(r.nr) : esc(r.code)}</td><td class="dim">${T.level === "postnr" ? esc(m.name || "") : esc(r.region || "")}</td>
       <td class="num dim" data-v="${r.pop || 0}">${r.pop != null ? nf(r.pop, 0) : "–"}</td>
-      ${cols.map(i => { const own = r[i.key]; return own != null ? fmtCell(i, own, false) : (T.level === "postnr" ? fmtCell(i, m[i.key], true) : fmtCell(i, null, false)); }).join("")}</tr>`; }).join("");
+      ${cols.map(i => { const own = V(r, i.key); return own != null ? fmtCell(i, own, false) : (T.level === "postnr" ? fmtCell(i, V(m, i.key), true) : fmtCell(i, null, false)); }).join("")}</tr>`; }).join("");
 }
 function renderTableBody() {
   const tb = document.getElementById("tbody"); if (!tb) return;
@@ -263,7 +320,7 @@ function vTable(ind) {
   return `
   <div class="card accent">
     <div class="card-head"><h3>Macro table</h3>
-      <div class="tools">${modeSeg()}${indSelect()}</div></div>
+      <div class="tools">${modeSeg()}${indSelect()}${yearSelect()}</div></div>
     ${indExplain(ind)}
     <div class="tfilters">
       <input id="tq" type="search" placeholder="Search municipality, postal code or name…" value="${esc(T.q)}">
@@ -285,7 +342,7 @@ function exportCsv() {
   const cols = tableCols(), rows = tableRows();
   const head = [T.level === "postnr" ? "area" : "municipality", T.level === "postnr" ? "postal_code" : "code", T.level === "postnr" ? "municipality" : "region", "population"].concat(cols.map(i => i.key));
   const lines = [head.join(";")].concat(rows.map(r => { const m = T.level === "postnr" ? (byCode[r.muni] || {}) : r;
-    return [r.name, T.level === "postnr" ? r.nr : r.code, T.level === "postnr" ? (m.name || "") : (r.region || ""), r.pop ?? ""].concat(cols.map(i => r[i.key] ?? (T.level === "postnr" ? (m[i.key] ?? "") : ""))).map(v => String(v).replace(/;/g, ",")).join(";"); }));
+    return [r.name, T.level === "postnr" ? r.nr : r.code, T.level === "postnr" ? (m.name || "") : (r.region || ""), r.pop ?? ""].concat(cols.map(i => V(r, i.key) ?? (T.level === "postnr" ? (V(m, i.key) ?? "") : ""))).map(v => String(v).replace(/;/g, ",")).join(";"); }));
   const blob = new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
   a.download = `am-dashboard-dk_${T.level}_${(D.meta && D.meta.built) || "data"}.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
@@ -294,9 +351,9 @@ function exportCsv() {
 /* ---------- Leaflet layers ---------- */
 function lfPopup(a, muni) {
   const row = (i, v, own) => `<span class="lfrow"><span>${esc(i.short || i.label)}</span><b>${fmtOf(i)(v)}${own ? "" : " °"}</b></span>`;
-  const native = IND.filter(i => a[i.key] != null).map(i => row(i, a[i.key], true)).join("");
-  const inherited = IND.filter(i => a[i.key] == null && muni && muni[i.key] != null).map(i => row(i, muni[i.key], false)).join("");
-  return `<div class="lfpop"><b>${esc(a.nr)} ${esc(a.name)}</b>
+  const native = IND.filter(i => V(a, i.key) != null).map(i => row(i, V(a, i.key), true)).join("");
+  const inherited = IND.filter(i => V(a, i.key) == null && muni && V(muni, i.key) != null).map(i => row(i, V(muni, i.key), false)).join("");
+  return `<div class="lfpop"><b>${esc(a.nr)} ${esc(a.name)}</b>${MK.year !== LATEST ? ` <span class="tag">${MK.year}</span>` : ""}
     <span class="dim">${muni ? esc(muni.name) : ""}${a.pop != null ? " · " + nf(a.pop, 0) + " inhabitants" : ""}</span>
     ${native ? `<span class="lfsec">Postal code</span>${native}` : ""}
     ${inherited ? `<span class="lfsec">Municipality °</span>${inherited}` : ""}</div>`;
@@ -311,12 +368,13 @@ function lfLayers() {
   if (LF.labG) LF.map.removeLayer(LF.labG);
   const areas = MK.muni ? muniAreas(MK.muni) : AREAS;
   const munis = MK.muni ? [byCode[MK.muni]].filter(Boolean) : MUNI;
-  const sc = micro ? mkScale(areas.filter(a => a[ind.key] != null), ind.key) : mkScale(munis, ind.key);
+  const vk = o => V(o, ind.key);
+  const sc = (list => { const vals = list.map(vk).filter(v => v != null && !isNaN(v)); if (!vals.length) return { t: () => null, lo: null, hi: null }; const lo = Math.min(...vals), hi = Math.max(...vals); return { t: v => v == null || isNaN(v) ? null : (hi > lo ? (v - lo) / (hi - lo) : .5), lo, hi }; })(micro ? areas.filter(a => vk(a) != null) : munis);
   const polys = [], labs = [];
   areas.forEach(a => {
     const m = byCode[a.muni];
-    const src = micro && a[ind.key] != null ? a : m;
-    const t = src ? sc.t(src[ind.key]) : null;
+    const src = micro && vk(a) != null ? a : m;
+    const t = src ? sc.t(vk(src)) : null;
     const p = L.polygon(a.rings, { color: "#FFFFFF", weight: zoom >= MICRO_ZOOM ? 1.4 : 0.8,
       fillColor: t == null ? "#C4CBC4" : mkShade(t, ind.key), fillOpacity: .72, smoothFactor: 1 });
     p.bindPopup(lfPopup(a, m), { maxWidth: 300, maxHeight: 340, autoPanPadding: [24, 24] });
@@ -325,7 +383,7 @@ function lfLayers() {
   if (zoom >= MICRO_ZOOM) {
     const big = areas.slice().sort((x, y) => (y.pop || 0) - (x.pop || 0)).slice(0, 40);
     big.forEach(a => {
-      const m = byCode[a.muni]; const own = micro && a[ind.key] != null; const v = own ? a[ind.key] : (m ? m[ind.key] : null);
+      const m = byCode[a.muni]; const own = micro && vk(a) != null; const v = own ? vk(a) : (m ? vk(m) : null);
       const t = sc.t(v), dark = t != null && t > .55;
       labs.push(L.marker(centroid(mainRing(a)), { interactive: false, icon: L.divIcon({
         className: "lflab" + (dark ? " lflab-dark" : ""), iconSize: null,
@@ -336,11 +394,11 @@ function lfLayers() {
       const ma = muniAreas(m.code); let x = 0, y = 0, w = 0;
       ma.forEach(a => { const c = centroid(mainRing(a)); const ww = a.pop || 1; x += c[0] * ww; y += c[1] * ww; w += ww; });
       if (!w) return;
-      const t = sc.t(m[ind.key]), dark = t != null && t > .55;
+      const t = sc.t(vk(m)), dark = t != null && t > .55;
       if (zoom < 8 && (m.pop || 0) < 90000) return; /* declutter at national zoom */
       labs.push(L.marker([x / w, y / w], { interactive: false, icon: L.divIcon({
         className: "lflab" + (dark ? " lflab-dark" : ""), iconSize: null,
-        html: `<b>${esc(m.name)}</b><br>${m[ind.key] != null ? fmtOf(ind)(m[ind.key]) : "–"}` }) }));
+        html: `<b>${esc(m.name)}</b><br>${vk(m) != null ? fmtOf(ind)(vk(m)) : "–"}` }) }));
     });
   }
   LF.areaG = L.layerGroup(polys).addTo(LF.map);
