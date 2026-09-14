@@ -2,7 +2,16 @@
 
 Open-data macro & market layer for a residential asset-management dashboard, built for the Danish market. Same design and logic as the Finnish edition (choropleth map with indicator chips, municipality → postal-code drill-down, comparison tables, source notes) — but every number comes from **Danish open sources**, and the code base is English.
 
-**Read first:** [`docs/DATA_MAP.md`](docs/DATA_MAP.md) — the full source catalogue, indicator mapping, verification log and open decisions.
+## Documentation
+
+| doc | read it when |
+|---|---|
+| [`docs/RUNBOOK.md`](docs/RUNBOOK.md) | you are about to run something — step by step, expected output, troubleshooting |
+| [`docs/DATA_FOLDERS.md`](docs/DATA_FOLDERS.md) | you wonder where a file belongs, what is committed, how a number is traced to its source |
+| [`docs/DATA_MAP.md`](docs/DATA_MAP.md) | you need the source catalogue, indicator mapping (FI → DK), verification log |
+| [`docs/BUILD_PLAN.md`](docs/BUILD_PLAN.md) | you want the phases from empty repo to public GitHub Pages |
+| [`docs/GEO.md`](docs/GEO.md) | boundaries: DAWA now, Datafordeler after 2026-10-01 |
+| [`CHANGELOG.md`](CHANGELOG.md) | what changed in which version |
 
 ## ⚠ Do this before 1 October 2026
 
