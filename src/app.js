@@ -621,7 +621,7 @@ function lfLabels() {
   if (!LF.map || !LF.ctx) return;
   const { areas, munis, sc, micro, ind, vk } = LF.ctx; const zoom = LF.map.getZoom(); const labs = [];
   if (LF.labG) LF.map.removeLayer(LF.labG);
-  if (zoom >= MICRO_ZOOM) {
+  if (MK.muni || zoom >= MICRO_ZOOM) {
     const px = ring => { const xs = [], ys = []; ring.forEach(q => { const c = LF.map.latLngToContainerPoint(q); xs.push(c.x); ys.push(c.y); }); return [Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)]; };
     areas.slice().sort((x, y) => (y.pop || 0) - (x.pop || 0)).slice(0, 60).forEach(a => {
       const [w, h] = px(mainRing(a)); if (w < 44 || h < 20) return;
@@ -646,8 +646,10 @@ function lfLayers() {
   if (!LF.map) return;
   const zoom = LF.map.getZoom();
   const ind = curInd();
-  const micro = zoom >= MICRO_ZOOM && (cphMode() || ind.level === "postnr");
-  LF.level = (zoom >= MICRO_ZOOM ? "micro" : zoom < 8 ? "national" : "macro") + (cphMode() ? "-cph" : "");
+  /* a drilled-in municipality always shows its sub-areas, whatever the zoom (small screens fit it below zoom 10) */
+  const fine = !!MK.muni || zoom >= MICRO_ZOOM;
+  const micro = fine && (cphMode() || ind.level === "postnr");
+  LF.level = (fine ? "micro" : zoom < 8 ? "national" : "macro") + (cphMode() ? "-cph" : "") + (MK.muni || "");
   if (LF.areaG) LF.map.removeLayer(LF.areaG);
   if (LF.labG) LF.map.removeLayer(LF.labG);
   const areas = MK.muni ? muniAreas(MK.muni) : AREAS;
@@ -659,7 +661,7 @@ function lfLayers() {
     const m = byCode[a.muni];
     const src = micro && vk(a) != null ? a : m;
     const t = src ? sc.t(vk(src)) : null;
-    const w = zoom >= MICRO_ZOOM ? 1.4 : 0.8;
+    const w = fine ? 1.4 : 0.8;
     const p = L.polygon(a.rings, { color: "#FFFFFF", weight: w, fillColor: t == null ? "#C4CBC4" : mkShade(t, ind.key), fillOpacity: .72, smoothFactor: 1 });
     p.bindPopup(() => lfPopup(a, m), { maxWidth: 300, maxHeight: 360, autoPanPadding: [24, 24] });
     p.on("mouseover", () => p.setStyle({ weight: 2.2, color: "#141C18" })); p.on("mouseout", () => p.setStyle({ weight: w, color: "#FFFFFF" }));
@@ -694,8 +696,8 @@ function lfInit() {
   map.on("popupopen", ev => { const el = ev.popup.getElement(); if (el) el.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => go(b.dataset.go))); });
   map.on("zoomend", () => {
     /* rebuild polygons only when the display level changes — rebuilding on every pan would kill open popups */
-    const z = map.getZoom(), lvl = (z >= MICRO_ZOOM ? "micro" : z < 8 ? "national" : "macro") + (cphMode() ? "-cph" : "");
-    if (lvl !== LF.level) lfLayers(); else if (z >= MICRO_ZOOM) lfLabels();
+    const z = map.getZoom(), fine = !!MK.muni || z >= MICRO_ZOOM, lvl = (fine ? "micro" : z < 8 ? "national" : "macro") + (cphMode() ? "-cph" : "") + (MK.muni || "");
+    if (lvl !== LF.level) lfLayers(); else if (fine) lfLabels();
   });
   lfLayers();
   applyPendingFit();

@@ -1228,3 +1228,53 @@ aside{background:linear-gradient(178deg,#131C16 0%,#0D140F 100%)}
 .dinfo>summary::before{content:"▸ ";}
 .dinfo[open]>summary::before{content:"▾ ";}
 .dinfo>summary:hover{color:var(--ink)}
+
+/* ---- v1.3.1: responsive scaling for laptops with 125–150 % display scaling (Windows) ---- */
+:root{--sidew:250px}
+.app{grid-template-columns:var(--sidew) 1fr}
+aside{width:var(--sidew)}
+#lfmap{height:clamp(380px,calc(100vh - 330px),720px)}        /* the map fits the window: no scrolling to see the legend */
+#armap{height:clamp(300px,calc(100vh - 560px),420px)}
+.asrch input{min-width:min(300px,38vw)}
+.indsel{max-width:min(360px,44vw)}
+.card-head .tools{max-width:100%}
+.hero.wrap{grid-template-columns:repeat(7,minmax(0,1fr))}
+@media (max-width:1500px){.hero.wrap{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media (max-width:1180px){.hero.wrap{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:820px){.hero.wrap{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:1400px){
+  :root{--sidew:212px}
+  body{font-size:13px}
+  .brand{padding:16px 14px 10px}.brand h2{font-size:14px}
+  .nav-glab{padding:16px 12px 6px}
+  .nav-item{padding:9px 11px}.nav-item b{font-size:13px}.nav-item em{font-size:10px;line-height:1.35;margin-top:2px}
+  .side-foot{padding:12px 14px 14px}.xcap{font-size:10px}
+  .topbar{padding:12px 18px 10px}.hd-title p,.topbar p{font-size:12.5px}
+  #body{padding:14px 16px 60px;gap:12px}
+  .card{padding:14px 16px 16px}
+  .card-head{margin-bottom:10px}
+  .indx{font-size:12px;padding:8px 10px}
+  .tbl.compact th,.tbl.compact td{padding:4px 6px;font-size:11px}
+  .mstrip{gap:12px;padding:8px 12px}.mstrip-k{gap:12px}
+  .arhead h2{font-size:24px}
+  .hero .tile .tv b{font-size:18px}
+}
+@media (max-width:1180px){
+  :root{--sidew:180px}
+  .nav-item em{display:none}
+  .topbar h1{font-size:22px}
+  .grid-2{grid-template-columns:1fr}
+}
+@media (max-height:760px){
+  #lfmap{height:clamp(340px,calc(100vh - 300px),720px)}
+  .indx p:not(.dim){display:inline}
+}
+@media (max-width:900px){
+  :root{--sidew:100%}
+  aside{width:auto}
+  .hero.wrap{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+/* Windows: scrollbars take 17 px — keep them from pushing content and from overlapping the map */
+main{scrollbar-gutter:stable}
+.card{overflow-x:clip}
+.scrollx{max-width:100%}

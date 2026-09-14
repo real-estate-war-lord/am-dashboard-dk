@@ -6,6 +6,7 @@
 - Navigation by URL hash — every screen has a permalink, browser back/forward and Esc work; popups link to area pages; legend shows min/max; polygons highlight on hover; faster wheel zoom.
 - Map view: searchable area box (type a municipality, postal code or quarter; Enter opens it), source list folded under *Data information*.
 - Area page tiles: *All figures* first (max 14 = 7 × 2), each tile with y/y change, sparkline against the median of peers (dashed), rank bar, change since 2016 and gap to the median.
+- Responsive layout for laptops with 125–150 % display scaling (Windows): narrower sidebar and type below 1400 px, map height follows the window, tile grid 7 → 5 → 4 columns, stable scrollbar gutter; a drilled-in municipality shows its sub-areas at any zoom.
 - Sidebar: renamed *Macro Dashboard*; footer replaced by **Export data** — one long-format CSV (level; code; name; parent; region; population; year; indicator; label; unit; value; as_of) of every level, indicator and year plus the macro series.
 
 ## v1.2 — 2026-09-14
