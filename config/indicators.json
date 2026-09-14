@@ -1,0 +1,1129 @@
+{
+ "_doc": "Indicator registry for the Danish makro view. `db` = '' (Statistics Denmark), 's20' (Finans Danmark) or 's30' (Copenhagen). `level` = finest geography the indicator natively exists at. `calc` describes the post-processing in build_makro.py. `hue` = RGB target for the choropleth ramp (paper #EFF2EE → hue).",
+ "indicators": [
+  {
+   "key": "growth",
+   "label": "Population growth",
+   "short": "Growth",
+   "unit": "% / yr",
+   "level": "postnr",
+   "hue": [
+    10,
+    88,
+    70
+   ],
+   "sources": [
+    {
+     "db": "",
+     "table": "FOLK1A",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "KØN": [
+       "TOT"
+      ],
+      "ALDER": [
+       "IALT"
+      ],
+      "Tid": [
+       "(-n+5)"
+      ]
+     },
+     "geo": "kommune"
+    },
+    {
+     "db": "",
+     "table": "POSTNR1",
+     "vars": {
+      "PNR20": [
+       "*"
+      ],
+      "KØN": [
+       "TOT"
+      ],
+      "ALDER": [
+       "IALT"
+      ],
+      "Tid": [
+       "(-n+2)"
+      ]
+     },
+     "geo": "postnr"
+    }
+   ],
+   "calc": "yoy_pct",
+   "fmt": "signpct1",
+   "desc": "Population change over the last 12 months, % (same period previous year).",
+   "source": "DST FOLK1A (municipality, quarterly) · POSTNR1 (postal code, 1 Jan)"
+  },
+  {
+   "key": "income",
+   "label": "Disposable income, avg per person",
+   "short": "Income",
+   "unit": "kDKK / yr",
+   "level": "kommune",
+   "hue": [
+    10,
+    88,
+    70
+   ],
+   "sources": [
+    {
+     "db": "",
+     "table": "INDKP101",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "ENHED": [
+       "116"
+      ],
+      "INDKOMSTTYPE": [
+       "100"
+      ],
+      "KOEN": [
+       "MOK"
+      ],
+      "Tid": [
+       "(1)"
+      ]
+     },
+     "geo": "kommune"
+    }
+   ],
+   "calc": "value_div_1000",
+   "fmt": "kdkk",
+   "desc": "Average disposable income per person, DKK/yr (INDKP101, all persons).",
+   "source": "DST INDKP101",
+   "warn": "Published with ~11-month lag."
+  },
+  {
+   "key": "income_med",
+   "label": "Median equivalised disposable income",
+   "short": "Median inc.",
+   "unit": "kDKK / yr",
+   "level": "kommune",
+   "hue": [
+    10,
+    88,
+    70
+   ],
+   "sources": [
+    {
+     "db": "",
+     "table": "IFOR22",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "DECIL": [
+       "5"
+      ],
+      "Tid": [
+       "(1)"
+      ]
+     },
+     "geo": "kommune"
+    }
+   ],
+   "calc": "value_div_1000",
+   "note": "Check DECIL/ENHED codes against tableinfo before first run",
+   "fmt": "kdkk",
+   "desc": "Median equivalised disposable income (5th decile upper bound).",
+   "source": "DST IFOR22"
+  },
+  {
+   "key": "young",
+   "label": "Young adults 20–34",
+   "short": "Young",
+   "unit": "% of population",
+   "level": "postnr",
+   "hue": [
+    90,
+    60,
+    150
+   ],
+   "sources": [
+    {
+     "db": "",
+     "table": "FOLK1A",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "KØN": [
+       "TOT"
+      ],
+      "ALDER": [
+       "IALT",
+       "20-24",
+       "25-29",
+       "30-34"
+      ],
+      "Tid": [
+       "(1)"
+      ]
+     },
+     "geo": "kommune"
+    },
+    {
+     "db": "",
+     "table": "POSTNR1",
+     "vars": {
+      "PNR20": [
+       "*"
+      ],
+      "KØN": [
+       "TOT"
+      ],
+      "ALDER": [
+       "IALT",
+       "20-24",
+       "25-29",
+       "30-34"
+      ],
+      "Tid": [
+       "(1)"
+      ]
+     },
+     "geo": "postnr"
+    }
+   ],
+   "calc": "share_of_total",
+   "fmt": "pct0",
+   "desc": "Residents aged 20–34 as % of population.",
+   "source": "DST FOLK1A · POSTNR1"
+  },
+  {
+   "key": "single",
+   "label": "Single-person households",
+   "short": "Single",
+   "unit": "% of households",
+   "level": "kommune",
+   "hue": [
+    12,
+    94,
+    104
+   ],
+   "sources": [
+    {
+     "db": "",
+     "table": "FAM55N",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "HUSTYP": [
+       "TOT",
+       "M",
+       "K"
+      ],
+      "HUSSTØR": [
+       "TOT"
+      ],
+      "BØRN": [
+       "TOT"
+      ],
+      "Tid": [
+       "(1)"
+      ]
+     },
+     "geo": "kommune"
+    }
+   ],
+   "calc": "share_of_total",
+   "fmt": "pct0",
+   "desc": "Single-person households as % of all households.",
+   "source": "DST FAM55N"
+  },
+  {
+   "key": "benefit",
+   "label": "Housing-benefit households",
+   "short": "Benefit",
+   "unit": "% of households",
+   "level": "kommune",
+   "hue": [
+    166,
+    42,
+    22
+   ],
+   "sources": [
+    {
+     "db": "",
+     "table": "BOST63",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "YDELSESTYPE": [
+       "1000"
+      ],
+      "ENHED": [
+       "3000"
+      ],
+      "MND": [
+       "012"
+      ],
+      "Tid": [
+       "(1)"
+      ]
+     },
+     "geo": "kommune"
+    },
+    {
+     "db": "",
+     "table": "FAM55N",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "HUSTYP": [
+       "TOT"
+      ],
+      "HUSSTØR": [
+       "TOT"
+      ],
+      "BØRN": [
+       "TOT"
+      ],
+      "Tid": [
+       "(1)"
+      ]
+     },
+     "geo": "kommune",
+     "role": "denominator"
+    }
+   ],
+   "calc": "ratio_pct",
+   "fmt": "pct0",
+   "desc": "Households receiving housing benefit (boligsikring/boligydelse, December) as % of households.",
+   "source": "DST BOST63 / FAM55N"
+  },
+  {
+   "key": "rent_private",
+   "label": "Private rental rent",
+   "short": "Rent (priv.)",
+   "unit": "DKK / m² / yr",
+   "level": "kommune",
+   "hue": [
+    40,
+    84,
+    128
+   ],
+   "sources": [
+    {
+     "db": "boligstat",
+     "table": "husleje_privat",
+     "geo": "kommune",
+     "asof": "2025"
+    }
+   ],
+   "calc": "passthrough",
+   "note": "Scraped annually from boligstat.dk; computed by the ministry from Boligstøtteregister × BBR (87 % coverage). Analogue of the Finnish Kela rent.",
+   "fmt": "dkk0",
+   "desc": "Average rent DKK/m²/yr in private rental buildings with ≥3 dwellings.",
+   "source": "Social- og Boligstyrelsen, boligstat.dk",
+   "warn": "Computed from the housing-benefit register × BBR (87 % coverage); skews to the cheaper end — market rents are typically higher."
+  },
+  {
+   "key": "rent_social",
+   "label": "Social housing rent (almene)",
+   "short": "Rent (alm.)",
+   "unit": "DKK / m² / yr",
+   "level": "kommune",
+   "hue": [
+    40,
+    84,
+    128
+   ],
+   "sources": [
+    {
+     "db": "lbf",
+     "table": "basistabeller-for-huslejestatistik-2026.xlsx",
+     "geo": "kommune",
+     "asof": "1 Jan 2026"
+    }
+   ],
+   "calc": "passthrough",
+   "fmt": "dkk0",
+   "desc": "Average rent DKK/m²/yr in social (almene) family dwellings.",
+   "source": "Landsbyggefonden, Huslejestatistik"
+  },
+  {
+   "key": "renters",
+   "label": "Rented dwellings",
+   "short": "Rented",
+   "unit": "% of occupied dwellings",
+   "level": "kommune",
+   "hue": [
+    16,
+    105,
+    110
+   ],
+   "sources": [
+    {
+     "db": "",
+     "table": "BOL101",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "BEBO": [
+       "1000"
+      ],
+      "ANVENDELSE": [
+       "TOT"
+      ],
+      "UDLFORH": [
+       "TOT",
+       "LEJ"
+      ],
+      "EJER": [
+       "TOT"
+      ],
+      "OPFØRELSESÅR": [
+       "TOT"
+      ],
+      "Tid": [
+       "(1)"
+      ]
+     },
+     "geo": "kommune"
+    }
+   ],
+   "calc": "share_of_total",
+   "fmt": "pct0",
+   "desc": "Rented dwellings as % of occupied dwellings.",
+   "source": "DST BOL101"
+  },
+  {
+   "key": "unemp",
+   "label": "Unemployment rate",
+   "short": "Unemp.",
+   "unit": "% of labour force",
+   "level": "kommune",
+   "hue": [
+    150,
+    90,
+    30
+   ],
+   "sources": [
+    {
+     "db": "",
+     "table": "AUP01",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "ALDER": [
+       "TOT"
+      ],
+      "KØN": [
+       "TOT"
+      ],
+      "Tid": [
+       "(1)"
+      ]
+     },
+     "geo": "kommune"
+    }
+   ],
+   "calc": "passthrough",
+   "fmt": "pct1",
+   "desc": "Registered unemployed as % of the labour force (provisional, latest month).",
+   "source": "DST AUP01"
+  },
+  {
+   "key": "higher_ed",
+   "label": "Higher education",
+   "short": "Education",
+   "unit": "% of 15–69",
+   "level": "kommune",
+   "hue": [
+    10,
+    88,
+    70
+   ],
+   "sources": [
+    {
+     "db": "",
+     "table": "HFUDD11",
+     "vars": {
+      "BOPOMR": [
+       "*"
+      ],
+      "HFUDD": [
+       "TOT",
+       "H40",
+       "H50",
+       "H60",
+       "H70",
+       "H80"
+      ],
+      "ALDER": [
+       "TOT"
+      ],
+      "KØN": [
+       "TOT"
+      ],
+      "HERKOMST": [
+       "TOT"
+      ],
+      "Tid": [
+       "(1)"
+      ]
+     },
+     "geo": "kommune"
+    }
+   ],
+   "calc": "share_of_total",
+   "fmt": "pct0",
+   "desc": "Residents 15–69 with short-, medium- or long-cycle higher education, %.",
+   "source": "DST HFUDD11"
+  },
+  {
+   "key": "flats",
+   "label": "Multi-dwelling buildings",
+   "short": "Flats",
+   "unit": "% of dwellings",
+   "level": "kommune",
+   "hue": [
+    70,
+    85,
+    110
+   ],
+   "sources": [
+    {
+     "db": "",
+     "table": "BOL101",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "BEBO": [
+       "TOT"
+      ],
+      "ANVENDELSE": [
+       "TOT",
+       "140"
+      ],
+      "UDLFORH": [
+       "TOT"
+      ],
+      "EJER": [
+       "TOT"
+      ],
+      "OPFØRELSESÅR": [
+       "TOT"
+      ],
+      "Tid": [
+       "(1)"
+      ]
+     },
+     "geo": "kommune"
+    }
+   ],
+   "calc": "share_of_total",
+   "fmt": "pct0",
+   "desc": "Dwellings in multi-dwelling buildings as % of all dwellings.",
+   "source": "DST BOL101"
+  },
+  {
+   "key": "foreign",
+   "label": "Immigrants and descendants",
+   "short": "Foreign bg.",
+   "unit": "% of population",
+   "level": "kommune",
+   "hue": [
+    130,
+    52,
+    108
+   ],
+   "sources": [
+    {
+     "db": "",
+     "table": "FOLK1E",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "HERKOMST": [
+       "TOT",
+       "3",
+       "4"
+      ],
+      "ALDER": [
+       "IALT"
+      ],
+      "KØN": [
+       "TOT"
+      ],
+      "Tid": [
+       "(1)"
+      ]
+     },
+     "geo": "kommune"
+    }
+   ],
+   "calc": "share_of_total",
+   "note": "Confirm HERKOMST codes (immigrants / descendants) from tableinfo",
+   "fmt": "pct1",
+   "desc": "Immigrants and descendants as % of population.",
+   "source": "DST FOLK1E"
+  },
+  {
+   "key": "price_m2",
+   "label": "Realised price, owner-occupied flats",
+   "short": "Price/m²",
+   "unit": "DKK / m²",
+   "level": "postnr",
+   "hue": [
+    30,
+    60,
+    140
+   ],
+   "sources": [
+    {
+     "db": "s20",
+     "table": "BM010",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "EJKAT20": [
+       "Ejerlejlighed"
+      ],
+      "PRIS20": [
+       "REAL"
+      ],
+      "Tid": [
+       "(-n+4)"
+      ]
+     },
+     "geo": "kommune"
+    },
+    {
+     "db": "s20",
+     "table": "BM011",
+     "vars": {
+      "PNR20": [
+       "*"
+      ],
+      "EJKAT20": [
+       "Ejerlejlighed"
+      ],
+      "PRIS20": [
+       "REAL"
+      ],
+      "Tid": [
+       "(-n+4)"
+      ]
+     },
+     "geo": "postnr"
+    }
+   ],
+   "calc": "last4q_mean",
+   "note": "Check value codes for EJKAT20/OMRÅDE via s20/tableinfo; '..' and 0 → null",
+   "fmt": "dkk0",
+   "desc": "Realised sale price of owner-occupied flats, DKK/m², mean of last 4 quarters.",
+   "source": "Finans Danmark BM010 / BM011",
+   "warn": "Postal codes with few trades are suppressed by the source; small-n quarters are noisy."
+  },
+  {
+   "key": "discount",
+   "label": "Asking → realised discount",
+   "short": "Discount",
+   "unit": "%",
+   "level": "postnr",
+   "hue": [
+    166,
+    42,
+    22
+   ],
+   "sources": [
+    {
+     "db": "s20",
+     "table": "BM011",
+     "vars": {
+      "PNR20": [
+       "*"
+      ],
+      "EJKAT20": [
+       "Ejerlejlighed"
+      ],
+      "PRIS20": [
+       "UDBUD",
+       "REAL"
+      ],
+      "Tid": [
+       "(-n+4)"
+      ]
+     },
+     "geo": "postnr"
+    }
+   ],
+   "calc": "discount_pct",
+   "fmt": "pct1",
+   "desc": "(first asking price − realised price) / asking price, %, mean of last 4 quarters.",
+   "source": "Finans Danmark BM011"
+  },
+  {
+   "key": "dom",
+   "label": "Days on market, sold flats",
+   "short": "DOM",
+   "unit": "days",
+   "level": "postnr",
+   "hue": [
+    150,
+    90,
+    30
+   ],
+   "sources": [
+    {
+     "db": "s20",
+     "table": "BM030",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "EJKAT20": [
+       "Ejerlejlighed"
+      ],
+      "Tid": [
+       "(-n+4)"
+      ]
+     },
+     "geo": "kommune"
+    },
+    {
+     "db": "s20",
+     "table": "BM031",
+     "vars": {
+      "PNR20": [
+       "*"
+      ],
+      "EJKAT20": [
+       "Ejerlejlighed"
+      ],
+      "Tid": [
+       "(-n+4)"
+      ]
+     },
+     "geo": "postnr"
+    }
+   ],
+   "calc": "last4q_mean",
+   "fmt": "days",
+   "desc": "Days on market of sold owner-occupied flats, mean of last 4 quarters.",
+   "source": "Finans Danmark BM030 / BM031"
+  },
+  {
+   "key": "supply",
+   "label": "Homes for sale",
+   "short": "Supply",
+   "unit": "per 1,000 dwellings",
+   "level": "kommune",
+   "hue": [
+    150,
+    90,
+    30
+   ],
+   "sources": [
+    {
+     "db": "s20",
+     "table": "UDB010",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "Tid": [
+       "(1)"
+      ]
+     },
+     "geo": "kommune"
+    }
+   ],
+   "calc": "per_1000_dwellings",
+   "note": "Denominator = BOL101 total dwellings",
+   "fmt": "per1000",
+   "desc": "Homes listed for sale per 1,000 dwellings (latest month).",
+   "source": "Finans Danmark UDB010 / DST BOL101"
+  },
+  {
+   "key": "pipeline",
+   "label": "Dwellings completed, last 4Q",
+   "short": "Pipeline",
+   "unit": "per 1,000 dwellings",
+   "level": "kommune",
+   "hue": [
+    10,
+    88,
+    70
+   ],
+   "sources": [
+    {
+     "db": "",
+     "table": "BYGV33",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "BYGFASE": [
+       "*"
+      ],
+      "ANVENDELSE": [
+       "TOT"
+      ],
+      "BYGHERRE": [
+       "TOT"
+      ],
+      "Tid": [
+       "(-n+4)"
+      ]
+     },
+     "geo": "kommune",
+     "select": {
+      "BYGFASE": "TODO_completed_code"
+     }
+    }
+   ],
+   "calc": "sum4q_per_1000",
+   "note": "Run validate_config.py and replace select.BYGFASE with the code for 'completed' (fuldført).",
+   "fmt": "per1000",
+   "desc": "Dwellings completed in the last 4 quarters per 1,000 dwellings.",
+   "source": "DST BYGV33",
+   "warn": "Not adjusted for reporting delays — recent quarters are revised upward."
+  },
+  {
+   "key": "almene",
+   "label": "Social housing share",
+   "short": "Almene",
+   "unit": "% of dwellings",
+   "level": "kommune",
+   "hue": [
+    70,
+    85,
+    110
+   ],
+   "sources": [
+    {
+     "db": "",
+     "table": "BOL101",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "BEBO": [
+       "TOT"
+      ],
+      "ANVENDELSE": [
+       "TOT"
+      ],
+      "UDLFORH": [
+       "TOT"
+      ],
+      "EJER": [
+       "TOT",
+       "20"
+      ],
+      "OPFØRELSESÅR": [
+       "TOT"
+      ],
+      "Tid": [
+       "(1)"
+      ]
+     },
+     "geo": "kommune"
+    }
+   ],
+   "calc": "share_of_total",
+   "fmt": "pct0",
+   "desc": "Social housing (almene boliger) as % of all dwellings.",
+   "source": "DST BOL101"
+  },
+  {
+   "key": "avg_m2",
+   "label": "Average dwelling size",
+   "short": "Ø m²",
+   "unit": "m²",
+   "level": "kommune",
+   "hue": [
+    70,
+    85,
+    110
+   ],
+   "table_only": true,
+   "sources": [
+    {
+     "db": "",
+     "table": "BOL106",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "Tid": [
+       "(1)"
+      ]
+     },
+     "geo": "kommune"
+    }
+   ],
+   "calc": "passthrough",
+   "fmt": "m2",
+   "desc": "Average floor area per dwelling.",
+   "source": "DST BOL106"
+  }
+ ],
+ "macro": [
+  {
+   "key": "cpi",
+   "table": "PRIS01",
+   "vars": {
+    "VAREGR": [
+     "000000"
+    ],
+    "Tid": [
+     "(-n+36)"
+    ]
+   },
+   "label": "Consumer price index",
+   "unit": "idx",
+   "dec": 1,
+   "yoy": true,
+   "src": "DST PRIS01"
+  },
+  {
+   "key": "cpi_rent",
+   "table": "PRIS01",
+   "vars": {
+    "VAREGR": [
+     "041000"
+    ],
+    "Tid": [
+     "(-n+36)"
+    ]
+   },
+   "label": "CPI: actual rentals for housing",
+   "unit": "idx",
+   "dec": 1,
+   "yoy": true,
+   "src": "DST PRIS01"
+  },
+  {
+   "key": "npi",
+   "table": "PRIS04",
+   "vars": {
+    "VAREGR": [
+     "000000"
+    ],
+    "Tid": [
+     "(-n+36)"
+    ]
+   },
+   "label": "Net price index (rent indexation)",
+   "unit": "idx",
+   "dec": 1,
+   "yoy": true,
+   "src": "DST PRIS04"
+  },
+  {
+   "key": "rent_index",
+   "table": "HUS1",
+   "vars": {
+    "REGION": [
+     "000"
+    ],
+    "EJENDOMSKATE": [
+     "552"
+    ],
+    "TAL": [
+     "100"
+    ],
+    "Tid": [
+     "(-n+16)"
+    ]
+   },
+   "label": "Rent index, private rental (2021=100)",
+   "unit": "idx",
+   "dec": 1,
+   "yoy": true,
+   "src": "DST HUS1"
+  },
+  {
+   "key": "rent_index_social",
+   "table": "HUS1",
+   "vars": {
+    "REGION": [
+     "000"
+    ],
+    "EJENDOMSKATE": [
+     "554"
+    ],
+    "TAL": [
+     "100"
+    ],
+    "Tid": [
+     "(-n+16)"
+    ]
+   },
+   "label": "Rent index, social housing (2021=100)",
+   "unit": "idx",
+   "dec": 1,
+   "yoy": true,
+   "src": "DST HUS1"
+  },
+  {
+   "key": "hpi_flats",
+   "table": "EJ56",
+   "vars": {
+    "OMRÅDE": [
+     "000"
+    ],
+    "EJENDOMSKATE": [
+     "TODO_flats"
+    ],
+    "TAL": [
+     "TODO_index"
+    ],
+    "Tid": [
+     "(-n+16)"
+    ]
+   },
+   "label": "House price index, owner-occupied flats",
+   "unit": "idx",
+   "dec": 1,
+   "yoy": true,
+   "src": "DST EJ56",
+   "note": "validate codes"
+  },
+  {
+   "key": "supply_dk",
+   "db": "s20",
+   "table": "UDB010",
+   "vars": {
+    "OMRÅDE": [
+     "TODO_DK"
+    ],
+    "Tid": [
+     "(-n+36)"
+    ]
+   },
+   "label": "Homes for sale, Denmark",
+   "unit": "",
+   "dec": 0,
+   "yoy": true,
+   "src": "Finans Danmark UDB010",
+   "note": "validate OMRÅDE code for all Denmark and any category var"
+  },
+  {
+   "key": "completions",
+   "table": "BYGV33",
+   "vars": {
+    "OMRÅDE": [
+     "000"
+    ],
+    "BYGFASE": [
+     "TODO_completed_code"
+    ],
+    "ANVENDELSE": [
+     "TOT"
+    ],
+    "BYGHERRE": [
+     "TOT"
+    ],
+    "Tid": [
+     "(-n+16)"
+    ]
+   },
+   "label": "Dwellings completed per quarter",
+   "unit": "",
+   "dec": 0,
+   "yoy": true,
+   "src": "DST BYGV33"
+  },
+  {
+   "key": "rate_policy",
+   "table": "DNRENTM",
+   "vars": {
+    "INSTRUMENT": [
+     "TODO_policy_rate"
+    ],
+    "Tid": [
+     "(-n+36)"
+    ]
+   },
+   "label": "Nationalbank policy rate",
+   "unit": "%",
+   "dec": 2,
+   "yoy": false,
+   "src": "Danmarks Nationalbank via DST DNRENTM"
+  },
+  {
+   "key": "rate_mortgage30",
+   "table": "DNRENTM",
+   "vars": {
+    "INSTRUMENT": [
+     "TODO_30y_bond"
+    ],
+    "Tid": [
+     "(-n+36)"
+    ]
+   },
+   "label": "30-year mortgage bond yield",
+   "unit": "%",
+   "dec": 2,
+   "yoy": false,
+   "src": "Danmarks Nationalbank via DST DNRENTM"
+  },
+  {
+   "key": "unemp_dk",
+   "table": "AUS07",
+   "vars": {
+    "Tid": [
+     "(-n+36)"
+    ]
+   },
+   "label": "Unemployment, seasonally adjusted",
+   "unit": "%",
+   "dec": 1,
+   "yoy": false,
+   "src": "DST AUS07"
+  },
+  {
+   "key": "gdp",
+   "table": "NKN1",
+   "vars": {
+    "Tid": [
+     "(-n+12)"
+    ]
+   },
+   "label": "GDP, real, seasonally adjusted",
+   "unit": "bn DKK",
+   "dec": 0,
+   "yoy": true,
+   "src": "DST NKN1",
+   "note": "validate TRANSAKT/PRISENHED codes"
+  },
+  {
+   "key": "forced_sales",
+   "table": "TVANG1",
+   "vars": {
+    "Tid": [
+     "(-n+36)"
+    ]
+   },
+   "label": "Forced sales per month",
+   "unit": "",
+   "dec": 0,
+   "yoy": true,
+   "src": "DST TVANG1"
+  }
+ ],
+ "macro_hero": [
+  "rent_index",
+  "hpi_flats",
+  "supply_dk",
+  "completions"
+ ]
+}

@@ -1,0 +1,30 @@
+name: refresh-data
+on:
+  schedule: [{ cron: "0 6 3 * *" }]   # 3rd of each month, 06:00 UTC
+  workflow_dispatch:
+permissions: { contents: write, pages: write, id-token: write }
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: pip install shapely
+      - run: python scripts/fetch_statbank.py
+      - run: python scripts/build_makro.py && python scripts/build_market.py && python scripts/build_dashboard.py
+      - name: Commit processed data
+        run: |
+          git config user.name "github-actions"; git config user.email "actions@github.com"
+          git add data/processed data/raw/*.meta.json dist/index.html
+          git commit -m "Monthly data refresh $(date +%F)" || echo "nothing to commit"
+          git push
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: dist }
+  deploy:
+    needs: refresh
+    runs-on: ubuntu-latest
+    environment: { name: github-pages }
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
