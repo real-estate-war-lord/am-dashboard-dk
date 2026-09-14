@@ -53,7 +53,7 @@ Fallback after the deadline: Datafordeler DAGI Fildownload → `ogr2ogr` (docs/G
 ## Phase 6 — Depth (ongoing)
 
 - BBR via Datafordeler GraphQL (free key): dwelling size/age/tenure mix at postal-code level → new postnr-level indicators.
-- Copenhagen bydele via `s30` as a third map level.
+- ~~Copenhagen bydele via `s30` as a third map level.~~ Done in v1.2: 67 kvarterer, 12 indicators, 2016–2026.
 - Plandata kommuneplanrammer as a context layer (planned housing capacity).
 - Portfolio module: `data/processed/portfolio.json` (schema in `src/app.js` header) — kept out of the public repo or anonymised; the map's "Own properties" toggle and the municipality table's portfolio columns switch on automatically when the file exists.
 
@@ -87,7 +87,7 @@ Status: phases 0–5 done; live at https://real-estate-war-lord.github.io/am-das
 
 ### Data depth (phase 6)
 - **BBR via Datafordeler GraphQL** (free key): dwelling size/age/tenure mix per postal code → real postnr-level structure indicators.
-- **Copenhagen bydele/roder** via `s30` as a third map level.
+- ~~**Copenhagen bydele/roder** via `s30` as a third map level.~~ Done (v1.2). Next candidates below it: sogne (parishes, 2 097 polygons already vendored) once a parish-level statistic is chosen; BBR unit-level structure via Datafordeler.
 - **Plandata kommuneplanrammer** as a context layer: planned housing capacity (plot ratio × area) per municipality.
 - **Live mortgage yield** (Nationalbanken statbank or Finans Danmark LT10) to replace the retired DNRENTM bond series.
 - **Vacancy**: BOL101 BEBO=2000 proxy + Landsbyggefonden ledige boliger.

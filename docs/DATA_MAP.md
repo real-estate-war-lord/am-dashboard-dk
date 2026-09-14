@@ -144,7 +144,21 @@ Full table list used by the Danish edition (all verified to exist):
 
 ### 3.5 Copenhagen detail — sub-database `s30`
 
-`https://api.statbank.dk/v1/s30/tables` → `KKBOL1–4` (dwellings by district/rode × tenure × size × year), `KKBEF1/3` (population by district, quarterly to 2026K3), `KKHUS1` (households), `KKFR2026` (projection). District polygons from opendata.dk (Københavns Kommune, CC BY 4.0). Use this for a Copenhagen "micro" level below postal code.
+`https://api.statbank.dk/v1/s30/tables` → 48 tables. **Implemented in v1.2 as a third map level: 67 quarters (kvarterer).** The area variable is `OMRKK`: `1000` = city total, `1001–1010` = 10 districts (bydele), `2001–2012` = local committees (lokaludvalg), `20101–21211` = kvarterer (code `2LLxx` → lokaludvalg `20LL` → bydel, mapping in `scripts/build_cph.py`). Polygons: `wfs-kbhkort.kk.dk/k101` layers `kvarter` and `bydel` (CC BY 4.0, `scripts/fetch_geo_cph.py`); the WFS `kvarternr` equals the statbank code one-to-one.
+
+| key | table (pull) | selection | calc | note |
+|---|---|---|---|---|
+| growth | KKBEF1 (`KKBEF1_pop`) | all dims SUM, quarterly | yoy_pct | same quarter previous year |
+| young | KKBEF1 (`KKBEF1_age`) | ALDER TOT + 20…34 | share_of_total | |
+| single | KKHUS1 (`KKHUS1_size`) | HUSSTØR 001 / TOT | share_of_total | one-person households (household size = 1), not "single men + women" as in FAM55N |
+| income_med | KKIND4 | DECILGR 5 | value_div_1000 | 5th decile boundary = median disposable income, persons 15+; lag ~2 years |
+| higher_ed | KKUDD1 | HFUAMS 04–08 / TOT | share_of_total | short-cycle … PhD, of 15–69 |
+| renters, private_rental, andel, almene | KKBOL3 (`KKBOL3_tenure`) | EJER 02+03+04+05, 02, 03, 04 / 01–05 | share_of_total | `99` unknown excluded from denominator |
+| avg_m2 | KKBOL3 (`KKBOL3_size`) | ENHED 03 | passthrough | average m² per dwelling |
+| new_stock | KKBOL3 (`KKBOL3_year`) | IBRUGKK 13–28 (2010…2025) / TOT | share_of_total | share of stock commissioned 2010+ |
+| unemp | KKLEDIG2 ÷ KKBEF1_pop | ALERAMS SUM | ratio_pct | **district level only** (KKLEDIG2 has 23 area codes, no kvarterer) — each quarter shows its bydel's value; denominator is the same year's population, not the labour force |
+
+Not usable at quarter level: KKLEDIG2 (unemployment, bydel only), KKIND* other than the decile table (means at bydel), anything with `OMRKK` limited to 23 codes — check `validate_config.py`'s `OMRKK=* (n codes)` line: 93 codes = kvarter level available, 23 = districts only.
 
 ### 3.6 Macro panel
 

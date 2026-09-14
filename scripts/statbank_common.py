@@ -7,7 +7,7 @@ import re
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 RAW = ROOT / "data" / "raw"
 CFG = ROOT / "config" / "indicators.json"
-AREA_VARS = {"OMRÅDE", "BOPOMR", "REGION", "KOMMUNE", "KOMMUNEDK", "OMR20", "PNR20", "SOGN", "BYER"}
+AREA_VARS = {"OMRÅDE", "BOPOMR", "REGION", "KOMMUNE", "KOMMUNEDK", "OMR20", "PNR20", "SOGN", "BYER", "OMRKK"}
 
 
 def cfg() -> dict:

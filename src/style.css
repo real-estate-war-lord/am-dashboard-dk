@@ -1173,3 +1173,58 @@ aside{background:linear-gradient(178deg,#131C16 0%,#0D140F 100%)}
 
 .tbl td.pin{cursor:pointer;color:var(--dim);font-size:13px;width:18px;text-align:center}
 .tbl td.pin.on,.tbl td.pin:hover{color:var(--ink)}
+
+/* ---- v1.3: map-only map view, area pages ---- */
+.mklegend .lgv{font-weight:600;color:var(--ink2)}
+.mstrip{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:10px 14px;margin:0 0 12px;border:1px solid var(--line);border-radius:9px;background:var(--panel2)}
+.mstrip-id b{font-family:var(--disp);font-size:16px;display:block}
+.mstrip-id .dim{font-size:11.5px}
+.mstrip-k{display:flex;gap:18px;flex-wrap:wrap;margin-left:auto}
+.mstrip-k>div span{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mstrip-k>div b{font-family:var(--mono);font-size:15px;display:block}
+.mstrip-k>div em{font-style:normal;font-family:var(--mono);font-size:9.5px;color:var(--muted)}
+.mstrip-act{display:flex;gap:6px}
+.lfpop .lfact{display:flex;gap:4px;flex-wrap:wrap;margin:4px 0 6px}
+.arhead{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.arhead h2{font-size:30px;letter-spacing:-.03em;margin:2px 0 8px}
+.crumb{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.artags{display:flex;gap:6px;flex-wrap:wrap}
+.artags .tag{color:var(--ink2);border-color:var(--line)}
+.hero.wrap{grid-template-columns:repeat(7,minmax(0,1fr));background:var(--panel);gap:0}
+@media (max-width:1250px){.hero.wrap{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:800px){.hero.wrap{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.hero.wrap>div{border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.hero .tile{cursor:pointer;transition:background .12s}
+.hero .tile:hover{background:var(--panel2)}
+.hero .tile.on{box-shadow:inset 0 3px 0 var(--ink);background:#F0F4EE}
+.hero .tile{padding:11px 10px 9px;min-height:0}
+.hero .tile .tl{font-size:9px;letter-spacing:.06em;min-height:26px;line-height:1.35}
+.hero .tile .tv{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;margin-top:4px}
+.hero .tile .tv b{font-size:19px;margin:0;display:inline;letter-spacing:-.03em}
+.hero .tile .tv i{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--ink2)}
+.hero .tile .tspark{width:100%;height:60px;display:block;margin-top:6px;overflow:visible}
+.hero .tile .tspark .ax{font-size:8.5px}
+.hero .tile .tm{display:grid;gap:2px;margin-top:4px;font-family:var(--mono);font-size:9.5px;color:var(--muted)}
+.hero .tile .tm i{font-style:normal;font-weight:600}
+.hero .tile .rk{display:flex;align-items:center;gap:6px;color:var(--ink2)}
+.rkbar{position:relative;display:inline-block;width:46px;height:5px;background:var(--line);border-radius:3px;flex:0 0 46px}
+.rkbar i{position:absolute;top:-2px;width:3px;height:9px;margin-left:-1px;background:var(--ink);border-radius:1px}
+.hero .tile .up{color:var(--good)}.hero .tile .dn{color:var(--bad)}
+.hero .tile em i{font-style:normal;font-weight:600}
+#armap{height:380px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);position:relative;z-index:0;isolation:isolate}
+.tbl .go{color:var(--dim);font-size:13px;font-weight:400;margin-left:2px}
+.back button+.dim{margin:0 4px}
+@media (max-width:1100px){.mstrip-k{margin-left:0}}
+
+.xbtn{display:block;width:100%;background:var(--side2);border:1px solid #2C3A32;color:var(--side-ink);font-family:var(--mono);font-size:11.5px;padding:9px 10px;cursor:pointer;border-radius:7px;text-align:left}
+.xbtn:hover{border-color:var(--side-ink)}
+.xcap{margin-top:8px;font-size:10.5px;color:var(--side-muted);line-height:1.45}
+
+.asrch{display:flex;gap:6px;align-items:center}
+.asrch input{min-width:300px}
+.dinfo{margin-top:10px}
+.dinfo>summary{cursor:pointer;list-style:none;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:6px 0}
+.dinfo>summary::-webkit-details-marker{display:none}
+.dinfo>summary::before{content:"▸ ";}
+.dinfo[open]>summary::before{content:"▾ ";}
+.dinfo>summary:hover{color:var(--ink)}

@@ -1,0 +1,656 @@
+{
+ "id": "KKUDD1",
+ "text": "Educational attainment (15-69 years)",
+ "description": "Educational attainment (15-69 years) by district, highest education completed, sex, age and time",
+ "unit": "Number",
+ "suppressedDataValue": "0",
+ "updated": "2026-05-29T08:00:00",
+ "active": true,
+ "contacts": [
+  {
+   "name": "Københavns Kommunes Tværgående Analyseenhed",
+   "phone": "+4529298013",
+   "mail": "statistik@okf.kk.dk"
+  }
+ ],
+ "documentation": null,
+ "footnote": {
+  "text": "Source: Copenhagen Municipalitys calculations on the basis of microdata from Statistics Denmarks Research Service",
+  "mandatory": false
+ },
+ "variables": [
+  {
+   "id": "OMRKK",
+   "text": "district",
+   "elimination": true,
+   "time": false,
+   "map": "kk_lokaludvalg_21",
+   "values": [
+    {
+     "id": "1000",
+     "text": "Copenhagen total"
+    },
+    {
+     "id": "1001",
+     "text": "District - Indre By"
+    },
+    {
+     "id": "1002",
+     "text": "District - Østerbro"
+    },
+    {
+     "id": "1003",
+     "text": "District - Nørrebro"
+    },
+    {
+     "id": "1004",
+     "text": "District - Vesterbro/Kongens Enghave"
+    },
+    {
+     "id": "1005",
+     "text": "District - Valby"
+    },
+    {
+     "id": "1006",
+     "text": "District - Vanløse"
+    },
+    {
+     "id": "1007",
+     "text": "District - Brønshøj-Husum"
+    },
+    {
+     "id": "1008",
+     "text": "District - Bispebjerg"
+    },
+    {
+     "id": "1009",
+     "text": "District - Amager Øst"
+    },
+    {
+     "id": "1010",
+     "text": "District - Amager Vest"
+    },
+    {
+     "id": "2001",
+     "text": "Local committee district - Indre By"
+    },
+    {
+     "id": "2002",
+     "text": "Local committee district - Christianshavn"
+    },
+    {
+     "id": "2003",
+     "text": "Local committee district - Østerbro"
+    },
+    {
+     "id": "2004",
+     "text": "Local committee district - Nørrebro"
+    },
+    {
+     "id": "2005",
+     "text": "Local committee district - Vesterbro"
+    },
+    {
+     "id": "2006",
+     "text": "Local committee district - Kgs. Enghave"
+    },
+    {
+     "id": "2007",
+     "text": "Local committee district - Valby"
+    },
+    {
+     "id": "2008",
+     "text": "Local committee district - Vanløse"
+    },
+    {
+     "id": "2009",
+     "text": "Local committee district - Brønshøj-Husum"
+    },
+    {
+     "id": "2010",
+     "text": "Local committee district - Bispebjerg"
+    },
+    {
+     "id": "2011",
+     "text": "Local committee district - Amager Øst"
+    },
+    {
+     "id": "2012",
+     "text": "Local committee district - Amager Vest"
+    },
+    {
+     "id": "20101",
+     "text": "Indre By - Middelalderbyen"
+    },
+    {
+     "id": "20102",
+     "text": "Indre By - Metropolzonen "
+    },
+    {
+     "id": "20103",
+     "text": "Indre By - Nansensgade-kvarteret"
+    },
+    {
+     "id": "20104",
+     "text": "Indre By - Øster Farimagsgade-kvarteret"
+    },
+    {
+     "id": "20105",
+     "text": "Indre By - Østerport"
+    },
+    {
+     "id": "20106",
+     "text": "Indre By - Frederiksstaden"
+    },
+    {
+     "id": "20107",
+     "text": "Indre By - Gammelholm og Nyhavn"
+    },
+    {
+     "id": "20201",
+     "text": "Christianshavn - Neden Vandet"
+    },
+    {
+     "id": "20202",
+     "text": "Christianshavn - Oven Vandet"
+    },
+    {
+     "id": "20203",
+     "text": "Christianshavn - Holmen og Refshaleøen"
+    },
+    {
+     "id": "20301",
+     "text": "Østerbro - Nord/Komponistkvarteret "
+    },
+    {
+     "id": "20302",
+     "text": "Østerbro - Svanemøllen Syd/Øst"
+    },
+    {
+     "id": "20303",
+     "text": "Østerbro - Århusgade Nord"
+    },
+    {
+     "id": "20304",
+     "text": "Østerbro - Århusgade Syd "
+    },
+    {
+     "id": "20305",
+     "text": "Østerbro - Rosenvænget "
+    },
+    {
+     "id": "20306",
+     "text": "Østerbro - Ny Ryvang "
+    },
+    {
+     "id": "20307",
+     "text": "Østerbro - Nord"
+    },
+    {
+     "id": "20308",
+     "text": "Østerbro - Nordhavn "
+    },
+    {
+     "id": "20309",
+     "text": "Østerbro - Lyngbyvej Vest "
+    },
+    {
+     "id": "20310",
+     "text": "Østerbro - Lyngbyvej Øst/Klimakvarteret"
+    },
+    {
+     "id": "20311",
+     "text": "Østerbro - Fælled "
+    },
+    {
+     "id": "20401",
+     "text": "Nørrebro - Blågårdskvarteret/Assistens/Rantzausgade"
+    },
+    {
+     "id": "20402",
+     "text": "Nørrebro - Guldbergskvarteret/Panum/Ravnsborggade "
+    },
+    {
+     "id": "20403",
+     "text": "Nørrebro - Stefansgade/Nørrebroparken/Lundtoftegade "
+    },
+    {
+     "id": "20404",
+     "text": "Nørrebro - Mimersgade-kvarteret/ Nørrebro St. "
+    },
+    {
+     "id": "20405",
+     "text": "Nørrebro - Haraldsgade-kvarteret"
+    },
+    {
+     "id": "20501",
+     "text": "Vesterbro - Vest"
+    },
+    {
+     "id": "20502",
+     "text": "Vesterbro - Central "
+    },
+    {
+     "id": "20503",
+     "text": "Vesterbro - Øst"
+    },
+    {
+     "id": "20504",
+     "text": "Vesterbro - Syd"
+    },
+    {
+     "id": "20601",
+     "text": "Kgs. Enghave - Bavnehøj"
+    },
+    {
+     "id": "20602",
+     "text": "Kgs. Enghave - Gl. Sydhavn"
+    },
+    {
+     "id": "20603",
+     "text": "Kgs. Enghave - Holmene"
+    },
+    {
+     "id": "20701",
+     "text": "Valby - Gl. Valby "
+    },
+    {
+     "id": "20702",
+     "text": "Valby - Syd"
+    },
+    {
+     "id": "20703",
+     "text": "Valby - Ålholm"
+    },
+    {
+     "id": "20704",
+     "text": "Valby - Valby Sydvest "
+    },
+    {
+     "id": "20705",
+     "text": "Valby - Vigerslev"
+    },
+    {
+     "id": "20801",
+     "text": "Vanløse - Jyllingevej Kvarter"
+    },
+    {
+     "id": "20802",
+     "text": "Vanløse - Jernbane Allé Kvarter"
+    },
+    {
+     "id": "20803",
+     "text": "Vanløse - Sallingvej Kvarter"
+    },
+    {
+     "id": "20804",
+     "text": "Vanløse - Grøndals Park Kvarter"
+    },
+    {
+     "id": "20901",
+     "text": "Brønshøj-Husum - Husum"
+    },
+    {
+     "id": "20902",
+     "text": "Brønshøj-Husum - Husum Nord"
+    },
+    {
+     "id": "20903",
+     "text": "Brønshøj-Husum - Tingbjerg "
+    },
+    {
+     "id": "20904",
+     "text": "Brønshøj-Husum - Brønshøj"
+    },
+    {
+     "id": "20905",
+     "text": "Brønshøj-Husum - Bellahøj"
+    },
+    {
+     "id": "21001",
+     "text": "Bispebjerg - Emdrup "
+    },
+    {
+     "id": "21002",
+     "text": "Bispebjerg- Ryparken-Lundehus"
+    },
+    {
+     "id": "21003",
+     "text": "Bispebjerg - Bispebjerg "
+    },
+    {
+     "id": "21004",
+     "text": "Bispebjerg - Utterslev "
+    },
+    {
+     "id": "21005",
+     "text": "Bispebjerg - Nordvest"
+    },
+    {
+     "id": "21101",
+     "text": "Amager Øst - Amagerbro Øst"
+    },
+    {
+     "id": "21102",
+     "text": "Amager Øst - Sundbyøster"
+    },
+    {
+     "id": "21103",
+     "text": "Amager Øst - Villakvartererne "
+    },
+    {
+     "id": "21104",
+     "text": "Amager Øst - Nordøstamager"
+    },
+    {
+     "id": "21201",
+     "text": "Amager Vest - Amagerbro Vest"
+    },
+    {
+     "id": "21202",
+     "text": "Amager Vest - Bryggen Syd "
+    },
+    {
+     "id": "21203",
+     "text": "Amager Vest - Faste Batteri"
+    },
+    {
+     "id": "21204",
+     "text": "Amager Vest - Gamle Bryggen"
+    },
+    {
+     "id": "21205",
+     "text": "Amager Vest - Grønjordssøen (Ørestad Nord and Vejlandskvarter)"
+    },
+    {
+     "id": "21206",
+     "text": "Amager Vest - Kolonihavekvarteret"
+    },
+    {
+     "id": "21207",
+     "text": "Amager Vest - Sundbyvester"
+    },
+    {
+     "id": "21208",
+     "text": "Amager Vest - Sundholmsvejs kvarteret "
+    },
+    {
+     "id": "21209",
+     "text": "Amager Vest - Urbanplanen "
+    },
+    {
+     "id": "21210",
+     "text": "Amager Vest - Ørestad City "
+    },
+    {
+     "id": "21211",
+     "text": "Amager Vest - Ørestad Syd"
+    }
+   ]
+  },
+  {
+   "id": "HFUAMS",
+   "text": "highest education completed",
+   "elimination": true,
+   "time": false,
+   "values": [
+    {
+     "id": "TOT",
+     "text": "Highest education completed total"
+    },
+    {
+     "id": "01",
+     "text": "Primary education"
+    },
+    {
+     "id": "02",
+     "text": "Upper secondary education and qualifying educational programs"
+    },
+    {
+     "id": "03",
+     "text": "Vocational Education and Training (VET)"
+    },
+    {
+     "id": "04",
+     "text": "Short cycle higher educations"
+    },
+    {
+     "id": "05",
+     "text": "Vocational bachelors educations"
+    },
+    {
+     "id": "06",
+     "text": "Bachelors programs"
+    },
+    {
+     "id": "07",
+     "text": "Masters programs"
+    },
+    {
+     "id": "08",
+     "text": "PhD programs"
+    },
+    {
+     "id": "99",
+     "text": "Not stated"
+    }
+   ]
+  },
+  {
+   "id": "KONAMS",
+   "text": "sex",
+   "elimination": true,
+   "time": false,
+   "values": [
+    {
+     "id": "TOT",
+     "text": "Sex total"
+    },
+    {
+     "id": "01",
+     "text": "Men"
+    },
+    {
+     "id": "02",
+     "text": "Women"
+    }
+   ]
+  },
+  {
+   "id": "ALERAMS",
+   "text": "age",
+   "elimination": true,
+   "time": false,
+   "values": [
+    {
+     "id": "TOT",
+     "text": "Age total"
+    },
+    {
+     "id": "01",
+     "text": "15-34 years"
+    },
+    {
+     "id": "02",
+     "text": "35-54 years"
+    },
+    {
+     "id": "03",
+     "text": "55-69 years"
+    }
+   ]
+  },
+  {
+   "id": "Tid",
+   "text": "time",
+   "elimination": false,
+   "time": true,
+   "values": [
+    {
+     "id": "1985",
+     "text": "1985"
+    },
+    {
+     "id": "1986",
+     "text": "1986"
+    },
+    {
+     "id": "1987",
+     "text": "1987"
+    },
+    {
+     "id": "1988",
+     "text": "1988"
+    },
+    {
+     "id": "1989",
+     "text": "1989"
+    },
+    {
+     "id": "1990",
+     "text": "1990"
+    },
+    {
+     "id": "1991",
+     "text": "1991"
+    },
+    {
+     "id": "1992",
+     "text": "1992"
+    },
+    {
+     "id": "1993",
+     "text": "1993"
+    },
+    {
+     "id": "1994",
+     "text": "1994"
+    },
+    {
+     "id": "1995",
+     "text": "1995"
+    },
+    {
+     "id": "1996",
+     "text": "1996"
+    },
+    {
+     "id": "1997",
+     "text": "1997"
+    },
+    {
+     "id": "1998",
+     "text": "1998"
+    },
+    {
+     "id": "1999",
+     "text": "1999"
+    },
+    {
+     "id": "2000",
+     "text": "2000"
+    },
+    {
+     "id": "2001",
+     "text": "2001"
+    },
+    {
+     "id": "2002",
+     "text": "2002"
+    },
+    {
+     "id": "2003",
+     "text": "2003"
+    },
+    {
+     "id": "2004",
+     "text": "2004"
+    },
+    {
+     "id": "2005",
+     "text": "2005"
+    },
+    {
+     "id": "2006",
+     "text": "2006"
+    },
+    {
+     "id": "2007",
+     "text": "2007"
+    },
+    {
+     "id": "2008",
+     "text": "2008"
+    },
+    {
+     "id": "2009",
+     "text": "2009"
+    },
+    {
+     "id": "2010",
+     "text": "2010"
+    },
+    {
+     "id": "2011",
+     "text": "2011"
+    },
+    {
+     "id": "2012",
+     "text": "2012"
+    },
+    {
+     "id": "2013",
+     "text": "2013"
+    },
+    {
+     "id": "2014",
+     "text": "2014"
+    },
+    {
+     "id": "2015",
+     "text": "2015"
+    },
+    {
+     "id": "2016",
+     "text": "2016"
+    },
+    {
+     "id": "2017",
+     "text": "2017"
+    },
+    {
+     "id": "2018",
+     "text": "2018"
+    },
+    {
+     "id": "2019",
+     "text": "2019"
+    },
+    {
+     "id": "2020",
+     "text": "2020"
+    },
+    {
+     "id": "2021",
+     "text": "2021"
+    },
+    {
+     "id": "2022",
+     "text": "2022"
+    },
+    {
+     "id": "2023",
+     "text": "2023"
+    },
+    {
+     "id": "2024",
+     "text": "2024"
+    },
+    {
+     "id": "2025",
+     "text": "2025"
+    }
+   ]
+  }
+ ]
+}

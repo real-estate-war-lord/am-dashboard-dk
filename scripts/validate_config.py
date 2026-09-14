@@ -86,6 +86,10 @@ def main():
                 check(s.get("db", ""), s["table"], s["vars"], args.show, cache)
     for m in c["macro"]:
         check(m.get("db", ""), m["table"], m["vars"], args.show, cache)
+    for ind in (c.get("cph") or {}).get("indicators", []):
+        for s in ind["sources"]:
+            if "vars" in s:
+                check(s.get("db", ""), s["table"], s["vars"], args.show, cache)
 
 
 if __name__ == "__main__":

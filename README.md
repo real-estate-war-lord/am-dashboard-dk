@@ -1,4 +1,4 @@
-# AM Dashboard — Denmark Edition
+# Macro Dashboard — Denmark (AM dashboard, Danish edition)
 
 **Live:** https://real-estate-war-lord.github.io/am-dashboard-dk/
 
@@ -8,8 +8,10 @@ An open-data market map for residential asset management in Denmark: 20 indicato
 
 ## What you get
 
-- **Macro map** — choropleth by municipality, zoom in for postal codes; pick any indicator from a grouped selector; an explanation panel shows definition, source table, period, coverage and caveats. Click a polygon for all its values.
-- **Table mode** — the same data as a sortable table with search, region filter, minimum population, municipality/postal-code level, and CSV export.
+- **Macro map** — choropleth by municipality, zoom in for postal codes (and Copenhagen quarters); area selector, grouped indicator selector with an explanation panel (definition, source table, period, coverage, caveats), year selector 2016–2026. Popups link to area pages.
+- **Area pages** — every municipality, postal code and Copenhagen quarter has its own page (`#area/<type>/<code>`): key-figure tiles by group with change since 2016, rank among peers and sparklines; trend chart vs municipality and median; context map with clickable neighbours; comparison table; sub-areas.
+- **Table** — everything side by side (municipalities / postal codes / quarters) with search, region filter, minimum population, sorting and CSV export.
+- **Export data** (sidebar) — one long-format CSV of every level, indicator and year plus the macro series, ready for analysis in Claude, Python or Excel.
 - **Market** — KPI tiles and series for the national picture.
 - **Sources** — every table with its "updated" stamp, plus indicator definitions.
 
@@ -65,6 +67,7 @@ The UI is a port of a Finnish asset-management dashboard's market section: same 
 - Cooperative dwellings (andelsboliger) count as rented in DST's tenure statistic.
 - Finans Danmark suppresses cells with few trades; small municipalities and most rural postal codes show no price.
 - Street-level postal codes in central Copenhagen (1000–1999) are merged by name.
+- Copenhagen quarters (kvarterer) use Københavns Kommune's own statbank (`s30`); unemployment there exists only per district (bydel) and is repeated on each quarter of the district.
 
 ## Licence and attribution
 

@@ -1329,5 +1329,675 @@
   "supply_dk",
   "completions"
  ],
- "history_years": 11
+ "history_years": 11,
+ "cph": {
+  "_doc": "Copenhagen quarter (kvarter, 67 areas) layer from Københavns Kommune's statbank (api.statbank.dk/v1/s30). Same calc engine as indicators; OMRKK codes 20101–21211 are kvarterer, 1001–1010 bydele. Geometry: wfs-kbhkort.kk.dk k101:kvarter (CC BY 4.0).",
+  "indicators": [
+   {
+    "key": "growth",
+    "label": "Population growth",
+    "short": "Growth",
+    "unit": "% / yr",
+    "fmt": "signpct1",
+    "hue": [
+     10,
+     88,
+     70
+    ],
+    "group": "Demographics",
+    "calc": "yoy_pct",
+    "sources": [
+     {
+      "db": "s30",
+      "table": "KKBEF1",
+      "vars": {
+       "OMRKK": [
+        "*"
+       ],
+       "KON": [
+        "SUM"
+       ],
+       "ALDER": [
+        "SUM"
+       ],
+       "CIVILSTAND": [
+        "SUM"
+       ],
+       "Tid": [
+        "(-n+45)"
+       ]
+      },
+      "geo": "kvarter",
+      "pull": "KKBEF1_pop"
+     }
+    ],
+    "desc": "Population change over 12 months, same quarter previous year.",
+    "source": "Københavns Kommune, KKBEF1"
+   },
+   {
+    "key": "young",
+    "label": "Young adults 20–34",
+    "short": "Young",
+    "unit": "% of population",
+    "fmt": "pct0",
+    "hue": [
+     90,
+     60,
+     150
+    ],
+    "group": "Demographics",
+    "calc": "share_of_total",
+    "sources": [
+     {
+      "db": "s30",
+      "table": "KKBEF1",
+      "vars": {
+       "OMRKK": [
+        "*"
+       ],
+       "KON": [
+        "SUM"
+       ],
+       "ALDER": [
+        "TOT",
+        "20",
+        "21",
+        "22",
+        "23",
+        "24",
+        "25",
+        "26",
+        "27",
+        "28",
+        "29",
+        "30",
+        "31",
+        "32",
+        "33",
+        "34"
+       ],
+       "CIVILSTAND": [
+        "SUM"
+       ],
+       "Tid": [
+        "(-n+45)"
+       ]
+      },
+      "geo": "kvarter",
+      "share": {
+       "var": "ALDER",
+       "num": [
+        "20",
+        "21",
+        "22",
+        "23",
+        "24",
+        "25",
+        "26",
+        "27",
+        "28",
+        "29",
+        "30",
+        "31",
+        "32",
+        "33",
+        "34"
+       ],
+       "den": [
+        "TOT"
+       ]
+      },
+      "pull": "KKBEF1_age"
+     }
+    ],
+    "desc": "Residents aged 20–34 as % of population.",
+    "source": "Københavns Kommune, KKBEF1"
+   },
+   {
+    "key": "single",
+    "label": "Single-person households",
+    "short": "Single",
+    "unit": "% of households",
+    "fmt": "pct0",
+    "hue": [
+     12,
+     94,
+     104
+    ],
+    "group": "Demographics",
+    "calc": "share_of_total",
+    "sources": [
+     {
+      "db": "s30",
+      "table": "KKHUS1",
+      "vars": {
+       "OMRKK": [
+        "*"
+       ],
+       "HUSTYP": [
+        "SUM"
+       ],
+       "ANTBORNH": [
+        "SUM"
+       ],
+       "HUSSTØR": [
+        "TOT",
+        "001"
+       ],
+       "Tid": [
+        "(-n+45)"
+       ]
+      },
+      "geo": "kvarter",
+      "share": {
+       "var": "HUSSTØR",
+       "num": [
+        "001"
+       ],
+       "den": [
+        "TOT"
+       ]
+      },
+      "pull": "KKHUS1_size"
+     }
+    ],
+    "desc": "One-person households as % of all households (household size = 1).",
+    "source": "Københavns Kommune, KKHUS1"
+   },
+   {
+    "key": "income_med",
+    "label": "Median disposable income",
+    "short": "Median inc.",
+    "unit": "kDKK / yr",
+    "fmt": "kdkk",
+    "hue": [
+     10,
+     88,
+     70
+    ],
+    "group": "Income & jobs",
+    "calc": "value_div_1000",
+    "sources": [
+     {
+      "db": "s30",
+      "table": "KKIND4",
+      "vars": {
+       "OMRKK": [
+        "*"
+       ],
+       "DECILGR": [
+        "5"
+       ],
+       "Tid": [
+        "(-n+11)"
+       ]
+      },
+      "geo": "kvarter"
+     }
+    ],
+    "desc": "Median (5th decile boundary) disposable income of persons over 14, DKK/yr.",
+    "source": "Københavns Kommune, KKIND4"
+   },
+   {
+    "key": "higher_ed",
+    "label": "Higher education",
+    "short": "Education",
+    "unit": "% of 15–69",
+    "fmt": "pct0",
+    "hue": [
+     10,
+     88,
+     70
+    ],
+    "group": "Income & jobs",
+    "calc": "share_of_total",
+    "sources": [
+     {
+      "db": "s30",
+      "table": "KKUDD1",
+      "vars": {
+       "OMRKK": [
+        "*"
+       ],
+       "HFUAMS": [
+        "TOT",
+        "04",
+        "05",
+        "06",
+        "07",
+        "08"
+       ],
+       "KONAMS": [
+        "TOT"
+       ],
+       "ALERAMS": [
+        "TOT"
+       ],
+       "Tid": [
+        "(-n+11)"
+       ]
+      },
+      "geo": "kvarter",
+      "share": {
+       "var": "HFUAMS",
+       "num": [
+        "04",
+        "05",
+        "06",
+        "07",
+        "08"
+       ],
+       "den": [
+        "TOT"
+       ]
+      }
+     }
+    ],
+    "desc": "Residents 15–69 with short-, medium- or long-cycle higher education, %.",
+    "source": "Københavns Kommune, KKUDD1"
+   },
+   {
+    "key": "renters",
+    "label": "Rented dwellings",
+    "short": "Rented",
+    "unit": "% of dwellings",
+    "fmt": "pct0",
+    "hue": [
+     16,
+     105,
+     110
+    ],
+    "group": "Housing stock",
+    "calc": "share_of_total",
+    "sources": [
+     {
+      "db": "s30",
+      "table": "KKBOL3",
+      "vars": {
+       "OMRKK": [
+        "*"
+       ],
+       "EJER": [
+        "*"
+       ],
+       "IBRUGKK": [
+        "SUM"
+       ],
+       "BYGANVEND": [
+        "SUM"
+       ],
+       "ENHED": [
+        "01"
+       ],
+       "Tid": [
+        "(-n+11)"
+       ]
+      },
+      "geo": "kvarter",
+      "share": {
+       "var": "EJER",
+       "num": [
+        "02",
+        "03",
+        "04",
+        "05"
+       ],
+       "den": [
+        "01",
+        "02",
+        "03",
+        "04",
+        "05"
+       ]
+      },
+      "pull": "KKBOL3_tenure"
+     }
+    ],
+    "desc": "Private rental + andel + almene + public dwellings as % of dwellings with known tenure (andel counted as rented, as DST does).",
+    "source": "Københavns Kommune, KKBOL3"
+   },
+   {
+    "key": "private_rental",
+    "label": "Private rental share",
+    "short": "Priv. rental",
+    "unit": "% of dwellings",
+    "fmt": "pct0",
+    "hue": [
+     40,
+     84,
+     128
+    ],
+    "group": "Housing stock",
+    "calc": "share_of_total",
+    "sources": [
+     {
+      "db": "s30",
+      "table": "KKBOL3",
+      "vars": {
+       "OMRKK": [
+        "*"
+       ],
+       "EJER": [
+        "*"
+       ],
+       "IBRUGKK": [
+        "SUM"
+       ],
+       "BYGANVEND": [
+        "SUM"
+       ],
+       "ENHED": [
+        "01"
+       ],
+       "Tid": [
+        "(-n+11)"
+       ]
+      },
+      "geo": "kvarter",
+      "share": {
+       "var": "EJER",
+       "num": [
+        "02"
+       ],
+       "den": [
+        "01",
+        "02",
+        "03",
+        "04",
+        "05"
+       ]
+      },
+      "pull": "KKBOL3_tenure"
+     }
+    ],
+    "desc": "Privately rented dwellings as % of dwellings with known tenure.",
+    "source": "Københavns Kommune, KKBOL3"
+   },
+   {
+    "key": "andel",
+    "label": "Cooperative (andel) share",
+    "short": "Andel",
+    "unit": "% of dwellings",
+    "fmt": "pct0",
+    "hue": [
+     130,
+     52,
+     108
+    ],
+    "group": "Housing stock",
+    "calc": "share_of_total",
+    "sources": [
+     {
+      "db": "s30",
+      "table": "KKBOL3",
+      "vars": {
+       "OMRKK": [
+        "*"
+       ],
+       "EJER": [
+        "*"
+       ],
+       "IBRUGKK": [
+        "SUM"
+       ],
+       "BYGANVEND": [
+        "SUM"
+       ],
+       "ENHED": [
+        "01"
+       ],
+       "Tid": [
+        "(-n+11)"
+       ]
+      },
+      "geo": "kvarter",
+      "share": {
+       "var": "EJER",
+       "num": [
+        "03"
+       ],
+       "den": [
+        "01",
+        "02",
+        "03",
+        "04",
+        "05"
+       ]
+      },
+      "pull": "KKBOL3_tenure"
+     }
+    ],
+    "desc": "Andelsboliger as % of dwellings with known tenure.",
+    "source": "Københavns Kommune, KKBOL3"
+   },
+   {
+    "key": "almene",
+    "label": "Social housing share",
+    "short": "Almene",
+    "unit": "% of dwellings",
+    "fmt": "pct0",
+    "hue": [
+     70,
+     85,
+     110
+    ],
+    "group": "Housing stock",
+    "calc": "share_of_total",
+    "sources": [
+     {
+      "db": "s30",
+      "table": "KKBOL3",
+      "vars": {
+       "OMRKK": [
+        "*"
+       ],
+       "EJER": [
+        "*"
+       ],
+       "IBRUGKK": [
+        "SUM"
+       ],
+       "BYGANVEND": [
+        "SUM"
+       ],
+       "ENHED": [
+        "01"
+       ],
+       "Tid": [
+        "(-n+11)"
+       ]
+      },
+      "geo": "kvarter",
+      "share": {
+       "var": "EJER",
+       "num": [
+        "04"
+       ],
+       "den": [
+        "01",
+        "02",
+        "03",
+        "04",
+        "05"
+       ]
+      },
+      "pull": "KKBOL3_tenure"
+     }
+    ],
+    "desc": "Almene boliger as % of dwellings with known tenure.",
+    "source": "Københavns Kommune, KKBOL3"
+   },
+   {
+    "key": "avg_m2",
+    "label": "Average dwelling size",
+    "short": "Ø m²",
+    "unit": "m²",
+    "fmt": "m2",
+    "hue": [
+     70,
+     85,
+     110
+    ],
+    "group": "Housing stock",
+    "calc": "passthrough",
+    "sources": [
+     {
+      "db": "s30",
+      "table": "KKBOL3",
+      "vars": {
+       "OMRKK": [
+        "*"
+       ],
+       "EJER": [
+        "TOT"
+       ],
+       "IBRUGKK": [
+        "TOT"
+       ],
+       "BYGANVEND": [
+        "TOT"
+       ],
+       "ENHED": [
+        "03"
+       ],
+       "Tid": [
+        "(-n+11)"
+       ]
+      },
+      "geo": "kvarter",
+      "pull": "KKBOL3_size"
+     }
+    ],
+    "desc": "Average floor area per dwelling.",
+    "source": "Københavns Kommune, KKBOL3"
+   },
+   {
+    "key": "new_stock",
+    "label": "Dwellings built 2010+",
+    "short": "New stock",
+    "unit": "% of dwellings",
+    "fmt": "pct0",
+    "hue": [
+     10,
+     88,
+     70
+    ],
+    "group": "Construction",
+    "calc": "share_of_total",
+    "sources": [
+     {
+      "db": "s30",
+      "table": "KKBOL3",
+      "vars": {
+       "OMRKK": [
+        "*"
+       ],
+       "EJER": [
+        "SUM"
+       ],
+       "IBRUGKK": [
+        "*"
+       ],
+       "BYGANVEND": [
+        "SUM"
+       ],
+       "ENHED": [
+        "01"
+       ],
+       "Tid": [
+        "(-n+11)"
+       ]
+      },
+      "geo": "kvarter",
+      "share": {
+       "var": "IBRUGKK",
+       "num": [
+        "13",
+        "14",
+        "15",
+        "16",
+        "17",
+        "18",
+        "19",
+        "20",
+        "21",
+        "22",
+        "23",
+        "24",
+        "25",
+        "26",
+        "27",
+        "28"
+       ],
+       "den": [
+        "TOT"
+       ]
+      },
+      "pull": "KKBOL3_year"
+     }
+    ],
+    "desc": "Dwellings taken into use 2010 or later as % of all dwellings.",
+    "source": "Københavns Kommune, KKBOL3"
+   },
+   {
+    "key": "unemp",
+    "label": "Unemployed (Nov.)",
+    "short": "Unemp.",
+    "unit": "% of residents",
+    "fmt": "pct1",
+    "hue": [
+     150,
+     90,
+     30
+    ],
+    "group": "Income & jobs",
+    "calc": "ratio_pct",
+    "sources": [
+     {
+      "db": "s30",
+      "table": "KKLEDIG2",
+      "vars": {
+       "OMRKK": [
+        "*"
+       ],
+       "ALERAMS": [
+        "SUM"
+       ],
+       "Tid": [
+        "(-n+11)"
+       ]
+      },
+      "geo": "bydel"
+     },
+     {
+      "db": "s30",
+      "table": "KKBEF1",
+      "vars": {
+       "OMRKK": [
+        "*"
+       ],
+       "KON": [
+        "SUM"
+       ],
+       "ALDER": [
+        "SUM"
+       ],
+       "CIVILSTAND": [
+        "SUM"
+       ],
+       "Tid": [
+        "(-n+45)"
+       ]
+      },
+      "geo": "bydel",
+      "pull": "KKBEF1_pop"
+     }
+    ],
+    "desc": "Registered unemployed at end of November as % of residents. Published for the 10 districts (bydele) only — every quarter shows its district's value.",
+    "source": "Københavns Kommune, KKLEDIG2 / KKBEF1",
+    "warn": "District-level (bydel) figure repeated on each quarter. Denominator is total population, not labour force; comparable between districts, not with the national AUP01 rate.",
+    "geo_level": "bydel"
+   }
+  ]
+ }
 }

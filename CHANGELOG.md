@@ -1,5 +1,19 @@
 # Changelog
 
+## v1.3 — 2026-09-14
+- Map view is map-only: area selector (Denmark / region › municipality), indicator + year, selected-municipality strip with rank and a link to its page. Tables moved to the Table view (own nav item; rows open area pages; Δ column), trend chart removed from the map.
+- Area pages for every municipality, postal code and Copenhagen quarter (`#area/<type>/<code>`): key-figure tiles by group (Δ since first year, rank among peers, sparkline), trend chart vs municipality and median of peers, context map (neighbours clickable), all-indicator comparison table, sub-area table (postal codes / quarters).
+- Navigation by URL hash — every screen has a permalink, browser back/forward and Esc work; popups link to area pages; legend shows min/max; polygons highlight on hover; faster wheel zoom.
+- Map view: searchable area box (type a municipality, postal code or quarter; Enter opens it), source list folded under *Data information*.
+- Area page tiles: *All figures* first (max 14 = 7 × 2), each tile with y/y change, sparkline against the median of peers (dashed), rank bar, change since 2016 and gap to the median.
+- Sidebar: renamed *Macro Dashboard*; footer replaced by **Export data** — one long-format CSV (level; code; name; parent; region; population; year; indicator; label; unit; value; as_of) of every level, indicator and year plus the macro series.
+
+## v1.2 — 2026-09-14
+- Copenhagen quarter level: 67 kvarterer from Københavns Kommune's statbank (`s30`, config section `cph`, `scripts/build_cph.py`) with 12 indicators and 2016–2026 history; polygons from the municipality's WFS (`scripts/fetch_geo_cph.py`, CC BY 4.0).
+- UI: clicking København shows quarters with a *Quarters | Postal codes* toggle; table mode gains a *Copenhagen quarters* level; popups, trend chart, CSV export and year selector work on quarters.
+- Map: fractional zoom so a municipality fills the map after drill-down; labels rebuilt on every zoom step and shown only where the polygon is wide enough on screen (fixes the label pile-up in Copenhagen).
+- Unemployment in Copenhagen is district-level (bydel) by source — repeated on each quarter and flagged in the indicator explanation.
+
 ## v1.1 — 2026-09-14
 - Time series 2016–2026 for every indicator (same calculation per year, same quarter/month each year; values filed under the data's own year so lagging sources do not repeat).
 - Year selector next to the indicator selector; map, tables, popups and CSV follow the selected year; "Δ since 2016" column.

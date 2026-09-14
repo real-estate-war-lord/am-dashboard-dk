@@ -28,6 +28,14 @@ make geo
 **Commit:** `git add data/geo && git commit -m "data: vendor DAGI boundaries (DAWA, $(date +%F))"`
 **If not:** `FAILED: <error>` per layer — paste it. If DAWA is already closed, follow `docs/GEO.md` (Datafordeler).
 
+## Step 1b — Copenhagen quarter polygons (network)
+
+```bash
+make geo-cph
+```
+**Good:** `67 features → data/geo/cph_kvarterer.geojson` and `10 features → data/geo/cph_bydele.geojson`. Both are committed (small, ~90 kB together).
+**If not:** the WFS at `wfs-kbhkort.kk.dk` is down or renamed a layer — `docs/DATA_MAP.md §3.5` lists the layer names; the dashboard still builds without the Copenhagen level (`build_cph.py` is optional in `make build`).
+
 ## Step 2 — Validate the registry (network)
 
 ```bash
@@ -53,7 +61,7 @@ make fetch
 ```bash
 make build
 ```
-**Good:** `wrote data/processed/makro.json: 98 municipalities, ~600 areas, 20 indicators`, then `wrote data/processed/market.json: 13 series`, then `wrote dist/index.html (x MB)`.
+**Good:** `wrote data/processed/makro.json: 98 municipalities, ~600 areas, 20 indicators`, then `wrote data/processed/market.json: 13 series`, then `wrote data/processed/cph.json: 67 quarters, 12 indicators, years 2016–2026`, then `wrote dist/index.html (x MB)`.
 **Warnings (⚠)** name an indicator and the reason — paste them; the dashboard still builds with that indicator missing.
 
 ## Step 5 — Look at it
@@ -65,6 +73,7 @@ make serve      # then open http://localhost:8080
 - national zoom shows 98 coloured municipalities, labels on the large ones;
 - switching chips recolours the map and re-sorts the table;
 - clicking a municipality row zooms in and shows its postal codes;
+- clicking the København row shows 67 quarters with a *Quarters | Postal codes* toggle; the table mode has a *Copenhagen quarters* level;
 - *Sources* lists every table with an "as of" date.
 - spot-check 3 values against https://www.statistikbanken.dk (e.g. København population 2026Q3, Aarhus unemployment latest month, 2100 København Ø price/m² 2026K1 = 79 842 DKK).
 

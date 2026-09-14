@@ -1,0 +1,1380 @@
+{
+ "id": "KKBEF1",
+ "text": "Population",
+ "description": "Population by district, sex, age, marital status and time",
+ "unit": "Number",
+ "suppressedDataValue": "0",
+ "updated": "2026-08-06T08:00:00",
+ "active": true,
+ "contacts": [
+  {
+   "name": "Københavns Kommunes Tværgående Analyseenhed",
+   "phone": "+4529298013",
+   "mail": "statistik@okf.kk.dk"
+  }
+ ],
+ "documentation": null,
+ "footnote": {
+  "text": "Source: Calculations made by the City of Copenhagen based on data from the Civil Registration System (CPR).",
+  "mandatory": false
+ },
+ "variables": [
+  {
+   "id": "OMRKK",
+   "text": "district",
+   "elimination": true,
+   "time": false,
+   "map": "kk_lokaludvalg_21",
+   "values": [
+    {
+     "id": "1000",
+     "text": "Copenhagen total"
+    },
+    {
+     "id": "1001",
+     "text": "District - Indre By"
+    },
+    {
+     "id": "1002",
+     "text": "District - Østerbro"
+    },
+    {
+     "id": "1003",
+     "text": "District - Nørrebro"
+    },
+    {
+     "id": "1004",
+     "text": "District - Vesterbro/Kongens Enghave"
+    },
+    {
+     "id": "1005",
+     "text": "District - Valby"
+    },
+    {
+     "id": "1006",
+     "text": "District - Vanløse"
+    },
+    {
+     "id": "1007",
+     "text": "District - Brønshøj-Husum"
+    },
+    {
+     "id": "1008",
+     "text": "District - Bispebjerg"
+    },
+    {
+     "id": "1009",
+     "text": "District - Amager Øst"
+    },
+    {
+     "id": "1010",
+     "text": "District - Amager Vest"
+    },
+    {
+     "id": "1099",
+     "text": "District - Unlocated"
+    },
+    {
+     "id": "2001",
+     "text": "Local committee district - Indre By"
+    },
+    {
+     "id": "2002",
+     "text": "Local committee district - Christianshavn"
+    },
+    {
+     "id": "2003",
+     "text": "Local committee district - Østerbro"
+    },
+    {
+     "id": "2004",
+     "text": "Local committee district - Nørrebro"
+    },
+    {
+     "id": "2005",
+     "text": "Local committee district - Vesterbro"
+    },
+    {
+     "id": "2006",
+     "text": "Local committee district - Kgs. Enghave"
+    },
+    {
+     "id": "2007",
+     "text": "Local committee district - Valby"
+    },
+    {
+     "id": "2008",
+     "text": "Local committee district - Vanløse"
+    },
+    {
+     "id": "2009",
+     "text": "Local committee district - Brønshøj-Husum"
+    },
+    {
+     "id": "2010",
+     "text": "Local committee district - Bispebjerg"
+    },
+    {
+     "id": "2011",
+     "text": "Local committee district - Amager Øst"
+    },
+    {
+     "id": "2012",
+     "text": "Local committee district - Amager Vest"
+    },
+    {
+     "id": "2099",
+     "text": "Local committee district - Unlocated"
+    },
+    {
+     "id": "20101",
+     "text": "Indre By - Middelalderbyen"
+    },
+    {
+     "id": "20102",
+     "text": "Indre By - Metropolzonen "
+    },
+    {
+     "id": "20103",
+     "text": "Indre By - Nansensgade-kvarteret"
+    },
+    {
+     "id": "20104",
+     "text": "Indre By - Øster Farimagsgade-kvarteret"
+    },
+    {
+     "id": "20105",
+     "text": "Indre By - Østerport"
+    },
+    {
+     "id": "20106",
+     "text": "Indre By - Frederiksstaden"
+    },
+    {
+     "id": "20107",
+     "text": "Indre By - Gammelholm og Nyhavn"
+    },
+    {
+     "id": "20201",
+     "text": "Christianshavn - Neden Vandet"
+    },
+    {
+     "id": "20202",
+     "text": "Christianshavn - Oven Vandet"
+    },
+    {
+     "id": "20203",
+     "text": "Christianshavn - Holmen og Refshaleøen"
+    },
+    {
+     "id": "20301",
+     "text": "Østerbro - Nord/Komponistkvarteret "
+    },
+    {
+     "id": "20302",
+     "text": "Østerbro - Svanemøllen Syd/Øst"
+    },
+    {
+     "id": "20303",
+     "text": "Østerbro - Århusgade Nord"
+    },
+    {
+     "id": "20304",
+     "text": "Østerbro - Århusgade Syd "
+    },
+    {
+     "id": "20305",
+     "text": "Østerbro - Rosenvænget "
+    },
+    {
+     "id": "20306",
+     "text": "Østerbro - Ny Ryvang "
+    },
+    {
+     "id": "20307",
+     "text": "Østerbro - Nord"
+    },
+    {
+     "id": "20308",
+     "text": "Østerbro - Nordhavn "
+    },
+    {
+     "id": "20309",
+     "text": "Østerbro - Lyngbyvej Vest "
+    },
+    {
+     "id": "20310",
+     "text": "Østerbro - Lyngbyvej Øst/Klimakvarteret"
+    },
+    {
+     "id": "20311",
+     "text": "Østerbro - Fælled "
+    },
+    {
+     "id": "20401",
+     "text": "Nørrebro - Blågårdskvarteret/Assistens/Rantzausgade"
+    },
+    {
+     "id": "20402",
+     "text": "Nørrebro - Guldbergskvarteret/Panum/Ravnsborggade "
+    },
+    {
+     "id": "20403",
+     "text": "Nørrebro - Stefansgade/Nørrebroparken/Lundtoftegade "
+    },
+    {
+     "id": "20404",
+     "text": "Nørrebro - Mimersgade-kvarteret/ Nørrebro St. "
+    },
+    {
+     "id": "20405",
+     "text": "Nørrebro - Haraldsgade-kvarteret"
+    },
+    {
+     "id": "20501",
+     "text": "Vesterbro - Vest"
+    },
+    {
+     "id": "20502",
+     "text": "Vesterbro - Central "
+    },
+    {
+     "id": "20503",
+     "text": "Vesterbro - Øst"
+    },
+    {
+     "id": "20504",
+     "text": "Vesterbro - Syd"
+    },
+    {
+     "id": "20601",
+     "text": "Kgs. Enghave - Bavnehøj"
+    },
+    {
+     "id": "20602",
+     "text": "Kgs. Enghave - Gl. Sydhavn"
+    },
+    {
+     "id": "20603",
+     "text": "Kgs. Enghave - Holmene"
+    },
+    {
+     "id": "20701",
+     "text": "Valby - Gl. Valby "
+    },
+    {
+     "id": "20702",
+     "text": "Valby - Syd"
+    },
+    {
+     "id": "20703",
+     "text": "Valby - Ålholm"
+    },
+    {
+     "id": "20704",
+     "text": "Valby - Valby Sydvest "
+    },
+    {
+     "id": "20705",
+     "text": "Valby - Vigerslev"
+    },
+    {
+     "id": "20801",
+     "text": "Vanløse - Jyllingevej Kvarter"
+    },
+    {
+     "id": "20802",
+     "text": "Vanløse - Jernbane Allé Kvarter"
+    },
+    {
+     "id": "20803",
+     "text": "Vanløse - Sallingvej Kvarter"
+    },
+    {
+     "id": "20804",
+     "text": "Vanløse - Grøndals Park Kvarter"
+    },
+    {
+     "id": "20901",
+     "text": "Brønshøj-Husum - Husum"
+    },
+    {
+     "id": "20902",
+     "text": "Brønshøj-Husum - Husum Nord"
+    },
+    {
+     "id": "20903",
+     "text": "Brønshøj-Husum - Tingbjerg "
+    },
+    {
+     "id": "20904",
+     "text": "Brønshøj-Husum - Brønshøj"
+    },
+    {
+     "id": "20905",
+     "text": "Brønshøj-Husum - Bellahøj"
+    },
+    {
+     "id": "21001",
+     "text": "Bispebjerg - Emdrup "
+    },
+    {
+     "id": "21002",
+     "text": "Bispebjerg- Ryparken-Lundehus"
+    },
+    {
+     "id": "21003",
+     "text": "Bispebjerg - Bispebjerg "
+    },
+    {
+     "id": "21004",
+     "text": "Bispebjerg - Utterslev "
+    },
+    {
+     "id": "21005",
+     "text": "Bispebjerg - Nordvest"
+    },
+    {
+     "id": "21101",
+     "text": "Amager Øst - Amagerbro Øst"
+    },
+    {
+     "id": "21102",
+     "text": "Amager Øst - Sundbyøster"
+    },
+    {
+     "id": "21103",
+     "text": "Amager Øst - Villakvartererne "
+    },
+    {
+     "id": "21104",
+     "text": "Amager Øst - Nordøstamager"
+    },
+    {
+     "id": "21201",
+     "text": "Amager Vest - Amagerbro Vest"
+    },
+    {
+     "id": "21202",
+     "text": "Amager Vest - Bryggen Syd "
+    },
+    {
+     "id": "21203",
+     "text": "Amager Vest - Faste Batteri"
+    },
+    {
+     "id": "21204",
+     "text": "Amager Vest - Gamle Bryggen"
+    },
+    {
+     "id": "21205",
+     "text": "Amager Vest - Grønjordssøen (Ørestad Nord and Vejlandskvarter)"
+    },
+    {
+     "id": "21206",
+     "text": "Amager Vest - Kolonihavekvarteret"
+    },
+    {
+     "id": "21207",
+     "text": "Amager Vest - Sundbyvester"
+    },
+    {
+     "id": "21208",
+     "text": "Amager Vest - Sundholmsvejs kvarteret "
+    },
+    {
+     "id": "21209",
+     "text": "Amager Vest - Urbanplanen "
+    },
+    {
+     "id": "21210",
+     "text": "Amager Vest - Ørestad City "
+    },
+    {
+     "id": "21211",
+     "text": "Amager Vest - Ørestad Syd"
+    },
+    {
+     "id": "29999",
+     "text": "Neighborhood - Unlocated"
+    }
+   ]
+  },
+  {
+   "id": "KON",
+   "text": "sex",
+   "elimination": true,
+   "time": false,
+   "values": [
+    {
+     "id": "TOT",
+     "text": "Sex total"
+    },
+    {
+     "id": "01",
+     "text": "Men"
+    },
+    {
+     "id": "02",
+     "text": "Women"
+    }
+   ]
+  },
+  {
+   "id": "ALDER",
+   "text": "age",
+   "elimination": true,
+   "time": false,
+   "values": [
+    {
+     "id": "TOT",
+     "text": "Age total"
+    },
+    {
+     "id": "00",
+     "text": "0 year"
+    },
+    {
+     "id": "01",
+     "text": "1 year"
+    },
+    {
+     "id": "02",
+     "text": "2 year"
+    },
+    {
+     "id": "03",
+     "text": "3 year"
+    },
+    {
+     "id": "04",
+     "text": "4 year"
+    },
+    {
+     "id": "05",
+     "text": "5 year"
+    },
+    {
+     "id": "06",
+     "text": "6 year"
+    },
+    {
+     "id": "07",
+     "text": "7 year"
+    },
+    {
+     "id": "08",
+     "text": "8 year"
+    },
+    {
+     "id": "09",
+     "text": "9 year"
+    },
+    {
+     "id": "10",
+     "text": "10 year"
+    },
+    {
+     "id": "11",
+     "text": "11 year"
+    },
+    {
+     "id": "12",
+     "text": "12 year"
+    },
+    {
+     "id": "13",
+     "text": "13 year"
+    },
+    {
+     "id": "14",
+     "text": "14 year"
+    },
+    {
+     "id": "15",
+     "text": "15 year"
+    },
+    {
+     "id": "16",
+     "text": "16 year"
+    },
+    {
+     "id": "17",
+     "text": "17 year"
+    },
+    {
+     "id": "18",
+     "text": "18 year"
+    },
+    {
+     "id": "19",
+     "text": "19 year"
+    },
+    {
+     "id": "20",
+     "text": "20 year"
+    },
+    {
+     "id": "21",
+     "text": "21 year"
+    },
+    {
+     "id": "22",
+     "text": "22 year"
+    },
+    {
+     "id": "23",
+     "text": "23 year"
+    },
+    {
+     "id": "24",
+     "text": "24 year"
+    },
+    {
+     "id": "25",
+     "text": "25 year"
+    },
+    {
+     "id": "26",
+     "text": "26 year"
+    },
+    {
+     "id": "27",
+     "text": "27 year"
+    },
+    {
+     "id": "28",
+     "text": "28 year"
+    },
+    {
+     "id": "29",
+     "text": "29 year"
+    },
+    {
+     "id": "30",
+     "text": "30 year"
+    },
+    {
+     "id": "31",
+     "text": "31 year"
+    },
+    {
+     "id": "32",
+     "text": "32 year"
+    },
+    {
+     "id": "33",
+     "text": "33 year"
+    },
+    {
+     "id": "34",
+     "text": "34 year"
+    },
+    {
+     "id": "35",
+     "text": "35 year"
+    },
+    {
+     "id": "36",
+     "text": "36 year"
+    },
+    {
+     "id": "37",
+     "text": "37 year"
+    },
+    {
+     "id": "38",
+     "text": "38 year"
+    },
+    {
+     "id": "39",
+     "text": "39 year"
+    },
+    {
+     "id": "40",
+     "text": "40 year"
+    },
+    {
+     "id": "41",
+     "text": "41 year"
+    },
+    {
+     "id": "42",
+     "text": "42 year"
+    },
+    {
+     "id": "43",
+     "text": "43 year"
+    },
+    {
+     "id": "44",
+     "text": "44 year"
+    },
+    {
+     "id": "45",
+     "text": "45 year"
+    },
+    {
+     "id": "46",
+     "text": "46 year"
+    },
+    {
+     "id": "47",
+     "text": "47 year"
+    },
+    {
+     "id": "48",
+     "text": "48 year"
+    },
+    {
+     "id": "49",
+     "text": "49 year"
+    },
+    {
+     "id": "50",
+     "text": "50 year"
+    },
+    {
+     "id": "51",
+     "text": "51 year"
+    },
+    {
+     "id": "52",
+     "text": "52 year"
+    },
+    {
+     "id": "53",
+     "text": "53 year"
+    },
+    {
+     "id": "54",
+     "text": "54 year"
+    },
+    {
+     "id": "55",
+     "text": "55 year"
+    },
+    {
+     "id": "56",
+     "text": "56 year"
+    },
+    {
+     "id": "57",
+     "text": "57 year"
+    },
+    {
+     "id": "58",
+     "text": "58 year"
+    },
+    {
+     "id": "59",
+     "text": "59 year"
+    },
+    {
+     "id": "60",
+     "text": "60 year"
+    },
+    {
+     "id": "61",
+     "text": "61 year"
+    },
+    {
+     "id": "62",
+     "text": "62 year"
+    },
+    {
+     "id": "63",
+     "text": "63 year"
+    },
+    {
+     "id": "64",
+     "text": "64 year"
+    },
+    {
+     "id": "65",
+     "text": "65 year"
+    },
+    {
+     "id": "66",
+     "text": "66 year"
+    },
+    {
+     "id": "67",
+     "text": "67 year"
+    },
+    {
+     "id": "68",
+     "text": "68 year"
+    },
+    {
+     "id": "69",
+     "text": "69 year"
+    },
+    {
+     "id": "70",
+     "text": "70 year"
+    },
+    {
+     "id": "71",
+     "text": "71 year"
+    },
+    {
+     "id": "72",
+     "text": "72 year"
+    },
+    {
+     "id": "73",
+     "text": "73 year"
+    },
+    {
+     "id": "74",
+     "text": "74 year"
+    },
+    {
+     "id": "75",
+     "text": "75 year"
+    },
+    {
+     "id": "76",
+     "text": "76 year"
+    },
+    {
+     "id": "77",
+     "text": "77 year"
+    },
+    {
+     "id": "78",
+     "text": "78 year"
+    },
+    {
+     "id": "79",
+     "text": "79 year"
+    },
+    {
+     "id": "80",
+     "text": "80 year"
+    },
+    {
+     "id": "81",
+     "text": "81 year"
+    },
+    {
+     "id": "82",
+     "text": "82 year"
+    },
+    {
+     "id": "83",
+     "text": "83 year"
+    },
+    {
+     "id": "84",
+     "text": "84 year"
+    },
+    {
+     "id": "85",
+     "text": "85 year"
+    },
+    {
+     "id": "86",
+     "text": "86 year"
+    },
+    {
+     "id": "87",
+     "text": "87 year"
+    },
+    {
+     "id": "88",
+     "text": "88 year"
+    },
+    {
+     "id": "89",
+     "text": "89 year"
+    },
+    {
+     "id": "90",
+     "text": "90 year"
+    },
+    {
+     "id": "91",
+     "text": "91 year"
+    },
+    {
+     "id": "92",
+     "text": "92 year"
+    },
+    {
+     "id": "93",
+     "text": "93 year"
+    },
+    {
+     "id": "94",
+     "text": "94 year"
+    },
+    {
+     "id": "95",
+     "text": "95 year"
+    },
+    {
+     "id": "96",
+     "text": "96 year"
+    },
+    {
+     "id": "97",
+     "text": "97 year"
+    },
+    {
+     "id": "98",
+     "text": "98 year"
+    },
+    {
+     "id": "99",
+     "text": "99+ year"
+    }
+   ]
+  },
+  {
+   "id": "CIVILSTAND",
+   "text": "marital status",
+   "elimination": true,
+   "time": false,
+   "values": [
+    {
+     "id": "TOT",
+     "text": "Marital status total"
+    },
+    {
+     "id": "U",
+     "text": "Never married"
+    },
+    {
+     "id": "G",
+     "text": "Married / seperated "
+    },
+    {
+     "id": "E",
+     "text": "Widowed"
+    },
+    {
+     "id": "F",
+     "text": "Divorced"
+    }
+   ]
+  },
+  {
+   "id": "Tid",
+   "text": "time",
+   "elimination": false,
+   "time": true,
+   "values": [
+    {
+     "id": "1974K1",
+     "text": "1974Q1"
+    },
+    {
+     "id": "1975K1",
+     "text": "1975Q1"
+    },
+    {
+     "id": "1976K1",
+     "text": "1976Q1"
+    },
+    {
+     "id": "1977K1",
+     "text": "1977Q1"
+    },
+    {
+     "id": "1978K1",
+     "text": "1978Q1"
+    },
+    {
+     "id": "1979K1",
+     "text": "1979Q1"
+    },
+    {
+     "id": "1980K1",
+     "text": "1980Q1"
+    },
+    {
+     "id": "1981K1",
+     "text": "1981Q1"
+    },
+    {
+     "id": "1982K1",
+     "text": "1982Q1"
+    },
+    {
+     "id": "1983K1",
+     "text": "1983Q1"
+    },
+    {
+     "id": "1984K1",
+     "text": "1984Q1"
+    },
+    {
+     "id": "1985K1",
+     "text": "1985Q1"
+    },
+    {
+     "id": "1986K1",
+     "text": "1986Q1"
+    },
+    {
+     "id": "1987K1",
+     "text": "1987Q1"
+    },
+    {
+     "id": "1988K1",
+     "text": "1988Q1"
+    },
+    {
+     "id": "1989K1",
+     "text": "1989Q1"
+    },
+    {
+     "id": "1990K1",
+     "text": "1990Q1"
+    },
+    {
+     "id": "1991K1",
+     "text": "1991Q1"
+    },
+    {
+     "id": "1992K1",
+     "text": "1992Q1"
+    },
+    {
+     "id": "1993K1",
+     "text": "1993Q1"
+    },
+    {
+     "id": "1994K1",
+     "text": "1994Q1"
+    },
+    {
+     "id": "1995K1",
+     "text": "1995Q1"
+    },
+    {
+     "id": "1996K1",
+     "text": "1996Q1"
+    },
+    {
+     "id": "1997K1",
+     "text": "1997Q1"
+    },
+    {
+     "id": "1998K1",
+     "text": "1998Q1"
+    },
+    {
+     "id": "1999K1",
+     "text": "1999Q1"
+    },
+    {
+     "id": "2000K1",
+     "text": "2000Q1"
+    },
+    {
+     "id": "2001K1",
+     "text": "2001Q1"
+    },
+    {
+     "id": "2002K1",
+     "text": "2002Q1"
+    },
+    {
+     "id": "2002K2",
+     "text": "2002Q2"
+    },
+    {
+     "id": "2002K3",
+     "text": "2002Q3"
+    },
+    {
+     "id": "2002K4",
+     "text": "2002Q4"
+    },
+    {
+     "id": "2003K1",
+     "text": "2003Q1"
+    },
+    {
+     "id": "2003K2",
+     "text": "2003Q2"
+    },
+    {
+     "id": "2003K3",
+     "text": "2003Q3"
+    },
+    {
+     "id": "2003K4",
+     "text": "2003Q4"
+    },
+    {
+     "id": "2004K1",
+     "text": "2004Q1"
+    },
+    {
+     "id": "2004K2",
+     "text": "2004Q2"
+    },
+    {
+     "id": "2004K3",
+     "text": "2004Q3"
+    },
+    {
+     "id": "2004K4",
+     "text": "2004Q4"
+    },
+    {
+     "id": "2005K1",
+     "text": "2005Q1"
+    },
+    {
+     "id": "2005K2",
+     "text": "2005Q2"
+    },
+    {
+     "id": "2005K3",
+     "text": "2005Q3"
+    },
+    {
+     "id": "2005K4",
+     "text": "2005Q4"
+    },
+    {
+     "id": "2006K1",
+     "text": "2006Q1"
+    },
+    {
+     "id": "2006K2",
+     "text": "2006Q2"
+    },
+    {
+     "id": "2006K3",
+     "text": "2006Q3"
+    },
+    {
+     "id": "2006K4",
+     "text": "2006Q4"
+    },
+    {
+     "id": "2007K1",
+     "text": "2007Q1"
+    },
+    {
+     "id": "2007K2",
+     "text": "2007Q2"
+    },
+    {
+     "id": "2007K3",
+     "text": "2007Q3"
+    },
+    {
+     "id": "2007K4",
+     "text": "2007Q4"
+    },
+    {
+     "id": "2008K1",
+     "text": "2008Q1"
+    },
+    {
+     "id": "2008K2",
+     "text": "2008Q2"
+    },
+    {
+     "id": "2008K3",
+     "text": "2008Q3"
+    },
+    {
+     "id": "2008K4",
+     "text": "2008Q4"
+    },
+    {
+     "id": "2009K1",
+     "text": "2009Q1"
+    },
+    {
+     "id": "2009K2",
+     "text": "2009Q2"
+    },
+    {
+     "id": "2009K3",
+     "text": "2009Q3"
+    },
+    {
+     "id": "2009K4",
+     "text": "2009Q4"
+    },
+    {
+     "id": "2010K1",
+     "text": "2010Q1"
+    },
+    {
+     "id": "2010K2",
+     "text": "2010Q2"
+    },
+    {
+     "id": "2010K3",
+     "text": "2010Q3"
+    },
+    {
+     "id": "2010K4",
+     "text": "2010Q4"
+    },
+    {
+     "id": "2011K1",
+     "text": "2011Q1"
+    },
+    {
+     "id": "2011K2",
+     "text": "2011Q2"
+    },
+    {
+     "id": "2011K3",
+     "text": "2011Q3"
+    },
+    {
+     "id": "2011K4",
+     "text": "2011Q4"
+    },
+    {
+     "id": "2012K1",
+     "text": "2012Q1"
+    },
+    {
+     "id": "2012K2",
+     "text": "2012Q2"
+    },
+    {
+     "id": "2012K3",
+     "text": "2012Q3"
+    },
+    {
+     "id": "2012K4",
+     "text": "2012Q4"
+    },
+    {
+     "id": "2013K1",
+     "text": "2013Q1"
+    },
+    {
+     "id": "2013K2",
+     "text": "2013Q2"
+    },
+    {
+     "id": "2013K3",
+     "text": "2013Q3"
+    },
+    {
+     "id": "2013K4",
+     "text": "2013Q4"
+    },
+    {
+     "id": "2014K1",
+     "text": "2014Q1"
+    },
+    {
+     "id": "2014K2",
+     "text": "2014Q2"
+    },
+    {
+     "id": "2014K3",
+     "text": "2014Q3"
+    },
+    {
+     "id": "2014K4",
+     "text": "2014Q4"
+    },
+    {
+     "id": "2015K1",
+     "text": "2015Q1"
+    },
+    {
+     "id": "2015K2",
+     "text": "2015Q2"
+    },
+    {
+     "id": "2015K3",
+     "text": "2015Q3"
+    },
+    {
+     "id": "2015K4",
+     "text": "2015Q4"
+    },
+    {
+     "id": "2016K1",
+     "text": "2016Q1"
+    },
+    {
+     "id": "2016K2",
+     "text": "2016Q2"
+    },
+    {
+     "id": "2016K3",
+     "text": "2016Q3"
+    },
+    {
+     "id": "2016K4",
+     "text": "2016Q4"
+    },
+    {
+     "id": "2017K1",
+     "text": "2017Q1"
+    },
+    {
+     "id": "2017K2",
+     "text": "2017Q2"
+    },
+    {
+     "id": "2017K3",
+     "text": "2017Q3"
+    },
+    {
+     "id": "2017K4",
+     "text": "2017Q4"
+    },
+    {
+     "id": "2018K1",
+     "text": "2018Q1"
+    },
+    {
+     "id": "2018K2",
+     "text": "2018Q2"
+    },
+    {
+     "id": "2018K3",
+     "text": "2018Q3"
+    },
+    {
+     "id": "2018K4",
+     "text": "2018Q4"
+    },
+    {
+     "id": "2019K1",
+     "text": "2019Q1"
+    },
+    {
+     "id": "2019K2",
+     "text": "2019Q2"
+    },
+    {
+     "id": "2019K3",
+     "text": "2019Q3"
+    },
+    {
+     "id": "2019K4",
+     "text": "2019Q4"
+    },
+    {
+     "id": "2020K1",
+     "text": "2020Q1"
+    },
+    {
+     "id": "2020K2",
+     "text": "2020Q2"
+    },
+    {
+     "id": "2020K3",
+     "text": "2020Q3"
+    },
+    {
+     "id": "2020K4",
+     "text": "2020Q4"
+    },
+    {
+     "id": "2021K1",
+     "text": "2021Q1"
+    },
+    {
+     "id": "2021K2",
+     "text": "2021Q2"
+    },
+    {
+     "id": "2021K3",
+     "text": "2021Q3"
+    },
+    {
+     "id": "2021K4",
+     "text": "2021Q4"
+    },
+    {
+     "id": "2022K1",
+     "text": "2022Q1"
+    },
+    {
+     "id": "2022K2",
+     "text": "2022Q2"
+    },
+    {
+     "id": "2022K3",
+     "text": "2022Q3"
+    },
+    {
+     "id": "2022K4",
+     "text": "2022Q4"
+    },
+    {
+     "id": "2023K1",
+     "text": "2023Q1"
+    },
+    {
+     "id": "2023K2",
+     "text": "2023Q2"
+    },
+    {
+     "id": "2023K3",
+     "text": "2023Q3"
+    },
+    {
+     "id": "2023K4",
+     "text": "2023Q4"
+    },
+    {
+     "id": "2024K1",
+     "text": "2024Q1"
+    },
+    {
+     "id": "2024K2",
+     "text": "2024Q2"
+    },
+    {
+     "id": "2024K3",
+     "text": "2024Q3"
+    },
+    {
+     "id": "2024K4",
+     "text": "2024Q4"
+    },
+    {
+     "id": "2025K1",
+     "text": "2025Q1"
+    },
+    {
+     "id": "2025K2",
+     "text": "2025Q2"
+    },
+    {
+     "id": "2025K3",
+     "text": "2025Q3"
+    },
+    {
+     "id": "2025K4",
+     "text": "2025Q4"
+    },
+    {
+     "id": "2026K1",
+     "text": "2026Q1"
+    },
+    {
+     "id": "2026K2",
+     "text": "2026Q2"
+    },
+    {
+     "id": "2026K3",
+     "text": "2026Q3"
+    }
+   ]
+  }
+ ]
+}

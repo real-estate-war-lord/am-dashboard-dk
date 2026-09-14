@@ -61,6 +61,10 @@ def jobs(cfg: dict):
                 yield s.get("db", ""), s["table"], s["vars"], ind["key"], s.get("pull")
     for m in cfg["macro"]:
         yield m.get("db", ""), m["table"], m["vars"], m["key"], m.get("pull")
+    for ind in (cfg.get("cph") or {}).get("indicators", []):
+        for s in ind["sources"]:
+            if "vars" in s:
+                yield s.get("db", ""), s["table"], s["vars"], "cph:" + ind["key"], s.get("pull")
 
 
 def main():

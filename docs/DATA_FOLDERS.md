@@ -5,6 +5,7 @@ The rule: **data flows one way, left to right, and every folder has exactly one 
 ```
 config/            hand-edited      → the registry: what to fetch, how to compute, how to show
 data/geo/          fetch_geo_dawa   → boundary polygons (committed, simplified)
+                   fetch_geo_cph    → Copenhagen quarters + districts (committed)
 data/raw/          fetch_statbank   → untouched API pulls, dated (CSV not committed; .meta.json committed)
 data/external/     hand-filled      → the few series with no API (rents), as small CSVs (committed)
 data/processed/    build_*          → the JSON the dashboard reads (committed)
@@ -15,6 +16,7 @@ dist/              build_dashboard  → the single-file dashboard (index.html co
 |---|---|---|---|---|
 | `config/indicators.json` | you / Claude | every script | yes | one registry, no other config files |
 | `data/geo/<layer>.geojson` | `scripts/fetch_geo_dawa.py` | `build_makro.py` | **yes** (simplified, ~few MB) | `kommuner`, `postnumre`, `sogne`, `landsdele`, `regioner` |
+| `data/geo/cph_kvarterer.geojson`, `cph_bydele.geojson` | `scripts/fetch_geo_cph.py` | `build_cph.py` | **yes** | Københavns Kommune WFS `k101`, CC BY 4.0 (`ATTRIBUTION_CPH.txt`) |
 | `data/geo/raw/` | same script | nobody (archive) | no | full-precision originals |
 | `data/geo/ATTRIBUTION.txt` | same script | README / map footer | yes | required by the DAGI licence |
 | `data/raw/<db>_<TABLE>_<YYYY-MM-DD>.csv` | `scripts/fetch_statbank.py` | `build_makro.py`, `build_market.py` | no (regenerable; can be large) | `dst_FOLK1A_2026-09-15.csv`, `s20_BM011_2026-09-15.csv` — the newest date wins |

@@ -1,0 +1,928 @@
+{
+ "id": "KKHUS1",
+ "text": "Households",
+ "description": "Households by district, type of household, number of children in the household, household size and time",
+ "unit": "Number",
+ "suppressedDataValue": "0",
+ "updated": "2026-08-06T08:00:00",
+ "active": true,
+ "contacts": [
+  {
+   "name": "Københavns Kommunes Tværgående Analyseenhed",
+   "phone": "+4529298013",
+   "mail": "statistik@okf.kk.dk"
+  }
+ ],
+ "documentation": null,
+ "footnote": {
+  "text": "Source: Calculations made by the City of Copenhagen based on data from the Civil Registration System (CPR).",
+  "mandatory": false
+ },
+ "variables": [
+  {
+   "id": "OMRKK",
+   "text": "district",
+   "elimination": true,
+   "time": false,
+   "map": "kk_lokaludvalg_21",
+   "values": [
+    {
+     "id": "1000",
+     "text": "Copenhagen total"
+    },
+    {
+     "id": "1001",
+     "text": "District - Indre By"
+    },
+    {
+     "id": "1002",
+     "text": "District - Østerbro"
+    },
+    {
+     "id": "1003",
+     "text": "District - Nørrebro"
+    },
+    {
+     "id": "1004",
+     "text": "District - Vesterbro/Kongens Enghave"
+    },
+    {
+     "id": "1005",
+     "text": "District - Valby"
+    },
+    {
+     "id": "1006",
+     "text": "District - Vanløse"
+    },
+    {
+     "id": "1007",
+     "text": "District - Brønshøj-Husum"
+    },
+    {
+     "id": "1008",
+     "text": "District - Bispebjerg"
+    },
+    {
+     "id": "1009",
+     "text": "District - Amager Øst"
+    },
+    {
+     "id": "1010",
+     "text": "District - Amager Vest"
+    },
+    {
+     "id": "1099",
+     "text": "District - Unlocated"
+    },
+    {
+     "id": "2001",
+     "text": "Local committee district - Indre By"
+    },
+    {
+     "id": "2002",
+     "text": "Local committee district - Christianshavn"
+    },
+    {
+     "id": "2003",
+     "text": "Local committee district - Østerbro"
+    },
+    {
+     "id": "2004",
+     "text": "Local committee district - Nørrebro"
+    },
+    {
+     "id": "2005",
+     "text": "Local committee district - Vesterbro"
+    },
+    {
+     "id": "2006",
+     "text": "Local committee district - Kgs. Enghave"
+    },
+    {
+     "id": "2007",
+     "text": "Local committee district - Valby"
+    },
+    {
+     "id": "2008",
+     "text": "Local committee district - Vanløse"
+    },
+    {
+     "id": "2009",
+     "text": "Local committee district - Brønshøj-Husum"
+    },
+    {
+     "id": "2010",
+     "text": "Local committee district - Bispebjerg"
+    },
+    {
+     "id": "2011",
+     "text": "Local committee district - Amager Øst"
+    },
+    {
+     "id": "2012",
+     "text": "Local committee district - Amager Vest"
+    },
+    {
+     "id": "2099",
+     "text": "Local committee district - Unlocated"
+    },
+    {
+     "id": "20101",
+     "text": "Indre By - Middelalderbyen"
+    },
+    {
+     "id": "20102",
+     "text": "Indre By - Metropolzonen "
+    },
+    {
+     "id": "20103",
+     "text": "Indre By - Nansensgade-kvarteret"
+    },
+    {
+     "id": "20104",
+     "text": "Indre By - Øster Farimagsgade-kvarteret"
+    },
+    {
+     "id": "20105",
+     "text": "Indre By - Østerport"
+    },
+    {
+     "id": "20106",
+     "text": "Indre By - Frederiksstaden"
+    },
+    {
+     "id": "20107",
+     "text": "Indre By - Gammelholm og Nyhavn"
+    },
+    {
+     "id": "20201",
+     "text": "Christianshavn - Neden Vandet"
+    },
+    {
+     "id": "20202",
+     "text": "Christianshavn - Oven Vandet"
+    },
+    {
+     "id": "20203",
+     "text": "Christianshavn - Holmen og Refshaleøen"
+    },
+    {
+     "id": "20301",
+     "text": "Østerbro - Nord/Komponistkvarteret "
+    },
+    {
+     "id": "20302",
+     "text": "Østerbro - Svanemøllen Syd/Øst"
+    },
+    {
+     "id": "20303",
+     "text": "Østerbro - Århusgade Nord"
+    },
+    {
+     "id": "20304",
+     "text": "Østerbro - Århusgade Syd "
+    },
+    {
+     "id": "20305",
+     "text": "Østerbro - Rosenvænget "
+    },
+    {
+     "id": "20306",
+     "text": "Østerbro - Ny Ryvang "
+    },
+    {
+     "id": "20307",
+     "text": "Østerbro - Nord"
+    },
+    {
+     "id": "20308",
+     "text": "Østerbro - Nordhavn "
+    },
+    {
+     "id": "20309",
+     "text": "Østerbro - Lyngbyvej Vest "
+    },
+    {
+     "id": "20310",
+     "text": "Østerbro - Lyngbyvej Øst/Klimakvarteret"
+    },
+    {
+     "id": "20311",
+     "text": "Østerbro - Fælled "
+    },
+    {
+     "id": "20401",
+     "text": "Nørrebro - Blågårdskvarteret/Assistens/Rantzausgade"
+    },
+    {
+     "id": "20402",
+     "text": "Nørrebro - Guldbergskvarteret/Panum/Ravnsborggade "
+    },
+    {
+     "id": "20403",
+     "text": "Nørrebro - Stefansgade/Nørrebroparken/Lundtoftegade "
+    },
+    {
+     "id": "20404",
+     "text": "Nørrebro - Mimersgade-kvarteret/ Nørrebro St. "
+    },
+    {
+     "id": "20405",
+     "text": "Nørrebro - Haraldsgade-kvarteret"
+    },
+    {
+     "id": "20501",
+     "text": "Vesterbro - Vest"
+    },
+    {
+     "id": "20502",
+     "text": "Vesterbro - Central "
+    },
+    {
+     "id": "20503",
+     "text": "Vesterbro - Øst"
+    },
+    {
+     "id": "20504",
+     "text": "Vesterbro - Syd"
+    },
+    {
+     "id": "20601",
+     "text": "Kgs. Enghave - Bavnehøj"
+    },
+    {
+     "id": "20602",
+     "text": "Kgs. Enghave - Gl. Sydhavn"
+    },
+    {
+     "id": "20603",
+     "text": "Kgs. Enghave - Holmene"
+    },
+    {
+     "id": "20701",
+     "text": "Valby - Gl. Valby "
+    },
+    {
+     "id": "20702",
+     "text": "Valby - Syd"
+    },
+    {
+     "id": "20703",
+     "text": "Valby - Ålholm"
+    },
+    {
+     "id": "20704",
+     "text": "Valby - Valby Sydvest "
+    },
+    {
+     "id": "20705",
+     "text": "Valby - Vigerslev"
+    },
+    {
+     "id": "20801",
+     "text": "Vanløse - Jyllingevej Kvarter"
+    },
+    {
+     "id": "20802",
+     "text": "Vanløse - Jernbane Allé Kvarter"
+    },
+    {
+     "id": "20803",
+     "text": "Vanløse - Sallingvej Kvarter"
+    },
+    {
+     "id": "20804",
+     "text": "Vanløse - Grøndals Park Kvarter"
+    },
+    {
+     "id": "20901",
+     "text": "Brønshøj-Husum - Husum"
+    },
+    {
+     "id": "20902",
+     "text": "Brønshøj-Husum - Husum Nord"
+    },
+    {
+     "id": "20903",
+     "text": "Brønshøj-Husum - Tingbjerg "
+    },
+    {
+     "id": "20904",
+     "text": "Brønshøj-Husum - Brønshøj"
+    },
+    {
+     "id": "20905",
+     "text": "Brønshøj-Husum - Bellahøj"
+    },
+    {
+     "id": "21001",
+     "text": "Bispebjerg - Emdrup "
+    },
+    {
+     "id": "21002",
+     "text": "Bispebjerg- Ryparken-Lundehus"
+    },
+    {
+     "id": "21003",
+     "text": "Bispebjerg - Bispebjerg "
+    },
+    {
+     "id": "21004",
+     "text": "Bispebjerg - Utterslev "
+    },
+    {
+     "id": "21005",
+     "text": "Bispebjerg - Nordvest"
+    },
+    {
+     "id": "21101",
+     "text": "Amager Øst - Amagerbro Øst"
+    },
+    {
+     "id": "21102",
+     "text": "Amager Øst - Sundbyøster"
+    },
+    {
+     "id": "21103",
+     "text": "Amager Øst - Villakvartererne "
+    },
+    {
+     "id": "21104",
+     "text": "Amager Øst - Nordøstamager"
+    },
+    {
+     "id": "21201",
+     "text": "Amager Vest - Amagerbro Vest"
+    },
+    {
+     "id": "21202",
+     "text": "Amager Vest - Bryggen Syd "
+    },
+    {
+     "id": "21203",
+     "text": "Amager Vest - Faste Batteri"
+    },
+    {
+     "id": "21204",
+     "text": "Amager Vest - Gamle Bryggen"
+    },
+    {
+     "id": "21205",
+     "text": "Amager Vest - Grønjordssøen (Ørestad Nord and Vejlandskvarter)"
+    },
+    {
+     "id": "21206",
+     "text": "Amager Vest - Kolonihavekvarteret"
+    },
+    {
+     "id": "21207",
+     "text": "Amager Vest - Sundbyvester"
+    },
+    {
+     "id": "21208",
+     "text": "Amager Vest - Sundholmsvejs kvarteret "
+    },
+    {
+     "id": "21209",
+     "text": "Amager Vest - Urbanplanen "
+    },
+    {
+     "id": "21210",
+     "text": "Amager Vest - Ørestad City "
+    },
+    {
+     "id": "21211",
+     "text": "Amager Vest - Ørestad Syd"
+    },
+    {
+     "id": "29999",
+     "text": "Neighborhood - Unlocated"
+    }
+   ]
+  },
+  {
+   "id": "HUSTYP",
+   "text": "type of household",
+   "elimination": true,
+   "time": false,
+   "values": [
+    {
+     "id": "TOT",
+     "text": "Type of household total"
+    },
+    {
+     "id": "001",
+     "text": "Married couples and registered partnership"
+    },
+    {
+     "id": "002",
+     "text": "Couples living in consensual union and cohabiting couples"
+    },
+    {
+     "id": "003",
+     "text": "Single men"
+    },
+    {
+     "id": "004",
+     "text": "Single women"
+    },
+    {
+     "id": "005",
+     "text": "Children below 18 years not living with parents"
+    },
+    {
+     "id": "006",
+     "text": "Households including more than 1 familiy"
+    }
+   ]
+  },
+  {
+   "id": "ANTBORNH",
+   "text": "number of children in the household",
+   "elimination": true,
+   "time": false,
+   "values": [
+    {
+     "id": "TOT",
+     "text": "Children total"
+    },
+    {
+     "id": "001",
+     "text": "0 children"
+    },
+    {
+     "id": "002",
+     "text": "1 child"
+    },
+    {
+     "id": "003",
+     "text": "2 children"
+    },
+    {
+     "id": "004",
+     "text": "3 children"
+    },
+    {
+     "id": "005",
+     "text": "More than 3 children"
+    }
+   ]
+  },
+  {
+   "id": "HUSSTØR",
+   "text": "household size",
+   "elimination": true,
+   "time": false,
+   "values": [
+    {
+     "id": "TOT",
+     "text": "Household size total"
+    },
+    {
+     "id": "001",
+     "text": "1 person"
+    },
+    {
+     "id": "002",
+     "text": "2 persons"
+    },
+    {
+     "id": "003",
+     "text": "3 persons"
+    },
+    {
+     "id": "004",
+     "text": "4 persons"
+    },
+    {
+     "id": "005",
+     "text": "5 persons"
+    },
+    {
+     "id": "006",
+     "text": "More than 5 persons"
+    }
+   ]
+  },
+  {
+   "id": "Tid",
+   "text": "time",
+   "elimination": false,
+   "time": true,
+   "values": [
+    {
+     "id": "1998K1",
+     "text": "1998Q1"
+    },
+    {
+     "id": "1999K1",
+     "text": "1999Q1"
+    },
+    {
+     "id": "2000K1",
+     "text": "2000Q1"
+    },
+    {
+     "id": "2001K1",
+     "text": "2001Q1"
+    },
+    {
+     "id": "2002K1",
+     "text": "2002Q1"
+    },
+    {
+     "id": "2002K2",
+     "text": "2002Q2"
+    },
+    {
+     "id": "2002K3",
+     "text": "2002Q3"
+    },
+    {
+     "id": "2002K4",
+     "text": "2002Q4"
+    },
+    {
+     "id": "2003K1",
+     "text": "2003Q1"
+    },
+    {
+     "id": "2003K2",
+     "text": "2003Q2"
+    },
+    {
+     "id": "2003K3",
+     "text": "2003Q3"
+    },
+    {
+     "id": "2003K4",
+     "text": "2003Q4"
+    },
+    {
+     "id": "2004K1",
+     "text": "2004Q1"
+    },
+    {
+     "id": "2004K2",
+     "text": "2004Q2"
+    },
+    {
+     "id": "2004K3",
+     "text": "2004Q3"
+    },
+    {
+     "id": "2004K4",
+     "text": "2004Q4"
+    },
+    {
+     "id": "2005K1",
+     "text": "2005Q1"
+    },
+    {
+     "id": "2005K2",
+     "text": "2005Q2"
+    },
+    {
+     "id": "2005K3",
+     "text": "2005Q3"
+    },
+    {
+     "id": "2005K4",
+     "text": "2005Q4"
+    },
+    {
+     "id": "2006K1",
+     "text": "2006Q1"
+    },
+    {
+     "id": "2006K2",
+     "text": "2006Q2"
+    },
+    {
+     "id": "2006K3",
+     "text": "2006Q3"
+    },
+    {
+     "id": "2006K4",
+     "text": "2006Q4"
+    },
+    {
+     "id": "2007K1",
+     "text": "2007Q1"
+    },
+    {
+     "id": "2007K2",
+     "text": "2007Q2"
+    },
+    {
+     "id": "2007K3",
+     "text": "2007Q3"
+    },
+    {
+     "id": "2007K4",
+     "text": "2007Q4"
+    },
+    {
+     "id": "2008K1",
+     "text": "2008Q1"
+    },
+    {
+     "id": "2008K2",
+     "text": "2008Q2"
+    },
+    {
+     "id": "2008K3",
+     "text": "2008Q3"
+    },
+    {
+     "id": "2008K4",
+     "text": "2008Q4"
+    },
+    {
+     "id": "2009K1",
+     "text": "2009Q1"
+    },
+    {
+     "id": "2009K2",
+     "text": "2009Q2"
+    },
+    {
+     "id": "2009K3",
+     "text": "2009Q3"
+    },
+    {
+     "id": "2009K4",
+     "text": "2009Q4"
+    },
+    {
+     "id": "2010K1",
+     "text": "2010Q1"
+    },
+    {
+     "id": "2010K2",
+     "text": "2010Q2"
+    },
+    {
+     "id": "2010K3",
+     "text": "2010Q3"
+    },
+    {
+     "id": "2010K4",
+     "text": "2010Q4"
+    },
+    {
+     "id": "2011K1",
+     "text": "2011Q1"
+    },
+    {
+     "id": "2011K2",
+     "text": "2011Q2"
+    },
+    {
+     "id": "2011K3",
+     "text": "2011Q3"
+    },
+    {
+     "id": "2011K4",
+     "text": "2011Q4"
+    },
+    {
+     "id": "2012K1",
+     "text": "2012Q1"
+    },
+    {
+     "id": "2012K2",
+     "text": "2012Q2"
+    },
+    {
+     "id": "2012K3",
+     "text": "2012Q3"
+    },
+    {
+     "id": "2012K4",
+     "text": "2012Q4"
+    },
+    {
+     "id": "2013K1",
+     "text": "2013Q1"
+    },
+    {
+     "id": "2013K2",
+     "text": "2013Q2"
+    },
+    {
+     "id": "2013K3",
+     "text": "2013Q3"
+    },
+    {
+     "id": "2013K4",
+     "text": "2013Q4"
+    },
+    {
+     "id": "2014K1",
+     "text": "2014Q1"
+    },
+    {
+     "id": "2014K2",
+     "text": "2014Q2"
+    },
+    {
+     "id": "2014K3",
+     "text": "2014Q3"
+    },
+    {
+     "id": "2014K4",
+     "text": "2014Q4"
+    },
+    {
+     "id": "2015K1",
+     "text": "2015Q1"
+    },
+    {
+     "id": "2015K2",
+     "text": "2015Q2"
+    },
+    {
+     "id": "2015K3",
+     "text": "2015Q3"
+    },
+    {
+     "id": "2015K4",
+     "text": "2015Q4"
+    },
+    {
+     "id": "2016K1",
+     "text": "2016Q1"
+    },
+    {
+     "id": "2016K2",
+     "text": "2016Q2"
+    },
+    {
+     "id": "2016K3",
+     "text": "2016Q3"
+    },
+    {
+     "id": "2016K4",
+     "text": "2016Q4"
+    },
+    {
+     "id": "2017K1",
+     "text": "2017Q1"
+    },
+    {
+     "id": "2017K2",
+     "text": "2017Q2"
+    },
+    {
+     "id": "2017K3",
+     "text": "2017Q3"
+    },
+    {
+     "id": "2017K4",
+     "text": "2017Q4"
+    },
+    {
+     "id": "2018K1",
+     "text": "2018Q1"
+    },
+    {
+     "id": "2018K2",
+     "text": "2018Q2"
+    },
+    {
+     "id": "2018K3",
+     "text": "2018Q3"
+    },
+    {
+     "id": "2018K4",
+     "text": "2018Q4"
+    },
+    {
+     "id": "2019K1",
+     "text": "2019Q1"
+    },
+    {
+     "id": "2019K2",
+     "text": "2019Q2"
+    },
+    {
+     "id": "2019K3",
+     "text": "2019Q3"
+    },
+    {
+     "id": "2019K4",
+     "text": "2019Q4"
+    },
+    {
+     "id": "2020K1",
+     "text": "2020Q1"
+    },
+    {
+     "id": "2020K2",
+     "text": "2020Q2"
+    },
+    {
+     "id": "2020K3",
+     "text": "2020Q3"
+    },
+    {
+     "id": "2020K4",
+     "text": "2020Q4"
+    },
+    {
+     "id": "2021K1",
+     "text": "2021Q1"
+    },
+    {
+     "id": "2021K2",
+     "text": "2021Q2"
+    },
+    {
+     "id": "2021K3",
+     "text": "2021Q3"
+    },
+    {
+     "id": "2021K4",
+     "text": "2021Q4"
+    },
+    {
+     "id": "2022K1",
+     "text": "2022Q1"
+    },
+    {
+     "id": "2022K2",
+     "text": "2022Q2"
+    },
+    {
+     "id": "2022K3",
+     "text": "2022Q3"
+    },
+    {
+     "id": "2022K4",
+     "text": "2022Q4"
+    },
+    {
+     "id": "2023K1",
+     "text": "2023Q1"
+    },
+    {
+     "id": "2023K2",
+     "text": "2023Q2"
+    },
+    {
+     "id": "2023K3",
+     "text": "2023Q3"
+    },
+    {
+     "id": "2023K4",
+     "text": "2023Q4"
+    },
+    {
+     "id": "2024K1",
+     "text": "2024Q1"
+    },
+    {
+     "id": "2024K2",
+     "text": "2024Q2"
+    },
+    {
+     "id": "2024K3",
+     "text": "2024Q3"
+    },
+    {
+     "id": "2024K4",
+     "text": "2024Q4"
+    },
+    {
+     "id": "2025K1",
+     "text": "2025Q1"
+    },
+    {
+     "id": "2025K2",
+     "text": "2025Q2"
+    },
+    {
+     "id": "2025K3",
+     "text": "2025Q3"
+    },
+    {
+     "id": "2025K4",
+     "text": "2025Q4"
+    },
+    {
+     "id": "2026K1",
+     "text": "2026Q1"
+    },
+    {
+     "id": "2026K2",
+     "text": "2026Q2"
+    },
+    {
+     "id": "2026K3",
+     "text": "2026Q3"
+    }
+   ]
+  }
+ ]
+}

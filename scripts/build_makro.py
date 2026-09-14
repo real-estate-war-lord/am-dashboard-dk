@@ -30,7 +30,11 @@ def dims(r):
 
 
 def norm_area(col, code):
-    return muni_code(code) if col != "PNR20" else str(code).strip()[:4]
+    if col == "PNR20":
+        return str(code).strip()[:4]
+    if col == "OMRKK":  # Copenhagen districts/quarters: keep the code as is
+        return str(code).strip()
+    return muni_code(code)
 
 
 def latest_period(rs):

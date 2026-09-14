@@ -8,10 +8,12 @@ geo:        ## vendor DAGI boundaries (DAWA — before 2026-10-01!)
 fetch:      ## pull all StatBank / Finans Danmark tables to data/raw
 	$(PY) scripts/fetch_statbank.py
 build:      ## raw -> processed -> dist/index.html
-	$(PY) scripts/build_makro.py && $(PY) scripts/build_market.py && $(PY) scripts/build_dashboard.py
+	$(PY) scripts/build_makro.py && $(PY) scripts/build_market.py && ($(PY) scripts/build_cph.py || true) && $(PY) scripts/build_dashboard.py
+geo-cph:    ## vendor Copenhagen quarter/district polygons (Københavns Kommune WFS)
+	$(PY) scripts/fetch_geo_cph.py
 serve:      ## open the dashboard locally
 	cd dist && $(PY) -m http.server 8080
 fixture:    ## synthetic render check (never ship)
-	$(PY) tests/make_fixture.py && $(PY) scripts/build_dashboard.py --data tests/fixture_makro.json --market tests/fixture_market.json --out dist/fixture.html
+	$(PY) tests/make_fixture.py && $(PY) scripts/build_dashboard.py --data tests/fixture_makro.json --market tests/fixture_market.json --cph tests/fixture_cph.json --out dist/fixture.html
 refresh: fetch build
-.PHONY: validate geo fetch build serve fixture refresh
+.PHONY: validate geo geo-cph fetch build serve fixture refresh

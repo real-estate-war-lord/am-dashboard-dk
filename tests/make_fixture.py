@@ -47,3 +47,22 @@ for m in c["macro"]:
 market = {"series": series, "latest": latest, "hero": c["macro_hero"], "table": [m["key"] for m in c["macro"]], "note": "SYNTHETIC fixture."}
 (HERE / "fixture_market.json").write_text(json.dumps(market, ensure_ascii=False))
 print("fixture written")
+
+# --- SYNTHETIC Copenhagen quarter layer (tests/fixture_cph.json) ---
+cph_sec = c.get("cph") or {}
+cinds = [{k: i[k] for k in ("key", "label", "short", "unit", "hue", "group", "fmt") if k in i} | {"level": "kvarter", "desc": i.get("desc", ""), "source": i.get("source", ""), "warn": i.get("warn", "")} for i in cph_sec.get("indicators", [])]
+CR = {"growth": (-1, 3), "young": (10, 40), "single": (40, 70), "income_med": (200000, 400000), "higher_ed": (20, 70), "renters": (30, 80),
+      "private_rental": (5, 40), "andel": (5, 40), "almene": (0, 50), "avg_m2": (60, 120), "new_stock": (0, 30), "unemp": (1, 6)}
+years = [str(y) for y in range(2016, 2027)]
+Q = []
+for j in range(12):
+    cx, cy = 55.64 + (j // 4) * 0.03, 12.50 + (j % 4) * 0.04
+    ring = [[round(cx + 0.013 * math.sin(t), 5), round(cy + 0.02 * math.cos(t), 5)] for t in [k * math.pi / 3 for k in range(6)]]
+    q = {"code": f"2{j//3+1:02d}{j%3+1:02d}", "name": f"SYN-Kvarter {j+1}", "bydel": f"SYN-Bydel {j//3+1}", "bydel_code": f"100{j//3+1}", "muni": "101", "rings": [ring], "pop": random.randint(3000, 25000), "hist": {}}
+    for i in cinds:
+        lo, hi = CR.get(i["key"], (0, 100)); base = random.uniform(lo, hi); q[i["key"]] = round(base, 2)
+        q["hist"][i["key"]] = {y: round(base * (1 + 0.02 * (k - 10) + random.uniform(-0.03, 0.03)), 2) for k, y in enumerate(years)}
+    Q.append(q)
+cph = {"meta": {"built": "SYNTHETIC", "years": years, "latest_year": "2026", "sources": [{"label": "SYNTHETIC FIXTURE", "asof": "n/a"}], "attribution": "synthetic"}, "indicators": cinds, "areas": Q}
+(HERE / "fixture_cph.json").write_text(json.dumps(cph, ensure_ascii=False))
+print("cph fixture written")
