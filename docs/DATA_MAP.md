@@ -244,4 +244,24 @@ am-dashboard-dk/
 | 2026-09-14 | Nationalbank sub-database on `api.statbank.dk` | ❌ not found |
 | — | Datafordeler GraphQL with a real key, EMOData, Rejseplanen GTFS download | not yet (need credentials) |
 
+### 7b. Calculation verification (phase B, 2026-09-14)
+
+Each dashboard value below was recomputed by hand from separate API pulls of the underlying cells (different query, no pipeline code involved).
+
+| indicator | cell | independent value | dashboard | result |
+|---|---|---|---|---|
+| House price index, flats (y/y) | EJ56 DK 2026K1, TAL=310 as published by DST | **15.8 %** (index 106.9 → 123.8) | 15.81 % | ✅ genuine, not a bug |
+| Realised price DKK/m², flats | BM010 København 2025K2–2026K1: 60 503 / 64 254 / 68 247 / 72 846 → mean | 66 462.5 | 66 462.5 | ✅ |
+| Realised price DKK/m², flats | BM010 Aarhus, same quarters | 38 842.75 | 38 842.75 | ✅ |
+| Housing-benefit households % | BOST63 Aarhus Dec 2025 all types 53 934 ÷ FAM55N households 186 792 | 28.87 % | 28.87 % | ✅ (high: students on boligsikring + pensioners on boligydelse) |
+| Housing-benefit households % | København 58 399 ÷ 332 181 | 17.58 % | 17.58 % | ✅ |
+| Single-person households % | FAM55N København (73 557 + 94 258) ÷ 332 181 | 50.52 % | 50.52 % | ✅ |
+| Rented dwellings % | BOL101 København 2026 LEJ 263 497 ÷ (EJ 65 525 + LEJ 263 497) | 80.08 % | 80.08 % | ✅ — note DST counts andelsbolig residents as tenants |
+| Unemployment % | AUP01 København / Gentofte 2026M07 | 4.3 / 2.7 | 4.3 / 2.7 | ✅ |
+| Population growth | FOLK1A København 2025K3 667 574 → 2026K3 670 389 | +0.42 % | +0.42 % | ✅ |
+| Private rent DKK/m²/yr | boligstat.dk 2026 København / hele landet | 1 637 / 1 277 | 1 637 (national not shown) | ✅ |
+| Social rent DKK/m²/yr | LBF Tabel 7 familieboliger 2026 København | 1 077 | 1 077 | ✅ |
+
+Definitions confirmed against the source metadata in the same pass: FOLK1E origin codes 24/25/34/35 = immigrants + descendants; HFUDD11 H40–H80 = short-, medium- and long-cycle higher education incl. PhD; BYGV33 phase 3 = completed.
+
 Sources: Danmarks Statistik API docs (https://www.dst.dk/en/Statistik/brug-statistikken/muligheder-i-statistikbanken/api) · Finans Danmark Boligmarkedsstatistikken (https://finansdanmark.dk/tal-og-data/boligstatistik/boligmarkedsstatistikken/) · Klimadatastyrelsen, DAWA lukker 1. oktober 2026 (https://www.klimadatastyrelsen.dk/om-klimadatastyrelsen/nyheder/nyhedsarkiv/2026/jul/dawa-lukker-d-1-oktober-2026) · Datafordeler transition plan (https://datafordeler.dk/vejledning/transitionsnetvaerk/) · BBR GraphQL (https://datafordeler.dk/dataoversigt/bygnings-og-boligregistret-bbr/bbr-graphql/) · boligstat.dk om husleje (https://boligstat.dk/boligstat/dokumenter/omhusleje.html) · Landsbyggefonden Huslejestatistik 2026 (https://lbf.dk/viden/statistikker/huslejestatistik/huslejestatistik-2026) · Plandata WFS (https://geoserver.plandata.dk/geoserver/wfs?request=GetCapabilities&service=WFS) · Eurostat API (https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nama_10r_3gdp?geo=DK011&unit=EUR_HAB&time=2023) · Frie geografiske data, vilkår (https://dataforsyningen.dk/asset/PDF/rettigheder_vilkaar/Vilk%C3%A5r%20for%20brug%20af%20frie%20geografiske%20data.pdf)

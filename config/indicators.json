@@ -356,7 +356,8 @@
    "fmt": "pct0",
    "desc": "Households receiving housing benefit (boligsikring/boligydelse, December) as % of households.",
    "source": "DST BOST63 / FAM55N",
-   "group": "Income & jobs"
+   "group": "Income & jobs",
+   "warn": "All housing-benefit types (boligsikring incl. students and boligydelse for pensioners); student cities and municipalities with many pensioners score high."
   },
   {
    "key": "rent_private",
@@ -466,7 +467,8 @@
    "fmt": "pct0",
    "desc": "Rented dwellings as % of occupied dwellings.",
    "source": "DST BOL101",
-   "group": "Housing stock"
+   "group": "Housing stock",
+   "warn": "DST counts residents of cooperative dwellings (andelsboliger) as tenants, so in Copenhagen ~⅓ of the stock is 'rented' via andel. Private rental + almene + andel together."
   },
   {
    "key": "unemp",
