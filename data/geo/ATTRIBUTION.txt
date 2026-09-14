@@ -1,0 +1,2 @@
+Indeholder data fra Klimadatastyrelsen, Danmarks Administrative Geografiske Inddeling (DAGI), hentet via DAWA 2026-09-14.
+Terms: Vilkår for brug af frie geografiske data.
