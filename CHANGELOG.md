@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.6 — 2026-09-15
+- **Charts** (new nav item): pick an indicator, up to 8 areas (municipalities, postal codes, Copenhagen quarters — search box or quick picks), year range and a median line; download as PNG (2400×1280, self-contained with title, legend and source) or the data as CSV; the URL holds the whole setup.
+- **Sources** merged into Market: folded panel *Sources, freshness and indicator definitions* at the bottom (`#market?src=1` opens it).
+- **Full-screen map**: ⤢ button on the map card (Esc exits); works in Areas and Buildings mode.
+
 ## v1.5 — 2026-09-15
 - **Buildings (Micro) layer** inside the map view: when a municipality is open, *Areas | Buildings* switches to every residential building with ≥ 2 dwellings as a dot (size = dwellings, colour = rented share / unoccupied / average size / year built / dwellings / < 50 m² / floors), filters (min. dwellings, year built, building type, rented ≥ %), building popup with tenure, sizes and rooms, CSV export of the filtered set, link from area pages. `scripts/build_micro.py` writes one compact file per municipality (`data/processed/micro/<kommune>.json`, loaded on demand — the page must be served over http: `make serve` or GitHub Pages).
 - BBR coverage: Copenhagen and the 18 suburban municipalities (776 791 dwellings); the rest of the country follows as it is fetched.

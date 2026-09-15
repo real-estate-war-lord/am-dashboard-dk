@@ -13,9 +13,10 @@ An open-data market map for residential asset management in Denmark: 20 indicato
 - **Table** — everything side by side (municipalities / postal codes / quarters) with search, region filter, minimum population, sorting and CSV export.
 - **Housing stock from BBR** — the building register itself, aggregated per postal code and Copenhagen quarter: tenure, unoccupied share, sizes, age, building type (free Datafordeler API key needed to refresh; the aggregated file is committed).
 - **Buildings (Micro)** — inside a municipality, every residential building with 2+ dwellings as a dot: tenure, size, year built, rooms; filter and export. Loaded per municipality on demand.
+- **Charts** — chart generator: indicator × areas × years, median line, PNG and CSV export, shareable URL.
 - **Export data** (sidebar) — one long-format CSV of every level, indicator and year plus the macro series, ready for analysis in Claude, Python or Excel.
 - **Market** — KPI tiles and series for the national picture.
-- **Sources** — every table with its "updated" stamp, plus indicator definitions.
+- **Sources** — folded under Market: every table with its "updated" stamp, plus indicator definitions.
 
 ## Data sources (all free, no key unless noted)
 

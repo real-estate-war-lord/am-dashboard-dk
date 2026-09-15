@@ -67,6 +67,8 @@ const microAvail = code => !!(code && MICRO_IDX[String(Number(code))]);
 const microMode = () => !!(MK.micro && MK.muni && microAvail(MK.muni));
 const curMind = () => MICRO_INDS.find(i => i.key === MK.mind) || MICRO_INDS[0];
 const AR = { type: null, code: null, group: "key", ind: null, sub: "kvarter" };   /* area page */
+const MKT = { src: false };                                                        /* market: sources panel open */
+const CH = { ind: (IND[0] || {}).key, areas: [], y0: "", y1: "", median: true, title: "" };   /* chart generator */
 const T = { q: "", level: "kommune", region: "", minPop: 0 };                     /* table view filters */
 const REGIONS = ["Hovedstaden", "Sjælland", "Syddanmark", "Midtjylland", "Nordjylland"];
 const LF = { map: null, center: [56.0, 10.5], zoom: 7 };
@@ -92,6 +94,8 @@ function hashFor() {
   let p;
   if (S.view === "area") { p = `area/${AR.type}/${AR.code}`; if (AR.group !== "key") q.push(`g=${encodeURIComponent(AR.group)}`); if (AR.sub !== "kvarter") q.push(`sub=${AR.sub}`); }
   else if (S.view === "table") p = `table/${T.level}`;
+  else if (S.view === "charts") { p = "charts"; q.length = 0; q.push(`ind=${encodeURIComponent(CH.ind)}`, `a=${CH.areas.join(",")}`, `y0=${CH.y0}`, `y1=${CH.y1}`, `med=${CH.median ? 1 : 0}`); }
+  else if (S.view === "market") { p = "market"; if (MKT.src) q.push("src=1"); }
   else if (S.view === "makro") p = "map" + (MK.muni ? "/" + MK.muni + (MK.muni === CPH_MUNI && MK.cphView === "postnr" ? "/postnr" : "") : "");
   else p = S.view;
   return p + "?" + q.join("&");
@@ -106,7 +110,9 @@ function parseHash() {
   const v = parts[0] || "map";
   if (v === "area" && parts[1] && parts[2]) { S.view = "area"; AR.type = parts[1]; AR.code = parts[2]; AR.group = q.g || "key"; AR.sub = q.sub || "kvarter"; }
   else if (v === "table") { S.view = "table"; if (["kommune", "postnr", "kvarter"].includes(parts[1])) T.level = parts[1]; }
-  else if (v === "market" || v === "sources") S.view = v;
+  else if (v === "sources") { S.view = "market"; MKT.src = true; }
+  else if (v === "market") { S.view = "market"; MKT.src = q.src === "1"; }
+  else if (v === "charts") { S.view = "charts"; CH.ind = q.ind || CH.ind; CH.areas = q.a ? q.a.split(",").filter(Boolean) : CH.areas; CH.y0 = q.y0 || CH.y0; CH.y1 = q.y1 || CH.y1; CH.median = q.med !== "0"; }
   else { S.view = "makro"; MK.muni = parts[1] && byCode[parts[1]] ? parts[1] : null; MK.cphView = parts[2] === "postnr" ? "postnr" : "kvarter";
          MK.micro = q.micro === "1" && microAvail(MK.muni); if (q.mind && MICRO_INDS.some(i => i.key === q.mind)) MK.mind = q.mind; }
   if (!curInds().some(i => i.key === MK.ind)) MK.ind = (curInds()[0] || {}).key;
@@ -127,9 +133,9 @@ window.addEventListener("hashchange", () => { const r = parseHash(); render(); i
 const VIEWS = [
   ["makro",   "Macro map",     "Demographics, income, housing and prices by municipality, postal code and Copenhagen quarter", "map"],
   ["table",   "Table",         "Every municipality, postal code and quarter side by side — filter, sort, export", "table"],
-  ["market",  "Market",        "Prices, rents, supply, construction and macro indicators", "market"],
-  ["sources", "Sources",       "Data sources, freshness and definitions", "sources"]];
-const NAV_GROUPS = [["Market intelligence", ["makro", "table", "market", "sources"]]];
+  ["charts",  "Charts",        "Pick an indicator, areas and years — export the chart as PNG or the data as CSV", "charts"],
+  ["market",  "Market",        "Prices, rents, supply, construction, macro indicators — and the data sources", "market"]];
+const NAV_GROUPS = [["Market intelligence", ["makro", "table", "charts", "market"]]];
 const viewOf = id => VIEWS.find(v => v[0] === id) || VIEWS[0];
 
 function renderNav() {
@@ -142,7 +148,7 @@ function renderTop() {
   const v = viewOf(S.view);
   document.getElementById("hd").innerHTML = `<h1>${v[1]}</h1><p class="dim">${v[2]}</p>`;
 }
-const RENDER = { makro: vMakro, table: vTable, area: vArea, market: vMarket, sources: vSources };
+const RENDER = { makro: vMakro, table: vTable, area: vArea, charts: vCharts, market: vMarket };
 function render() {
   renderNav(); renderTop();
   const body = document.getElementById("body");
@@ -160,6 +166,12 @@ document.addEventListener("click", e => {
   if (g("[data-xall]")) { exportAll(); return; }
   if (g("[data-mkown]")) { MK.own = !MK.own; renderKeep(); return; }
   if ((el = g("[data-cphview]"))) { MK.cphView = el.dataset.cphview; go(hashFor()); return; }
+  if (g("[data-fs]")) { toggleFullscreen(); return; }
+  if ((el = g("[data-chadd]"))) { chartAddMany(el.dataset.chadd.split("|")); return; }
+  if ((el = g("[data-chrm]"))) { CH.areas = CH.areas.filter(a => a !== el.dataset.chrm); syncHash(); renderKeep(); return; }
+  if (g("[data-chpng]")) { chartPng(); return; }
+  if (g("[data-chcsv]")) { chartCsv(); return; }
+  if (g("[data-chclear]")) { CH.areas = []; syncHash(); renderKeep(); return; }
   if ((el = g("[data-micro]"))) { MK.micro = el.dataset.micro === "1"; syncHash(); renderKeep(); return; }
   if (g("[data-mcsv]")) { exportMicroCsv(); return; }
   if ((el = g("[data-argroup]"))) { AR.group = el.dataset.argroup; syncHash(); renderKeep(); return; }
@@ -174,6 +186,12 @@ document.addEventListener("change", e => {
   if (el.id === "yearsel") { MK.year = el.value; syncHash(); renderKeep(); }
   if (el.id === "areaq") areaSearchGo(el.value);
   if (el.id === "mindsel") { MK.mind = el.value; syncHash(); renderKeep(); }
+  if (el.id === "chind") { CH.ind = el.value; syncHash(); renderKeep(); }
+  if (el.id === "chy0") { CH.y0 = el.value; syncHash(); renderKeep(); }
+  if (el.id === "chy1") { CH.y1 = el.value; syncHash(); renderKeep(); }
+  if (el.id === "chmed") { CH.median = el.checked; syncHash(); renderKeep(); }
+  if (el.id === "chq") { chartAdd(null, el.value); }
+  if (el.id === "chtitle") { CH.title = el.value; const t = document.getElementById("chsvgtitle"); if (t) t.textContent = CH.title || chartAutoTitle(); }
   if (el.id === "mf-type") { MF.type = el.value; lfLayers(); }
   if (["mf-mindw", "mf-yfrom", "mf-yto", "mf-rent"].includes(el.id)) { MF.minDw = Number(document.getElementById("mf-mindw").value) || 1; MF.yFrom = document.getElementById("mf-yfrom").value; MF.yTo = document.getElementById("mf-yto").value; MF.rentMin = Number(document.getElementById("mf-rent").value) || 0; lfLayers(); }
   if (el.id === "tregion") { T.region = el.value; renderTableBody(); }
@@ -182,6 +200,7 @@ document.addEventListener("change", e => {
 document.addEventListener("input", e => { if (e.target.id === "tq") { T.q = e.target.value.trim().toLowerCase(); renderTableBody(); } });
 document.addEventListener("keydown", e => {
   if (e.key === "Enter" && e.target.id === "areaq") { areaSearchGo(e.target.value); return; }
+  if (e.key === "Enter" && e.target.id === "chq") { chartAdd(null, e.target.value); return; }
   if (e.key === "Escape" && S.view === "area") history.back();
 });
 
@@ -297,7 +316,7 @@ function srcNote(extra = "") {
   const list = s.map(x => `${esc(x.label)}${x.asof ? " (" + esc(x.asof) + ")" : ""}`).join(" · ");
   return `<details class="dinfo"><summary>Data information</summary><div class="note"><b>Open data.</b> ${list || "no sources recorded"}${CPH && CPH.meta && CPH.meta.attribution ? " · " + esc(CPH.meta.attribution) : ""}.
     Municipality-level indicators are shown on postal-code polygons with the municipality value (marked °) when no finer statistic exists.
-    ${esc((D.meta && D.meta.note) || "")}</div>${extra}<p class="cap">Full definitions and table stamps under <button class="lk mini" data-go="sources">Sources</button>. Built ${esc((D.meta && D.meta.built) || "–")}.</p></details>`;
+    ${esc((D.meta && D.meta.note) || "")}</div>${extra}<p class="cap">Full definitions and table stamps under <button class="lk mini" data-go="market?src=1">Market › Sources</button>. Built ${esc((D.meta && D.meta.built) || "–")}.</p></details>`;
 }
 function rankOf(o, key, peers) {
   const v = V(o, key); if (v == null) return null;
@@ -322,9 +341,9 @@ function vMakro() {
   const legend = [0, .25, .5, .75, 1].map(x => `<i style="background:${mkShade(x, microMode() ? "micro:" + curMind().key : ind.key)}"></i>`).join("");
   const muni = MK.muni ? byCode[MK.muni] : null;
   return `
-  <div class="card accent">
+  <div class="card accent" id="mapcard">
     <div class="card-head"><h3>${muni ? esc(muni.name) + (microMode() ? " — buildings" : cphMode() ? " — quarters" : " — postal codes") : "Macro map — Denmark"}</h3>
-      <div class="tools">${areaSearch()}${muni && microAvail(muni.code) ? `<div class="seg"><button class="sg ${!MK.micro ? "on" : ""}" data-micro="0">Areas</button><button class="sg ${MK.micro ? "on" : ""}" data-micro="1">Buildings (${nf(MICRO_IDX[String(Number(muni.code))].n, 0)})</button></div>` : ""}${muni && muni.code === CPH_MUNI && CPH && !microMode() ? `<div class="seg"><button class="sg ${MK.cphView !== "postnr" ? "on" : ""}" data-cphview="kvarter">Quarters (${CPH.areas.length})</button><button class="sg ${MK.cphView === "postnr" ? "on" : ""}" data-cphview="postnr">Postal codes</button></div>` : ""}${microMode() ? mindSelect() : indSelect() + yearSelect()}${D.portfolio ? `<button class="lk mini ${MK.own ? "primary" : ""}" data-mkown>● Own properties</button>` : ""}</div></div>
+      <div class="tools">${areaSearch()}${muni && microAvail(muni.code) ? `<div class="seg"><button class="sg ${!MK.micro ? "on" : ""}" data-micro="0">Areas</button><button class="sg ${MK.micro ? "on" : ""}" data-micro="1">Buildings (${nf(MICRO_IDX[String(Number(muni.code))].n, 0)})</button></div>` : ""}${muni && muni.code === CPH_MUNI && CPH && !microMode() ? `<div class="seg"><button class="sg ${MK.cphView !== "postnr" ? "on" : ""}" data-cphview="kvarter">Quarters (${CPH.areas.length})</button><button class="sg ${MK.cphView === "postnr" ? "on" : ""}" data-cphview="postnr">Postal codes</button></div>` : ""}${microMode() ? mindSelect() : indSelect() + yearSelect()}${D.portfolio ? `<button class="lk mini ${MK.own ? "primary" : ""}" data-mkown>● Own properties</button>` : ""}<button class="lk" data-fs title="Full screen (Esc to exit)">⤢ Full screen</button></div></div>
     ${microMode() ? microExplain() : indExplain(ind)}
     ${muni && !microMode() ? muniStrip(muni) : ""}
     <div id="lfmap"></div>
@@ -819,6 +838,115 @@ function lfInit() {
   applyPendingFit();
 }
 
+/* ---------- Full-screen map ---------- */
+function toggleFullscreen() {
+  const el = document.getElementById("mapcard"); if (!el) return;
+  if (document.fullscreenElement) { document.exitFullscreen(); return; }
+  if (el.requestFullscreen) el.requestFullscreen().catch(() => el.classList.toggle("fs-fallback"));
+  else el.classList.toggle("fs-fallback");
+  setTimeout(() => LF.map && LF.map.invalidateSize(), 300);
+}
+document.addEventListener("fullscreenchange", () => {
+  const b = document.querySelector("[data-fs]"); if (b) b.textContent = document.fullscreenElement ? "⤡ Exit full screen" : "⤢ Full screen";
+  setTimeout(() => LF.map && LF.map.invalidateSize(), 250);
+});
+
+/* ---------- Chart generator ---------- */
+const CH_COLORS = ["#1C6B5C", "#B07A1E", "#40547F", "#B0331B", "#82346C", "#5C5F52", "#6E8C5E", "#C08A24"];
+function chEntity(id) {
+  const [t, c] = id.split(":");
+  if (t === "kommune" && byCode[c]) return { id, type: t, o: byCode[c], name: byCode[c].name, inds: IND, peers: MUNI, peerLabel: "municipalities" };
+  if (t === "postnr" && byNr[c]) return { id, type: t, o: byNr[c], name: `${c} ${byNr[c].name}`, inds: IND, peers: AREAS, peerLabel: "postal codes", muni: byCode[byNr[c].muni] };
+  if (t === "kvarter" && byQ[c]) return { id, type: t, o: byQ[c], name: byQ[c].name + " (CPH)", inds: IND_CPH, peers: CPH.areas, peerLabel: "quarters" };
+  return null;
+}
+function chartAdd(id, text) {
+  if (!id && text) { const q = text.trim(); const o = AREA_OPTS.find(x => x.t === q) || AREA_OPTS.find(x => x.k.some(k => k === q.toLowerCase())) || AREA_OPTS.find(x => x.k.some(k => k.startsWith(q.toLowerCase())));
+    if (!o) return; id = o.h.startsWith("map/") ? "kommune:" + o.h.slice(4) : o.h.replace("area/", "").replace("/", ":"); }
+  if (!id || CH.areas.includes(id) || CH.areas.length >= 8) return;
+  CH.areas.push(id); syncHash(); renderKeep();
+  const q = document.getElementById("chq"); if (q) { q.value = ""; q.focus(); }
+}
+function chartInd() { return IND.concat(IND_CPH.filter(i => !IND.some(x => x.key === i.key))).find(i => i.key === CH.ind) || IND[0]; }
+function chartYears() {
+  const ys = YEARS.filter(y => (!CH.y0 || y >= CH.y0) && (!CH.y1 || y <= CH.y1)); return ys.length >= 2 ? ys : YEARS;
+}
+function chartAutoTitle() { const i = chartInd(); return `${i.label}${i.unit ? " · " + i.unit : ""}`; }
+function chartSeries() {
+  const ind = chartInd(), ys = chartYears(); const ents = CH.areas.map(chEntity).filter(Boolean);
+  const series = ents.map((e, k) => { const own = e.inds.some(i => i.key === ind.key);
+    const val = y => { const v = V(e.o, ind.key, y); if (v != null) return v; return e.type === "postnr" && e.muni ? V(e.muni, ind.key, y) : null; };
+    return { name: e.name, color: CH_COLORS[k % CH_COLORS.length], pts: ys.map(y => ({ y, v: own ? val(y) : null })), inherited: e.type === "postnr" && V(e.o, ind.key) == null && e.muni && V(e.muni, ind.key) != null }; });
+  if (CH.median) { const pool = ents.length && ents.every(e => e.type === "kvarter") ? CPH.areas : MUNI;
+    series.push({ name: pool === MUNI ? "Denmark — median of municipalities" : "Copenhagen — median of quarters", color: "#8A8C81", dash: true, pts: ys.map(y => ({ y, v: median(pool.map(p => V(p, ind.key, y))) })) }); }
+  return { ind, ys, series: series.filter(s => s.pts.some(p => p.v != null)) };
+}
+/* self-contained SVG (inline styles, title, legend) so the same markup renders on screen and rasterises to PNG */
+function chartSvg(withTitle) {
+  const { ind, ys, series } = chartSeries();
+  const W = 1200, H = 640, L0 = 96, R = 30, T0 = withTitle ? 84 : 24, B = 150;
+  const all = series.flatMap(s_ => s_.pts.map(p => p.v)).filter(v => v != null);
+  const F = "Inter, 'Helvetica Neue', Arial, sans-serif", M = "'IBM Plex Mono', Menlo, monospace";
+  if (!all.length) return `<svg class="chart" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg"><rect width="${W}" height="${H}" fill="#FFFFFF"/><text x="${W / 2}" y="${H / 2}" text-anchor="middle" font-family="${F}" font-size="18" fill="#8A8C81">Add areas with the search box — nothing to plot yet</text></svg>`;
+  const lo0 = Math.min(...all), hi0 = Math.max(...all), pad = (hi0 - lo0 || Math.abs(hi0) || 1) * .08; const lo = lo0 - pad, hi = hi0 + pad, sp = hi - lo;
+  const x = i => L0 + i / (ys.length - 1) * (W - L0 - R), y = v => T0 + (1 - (v - lo) / sp) * (H - T0 - B);
+  const ticks = [0, .25, .5, .75, 1].map(t => lo + t * sp);
+  const paths = series.map(s_ => { let d = "", open = false; s_.pts.forEach((p, i) => { if (p.v == null) { open = false; return; } d += (open ? "L" : "M") + x(i).toFixed(1) + "," + y(p.v).toFixed(1); open = true; });
+    return `<path d="${d}" fill="none" stroke="${s_.color}" stroke-width="${s_.dash ? 2 : 3}" ${s_.dash ? 'stroke-dasharray="7 5"' : ""} stroke-linejoin="round"/>` +
+      s_.pts.map((p, i) => p.v == null || s_.dash ? "" : `<circle cx="${x(i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="4" fill="${s_.color}"><title>${esc(s_.name)} ${p.y}: ${fmtOf(ind)(p.v)}</title></circle>`).join(""); }).join("");
+  const legY = H - B + 46; const perRow = 3, colW = (W - L0 - R) / perRow;
+  const legend = series.map((s_, k) => { const lx = L0 + (k % perRow) * colW, ly = legY + Math.floor(k / perRow) * 24; const last = [...s_.pts].reverse().find(p => p.v != null);
+    return `<line x1="${lx}" x2="${lx + 26}" y1="${ly - 4}" y2="${ly - 4}" stroke="${s_.color}" stroke-width="${s_.dash ? 2 : 3}" ${s_.dash ? 'stroke-dasharray="7 5"' : ""}/><text x="${lx + 34}" y="${ly}" font-family="${F}" font-size="14" fill="#16170F">${esc(s_.name)}${s_.inherited ? " °" : ""}${last ? ` <tspan font-family="${M}" fill="#4A4C43">${esc(fmtOf(ind)(last.v))} (${last.y})</tspan>` : ""}</text>`; }).join("");
+  const title = withTitle ? `<text x="${L0}" y="40" font-family="${F}" font-size="24" font-weight="600" fill="#16170F" id="chsvgtitle">${esc(CH.title || chartAutoTitle())}</text><text x="${L0}" y="64" font-family="${M}" font-size="12" fill="#8A8C81">${esc(ind.desc || "")}</text>` : "";
+  const foot = `<text x="${L0}" y="${H - 14}" font-family="${M}" font-size="11" fill="#8A8C81">Source: ${esc(ind.source || "")} · Macro Dashboard — Denmark, open data · built ${esc((D.meta && D.meta.built) || "")}${series.some(s_ => s_.inherited) ? " · ° = municipality value shown for a postal code" : ""}</text>`;
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" id="chsvg"><rect width="${W}" height="${H}" fill="#FFFFFF"/>${title}
+    ${ticks.map(t => `<line x1="${L0}" x2="${W - R}" y1="${y(t).toFixed(1)}" y2="${y(t).toFixed(1)}" stroke="#EFEFEA"/><text x="${L0 - 10}" y="${(y(t) + 4).toFixed(1)}" text-anchor="end" font-family="${M}" font-size="12" fill="#8A8C81">${esc(fmtOf(ind)(t))}</text>`).join("")}
+    ${ys.map((yy, i) => `<text x="${x(i).toFixed(1)}" y="${H - B + 22}" text-anchor="middle" font-family="${M}" font-size="12" fill="#8A8C81">${yy}</text>`).join("")}
+    ${paths}${legend}${foot}</svg>`;
+}
+function vCharts() {
+  const ind = chartInd(), ys = chartYears(); const ents = CH.areas.map(chEntity).filter(Boolean);
+  const L = IND.concat(IND_CPH.filter(i => !IND.some(x => x.key === i.key)));
+  const groups = GROUP_ORDER.filter(gn => L.some(i => (i.group || "Other") === gn)).concat(L.some(i => !GROUP_ORDER.includes(i.group || "Other")) ? ["Other"] : []);
+  const quick = [["Top 5 municipalities", MUNI.slice().sort((a, b) => (b.pop || 0) - (a.pop || 0)).slice(0, 5).map(m => "kommune:" + m.code)],
+                 ["Copenhagen metro", ["101", "147", "157", "159", "173", "230"].filter(c => byCode[c]).map(c => "kommune:" + c)],
+                 ["Big four", ["101", "751", "461", "851"].filter(c => byCode[c]).map(c => "kommune:" + c)]];
+  const { series } = chartSeries();
+  return `
+  <div class="card accent">
+    <div class="card-head"><h3>Chart generator</h3><div class="tools">
+      <select id="chind" class="indsel">${groups.map(gn => `<optgroup label="${esc(gn)}">${L.filter(i => (i.group || "Other") === gn).map(i => `<option value="${i.key}" ${CH.ind === i.key ? "selected" : ""}>${esc(i.label)}${i.unit ? " · " + esc(i.unit) : ""}</option>`).join("")}</optgroup>`).join("")}</select>
+      <select id="chy0" class="indsel"><option value="">from ${YEARS[0]}</option>${YEARS.map(y => `<option value="${y}" ${CH.y0 === y ? "selected" : ""}>${y}</option>`).join("")}</select>
+      <select id="chy1" class="indsel"><option value="">to ${LATEST}</option>${YEARS.map(y => `<option value="${y}" ${CH.y1 === y ? "selected" : ""}>${y}</option>`).join("")}</select>
+      <label class="hint" style="display:flex;align-items:center;gap:5px"><input type="checkbox" id="chmed" ${CH.median ? "checked" : ""}> median line</label></div></div>
+    <div class="tfilters">
+      <span class="asrch"><input id="chq" list="arealist" class="indsel" placeholder="Add municipality, postal code or quarter… (Enter)" autocomplete="off"><datalist id="arealist">${AREA_OPTS.map(o => `<option value="${esc(o.t)}"></option>`).join("")}</datalist></span>
+      ${quick.map(([l, ids]) => `<button class="lk mini" data-chadd="${ids.join("|")}">+ ${l}</button>`).join("")}
+      ${CH.areas.length ? `<button class="lk mini" data-chclear>clear</button>` : ""}
+    </div>
+    <div class="chips">${ents.map((e, k) => `<span class="chip" style="border-color:${CH_COLORS[k % CH_COLORS.length]}"><i style="background:${CH_COLORS[k % CH_COLORS.length]}"></i>${esc(e.name)}${!e.inds.some(i => i.key === ind.key) ? ' <em title="indicator not available at this level">n/a</em>' : ""}<button data-chrm="${esc(e.id)}" title="remove">×</button></span>`).join("") || `<span class="hint">no areas yet — type a name above or use a quick pick; up to 8 series</span>`}</div>
+    <div class="tfilters"><label class="hint" style="flex:1;display:flex;gap:8px;align-items:center">title <input id="chtitle" type="text" value="${esc(CH.title)}" placeholder="${esc(chartAutoTitle())}" style="flex:1;min-width:200px"></label>
+      <button class="lk primary" data-chpng>⤓ Download PNG</button><button class="lk" data-chcsv>⤓ Data CSV</button><span class="hint">link: copy the address bar — it holds the whole setup</span></div>
+    <div class="chartbox">${chartSvg(true)}</div>
+    <p class="cap">${esc(ind.desc || "")} ${ind.warn ? "⚠ " + esc(ind.warn) : ""} Same sub-period each year (e.g. Q3 or July); values are those shown in the dashboard.</p>
+  </div>
+  ${series.length ? `<div class="card"><div class="card-head"><h3>Data</h3><span class="hint">${esc(ind.unit || "")}</span></div>
+    <div class="scrollx"><table class="tbl compact" data-sortable><thead><tr><th>Year</th>${series.map(s_ => `<th class="num">${esc(s_.name)}</th>`).join("")}</tr></thead>
+    <tbody>${ys.map((yy, i) => `<tr><th>${yy}</th>${series.map(s_ => fmtCell(ind, s_.pts[i].v, false)).join("")}</tr>`).join("")}</tbody></table></div></div>` : ""}`;
+}
+function chartAddMany(ids) { ids.forEach(id => { if (!CH.areas.includes(id) && CH.areas.length < 8) CH.areas.push(id); }); syncHash(); renderKeep(); }
+function chartPng() {
+  const svg = chartSvg(true).replace('class="chart" ', 'width="1200" height="640" ').replace(' id="chsvg"', "");
+  const img = new Image(); const scale = 2; const W = 1200, H = 640;
+  img.onload = () => { const c = document.createElement("canvas"); c.width = W * scale; c.height = H * scale; const ctx = c.getContext("2d"); ctx.scale(scale, scale); ctx.drawImage(img, 0, 0, W, H);
+    c.toBlob(b => { const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = `chart_${CH.ind}_${chartYears()[0]}-${chartYears().slice(-1)[0]}.png`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000); }, "image/png"); };
+  img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
+function chartCsv() {
+  const { ind, ys, series } = chartSeries();
+  downloadCsv([["year"].concat(series.map(s_ => s_.name)).join(";")].concat(ys.map((yy, i) => [yy].concat(series.map(s_ => s_.pts[i].v ?? "")).map(v => String(v).replace(/;/g, ",")).join(";"))), `chart_${ind.key}.csv`);
+}
+
 /* ---------- Market view (Denmark-only panel) ---------- */
 function spark(series, w = 160, h = 26) {
   const v = (series || []).map(p => p.v).filter(x => x != null);
@@ -862,10 +990,11 @@ function vMarket() {
     <table class="tbl compact" data-sortable><thead><tr><th>Indicator</th><th class="num">Value</th><th class="num">y/y</th><th>Period</th><th>Source</th></tr></thead>
     <tbody>${tableKeys.map(k => { const o = lt[k]; if (!o) return ""; return `<tr><th>${esc(o.label || k)}</th><td class="num" data-v="${o.v}">${nf(o.v, o.dec ?? 1)} ${esc(o.unit || "")}</td>
       <td class="num ${o.yoy > 0 ? "good" : o.yoy < 0 ? "bad" : ""}">${o.yoy != null ? sign(o.yoy, x => nf(x, 1) + " %") : "–"}</td><td class="dim">${esc(o.t || "")}</td><td class="dim">${esc(o.src || "")}</td></tr>`; }).join("")}</tbody></table>
-    <p class="cap">${esc(mac.note || "")}</p></div>`;
+    <p class="cap">${esc(mac.note || "")}</p></div>
+  <details class="dinfo srcfold" ${MKT.src ? "open" : ""} id="srcfold"><summary>Sources, freshness and indicator definitions</summary>${vSources()}</details>`;
 }
 
-/* ---------- Sources view ---------- */
+/* ---------- Sources (folded under Market) ---------- */
 function vSources() {
   const s = ((D.meta && D.meta.sources) || []).concat(CPH && CPH.meta ? CPH.meta.sources || [] : []);
   const defs = (list, title) => `<div class="card"><div class="card-head"><h3>${title}</h3></div>

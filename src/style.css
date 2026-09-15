@@ -1294,3 +1294,21 @@ main{scrollbar-gutter:stable}
 .mfilters{margin:8px 0 0;padding-top:8px;border-top:1px solid var(--line2)}
 .mfilters input{font-family:var(--mono);font-size:11px;padding:3px 5px;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
 .lfpop a.lk{display:inline-block}
+
+/* full-screen map */
+#mapcard:fullscreen,#mapcard.fs-fallback{position:fixed;inset:0;z-index:100;overflow:auto;background:var(--bg);border:0;border-radius:0;padding:12px 18px}
+#mapcard:fullscreen .indx,#mapcard:fullscreen .mstrip,#mapcard:fullscreen .dinfo,#mapcard:fullscreen .cap,#mapcard.fs-fallback .indx,#mapcard.fs-fallback .mstrip,#mapcard.fs-fallback .dinfo,#mapcard.fs-fallback .cap{display:none}
+#mapcard:fullscreen #lfmap,#mapcard.fs-fallback #lfmap{height:calc(100vh - 118px)}
+/* chart generator */
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-left-width:4px;border-radius:7px;padding:3px 6px 3px 8px;font-size:12px;background:var(--panel)}
+.chip i{width:8px;height:8px;border-radius:2px;display:inline-block}
+.chip em{font-style:normal;font-family:var(--mono);font-size:9.5px;color:var(--warn)}
+.chip button{border:0;background:none;color:var(--muted);cursor:pointer;font-size:14px;line-height:1;padding:0 2px}
+.chip button:hover{color:var(--ink)}
+.chartbox{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.chartbox svg{width:100%;height:auto;display:block}
+#chtitle{font:inherit;font-size:12.5px;padding:5px 8px;border:1px solid var(--line);border-radius:7px;background:var(--panel)}
+.srcfold{margin-top:4px}
+.srcfold>summary{font-size:11px}
+.srcfold .card{margin-top:10px}
