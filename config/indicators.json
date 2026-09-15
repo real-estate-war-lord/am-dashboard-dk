@@ -1026,6 +1026,174 @@
    "desc": "Average floor area per dwelling.",
    "source": "DST BOL106",
    "group": "Housing stock"
+  },
+  {
+   "key": "renters_bbr",
+   "label": "Rented dwellings (BBR)",
+   "short": "Rented (BBR)",
+   "unit": "% of dwellings",
+   "level": "postnr",
+   "hue": [
+    40,
+    84,
+    128
+   ],
+   "sources": [
+    {
+     "db": "bbr",
+     "geo": "postnr"
+    }
+   ],
+   "calc": "bbr",
+   "fmt": "pct0",
+   "desc": "Dwellings registered as rented (enh045 = 1, includes andel) as % of dwellings with a known tenure — BBR unit register, postal-code level.",
+   "source": "BBR via Datafordeler (Klimadatastyrelsen)",
+   "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings.",
+   "group": "Housing stock (BBR)"
+  },
+  {
+   "key": "vacant_bbr",
+   "label": "Unoccupied dwellings (BBR)",
+   "short": "Unoccupied",
+   "unit": "% of dwellings",
+   "level": "postnr",
+   "hue": [
+    166,
+    42,
+    22
+   ],
+   "sources": [
+    {
+     "db": "bbr",
+     "geo": "postnr"
+    }
+   ],
+   "calc": "bbr",
+   "fmt": "pct1",
+   "desc": "Dwellings registered as 'not in use' (enh045 = 3) as % of dwellings with a known tenure. Owner-reported and slow to update — use as a relative signal between areas, not as a vacancy rate.",
+   "source": "BBR via Datafordeler (Klimadatastyrelsen)",
+   "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings.",
+   "group": "Housing stock (BBR)"
+  },
+  {
+   "key": "avg_m2_bbr",
+   "label": "Average dwelling size (BBR)",
+   "short": "Ø m² (BBR)",
+   "unit": "m²",
+   "level": "postnr",
+   "hue": [
+    90,
+    60,
+    150
+   ],
+   "sources": [
+    {
+     "db": "bbr",
+     "geo": "postnr"
+    }
+   ],
+   "calc": "bbr",
+   "fmt": "m2",
+   "desc": "Mean registered dwelling area (enh026), all dwellings.",
+   "source": "BBR via Datafordeler (Klimadatastyrelsen)",
+   "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings.",
+   "group": "Housing stock (BBR)"
+  },
+  {
+   "key": "small_bbr",
+   "label": "Small dwellings < 50 m² (BBR)",
+   "short": "< 50 m²",
+   "unit": "% of dwellings",
+   "level": "postnr",
+   "hue": [
+    12,
+    94,
+    104
+   ],
+   "sources": [
+    {
+     "db": "bbr",
+     "geo": "postnr"
+    }
+   ],
+   "calc": "bbr",
+   "fmt": "pct0",
+   "desc": "Dwellings under 50 m² as % of dwellings with a registered area — the studio / one-room segment.",
+   "source": "BBR via Datafordeler (Klimadatastyrelsen)",
+   "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings.",
+   "group": "Housing stock (BBR)"
+  },
+  {
+   "key": "new_stock_bbr",
+   "label": "Dwellings built 2010+ (BBR)",
+   "short": "Built 2010+",
+   "unit": "% of dwellings",
+   "level": "postnr",
+   "hue": [
+    10,
+    88,
+    70
+   ],
+   "sources": [
+    {
+     "db": "bbr",
+     "geo": "postnr"
+    }
+   ],
+   "calc": "bbr",
+   "fmt": "pct0",
+   "desc": "Dwellings in buildings commissioned 2010 or later (byg026) as % of dwellings with a known year.",
+   "source": "BBR via Datafordeler (Klimadatastyrelsen)",
+   "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings.",
+   "group": "Housing stock (BBR)"
+  },
+  {
+   "key": "flats_bbr",
+   "label": "Multi-dwelling buildings (BBR)",
+   "short": "Flats (BBR)",
+   "unit": "% of dwellings",
+   "level": "postnr",
+   "hue": [
+    150,
+    90,
+    30
+   ],
+   "sources": [
+    {
+     "db": "bbr",
+     "geo": "postnr"
+    }
+   ],
+   "calc": "bbr",
+   "fmt": "pct0",
+   "desc": "Dwellings in multi-dwelling buildings (byg021 = 140) as % of dwellings.",
+   "source": "BBR via Datafordeler (Klimadatastyrelsen)",
+   "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings.",
+   "group": "Housing stock (BBR)"
+  },
+  {
+   "key": "dw_per_bld",
+   "label": "Dwellings per building (BBR)",
+   "short": "Dw./bldg",
+   "unit": "dwellings / building",
+   "level": "postnr",
+   "hue": [
+    92,
+    110,
+    140
+   ],
+   "sources": [
+    {
+     "db": "bbr",
+     "geo": "postnr"
+    }
+   ],
+   "calc": "bbr",
+   "fmt": "idx",
+   "desc": "Dwellings divided by residential buildings — building scale: 1–2 = houses, 10+ = blocks.",
+   "source": "BBR via Datafordeler (Klimadatastyrelsen)",
+   "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings.",
+   "group": "Housing stock (BBR)"
   }
  ],
  "macro": [
@@ -1997,6 +2165,167 @@
     "source": "Københavns Kommune, KKLEDIG2 / KKBEF1",
     "warn": "District-level (bydel) figure repeated on each quarter. Denominator is total population, not labour force; comparable between districts, not with the national AUP01 rate.",
     "geo_level": "bydel"
+   },
+   {
+    "key": "renters_bbr",
+    "label": "Rented dwellings (BBR)",
+    "short": "Rented (BBR)",
+    "unit": "% of dwellings",
+    "hue": [
+     40,
+     84,
+     128
+    ],
+    "group": "Housing stock (BBR)",
+    "calc": "bbr",
+    "sources": [
+     {
+      "db": "bbr",
+      "geo": "kvarter"
+     }
+    ],
+    "fmt": "pct0",
+    "desc": "Dwellings registered as rented (enh045 = 1, includes andel) as % of dwellings with a known tenure — BBR unit register, postal-code level.",
+    "source": "BBR via Datafordeler (Klimadatastyrelsen)",
+    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings."
+   },
+   {
+    "key": "vacant_bbr",
+    "label": "Unoccupied dwellings (BBR)",
+    "short": "Unoccupied",
+    "unit": "% of dwellings",
+    "hue": [
+     166,
+     42,
+     22
+    ],
+    "group": "Housing stock (BBR)",
+    "calc": "bbr",
+    "sources": [
+     {
+      "db": "bbr",
+      "geo": "kvarter"
+     }
+    ],
+    "fmt": "pct1",
+    "desc": "Dwellings registered as 'not in use' (enh045 = 3) as % of dwellings with a known tenure. Owner-reported and slow to update — use as a relative signal between areas, not as a vacancy rate.",
+    "source": "BBR via Datafordeler (Klimadatastyrelsen)",
+    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings."
+   },
+   {
+    "key": "avg_m2_bbr",
+    "label": "Average dwelling size (BBR)",
+    "short": "Ø m² (BBR)",
+    "unit": "m²",
+    "hue": [
+     90,
+     60,
+     150
+    ],
+    "group": "Housing stock (BBR)",
+    "calc": "bbr",
+    "sources": [
+     {
+      "db": "bbr",
+      "geo": "kvarter"
+     }
+    ],
+    "fmt": "m2",
+    "desc": "Mean registered dwelling area (enh026), all dwellings.",
+    "source": "BBR via Datafordeler (Klimadatastyrelsen)",
+    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings."
+   },
+   {
+    "key": "small_bbr",
+    "label": "Small dwellings < 50 m² (BBR)",
+    "short": "< 50 m²",
+    "unit": "% of dwellings",
+    "hue": [
+     12,
+     94,
+     104
+    ],
+    "group": "Housing stock (BBR)",
+    "calc": "bbr",
+    "sources": [
+     {
+      "db": "bbr",
+      "geo": "kvarter"
+     }
+    ],
+    "fmt": "pct0",
+    "desc": "Dwellings under 50 m² as % of dwellings with a registered area — the studio / one-room segment.",
+    "source": "BBR via Datafordeler (Klimadatastyrelsen)",
+    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings."
+   },
+   {
+    "key": "new_stock_bbr",
+    "label": "Dwellings built 2010+ (BBR)",
+    "short": "Built 2010+",
+    "unit": "% of dwellings",
+    "hue": [
+     10,
+     88,
+     70
+    ],
+    "group": "Housing stock (BBR)",
+    "calc": "bbr",
+    "sources": [
+     {
+      "db": "bbr",
+      "geo": "kvarter"
+     }
+    ],
+    "fmt": "pct0",
+    "desc": "Dwellings in buildings commissioned 2010 or later (byg026) as % of dwellings with a known year.",
+    "source": "BBR via Datafordeler (Klimadatastyrelsen)",
+    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings."
+   },
+   {
+    "key": "flats_bbr",
+    "label": "Multi-dwelling buildings (BBR)",
+    "short": "Flats (BBR)",
+    "unit": "% of dwellings",
+    "hue": [
+     150,
+     90,
+     30
+    ],
+    "group": "Housing stock (BBR)",
+    "calc": "bbr",
+    "sources": [
+     {
+      "db": "bbr",
+      "geo": "kvarter"
+     }
+    ],
+    "fmt": "pct0",
+    "desc": "Dwellings in multi-dwelling buildings (byg021 = 140) as % of dwellings.",
+    "source": "BBR via Datafordeler (Klimadatastyrelsen)",
+    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings."
+   },
+   {
+    "key": "dw_per_bld",
+    "label": "Dwellings per building (BBR)",
+    "short": "Dw./bldg",
+    "unit": "dwellings / building",
+    "hue": [
+     92,
+     110,
+     140
+    ],
+    "group": "Housing stock (BBR)",
+    "calc": "bbr",
+    "sources": [
+     {
+      "db": "bbr",
+      "geo": "kvarter"
+     }
+    ],
+    "fmt": "idx",
+    "desc": "Dwellings divided by residential buildings — building scale: 1–2 = houses, 10+ = blocks.",
+    "source": "BBR via Datafordeler (Klimadatastyrelsen)",
+    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings."
    }
   ]
  }

@@ -1278,3 +1278,19 @@ aside{width:var(--sidew)}
 main{scrollbar-gutter:stable}
 .card{overflow-x:clip}
 .scrollx{max-width:100%}
+
+/* BBR housing-stock distributions on area pages */
+.bbrgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+@media (max-width:1100px){.bbrgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.bbrblk h4{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin:0 0 6px;font-weight:500}
+.bbrrow{display:grid;grid-template-columns:78px 1fr 40px 44px;align-items:center;gap:6px;font-size:11.5px;padding:3px 0}
+.bbrrow>span:first-child{color:var(--ink2)}
+.bbrrow em{position:relative;display:block;height:10px;background:var(--line2);border-radius:2px;overflow:visible}
+.bbrrow em i{display:block;height:100%;background:#1C6B5C;border-radius:2px}
+.bbrrow em u{position:absolute;top:-3px;width:2px;height:16px;background:var(--ink);margin-left:-1px}
+.bbrrow b{font-family:var(--mono);font-size:11px;text-align:right}
+.bbrrow .dim{font-family:var(--mono);font-size:10px;text-align:right}
+
+.mfilters{margin:8px 0 0;padding-top:8px;border-top:1px solid var(--line2)}
+.mfilters input{font-family:var(--mono);font-size:11px;padding:3px 5px;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
+.lfpop a.lk{display:inline-block}

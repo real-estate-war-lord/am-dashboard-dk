@@ -205,12 +205,31 @@ def external_csv(name):
     return out
 
 
+_BBR = None
+
+
+def load_bbr():
+    """data/processed/bbr.json from scripts/build_bbr.py (housing stock per postal code / quarter / municipality), or None."""
+    global _BBR
+    if _BBR is None:
+        p = ROOT / "data" / "processed" / "bbr.json"
+        _BBR = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
+    return _BBR or None
+
+
 def compute(ind, year=None):
     """Returns {geo: ({area: value}, period)} for one indicator, optionally for a
     reference year (rows after that year are dropped; see rows_for_year)."""
     res = {}
     srcs = ind["sources"]
     calc = ind["calc"]
+    if calc == "bbr":
+        b = load_bbr()
+        if year or not b:
+            return {}   # snapshot only, no history
+        per = f"BBR {b['meta']['built']}"
+        return {"kommune": ({k: v.get(ind["key"]) for k, v in b["kommune"].items()}, per),
+                "postnr": ({k: v.get(ind["key"]) for k, v in b["postnr"].items()}, per)}
     sel = (lambda rs: rows_for_year(rs, year, calc)) if year else (lambda rs: rs)
     if calc == "ratio_pct":
         numr, p = calc_passthrough(sel(rows(srcs[0].get("db", ""), srcs[0]["table"], srcs[0].get("pull"))), srcs[0])
@@ -369,24 +388,36 @@ def main():
                                "warn": ind.get("warn", ""), "table_only": ind.get("table_only", False), "asof": asof,
                                "hist_asof": hist_asof})
 
+    # BBR housing-stock distributions for the area pages
+    bbr = load_bbr()
+    if bbr:
+        for code, m in munis.items():
+            if code in bbr["kommune"]:
+                m["bbr"] = {"n": bbr["kommune"][code]["n"], "n_bld": bbr["kommune"][code]["n_bld"], "dist": bbr["kommune"][code]["dist"]}
+        for nr, a in areas.items():
+            if nr in bbr["postnr"]:
+                a["bbr"] = {"n": bbr["postnr"][nr]["n"], "n_bld": bbr["postnr"][nr]["n_bld"], "dist": bbr["postnr"][nr]["dist"]}
     sources = []
     seen = set()
     for ind in c["indicators"]:
         for s in ind["sources"]:
-            key = (s.get("db", ""), s["table"])
-            if key in seen or s.get("db") in ("boligstat", "lbf"):
+            key = (s.get("db", ""), s.get("table", ""))
+            if key in seen or s.get("db") in ("boligstat", "lbf", "bbr"):
                 continue
             seen.add(key)
             m = meta(*key)
             sources.append({"key": f"{key[0] or 'dst'}/{key[1]}", "label": f"{'Finans Danmark' if key[0]=='s20' else 'Københavns Kommune' if key[0]=='s30' else 'Danmarks Statistik'} {key[1]}",
                             "tables": m.get("text", ""), "asof": m.get("updated", "")[:10], "url": f"https://api.statbank.dk/v1/{key[0] + '/' if key[0] else ''}tableinfo/{key[1]}",
                             "licence": "free reuse with attribution"})
+    if bbr:
+        sources.append({"key": "bbr", "label": f"BBR via Datafordeler — housing stock ({len(bbr['meta']['municipalities'])} municipalities, {bbr['meta']['dwellings']:,} dwellings)".replace(",", " "),
+                        "tables": "BBR_Enhed, BBR_Bygning (GraphQL v3)", "asof": bbr["meta"]["built"], "url": "https://datafordeler.dk/dataoversigt/bygnings-og-boligregistret-bbr/bbr-graphql/", "licence": "free (Klimadatastyrelsen)"})
     if (EXT / "rent_private.csv").exists():
         sources.append({"key": "boligstat", "label": "Social- og Boligstyrelsen, boligstat.dk — private rental rent DKK/m²", "url": "https://boligstat.dk", "licence": "public"})
     if (EXT / "rent_social.csv").exists():
         sources.append({"key": "lbf", "label": "Landsbyggefonden, Huslejestatistik — social housing rent DKK/m²", "url": "https://lbf.dk/viden/statistikker/huslejestatistik/", "licence": "public"})
     attribution = ["Danmarks Statistik", "Finans Danmark, Boligmarkedsstatistikken", "Social- og Boligstyrelsen", "Landsbyggefonden",
-                   "Indeholder data fra Klimadatastyrelsen (DAGI)", "Danmarks Nationalbank"]
+                   "Indeholder data fra Klimadatastyrelsen (DAGI, BBR)", "Danmarks Nationalbank"]
     out = {
         "meta": {"built": dt.date.today().isoformat(), "sources": sources, "attribution": attribution, "years": [str(y) for y in years], "latest_year": str(latest_year),
                  "note": "Postal codes take their dominant municipality. Cells with too few observations are suppressed by the source and shown as –.",

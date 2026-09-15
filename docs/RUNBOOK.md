@@ -88,6 +88,14 @@ git add -A && git commit -m "data: first full build $(date +%F)" && git push
 ```
 GitHub → Settings → Pages → Source *GitHub Actions*. The workflow in `.github/workflows/refresh.yml` deploys `dist/` and re-runs monthly. Tag: `git tag v1.0 && git push --tags`.
 
+## Step 8 — BBR housing stock (optional, needs a free Datafordeler key)
+
+1. portal.datafordeler.dk → create user → *IT-systemer* → new system → *API-Keys → Opret*; put `DATAFORDELER_API_KEY=…` in `.env` (gitignored). A fresh key can return 401 for a few hours.
+2. `python3 scripts/fetch_bbr.py --schema && python3 scripts/fetch_bbr.py --check` → `14/14` and `13/13 fields ok`.
+3. `python3 scripts/fetch_bbr.py --metro --workers 4` (≈ 1 h) or `--all --workers 4` (≈ 3–4 h, resumable — rerun the same command after an interruption).
+4. `pip3 install shapely` (once), then `make bbr && make build` — `make bbr` also writes the building files `data/processed/micro/<kommune>.json` for the *Buildings* toggle (needs the page served over http, e.g. `make serve`).
+**Good:** `wrote data/processed/bbr.json: n municipalities · … dwellings · 99.x% placed in a postal code`; the map's *Housing stock (BBR)* group shows values for the fetched municipalities.
+
 ---
 
 ## Troubleshooting

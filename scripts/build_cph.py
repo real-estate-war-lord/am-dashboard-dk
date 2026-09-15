@@ -25,6 +25,11 @@ LOK2BYDEL = {"01": ("1001", "Indre By"), "02": ("1001", "Indre By"), "03": ("100
 def compute(ind, year=None):
     """Same as build_makro.compute but for the cph section (all sources are s30)."""
     calc = ind["calc"]; srcs = ind["sources"]
+    if calc == "bbr":
+        b = bm.load_bbr()
+        if year or not b:
+            return {}, None
+        return {k: v.get(ind["key"]) for k, v in b.get("kvarter", {}).items()}, f"BBR {b['meta']['built']}"
     sel = (lambda rs: bm.rows_for_year(rs, year, calc)) if year else (lambda rs: rs)
     if calc == "ratio_pct":
         numr, p = bm.calc_passthrough(sel(rows("s30", srcs[0]["table"], srcs[0].get("pull"))), srcs[0])
@@ -91,12 +96,19 @@ def main():
             vals, per = compute(ind)
         except Exception as e:  # noqa: BLE001
             warnings.append(f"{ind['key']}: {e}"); continue
+        if not vals and ind["calc"] == "bbr":
+            continue   # no BBR data for Copenhagen yet
         for a, v in spread(vals).items():
             if a in areas and v is not None:
                 areas[a][ind["key"]] = round(v, 2)
         inds.append({k: ind[k] for k in ("key", "label", "short", "unit", "hue", "group", "fmt") if k in ind} |
                     {"level": "kvarter", "geo_level": ind.get("geo_level", "kvarter"), "desc": ind.get("desc", ""), "source": ind.get("source", ""), "warn": ind.get("warn", ""), "asof": {"kvarter": per}, "hist_asof": hist_asof})
-    tables = sorted({s["table"] for ind in section.get("indicators", []) for s in ind["sources"]})
+    b = bm.load_bbr()
+    if b:
+        for code, a in areas.items():
+            if code in b.get("kvarter", {}):
+                a["bbr"] = {"n": b["kvarter"][code]["n"], "n_bld": b["kvarter"][code]["n_bld"], "dist": b["kvarter"][code]["dist"]}
+    tables = sorted({s["table"] for ind in section.get("indicators", []) for s in ind["sources"] if "table" in s})
     sources = [{"key": f"s30/{t}", "label": f"Københavns Kommune {t}", "tables": meta("s30", t).get("text", ""), "asof": meta("s30", t).get("updated", "")[:10],
                 "url": f"https://api.statbank.dk/v1/s30/tableinfo/{t}", "licence": "free reuse with attribution"} for t in tables]
     out = {"meta": {"built": dt.date.today().isoformat(), "years": [str(y) for y in years], "latest_year": str(latest_year), "sources": sources,

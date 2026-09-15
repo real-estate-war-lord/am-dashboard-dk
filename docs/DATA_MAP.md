@@ -135,12 +135,22 @@ Full table list used by the Danish edition (all verified to exist):
 | DST `BOST63` | Avg/median housing-benefit DKK per household | API | Proxy of rent burden. |
 | Not open | BoligPortal, Boligsiden udbudsleje, husleje.dk, Huslejenævn decisions | web only / paid | Candidate for a separate "market listings" module with explicit ToS review (see §5). |
 
-### 3.4 Buildings & units — BBR via Datafordeler
+### 3.4 Buildings & units — BBR via Datafordeler (implemented v1.4)
 
-- GraphQL v3: `POST https://graphql.datafordeler.dk/BBR/v3?apiKey=<key>` — entities `BBR_Bygning` (use code `byg021BygningensAnvendelse`, year `byg026Opførelsesår`, area `byg038SamletBygningsareal`), `BBR_Enhed` (unit use, m², rooms), `Ejendomsrelation` (ownership type: private, almene, andel, company). Filter by `kommunekode`, paginate.
-- File download (full JSON per municipality) as an alternative for aggregation to postnr/sogn.
-- Registration: Datafordeler Administration — email/password is enough; API key valid 2 years; free. Document the sign-up in `CONTRIBUTING.md`; never commit keys (`.env`).
-- Use in dashboard: dwelling counts, size mix and construction-year mix at **postal-code / parish** level (which DST only gives at municipality level), and address-level joins for the owner's own properties (units, year built, energy-label link key).
+Endpoint `https://graphql.datafordeler.dk/BBR/v3?apiKey=…` (free key: portal.datafordeler.dk → IT-systemer → API-Keys; new keys take a while to activate — 401 for the first hours). Entities used: `BBR_Enhed` (dwelling units) and `BBR_Bygning` (buildings), cursor-paged 1 000 per request, filtered `kommunekode` + `status = 6` (current). Field names use ASCII transliteration (`byg026Opfoerelsesaar`, `enh031AntalVaerelser`); the coordinate is an object (`byg404Koordinat { wkt crs }`, EPSG:25832).
+
+| field | meaning | used for |
+|---|---|---|
+| `enh023Boligtype` | 1 dwelling, 2 mixed, 3 single room, 4 shared, 5 summer house, E business | dwelling filter (1–5) |
+| `enh045Udlejningsforhold` | 1 rented (incl. andel), 2 owner-occupied, 3 not in use | renters_bbr, vacant_bbr |
+| `enh026EnhedensSamledeAreal`, `enh031AntalVaerelser` | area m², rooms | avg_m2_bbr, small_bbr, distributions |
+| `bygning` → `byg026Opfoerelsesaar`, `byg021BygningensAnvendelse`, `byg404Koordinat` | year built, use (140 = multi-dwelling), point | new_stock_bbr, flats_bbr, placement |
+
+Placement: point-in-polygon (shapely) into `data/geo/postnumre.geojson` and `cph_kvarterer.geojson`; 99 % of dwellings get a coordinate. Throughput ≈ 70 units/s per worker (buildings 10× faster); Copenhagen + 18 suburbs ≈ 1 h with 4 workers, whole country ≈ 3–4 h. Raw pulls (`data/raw/bbr/`) are gitignored; only `data/processed/bbr.json` is committed, so CI needs no key.
+
+**Verification (2026-09-14):** Frederiksberg BBR 57 942 dwellings (boligtype 1–5, status 6) vs DST BOL101 2026 57 576 → +0.6 %. Tenure known for 99.97 %; 74 % rented incl. andel.
+
+Not in BBR: rents, migration, population — those stay with DST/boligstat. Unoccupied share is owner-reported and lags; DST BOL101 BEBO=2000 (municipality) is the reference vacancy figure.
 
 ### 3.5 Copenhagen detail — sub-database `s30`
 

@@ -49,7 +49,23 @@ const cphMode = () => !!(CPH && MK.muni === CPH_MUNI && MK.cphView !== "postnr")
 const S = { view: "makro" };
 const YEARS = [...new Set([...((D.meta && D.meta.years) || []), ...((D.cph && D.cph.meta && D.cph.meta.years) || [])])].sort();
 const LATEST = (D.meta && D.meta.latest_year) || (YEARS[YEARS.length - 1] || "");
-const MK = { ind: (IND[0] || {}).key, muni: null, own: false, year: LATEST, cphView: "kvarter" };
+const MK = { ind: (IND[0] || {}).key, muni: null, own: false, year: LATEST, cphView: "kvarter", micro: false, mind: "rented_pct" };
+/* Micro (building) layer: dist/micro/<kommune>.json, loaded on demand; D.micro = index {code: {file, n}} */
+const MICRO_IDX = (D.micro && D.micro.municipalities) || {};
+const MICRO = {};                                  /* code → {meta, b:[…]} once loaded */
+const MICRO_INDS = [
+  { key: "rented_pct", label: "Rented dwellings", short: "Rented", unit: "% of dwellings", fmt: "pct0", hue: [40, 84, 128], col: 3 },
+  { key: "vacant_pct", label: "Unoccupied dwellings", short: "Unoccupied", unit: "% of dwellings", fmt: "pct0", hue: [166, 42, 22], col: 4 },
+  { key: "avg_m2", label: "Average dwelling size", short: "Ø m²", unit: "m²", fmt: "m2", hue: [90, 60, 150], col: 5 },
+  { key: "year", label: "Year built", short: "Built", unit: "year", fmt: "int", hue: [10, 88, 70], col: 6 },
+  { key: "dwellings", label: "Dwellings in building", short: "Dwellings", unit: "dwellings", fmt: "int", hue: [150, 90, 30], col: 2 },
+  { key: "small_pct", label: "Small dwellings < 50 m²", short: "< 50 m²", unit: "% of dwellings", fmt: "pct0", hue: [12, 94, 104], col: 13 },
+  { key: "floors", label: "Floors", short: "Floors", unit: "floors", fmt: "int", hue: [92, 110, 140], col: 7 }];
+const MTYPE = { 1: "house", 2: "row house", 3: "multi-dwelling", 4: "other / mixed" };
+const MF = { minDw: 2, yFrom: "", yTo: "", type: "", rentMin: 0 };   /* building filters */
+const microAvail = code => !!(code && MICRO_IDX[String(Number(code))]);
+const microMode = () => !!(MK.micro && MK.muni && microAvail(MK.muni));
+const curMind = () => MICRO_INDS.find(i => i.key === MK.mind) || MICRO_INDS[0];
 const AR = { type: null, code: null, group: "key", ind: null, sub: "kvarter" };   /* area page */
 const T = { q: "", level: "kommune", region: "", minPop: 0 };                     /* table view filters */
 const REGIONS = ["Hovedstaden", "Sjælland", "Syddanmark", "Midtjylland", "Nordjylland"];
@@ -72,6 +88,7 @@ const curInd = () => { const L = curInds(); return L.find(i => i.key === MK.ind)
 /* ---------- routing (hash) ---------- */
 function hashFor() {
   const q = [`ind=${encodeURIComponent(MK.ind || "")}`]; if (MK.year && MK.year !== LATEST) q.push(`y=${MK.year}`);
+  if (S.view === "makro" && MK.micro) { q.push("micro=1"); q.push(`mind=${MK.mind}`); }
   let p;
   if (S.view === "area") { p = `area/${AR.type}/${AR.code}`; if (AR.group !== "key") q.push(`g=${encodeURIComponent(AR.group)}`); if (AR.sub !== "kvarter") q.push(`sub=${AR.sub}`); }
   else if (S.view === "table") p = `table/${T.level}`;
@@ -90,7 +107,8 @@ function parseHash() {
   if (v === "area" && parts[1] && parts[2]) { S.view = "area"; AR.type = parts[1]; AR.code = parts[2]; AR.group = q.g || "key"; AR.sub = q.sub || "kvarter"; }
   else if (v === "table") { S.view = "table"; if (["kommune", "postnr", "kvarter"].includes(parts[1])) T.level = parts[1]; }
   else if (v === "market" || v === "sources") S.view = v;
-  else { S.view = "makro"; MK.muni = parts[1] && byCode[parts[1]] ? parts[1] : null; MK.cphView = parts[2] === "postnr" ? "postnr" : "kvarter"; }
+  else { S.view = "makro"; MK.muni = parts[1] && byCode[parts[1]] ? parts[1] : null; MK.cphView = parts[2] === "postnr" ? "postnr" : "kvarter";
+         MK.micro = q.micro === "1" && microAvail(MK.muni); if (q.mind && MICRO_INDS.some(i => i.key === q.mind)) MK.mind = q.mind; }
   if (!curInds().some(i => i.key === MK.ind)) MK.ind = (curInds()[0] || {}).key;
   if (!yearsFor(MK.ind).includes(MK.year)) MK.year = LATEST;
   if (S.view === "makro") {
@@ -142,6 +160,8 @@ document.addEventListener("click", e => {
   if (g("[data-xall]")) { exportAll(); return; }
   if (g("[data-mkown]")) { MK.own = !MK.own; renderKeep(); return; }
   if ((el = g("[data-cphview]"))) { MK.cphView = el.dataset.cphview; go(hashFor()); return; }
+  if ((el = g("[data-micro]"))) { MK.micro = el.dataset.micro === "1"; syncHash(); renderKeep(); return; }
+  if (g("[data-mcsv]")) { exportMicroCsv(); return; }
   if ((el = g("[data-argroup]"))) { AR.group = el.dataset.argroup; syncHash(); renderKeep(); return; }
   if ((el = g("[data-arsub]"))) { AR.sub = el.dataset.arsub; syncHash(); renderKeep(); return; }
   if ((el = g("[data-arind]"))) { MK.ind = el.dataset.arind; if (!yearsFor(MK.ind).includes(MK.year)) MK.year = LATEST; syncHash(); renderKeep(); return; }
@@ -153,6 +173,9 @@ document.addEventListener("change", e => {
   if (el.id === "indsel") { MK.ind = el.value; if (!yearsFor(MK.ind).includes(MK.year)) MK.year = LATEST; syncHash(); renderKeep(); }
   if (el.id === "yearsel") { MK.year = el.value; syncHash(); renderKeep(); }
   if (el.id === "areaq") areaSearchGo(el.value);
+  if (el.id === "mindsel") { MK.mind = el.value; syncHash(); renderKeep(); }
+  if (el.id === "mf-type") { MF.type = el.value; lfLayers(); }
+  if (["mf-mindw", "mf-yfrom", "mf-yto", "mf-rent"].includes(el.id)) { MF.minDw = Number(document.getElementById("mf-mindw").value) || 1; MF.yFrom = document.getElementById("mf-yfrom").value; MF.yTo = document.getElementById("mf-yto").value; MF.rentMin = Number(document.getElementById("mf-rent").value) || 0; lfLayers(); }
   if (el.id === "tregion") { T.region = el.value; renderTableBody(); }
   if (el.id === "tminpop") { T.minPop = Number(el.value) || 0; renderTableBody(); }
 });
@@ -195,7 +218,7 @@ function enableSort(root) {
 
 /* ---------- choropleth colour model (identical to the Finnish edition) ---------- */
 function mkShade(t, key) {
-  const i = IND.concat(IND_CPH).find(x => x.key === key); const hue = (i && i.hue) || [10, 88, 70];
+  const i = key.startsWith("micro:") ? MICRO_INDS.find(x => x.key === key.slice(6)) : IND.concat(IND_CPH).find(x => x.key === key); const hue = (i && i.hue) || [10, 88, 70];
   const a = [239, 242, 238]; const c = a.map((x, k) => Math.round(x + (hue[k] - x) * t));
   return `rgb(${c[0]},${c[1]},${c[2]})`;
 }
@@ -205,7 +228,7 @@ function scaleOf(list, vk) {
   const lo = Math.min(...vals), hi = Math.max(...vals);
   return { t: v => v == null || isNaN(v) ? null : (hi > lo ? (v - lo) / (hi - lo) : .5), lo, hi };
 }
-const GROUP_ORDER = ["Demographics", "Income & jobs", "Housing stock", "Rents", "Prices & market", "Construction"];
+const GROUP_ORDER = ["Demographics", "Income & jobs", "Housing stock", "Housing stock (BBR)", "Rents", "Prices & market", "Construction"];
 function indSelect() {
   const L = curInds();
   const groups = GROUP_ORDER.filter(gname => L.some(i => (i.group || "Other") === gname)).concat(L.some(i => !GROUP_ORDER.includes(i.group || "Other")) ? ["Other"] : []);
@@ -296,18 +319,18 @@ function vMakro() {
   if (!AREAS.length || !MUNI.length) return `<div class="card"><p class="empty">No macro data built yet — run <code>make fetch</code>, <code>make geo</code> and <code>make build</code>.</p></div>`;
   const ind = curInd();
   setTimeout(lfInit, 0);
-  const legend = [0, .25, .5, .75, 1].map(x => `<i style="background:${mkShade(x, ind.key)}"></i>`).join("");
+  const legend = [0, .25, .5, .75, 1].map(x => `<i style="background:${mkShade(x, microMode() ? "micro:" + curMind().key : ind.key)}"></i>`).join("");
   const muni = MK.muni ? byCode[MK.muni] : null;
   return `
   <div class="card accent">
-    <div class="card-head"><h3>${muni ? esc(muni.name) + (cphMode() ? " — quarters" : " — postal codes") : "Macro map — Denmark"}</h3>
-      <div class="tools">${areaSearch()}${muni && muni.code === CPH_MUNI && CPH ? `<div class="seg"><button class="sg ${MK.cphView !== "postnr" ? "on" : ""}" data-cphview="kvarter">Quarters (${CPH.areas.length})</button><button class="sg ${MK.cphView === "postnr" ? "on" : ""}" data-cphview="postnr">Postal codes</button></div>` : ""}${indSelect()}${yearSelect()}${D.portfolio ? `<button class="lk mini ${MK.own ? "primary" : ""}" data-mkown>● Own properties</button>` : ""}</div></div>
-    ${indExplain(ind)}
-    ${muni ? muniStrip(muni) : ""}
+    <div class="card-head"><h3>${muni ? esc(muni.name) + (microMode() ? " — buildings" : cphMode() ? " — quarters" : " — postal codes") : "Macro map — Denmark"}</h3>
+      <div class="tools">${areaSearch()}${muni && microAvail(muni.code) ? `<div class="seg"><button class="sg ${!MK.micro ? "on" : ""}" data-micro="0">Areas</button><button class="sg ${MK.micro ? "on" : ""}" data-micro="1">Buildings (${nf(MICRO_IDX[String(Number(muni.code))].n, 0)})</button></div>` : ""}${muni && muni.code === CPH_MUNI && CPH && !microMode() ? `<div class="seg"><button class="sg ${MK.cphView !== "postnr" ? "on" : ""}" data-cphview="kvarter">Quarters (${CPH.areas.length})</button><button class="sg ${MK.cphView === "postnr" ? "on" : ""}" data-cphview="postnr">Postal codes</button></div>` : ""}${microMode() ? mindSelect() : indSelect() + yearSelect()}${D.portfolio ? `<button class="lk mini ${MK.own ? "primary" : ""}" data-mkown>● Own properties</button>` : ""}</div></div>
+    ${microMode() ? microExplain() : indExplain(ind)}
+    ${muni && !microMode() ? muniStrip(muni) : ""}
     <div id="lfmap"></div>
     <div class="mklegend"><span>low</span><span id="lglo" class="lgv"></span>${legend}<span id="lghi" class="lgv"></span><span>high</span>
-      <span class="dim">· ${esc(ind.label)}${ind.unit ? ", " + esc(ind.unit) : ""} · scaled to the visible level</span>
-      <span style="margin-left:auto" class="dim">${cphMode() ? "Copenhagen quarters — Københavns Kommune statbank" : ind.level === "postnr" ? "zoom in → postal-code values" : "municipality-level indicator — postal codes take the municipality value"}</span></div>
+      <span class="dim">· ${microMode() ? esc(curMind().label) + ", " + esc(curMind().unit) + " · dot size = dwellings" : esc(ind.label) + (ind.unit ? ", " + esc(ind.unit) : "") + " · scaled to the visible level"}</span>
+      <span style="margin-left:auto" class="dim">${microMode() ? "buildings — BBR register" : cphMode() ? "Copenhagen quarters — Københavns Kommune statbank" : ind.level === "postnr" ? "zoom in → postal-code values" : "municipality-level indicator — postal codes take the municipality value"}</span></div>
     ${srcNote(`<p class="cap">${muni ? "Click a polygon for its figures and a link to its page." : "Click a polygon for its figures; open a municipality with the search box above or from the popup. Table view lists everything side by side."} Boundaries: DAGI, Klimadatastyrelsen (simplified); basemap OpenStreetMap.</p>`)}
   </div>`;
 }
@@ -522,6 +545,21 @@ function areaSubTable(e) {
     <p class="cap">${sub === "kvarter" ? `${list.length} quarters (kvarterer). ${esc((CPH.meta && CPH.meta.attribution) || "")}` : `${list.length} postal-code areas; only postal-code-level indicators are listed — the rest take the municipality value (see the comparison table).`}</p>
   </div>`;
 }
+/* Housing stock from BBR: four distributions as bars, parent (municipality) as a reference tick */
+const BBR_DIST = [["rooms", "Rooms", ["1", "2", "3", "4+"]], ["size", "Dwelling size", ["< 50 m²", "50–79", "80–119", "120+ m²"]],
+                  ["built", "Year built", ["before 1950", "1950–79", "1980–2009", "2010+"]], ["type", "Building type", ["houses", "row houses", "multi-dwelling", "other"]]];
+function bbrCard(e) {
+  const b = e.o.bbr; if (!b || !b.dist) return "";
+  const ref = e.muni && e.muni.bbr ? e.muni.bbr.dist : null;
+  const pct = (arr, i) => { const t = arr.reduce((x, y) => x + y, 0); return t ? arr[i] / t * 100 : 0; };
+  const block = ([k, title, labels]) => `<div class="bbrblk"><h4>${title}</h4>${labels.map((l, i) => { const v = pct(b.dist[k], i), r = ref ? pct(ref[k], i) : null;
+    return `<div class="bbrrow"><span>${esc(l)}</span><em><i style="width:${v.toFixed(1)}%"></i>${r != null ? `<u style="left:${r.toFixed(1)}%" title="${esc(e.muni.name)} ${nf(r, 0)} %"></u>` : ""}</em><b>${nf(v, 0)} %</b><span class="dim">${nf(b.dist[k][i], 0)}</span></div>`; }).join("")}</div>`;
+  return `<div class="card">
+    <div class="card-head"><h3>Housing stock — BBR register</h3><span class="hint">${nf(b.n, 0)} dwellings in ${nf(b.n_bld, 0)} buildings${ref ? ` · tick = ${esc(e.muni.name)}` : ""}</span></div>
+    <div class="bbrgrid">${BBR_DIST.map(block).join("")}</div>
+    <p class="cap">Source: BBR (Bygnings- og Boligregistret) via Datafordeler, current dwellings (status 6, boligtype 1–5) placed by their building's coordinate. Register data as reported by owners.</p>
+  </div>`;
+}
 function vArea() {
   const e = areaEntity();
   if (!e) return `<div class="back"><button data-go="map">‹ Macro map</button></div><div class="card"><p class="empty">Unknown area.</p></div>`;
@@ -540,7 +578,7 @@ function vArea() {
       <h2>${esc(e.name)}</h2>
       <div class="artags"><span class="tag">${esc(e.typeLabel)}</span><span class="tag">code ${esc(e.code)}</span>${e.o.pop != null ? `<span class="tag">${nf(e.o.pop, 0)} inhabitants</span>` : ""}${e.type === "kommune" ? `<span class="tag">${e.ctx.length} postal codes</span>` : ""}${e.type === "postnr" && e.o.codes && e.o.codes.length > 1 ? `<span class="tag">merged codes ${esc(e.o.codes.join(", "))}</span>` : ""}</div>
     </div>
-    <div class="tools">${yearSelect()}<button class="lk" data-go="${withQ(mapHash)}">Show on map</button></div>
+    <div class="tools">${yearSelect()}<button class="lk" data-go="${withQ(mapHash)}">Show on map</button>${microAvail(e.type === "kommune" ? e.code : e.type === "kvarter" ? CPH_MUNI : e.o.muni) ? `<button class="lk primary" data-go="map/${e.type === "kommune" ? e.code : e.type === "kvarter" ? CPH_MUNI : e.o.muni}?ind=${MK.ind}&micro=1&mind=${MK.mind}">Buildings map ›</button>` : ""}</div>
   </div>
   <div class="card">
     <div class="card-head"><h3>Key figures${MK.year !== LATEST ? " · " + MK.year : ""}</h3><span class="hint">solid = ${esc(e.name)} · dashed = median of ${e.peerLabel} · hover a line for values</span>
@@ -564,6 +602,7 @@ function vArea() {
     <div class="card-head"><h3>All indicators — ${esc(e.name)} in context</h3><span class="hint">click a row to focus the chart</span></div>
     ${areaCompareTable(e)}
   </div>
+  ${bbrCard(e)}
   ${areaSubTable(e)}
   ${srcNote()}`;
 }
@@ -642,7 +681,83 @@ function lfLabels() {
   }
   LF.labG = L.layerGroup(labs).addTo(LF.map);
 }
+/* ---------- Micro: buildings ---------- */
+function mindSelect() {
+  return `<select id="mindsel" class="indsel" aria-label="Building indicator">${MICRO_INDS.map(i => `<option value="${i.key}" ${MK.mind === i.key ? "selected" : ""}>${esc(i.label)} · ${esc(i.unit)}</option>`).join("")}</select>`;
+}
+function microExplain() {
+  const i = curMind(), idx = MICRO_IDX[String(Number(MK.muni))] || {}; const m = byCode[MK.muni];
+  return `<div class="indx">
+    <div class="indx-head"><b>${esc(i.label)} — buildings</b><span class="tag">building level</span><span class="tag">${esc(i.unit)}</span></div>
+    <p>${{ rented_pct: "Dwellings registered as rented (incl. andel) as % of the building's dwellings with a known tenure.", vacant_pct: "Dwellings registered as 'not in use' as % of the building's dwellings — owner-reported, lags.",
+      avg_m2: "Mean registered dwelling area in the building.", year: "Year of commissioning (byg026).", dwellings: "Number of current dwellings (boligtype 1–5) in the building.",
+      small_pct: "Dwellings under 50 m² as % of the building's dwellings.", floors: "Number of floors (byg054)." }[i.key]}</p>
+    <p class="dim"><em>Source</em> BBR via Datafordeler, buildings with ≥ ${idx.min_dwellings || (D.micro && D.micro.min_dwellings) || 2} dwellings · <em>Coverage</em> ${nf(idx.n || 0, 0)} buildings in ${esc(m ? m.name : "")} · <em>As of</em> ${esc((D.micro && D.micro.built) || "")}</p>
+    <div class="tfilters mfilters">
+      <label class="hint">min. dwellings <input id="mf-mindw" type="number" min="1" step="1" value="${MF.minDw}" style="width:60px"></label>
+      <label class="hint">built <input id="mf-yfrom" type="number" placeholder="from" value="${esc(MF.yFrom)}" style="width:64px"> – <input id="mf-yto" type="number" placeholder="to" value="${esc(MF.yTo)}" style="width:64px"></label>
+      <select id="mf-type" class="indsel"><option value="">All building types</option>${Object.entries(MTYPE).map(([k, v]) => `<option value="${k}" ${MF.type === k ? "selected" : ""}>${v}</option>`).join("")}</select>
+      <label class="hint">rented ≥ <input id="mf-rent" type="number" min="0" max="100" step="5" value="${MF.rentMin}" style="width:56px"> %</label>
+      <span class="hint" id="mcount"></span>
+      <button class="lk mini" data-mcsv>⤓ Export buildings CSV</button>
+    </div>
+  </div>`;
+}
+function microRows(code) {
+  const d = MICRO[String(Number(code))]; if (!d) return [];
+  return d.b.filter(r => r[2] >= MF.minDw && (!MF.yFrom || (r[6] != null && r[6] >= Number(MF.yFrom))) && (!MF.yTo || (r[6] != null && r[6] <= Number(MF.yTo)))
+    && (!MF.type || String(r[8]) === MF.type) && (!MF.rentMin || (r[3] != null && r[3] >= MF.rentMin)));
+}
+function loadMicro(code) {
+  const k = String(Number(code)); const e = MICRO_IDX[k]; if (!e || MICRO[k] || MICRO["_loading_" + k]) return;
+  MICRO["_loading_" + k] = true;
+  fetch(e.file).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(d => { MICRO[k] = d; delete MICRO["_loading_" + k]; if (microMode() && LF.map) lfLayers(); })
+    .catch(() => { MICRO["_error_" + k] = true; delete MICRO["_loading_" + k]; const el = document.getElementById("mcount"); if (el) el.textContent = "buildings could not be loaded — open the dashboard via make serve or the GitHub Pages link (not as a file)"; });
+}
+function microPopup(r) {
+  const m = byCode[MK.muni]; const rooms = r.slice(9, 13); const rt = rooms.reduce((a, b) => a + b, 0);
+  const row = (l, v) => `<span class="lfrow"><span>${l}</span><b>${v}</b></span>`;
+  return `<div class="lfpop"><b>${esc(MTYPE[r[8]] || "building")} · ${r[2]} dwellings</b><span class="dim">${m ? esc(m.name) : ""} · ${r[0]}, ${r[1]} · BBR ${esc(r[14])}…</span>
+    <span class="lfsec">Building</span>${row("Built", r[6] ?? "–")}${row("Floors", r[7] ?? "–")}${row("Dwellings", r[2])}
+    <span class="lfsec">Dwellings</span>${row("Rented (incl. andel)", r[3] != null ? r[3] + " %" : "–")}${row("Unoccupied", r[4] != null ? r[4] + " %" : "–")}${row("Ø size", r[5] != null ? r[5] + " m²" : "–")}${row("< 50 m²", r[13] != null ? r[13] + " %" : "–")}
+    ${rt ? row("Rooms 1 / 2 / 3 / 4+", rooms.map(x => nf(x / rt * 100, 0) + "%").join(" / ")) : ""}
+    <span class="lfact"><a class="lk mini" target="_blank" rel="noopener" href="https://www.openstreetmap.org/?mlat=${r[0]}&mlon=${r[1]}#map=18/${r[0]}/${r[1]}">Open in OpenStreetMap</a></span></div>`;
+}
+function exportMicroCsv() {
+  const d = MICRO[String(Number(MK.muni))]; if (!d) return;
+  const rows = microRows(MK.muni); const cols = d.meta.cols;
+  downloadCsv([["municipality"].concat(cols).join(";")].concat(rows.map(r => [(byCode[MK.muni] || {}).name || MK.muni].concat(r).map(v => String(v ?? "")).join(";"))), `macro-dashboard-dk_buildings_${MK.muni}_${d.meta.built}.csv`);
+}
+/* dot radius grows with zoom so buildings separate when zoomed in and do not blanket the municipality when zoomed out */
+function microRadius(dw) { const z = LF.map ? LF.map.getZoom() : 12; const k = z < 12 ? .7 : z < 13.5 ? 1.0 : z < 15 ? 1.5 : 2.2; return Math.max(2, Math.min(16, k * Math.sqrt(dw) + 1)); }
+function lfMicroLayers() {
+  const code = MK.muni; const d = MICRO[String(Number(code))];
+  if (LF.areaG) LF.map.removeLayer(LF.areaG);
+  if (LF.labG) LF.map.removeLayer(LF.labG);
+  if (LF.microG) { LF.map.removeLayer(LF.microG); LF.microG = null; }
+  LF.level = "micro-b" + code; LF.ctx = null;
+  /* area outlines only, so the dots read against the basemap */
+  LF.areaG = L.layerGroup(muniAreas(code).map(a => L.polygon(a.rings, { color: "#141C18", weight: 1, fill: false, opacity: .35, interactive: false }))).addTo(LF.map);
+  const cnt = document.getElementById("mcount");
+  if (!d) { loadMicro(code); if (cnt && !MICRO["_error_" + String(Number(code))]) cnt.textContent = "loading buildings…"; return; }
+  const ind = curMind(), rows = microRows(code), c = ind.col;
+  const vals = rows.map(r => r[c]).filter(v => v != null);
+  /* colour scale on the 5th–95th percentile so a few outliers do not flatten the ramp */
+  const sorted = vals.slice().sort((a, b) => a - b); const lo = sorted[Math.floor(sorted.length * .05)] ?? null, hi = sorted[Math.floor(sorted.length * .95)] ?? null;
+  const t = v => v == null || lo == null ? null : hi > lo ? Math.max(0, Math.min(1, (v - lo) / (hi - lo))) : .5;
+  if (!LF.canvas) LF.canvas = L.canvas({ padding: .3 });
+  const marks = rows.map(r => { const tt = t(r[c]);
+    const m = L.circleMarker([r[0], r[1]], { renderer: LF.canvas, radius: microRadius(r[2]), color: "#141C18", weight: .6, opacity: .7, fillColor: tt == null ? "#C4CBC4" : mkShade(tt, "micro:" + ind.key), fillOpacity: .85 });
+    m._dw = r[2]; m.bindPopup(() => microPopup(r), { maxWidth: 300, autoPanPadding: [24, 24] }); return m; });
+  LF.microG = L.layerGroup(marks).addTo(LF.map); LF.microMarks = marks;
+  const lg = document.getElementById("lglo"), hg = document.getElementById("lghi");
+  if (lg && hg) { lg.textContent = lo != null ? fmtOf(ind)(lo) : ""; hg.textContent = hi != null ? fmtOf(ind)(hi) : ""; }
+  if (cnt) cnt.textContent = `${nf(rows.length, 0)} of ${nf(d.meta.n, 0)} buildings · ${nf(rows.reduce((s_, r) => s_ + r[2], 0), 0)} dwellings shown`;
+}
 function lfLayers() {
+  if (LF.map && microMode()) { lfMicroLayers(); return; }
+  if (LF.microG && LF.map) { LF.map.removeLayer(LF.microG); LF.microG = null; }
   if (!LF.map) return;
   const zoom = LF.map.getZoom();
   const ind = curInd();
@@ -696,6 +811,7 @@ function lfInit() {
   map.on("popupopen", ev => { const el = ev.popup.getElement(); if (el) el.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => go(b.dataset.go))); });
   map.on("zoomend", () => {
     /* rebuild polygons only when the display level changes — rebuilding on every pan would kill open popups */
+    if (microMode()) { (LF.microMarks || []).forEach(m => m.setRadius(microRadius(m._dw))); return; }
     const z = map.getZoom(), fine = !!MK.muni || z >= MICRO_ZOOM, lvl = (fine ? "micro" : z < 8 ? "national" : "macro") + (cphMode() ? "-cph" : "") + (MK.muni || "");
     if (lvl !== LF.level) lfLayers(); else if (fine) lfLabels();
   });

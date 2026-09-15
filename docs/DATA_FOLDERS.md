@@ -17,6 +17,9 @@ dist/              build_dashboard  → the single-file dashboard (index.html co
 | `config/indicators.json` | you / Claude | every script | yes | one registry, no other config files |
 | `data/geo/<layer>.geojson` | `scripts/fetch_geo_dawa.py` | `build_makro.py` | **yes** (simplified, ~few MB) | `kommuner`, `postnumre`, `sogne`, `landsdele`, `regioner` |
 | `data/geo/cph_kvarterer.geojson`, `cph_bydele.geojson` | `scripts/fetch_geo_cph.py` | `build_cph.py` | **yes** | Københavns Kommune WFS `k101`, CC BY 4.0 (`ATTRIBUTION_CPH.txt`) |
+| `data/raw/bbr/<kommune>_{enhed,bygning}.jsonl` | `scripts/fetch_bbr.py` | `build_bbr.py` | no (≈ 0.5 MB per 1 000 units; whole country ≈ 2 GB) | one file per municipality, resumable |
+| `data/processed/micro/<kommune>.json` + `index.json` | `scripts/build_micro.py` | the page, on demand (`dist/micro/`) | **yes** (≈ 60 B per building; whole country ≈ 12 MB) | buildings with ≥ 2 dwellings: position, dwellings, tenure, size, year, rooms |
+| `data/processed/bbr.json` | `scripts/build_bbr.py` | `build_makro.py`, `build_cph.py` | **yes** | housing-stock indicators + distributions per postal code / quarter / municipality |
 | `data/geo/raw/` | same script | nobody (archive) | no | full-precision originals |
 | `data/geo/ATTRIBUTION.txt` | same script | README / map footer | yes | required by the DAGI licence |
 | `data/raw/<db>_<TABLE>_<YYYY-MM-DD>.csv` | `scripts/fetch_statbank.py` | `build_makro.py`, `build_market.py` | no (regenerable; can be large) | `dst_FOLK1A_2026-09-15.csv`, `s20_BM011_2026-09-15.csv` — the newest date wins |

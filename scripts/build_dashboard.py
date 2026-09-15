@@ -34,6 +34,7 @@ def main():
     market = load(pathlib.Path(args.market)) or {}
     portfolio = load(pathlib.Path(args.portfolio))
     cph = load(pathlib.Path(args.cph))
+    micro_idx = load(PROC / "micro" / "index.json")
     built = (makro.get("meta") or {}).get("built") or dt.date.today().isoformat()
     data = {
         "meta": makro.get("meta", {"built": built, "sources": [], "attribution": []}),
@@ -43,6 +44,7 @@ def main():
         "macro": market,
         "portfolio": portfolio,
         "cph": cph,
+        "micro": micro_idx,
     }
     payload = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</script", "<\\/script")
     html = (SRC / "index.html").read_text(encoding="utf-8")
@@ -55,6 +57,13 @@ def main():
     out = pathlib.Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html, encoding="utf-8")
+    # building-level files are loaded on demand by the page (dist/micro/<kommune>.json)
+    if micro_idx:
+        import shutil
+        md = out.parent / "micro"; md.mkdir(exist_ok=True)
+        for f in (PROC / "micro").glob("*.json"):
+            shutil.copy(f, md / f.name)
+        print(f"copied {len(list(md.glob('*.json')))} micro files → {md}")
     print(f"wrote {out} ({out.stat().st_size/1e6:.1f} MB) · {len(data['municipalities'])} municipalities · {len(data['areas'])} areas")
 
 

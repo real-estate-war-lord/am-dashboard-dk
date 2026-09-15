@@ -11,3 +11,6 @@ fetch.txt
 *.log
 dist/index.html
 data/raw/bbr_schema.json
+data/raw/bbr/
+data/raw/bbr_schema.graphql
+dist/micro/

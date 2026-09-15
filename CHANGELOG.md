@@ -1,5 +1,15 @@
 # Changelog
 
+## v1.5 — 2026-09-15
+- **Buildings (Micro) layer** inside the map view: when a municipality is open, *Areas | Buildings* switches to every residential building with ≥ 2 dwellings as a dot (size = dwellings, colour = rented share / unoccupied / average size / year built / dwellings / < 50 m² / floors), filters (min. dwellings, year built, building type, rented ≥ %), building popup with tenure, sizes and rooms, CSV export of the filtered set, link from area pages. `scripts/build_micro.py` writes one compact file per municipality (`data/processed/micro/<kommune>.json`, loaded on demand — the page must be served over http: `make serve` or GitHub Pages).
+- BBR coverage: Copenhagen and the 18 suburban municipalities (776 791 dwellings); the rest of the country follows as it is fetched.
+
+## v1.4 — 2026-09-14
+- **BBR housing stock at postal-code and quarter level** (Datafordeler GraphQL, free API key): `scripts/fetch_bbr.py` pulls current dwellings and buildings per municipality (resumable, `--metro` / `--all`, `--workers`), `scripts/build_bbr.py` places each dwelling by its building's coordinate into postal codes and Copenhagen quarters and writes `data/processed/bbr.json`.
+- Seven new indicators, group *Housing stock (BBR)*: rented share, unoccupied share, average size, share < 50 m², built 2010+, multi-dwelling share, dwellings per building — same definition at every level, so no inherited ° values. Validation: Frederiksberg 57 942 dwellings vs DST BOL101 57 576 (+0.6 %).
+- Area pages: *Housing stock — BBR register* card with rooms, size, year-built and building-type distributions (municipality as reference tick).
+- Coverage grows as municipalities are fetched (first: Copenhagen and 18 suburban municipalities); areas without a pull show –.
+
 ## v1.3 — 2026-09-14
 - Map view is map-only: area selector (Denmark / region › municipality), indicator + year, selected-municipality strip with rank and a link to its page. Tables moved to the Table view (own nav item; rows open area pages; Δ column), trend chart removed from the map.
 - Area pages for every municipality, postal code and Copenhagen quarter (`#area/<type>/<code>`): key-figure tiles by group (Δ since first year, rank among peers, sparkline), trend chart vs municipality and median of peers, context map (neighbours clickable), all-indicator comparison table, sub-area table (postal codes / quarters).
