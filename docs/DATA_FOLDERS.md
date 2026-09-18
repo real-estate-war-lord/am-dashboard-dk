@@ -18,6 +18,7 @@ dist/              build_dashboard  → the single-file dashboard (index.html co
 | `data/geo/<layer>.geojson` | `scripts/fetch_geo_dawa.py` | `build_makro.py` | **yes** (simplified, ~few MB) | `kommuner`, `postnumre`, `sogne`, `landsdele`, `regioner` |
 | `data/geo/cph_kvarterer.geojson`, `cph_bydele.geojson` | `scripts/fetch_geo_cph.py` | `build_cph.py` | **yes** | Københavns Kommune WFS `k101`, CC BY 4.0 (`ATTRIBUTION_CPH.txt`) |
 | `data/raw/bbr/<kommune>_{enhed,bygning}.jsonl` | `scripts/fetch_bbr.py` | `build_bbr.py` | no (≈ 0.5 MB per 1 000 units; whole country ≈ 2 GB) | one file per municipality, resumable |
+| `data/raw/dar/*.jsonl` | `scripts/fetch_dar.py` | `build_micro.py` | no (≈ 60 MB) | addresses (DAR) and property numbers (BBR) for Micro buildings |
 | `data/processed/micro/<kommune>.json` + `index.json` | `scripts/build_micro.py` | the page, on demand (`dist/micro/`) | **yes** (≈ 60 B per building; whole country ≈ 12 MB) | buildings with ≥ 2 dwellings: position, dwellings, tenure, size, year, rooms |
 | `data/processed/bbr.json` | `scripts/build_bbr.py` | `build_makro.py`, `build_cph.py` | **yes** | housing-stock indicators + distributions per postal code / quarter / municipality |
 | `data/geo/raw/` | same script | nobody (archive) | no | full-precision originals |

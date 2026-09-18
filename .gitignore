@@ -14,3 +14,5 @@ data/raw/bbr_schema.json
 data/raw/bbr/
 data/raw/bbr_schema.graphql
 dist/micro/
+data/raw/dar/
+data/raw/dar_schema.graphql

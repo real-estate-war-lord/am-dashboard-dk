@@ -95,6 +95,7 @@ GitHub → Settings → Pages → Source *GitHub Actions*. The workflow in `.git
 3. `python3 scripts/fetch_bbr.py --metro --workers 4` (≈ 1 h) or `--all --workers 4` (≈ 3–4 h, resumable — rerun the same command after an interruption).
 4. `pip3 install shapely` (once), then `make bbr && make build` — `make bbr` also writes the building files `data/processed/micro/<kommune>.json` for the *Buildings* toggle (needs the page served over http, e.g. `make serve`).
 **Good:** `wrote data/processed/bbr.json: n municipalities · … dwellings · 99.x% placed in a postal code`; the map's *Housing stock (BBR)* group shows values for the fetched municipalities.
+5. Addresses + property numbers for the building layer (optional, same key): `python3 scripts/fetch_dar.py --schema && python3 scripts/fetch_dar.py --check` (all ✓), then `python3 scripts/fetch_dar.py --all` (≈ 25 min, resumable) and `make bbr && make build` again. **Good:** `… 174551 buildings with ≥2 dwellings · 174539 with address`.
 
 ---
 

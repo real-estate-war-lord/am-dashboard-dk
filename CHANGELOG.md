@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.8 — 2026-09-18
+- **Addresses and property numbers on buildings**: `scripts/fetch_dar.py` pulls the access address from DAR (husnummer → street + postal code) and the BFE property number from BBR (building → grund → ejendomsrelation) for every building in the Micro layer — 174 539 / 174 551 buildings (100 %) got an address, all got a BFE. Building cards show the address as title, the BFE and how many other buildings share the property; CSV export carries both columns.
+- **Find address** box in Buildings mode: type "Nordens Plads 4" → the map zooms to the building and opens its card (filters are widened if the building was filtered out).
+
 ## v1.6 — 2026-09-15
 - **Charts** (new nav item): pick an indicator, up to 8 areas (municipalities, postal codes, Copenhagen quarters — search box or quick picks), year range and a median line; download as PNG (2400×1280, self-contained with title, legend and source) or the data as CSV; the URL holds the whole setup.
 - **Sources** merged into Market: folded panel *Sources, freshness and indicator definitions* at the bottom (`#market?src=1` opens it).

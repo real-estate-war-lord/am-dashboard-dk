@@ -205,6 +205,7 @@ document.addEventListener("input", e => { if (e.target.id === "tq") { T.q = e.ta
 document.addEventListener("keydown", e => {
   if (e.key === "Enter" && e.target.id === "areaq") { areaSearchGo(e.target.value); return; }
   if (e.key === "Enter" && e.target.id === "chq") { chartAdd(null, e.target.value); return; }
+  if (e.key === "Enter" && e.target.id === "mf-addr") { microFind(e.target.value); return; }
   if (e.key === "Escape" && S.view === "area") history.back();
 });
 
@@ -724,6 +725,7 @@ function microExplain() {
       <label class="hint">rented ≥ <input id="mf-rent" type="number" min="0" max="100" step="5" value="${MF.rentMin}" style="width:56px"> %</label>
       <span class="hint" id="mcount"></span>
       <button class="lk mini" data-mcsv>⤓ Export buildings CSV</button>
+      <input id="mf-addr" type="search" placeholder="Find address… (Enter)" style="min-width:220px">
     </div>
   </div>`;
 }
@@ -742,11 +744,24 @@ function loadMicro(code) {
 function microPopup(r) {
   const m = byCode[MK.muni]; const rooms = r.slice(9, 13); const rt = rooms.reduce((a, b) => a + b, 0);
   const row = (l, v) => `<span class="lfrow"><span>${l}</span><b>${v}</b></span>`;
-  return `<div class="lfpop"><b>${esc(MTYPE[r[8]] || "building")} · ${r[2]} dwellings</b><span class="dim">${m ? esc(m.name) : ""} · ${r[0]}, ${r[1]} · BBR ${esc(r[14])}…</span>
+  const d = MICRO[String(Number(MK.muni))]; const same = r[16] && d ? d.b.filter(x => x[16] === r[16]).length - 1 : 0;
+  return `<div class="lfpop"><b>${r[15] ? esc(r[15]) : (esc(MTYPE[r[8]] || "building") + " · " + r[2] + " dwellings")}</b><span class="dim">${r[15] ? esc(MTYPE[r[8]] || "building") + " · " : ""}${m ? esc(m.name) : ""}${r[16] ? ` · BFE ${esc(r[16])}${same > 0 ? ` (+${same} more building${same > 1 ? "s" : ""} on this property)` : ""}` : ""} · BBR ${esc(r[14])}…</span>
     <span class="lfsec">Building</span>${row("Built", r[6] ?? "–")}${row("Floors", r[7] ?? "–")}${row("Dwellings", r[2])}
     <span class="lfsec">Dwellings</span>${row("Rented (incl. andel)", r[3] != null ? r[3] + " %" : "–")}${row("Unoccupied", r[4] != null ? r[4] + " %" : "–")}${row("Ø size", r[5] != null ? r[5] + " m²" : "–")}${row("< 50 m²", r[13] != null ? r[13] + " %" : "–")}
     ${rt ? row("Rooms 1 / 2 / 3 / 4+", rooms.map(x => nf(x / rt * 100, 0) + "%").join(" / ")) : ""}
-    <span class="lfact"><a class="lk mini" target="_blank" rel="noopener" href="https://www.openstreetmap.org/?mlat=${r[0]}&mlon=${r[1]}#map=18/${r[0]}/${r[1]}">Open in OpenStreetMap</a></span></div>`;
+    <span class="lfact"><a class="lk mini" target="_blank" rel="noopener" href="https://www.openstreetmap.org/?mlat=${r[0]}&mlon=${r[1]}#map=18/${r[0]}/${r[1]}">Open in OpenStreetMap</a>${r[16] ? `<a class="lk mini" target="_blank" rel="noopener" href="https://ois.dk/">OIS (BFE ${esc(r[16])})</a>` : ""}</span></div>`;
+}
+function microFind(text) {
+  /* zoom to the first building whose address contains the text and open its card; the filters are widened if it is filtered out */
+  const q = (text || "").trim().toLowerCase(); const d = MICRO[String(Number(MK.muni))]; if (!q || !d || !LF.map) return;
+  const norm = x => (x || "").toLowerCase().replace(/\s+/g, " ");
+  const r = d.b.find(x => norm(x[15]).startsWith(q)) || d.b.find(x => norm(x[15]).includes(q));
+  const cnt = document.getElementById("mcount");
+  if (!r) { if (cnt) cnt.textContent = `no building matching "${text}" in ${(byCode[MK.muni] || {}).name || "this municipality"} (≥ ${d.meta.min_dwellings} dwellings)`; return; }
+  let m = (LF.microMarks || []).find(mk => mk._row === r);
+  if (!m) { MF.minDw = Math.min(MF.minDw, r[2]); MF.yFrom = ""; MF.yTo = ""; MF.type = ""; MF.rentMin = 0; ["mf-mindw", "mf-yfrom", "mf-yto", "mf-rent"].forEach((id, i) => { const el = document.getElementById(id); if (el) el.value = [MF.minDw, "", "", 0][i]; }); const t = document.getElementById("mf-type"); if (t) t.value = ""; lfLayers(); m = (LF.microMarks || []).find(mk => mk._row === r); }
+  LF.map.setView([r[0], r[1]], Math.max(LF.map.getZoom(), 16));
+  setTimeout(() => { if (m) m.openPopup(); }, 350);
 }
 function exportMicroCsv() {
   const d = MICRO[String(Number(MK.muni))]; if (!d) return;
@@ -773,7 +788,7 @@ function lfMicroLayers() {
   if (!LF.canvas) LF.canvas = L.canvas({ padding: .3 });
   const marks = rows.map(r => { const tt = t(r[c]);
     const m = L.circleMarker([r[0], r[1]], { renderer: LF.canvas, radius: microRadius(r[2]), color: "#141C18", weight: .6, opacity: .7, fillColor: tt == null ? "#C4CBC4" : mkShade(tt, "micro:" + ind.key), fillOpacity: .85 });
-    m._dw = r[2]; m.bindPopup(() => microPopup(r), { maxWidth: 440, autoPanPadding: [24, 24] }); return m; });
+    m._dw = r[2]; m._row = r; m.bindPopup(() => microPopup(r), { maxWidth: 440, autoPanPadding: [24, 24] }); return m; });
   LF.microG = L.layerGroup(marks).addTo(LF.map); LF.microMarks = marks;
   const lg = document.getElementById("lglo"), hg = document.getElementById("lghi");
   if (lg && hg) { lg.textContent = lo != null ? fmtOf(ind)(lo) : ""; hg.textContent = hi != null ? fmtOf(ind)(hi) : ""; }

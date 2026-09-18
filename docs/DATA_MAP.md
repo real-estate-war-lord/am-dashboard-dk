@@ -150,6 +150,8 @@ Placement: point-in-polygon (shapely) into `data/geo/postnumre.geojson` and `cph
 
 **Verification (2026-09-14):** Frederiksberg BBR 57 942 dwellings (boligtype 1–5, status 6) vs DST BOL101 2026 57 576 → +0.6 %. Tenure known for 99.97 %; 74 % rented incl. andel.
 
+**Addresses and BFE (v1.8):** DAR GraphQL (`https://graphql.datafordeler.dk/DAR/v3`, same key): `DAR_Husnummer` (husnummertekst, navngivenVej, postnummer) → `DAR_NavngivenVej.vejnavn`, `DAR_Postnummer.postnr/navn`. Property number: `BBR_Bygning.grund` → `BBR_Grund.bestemtFastEjendom` → `BBR_Ejendomsrelation.bfeNummer` (`BBR_BygningEjendomsrelation` only covers buildings on foreign ground). Lookups by id lists of 100; whole country ≈ 25 min. Coverage 100 % of Micro buildings.
+
 Not in BBR: rents, migration, population — those stay with DST/boligstat. Unoccupied share is owner-reported and lags; DST BOL101 BEBO=2000 (municipality) is the reference vacancy figure.
 
 ### 3.5 Copenhagen detail — sub-database `s30`
