@@ -1154,7 +1154,12 @@ aside{background:linear-gradient(178deg,#131C16 0%,#0D140F 100%)}
 
 /* basemap: OpenStreetMap desaturated to sit under the pale palette (CARTO now needs an API key) */
 .leaflet-tile-pane{filter:grayscale(1) contrast(.85) opacity(.55)}
-.lfpop{max-width:280px}
+.lfpop{max-width:460px;min-width:300px;font-size:13.5px}
+.lfpop b{font-size:16px}
+.lfpop .lfrow{display:flex;justify-content:space-between;gap:12px;padding:2px 0;border-bottom:1px solid var(--line2)}
+.lfpop .lfrow b{font-size:13.5px;margin:0}
+.lfpop .lfsec{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+.leaflet-popup-content{margin:14px 18px 14px 16px}
 .lfrow{display:flex;justify-content:space-between;gap:12px;font-size:12px;line-height:1.35}
 .lfsec{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:6px 0 2px}
 
@@ -1312,3 +1317,5 @@ main{scrollbar-gutter:stable}
 .srcfold{margin-top:4px}
 .srcfold>summary{font-size:11px}
 .srcfold .card{margin-top:10px}
+.lfpop .lfrows{display:grid;grid-template-columns:1fr 1fr;column-gap:20px}
+.lfpop{max-width:520px}

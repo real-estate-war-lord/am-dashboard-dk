@@ -892,6 +892,45 @@
    "group": "Prices & market"
   },
   {
+   "key": "supply_n",
+   "label": "Homes for sale (number)",
+   "short": "For sale (n)",
+   "unit": "homes",
+   "level": "kommune",
+   "hue": [
+    150,
+    90,
+    30
+   ],
+   "sources": [
+    {
+     "db": "s20",
+     "table": "UDB010",
+     "vars": {
+      "OMR20": [
+       "*"
+      ],
+      "EJKAT20": [
+       "1",
+       "2"
+      ],
+      "BOLA20": [
+       "6"
+      ],
+      "Tid": [
+       "(-n+121)"
+      ]
+     },
+     "geo": "kommune"
+    }
+   ],
+   "calc": "passthrough",
+   "fmt": "int",
+   "desc": "Number of homes (houses + owner-occupied flats) listed for sale, latest month. The per-1,000 version above normalises this by the dwelling stock.",
+   "source": "Finans Danmark UDB010",
+   "group": "Prices & market"
+  },
+  {
    "key": "pipeline",
    "label": "Dwellings completed, last 4Q",
    "short": "Pipeline",
@@ -929,6 +968,48 @@
    "calc": "sum4q_per_1000",
    "fmt": "per1000",
    "desc": "Dwellings completed in the last 4 quarters per 1,000 dwellings.",
+   "source": "DST BYGV33",
+   "warn": "Not adjusted for reporting delays — recent quarters are revised upward.",
+   "group": "Construction"
+  },
+  {
+   "key": "completions_n",
+   "label": "Dwellings completed, last 4Q (number)",
+   "short": "Completed (n)",
+   "unit": "dwellings",
+   "level": "kommune",
+   "hue": [
+    10,
+    88,
+    70
+   ],
+   "sources": [
+    {
+     "db": "",
+     "table": "BYGV33",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "BYGFASE": [
+       "3"
+      ],
+      "ANVEND": [
+       "SUM"
+      ],
+      "BYGHERRE": [
+       "SUM"
+      ],
+      "Tid": [
+       "(-n+44)"
+      ]
+     },
+     "geo": "kommune"
+    }
+   ],
+   "calc": "sum4q",
+   "fmt": "int",
+   "desc": "Number of dwellings completed in the last 4 quarters (all uses, all developers). The per-1,000 version above normalises this by the dwelling stock.",
    "source": "DST BYGV33",
    "warn": "Not adjusted for reporting delays — recent quarters are revised upward.",
    "group": "Construction"

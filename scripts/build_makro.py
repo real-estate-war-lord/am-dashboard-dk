@@ -51,7 +51,7 @@ def period_parts(t):
     return (int(m.group(1)), m.group(2), int(m.group(3) or 0)) if m else (0, None, 0)
 
 
-SAME_SUB_CALCS = {"passthrough", "value_div_1000", "share_of_total", "yoy_pct", "per_1000_dwellings", "ratio_pct"}
+SAME_SUB_CALCS = {"passthrough", "value_div_1000", "share_of_total", "yoy_pct", "per_1000_dwellings", "ratio_pct"}   # sum4q/last4q use the trailing window
 
 
 def rows_for_year(rs, year, calc):
@@ -171,6 +171,17 @@ def calc_per_1000_dwellings(rs, src):
     return {a: v / dw[a] * 1000 for a, v in vals.items() if v is not None and dw.get(a)}, p
 
 
+def calc_sum4q(rs, src):
+    """Sum of the last 4 quarters per area (absolute count, e.g. dwellings completed)."""
+    rs = apply_select(rs, src.get("select"))
+    col = area_col(rs[0]); ps = periods_sorted(rs)[-4:]
+    by = {}
+    for r in rs:
+        if r["TID"] in ps and r["INDHOLD"] is not None:
+            by[norm_area(col, r[col])] = by.get(norm_area(col, r[col]), 0) + r["INDHOLD"]
+    return by, f"{ps[0]}–{ps[-1]}"
+
+
 def calc_sum4q_per_1000(rs, src):
     rs = apply_select(rs, src.get("select"))
     col = area_col(rs[0]); ps = periods_sorted(rs)[-4:]
@@ -186,7 +197,7 @@ CALCS = {
     "passthrough": calc_passthrough, "value_div_1000": calc_passthrough,
     "share_of_total": calc_share_of_total, "yoy_pct": calc_yoy_pct,
     "last4q_mean": calc_last4q_mean, "discount_pct": calc_discount_pct,
-    "per_1000_dwellings": calc_per_1000_dwellings, "sum4q_per_1000": calc_sum4q_per_1000,
+    "per_1000_dwellings": calc_per_1000_dwellings, "sum4q_per_1000": calc_sum4q_per_1000, "sum4q": calc_sum4q,
 }
 
 
