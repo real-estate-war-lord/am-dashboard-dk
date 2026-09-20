@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.9 — 2026-09-20
+- **Overview first**: the top bar is a breadcrumb (Denmark › municipality › area — every step a link) and the sidebar shows names only; the duplicate card titles, back-links and "× Denmark" chips are gone, so the map starts ~110 px higher.
+- **Indicator picker**: grouped select plus quick chips (Growth · Price/m² · Rent · Unemp. · Rented · Supply) on the map and in the table; the indicator's definition, source, coverage and history are folded behind *ⓘ details* (one line by default).
+- **Map colours and legend**: five quintile classes instead of a min–max ramp (each class holds a fifth of the visible areas, so outliers no longer flatten the map), a stronger ramp, and a class-break legend drawn on the map (bottom right) for the macro map, the buildings layer and the area-page map. Building shares (rented, unoccupied, < 50 m²) use fixed breaks. Fewer, cleaner labels: the 12 largest municipalities at national zoom, values from zoom 8, no overlapping names.
+- **Area pages**: headline row with the five key figures (value, y/y, rank) under the title; tiles show one theme at a time (Demographics first) with a single context line (#rank · vs median) and a ↗ into Charts; the explanatory paragraph became an ⓘ tooltip; *All indicators*, *Housing stock (BBR)* and *Quarters & postal codes* are tabs of one card — the page is about 2 200 px instead of 5 000.
+- **Map popups** in two levels: the selected indicator big with its rank, four headline figures, buttons *Open page › · Zoom to municipality · Buildings › · ↗ Chart*, and *All N values* folded underneath. Building cards name their quarter / postal code with a link to it.
+- **Buildings**: address search first, filters folded behind *Filters (n active) ▾*.
+- **Charts**: the empty state explains what to do and offers the quick picks; the "single snapshot" note only appears when it applies; every tile, table row and popup has a ↗ that opens Charts with that area and indicator.
+
 ## v1.8 — 2026-09-18
 - **Addresses and property numbers on buildings**: `scripts/fetch_dar.py` pulls the access address from DAR (husnummer → street + postal code) and the BFE property number from BBR (building → grund → ejendomsrelation) for every building in the Micro layer — 174 539 / 174 551 buildings (100 %) got an address, all got a BFE. Building cards show the address as title, the BFE and how many other buildings share the property; CSV export carries both columns.
 - **Find address** box in Buildings mode: type "Nordens Plads 4" → the map zooms to the building and opens its card (filters are widened if the building was filtered out).

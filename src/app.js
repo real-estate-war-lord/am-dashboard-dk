@@ -54,19 +54,20 @@ const MK = { ind: (IND[0] || {}).key, muni: null, own: false, year: LATEST, cphV
 const MICRO_IDX = (D.micro && D.micro.municipalities) || {};
 const MICRO = {};                                  /* code → {meta, b:[…]} once loaded */
 const MICRO_INDS = [
-  { key: "rented_pct", label: "Rented dwellings", short: "Rented", unit: "% of dwellings", fmt: "pct0", hue: [40, 84, 128], col: 3 },
-  { key: "vacant_pct", label: "Unoccupied dwellings", short: "Unoccupied", unit: "% of dwellings", fmt: "pct0", hue: [166, 42, 22], col: 4 },
+  { key: "rented_pct", label: "Rented dwellings", short: "Rented", unit: "% of dwellings", fmt: "pct0", hue: [40, 84, 128], col: 3, breaks: [20, 40, 60, 80] },
+  { key: "vacant_pct", label: "Unoccupied dwellings", short: "Unoccupied", unit: "% of dwellings", fmt: "pct0", hue: [166, 42, 22], col: 4, breaks: [2, 5, 10, 20] },
   { key: "avg_m2", label: "Average dwelling size", short: "Ø m²", unit: "m²", fmt: "m2", hue: [90, 60, 150], col: 5 },
   { key: "year", label: "Year built", short: "Built", unit: "year", fmt: "int", hue: [10, 88, 70], col: 6 },
   { key: "dwellings", label: "Dwellings in building", short: "Dwellings", unit: "dwellings", fmt: "int", hue: [150, 90, 30], col: 2 },
-  { key: "small_pct", label: "Small dwellings < 50 m²", short: "< 50 m²", unit: "% of dwellings", fmt: "pct0", hue: [12, 94, 104], col: 13 },
+  { key: "small_pct", label: "Small dwellings < 50 m²", short: "< 50 m²", unit: "% of dwellings", fmt: "pct0", hue: [12, 94, 104], col: 13, breaks: [10, 25, 50, 75] },
   { key: "floors", label: "Floors", short: "Floors", unit: "floors", fmt: "int", hue: [92, 110, 140], col: 7 }];
 const MTYPE = { 1: "house", 2: "row house", 3: "multi-dwelling", 4: "other / mixed" };
 const MF = { minDw: 2, yFrom: "", yTo: "", type: "", rentMin: 0 };   /* building filters */
 const microAvail = code => !!(code && MICRO_IDX[String(Number(code))]);
 const microMode = () => !!(MK.micro && MK.muni && microAvail(MK.muni));
 const curMind = () => MICRO_INDS.find(i => i.key === MK.mind) || MICRO_INDS[0];
-const AR = { type: null, code: null, group: "key", ind: null, sub: "kvarter" };   /* area page */
+const AR = { type: null, code: null, group: "", ind: null, sub: "kvarter", tab: "ind" };   /* area page: group = tile group, tab = lower panel */
+const UI = { indxOpen: false, mfOpen: false };                                    /* fold states that survive a re-render */
 const MKT = { src: false };                                                        /* market: sources panel open */
 const CH = { ind: (IND[0] || {}).key, areas: [], y0: "", y1: "", median: true, title: "", mode: "auto", dist: "size" };   /* chart generator */
 const T = { q: "", level: "kommune", region: "", minPop: 0 };                     /* table view filters */
@@ -76,9 +77,12 @@ const MICRO_ZOOM = 10;
 /* quarter indicators whose definition matches the national one closely enough to put København next to a quarter */
 const CPH_CMP = new Set(["growth", "young", "higher_ed", "renters", "almene", "avg_m2"]);
 const muniCmp = (e, key) => !!e.muni && (e.type !== "kvarter" || CPH_CMP.has(key));
-/* "All figures" tab: at most 14 tiles (7 × 2), in this order; the group tabs hold everything else */
-const KEY_INDS = ["growth", "young", "income_med", "unemp", "higher_ed", "renters", "almene", "price_m2", "discount", "dom", "rent_private", "rent_social", "supply", "pipeline", "avg_m2", "new_stock", "private_rental", "andel", "single"];
-const MAX_TILES = 14;
+/* headline figures (area page header, map popups, municipality strip) — the first five available, in this order */
+const HL_KEYS = ["growth", "price_m2", "rent_private", "unemp", "renters", "income_med", "young", "almene", "supply"];
+/* quick-pick indicator chips next to the indicator select */
+const QUICK_KEYS = ["growth", "price_m2", "rent_private", "unemp", "renters", "supply"];
+/* link into the chart generator with one area pre-selected */
+const chartLink = (key, type, code) => `charts?ind=${encodeURIComponent(key)}&a=${type}:${code}&y0=&y1=&med=1`;
 /* value of indicator k for municipality/area o in the selected year (latest = live field, else history) */
 const V = (o, k, y) => { const yr = y || MK.year; if (!o) return null; if (!yr || yr === LATEST) return o[k] ?? null; const h = o.hist && o.hist[k]; return h && h[yr] != null ? h[yr] : null; };
 const yearsForPool = (k, pool) => YEARS.filter(y => y === LATEST || pool.some(m => m.hist && m.hist[k] && m.hist[k][y] != null));
@@ -94,7 +98,7 @@ function hashFor() {
   const q = [`ind=${encodeURIComponent(MK.ind || "")}`]; if (MK.year && MK.year !== LATEST) q.push(`y=${MK.year}`);
   if (S.view === "makro" && MK.micro) { q.push("micro=1"); q.push(`mind=${MK.mind}`); }
   let p;
-  if (S.view === "area") { p = `area/${AR.type}/${AR.code}`; if (AR.group !== "key") q.push(`g=${encodeURIComponent(AR.group)}`); if (AR.sub !== "kvarter") q.push(`sub=${AR.sub}`); }
+  if (S.view === "area") { p = `area/${AR.type}/${AR.code}`; if (AR.group) q.push(`g=${encodeURIComponent(AR.group)}`); if (AR.sub !== "kvarter") q.push(`sub=${AR.sub}`); if (AR.tab !== "ind") q.push(`t=${AR.tab}`); }
   else if (S.view === "table") p = `table/${T.level}`;
   else if (S.view === "charts") { p = "charts"; q.length = 0; q.push(`ind=${encodeURIComponent(CH.ind)}`, `a=${CH.areas.join(",")}`, `y0=${CH.y0}`, `y1=${CH.y1}`, `med=${CH.median ? 1 : 0}`); if (CH.mode !== "auto") q.push(`mode=${CH.mode}`); if (CH.mode === "dist") q.push(`dist=${CH.dist}`); }
   else if (S.view === "market") { p = "market"; if (MKT.src) q.push("src=1"); }
@@ -110,7 +114,7 @@ function parseHash() {
   if (q.ind) MK.ind = q.ind;
   MK.year = q.y && YEARS.includes(q.y) ? q.y : LATEST;
   const v = parts[0] || "map";
-  if (v === "area" && parts[1] && parts[2]) { S.view = "area"; AR.type = parts[1]; AR.code = parts[2]; AR.group = q.g || "key"; AR.sub = q.sub || "kvarter"; }
+  if (v === "area" && parts[1] && parts[2]) { S.view = "area"; AR.type = parts[1]; AR.code = parts[2]; AR.group = q.g === "key" ? "" : (q.g || ""); AR.sub = q.sub || "kvarter"; AR.tab = ["ind", "bbr", "sub"].includes(q.t) ? q.t : "ind"; }
   else if (v === "table") { S.view = "table"; if (["kommune", "postnr", "kvarter"].includes(parts[1])) T.level = parts[1]; }
   else if (v === "sources") { S.view = "market"; MKT.src = true; }
   else if (v === "market") { S.view = "market"; MKT.src = q.src === "1"; }
@@ -143,12 +147,23 @@ const viewOf = id => VIEWS.find(v => v[0] === id) || VIEWS[0];
 function renderNav() {
   const on = S.view === "area" ? "makro" : S.view;
   document.getElementById("nav").innerHTML = NAV_GROUPS.map(([lab, ids]) => `<div class="nav-glab">${lab}</div>` +
-    ids.map(id => { const v = viewOf(id); return `<button class="nav-item ${on === id ? "on" : ""}" data-go="${v[3]}"><b>${v[1]}</b><em>${v[2]}</em></button>`; }).join("")).join("");
+    ids.map(id => { const v = viewOf(id); return `<button class="nav-item ${on === id ? "on" : ""}" data-go="${v[3]}" title="${esc(v[2])}"><b>${v[1]}</b></button>`; }).join("")).join("");
+}
+/* the top bar is a breadcrumb: Denmark › municipality › area — every step is a link, the last one is where you are */
+function crumbs() {
+  const q = `?ind=${encodeURIComponent(MK.ind)}` + (MK.year !== LATEST ? `&y=${MK.year}` : "");
+  const c = [["Denmark", "map" + q]]; let tail = "", kind = "";
+  if (S.view === "area") { const e = areaEntity(); if (!e) return { c, tail: "Area", kind: "" };
+    if (e.muni) c.push([e.muni.name, `area/kommune/${e.muni.code}` + q]); if (e.bydel) c.push([e.bydel, `map/${CPH_MUNI}` + q]); tail = e.name; kind = e.typeLabel; }
+  else if (S.view === "makro") { const m = MK.muni ? byCode[MK.muni] : null;
+    if (m) { if (microMode()) { c.push([m.name, `map/${m.code}` + q]); tail = "Buildings"; kind = "BBR register"; } else { tail = m.name; kind = cphMode() ? "quarters" : "postal codes"; } }
+    else { tail = "Map"; kind = "municipalities and postal codes"; } }
+  else { tail = viewOf(S.view)[1]; kind = { table: "every area side by side", charts: "PNG and CSV export", market: "national series and sources" }[S.view] || ""; }
+  return { c, tail, kind };
 }
 function renderTop() {
-  if (S.view === "area") { const e = areaEntity(); document.getElementById("hd").innerHTML = e ? `<h1>${esc(e.name)}</h1><p class="dim">${esc(e.typeLabel)} · ${crumbText(e)}</p>` : `<h1>Area</h1>`; return; }
-  const v = viewOf(S.view);
-  document.getElementById("hd").innerHTML = `<h1>${v[1]}</h1><p class="dim">${v[2]}</p>`;
+  const { c, tail, kind } = crumbs();
+  document.getElementById("hd").innerHTML = `<nav class="crumbs">${c.map(([l, h]) => `<button data-go="${esc(h)}">${esc(l)}</button><i>›</i>`).join("")}<b>${esc(tail)}</b>${kind ? `<span class="dim">${esc(kind)}</span>` : ""}</nav>`;
 }
 const RENDER = { makro: vMakro, table: vTable, area: vArea, charts: vCharts, market: vMarket };
 function render() {
@@ -178,7 +193,10 @@ document.addEventListener("click", e => {
   if ((el = g("[data-micro]"))) { MK.micro = el.dataset.micro === "1"; syncHash(); renderKeep(); return; }
   if (g("[data-mcsv]")) { exportMicroCsv(); return; }
   if ((el = g("[data-argroup]"))) { AR.group = el.dataset.argroup; syncHash(); renderKeep(); return; }
+  if ((el = g("[data-artab]"))) { AR.tab = el.dataset.artab; syncHash(); renderKeep(); return; }
   if ((el = g("[data-arsub]"))) { AR.sub = el.dataset.arsub; syncHash(); renderKeep(); return; }
+  if ((el = g("[data-indq]"))) { MK.ind = el.dataset.indq; if (!yearsFor(MK.ind).includes(MK.year)) MK.year = LATEST; syncHash(); renderKeep(); return; }
+  if (g("[data-mftoggle]")) { UI.mfOpen = !UI.mfOpen; const p = document.getElementById("mfpanel"), b = g("[data-mftoggle]"); if (p) p.style.display = UI.mfOpen ? "" : "none"; if (b) b.classList.toggle("on", UI.mfOpen); return; }
   if ((el = g("[data-arind]"))) { MK.ind = el.dataset.arind; if (!yearsFor(MK.ind).includes(MK.year)) MK.year = LATEST; syncHash(); renderKeep(); return; }
   if ((el = g(".im"))) { tipToggle(el); return; }
   tipHide();
@@ -196,12 +214,13 @@ document.addEventListener("change", e => {
   if (el.id === "chdist") { CH.dist = el.value; syncHash(); renderKeep(); }
   if (el.id === "chq") { chartAdd(null, el.value); }
   if (el.id === "chtitle") { CH.title = el.value; const t = document.getElementById("chsvgtitle"); if (t) t.textContent = CH.title || chartAutoTitle(); }
-  if (el.id === "mf-type") { MF.type = el.value; lfLayers(); }
-  if (["mf-mindw", "mf-yfrom", "mf-yto", "mf-rent"].includes(el.id)) { MF.minDw = Number(document.getElementById("mf-mindw").value) || 1; MF.yFrom = document.getElementById("mf-yfrom").value; MF.yTo = document.getElementById("mf-yto").value; MF.rentMin = Number(document.getElementById("mf-rent").value) || 0; lfLayers(); }
+  if (el.id === "mf-type") { MF.type = el.value; lfLayers(); mfBtn(); }
+  if (["mf-mindw", "mf-yfrom", "mf-yto", "mf-rent"].includes(el.id)) { MF.minDw = Number(document.getElementById("mf-mindw").value) || 1; MF.yFrom = document.getElementById("mf-yfrom").value; MF.yTo = document.getElementById("mf-yto").value; MF.rentMin = Number(document.getElementById("mf-rent").value) || 0; lfLayers(); mfBtn(); }
   if (el.id === "tregion") { T.region = el.value; renderTableBody(); }
   if (el.id === "tminpop") { T.minPop = Number(el.value) || 0; renderTableBody(); }
 });
 document.addEventListener("input", e => { if (e.target.id === "tq") { T.q = e.target.value.trim().toLowerCase(); renderTableBody(); } });
+document.addEventListener("toggle", e => { if (e.target.classList && e.target.classList.contains("indx")) UI.indxOpen = e.target.open; }, true);
 document.addEventListener("keydown", e => {
   if (e.key === "Enter" && e.target.id === "areaq") { areaSearchGo(e.target.value); return; }
   if (e.key === "Enter" && e.target.id === "chq") { chartAdd(null, e.target.value); return; }
@@ -242,16 +261,34 @@ function enableSort(root) {
 
 /* ---------- choropleth colour model (identical to the Finnish edition) ---------- */
 function mkShade(t, key) {
+  /* five steps from a light tint to the full hue, the top class deeper still — differences read at a glance */
   const i = key.startsWith("micro:") ? MICRO_INDS.find(x => x.key === key.slice(6)) : IND.concat(IND_CPH).find(x => x.key === key); const hue = (i && i.hue) || [10, 88, 70];
-  const a = [239, 242, 238]; const c = a.map((x, k) => Math.round(x + (hue[k] - x) * t));
+  const a = [232, 237, 231]; const s = 0.1 + 0.9 * Math.pow(Math.max(0, Math.min(1, t)), .9); const k = t >= .99 ? .72 : 1;
+  const c = a.map((x, j) => Math.round((x + (hue[j] - x) * s) * k));
   return `rgb(${c[0]},${c[1]},${c[2]})`;
 }
-function scaleOf(list, vk) {
-  const vals = list.map(vk).filter(v => v != null && !isNaN(v));
-  if (!vals.length) return { t: () => null, lo: null, hi: null };
-  const lo = Math.min(...vals), hi = Math.max(...vals);
-  return { t: v => v == null || isNaN(v) ? null : (hi > lo ? (v - lo) / (hi - lo) : .5), lo, hi };
+/* quintile classes: each colour step holds a fifth of the areas, so a few outliers cannot flatten the map */
+function scaleOf(list, vk, fixed) {
+  const vals = list.map(vk).filter(v => v != null && !isNaN(v)).sort((a, b) => a - b);
+  if (!vals.length) return { t: () => null, lo: null, hi: null, breaks: [] };
+  const q = p => vals[Math.min(vals.length - 1, Math.floor(p * vals.length))];
+  /* fixed breaks where the scale has a natural meaning (shares of a building); otherwise quintiles —
+     repeated quantiles (many identical values) collapse into fewer, non-empty classes */
+  const breaks = (fixed || [q(.2), q(.4), q(.6), q(.8)]).filter((b, i, a) => (i === 0 || b > a[i - 1]) && b < vals[vals.length - 1]);
+  const n = breaks.length + 1;
+  const t = v => { if (v == null || isNaN(v)) return null; let c = 0; while (c < breaks.length && v > breaks[c]) c++; return n > 1 ? c / (n - 1) : .5; };
+  return { t, lo: vals[0], hi: vals[vals.length - 1], breaks, classes: n, n: vals.length };
 }
+function legendHtml(sc, ind, key, note) {
+  /* class-break legend drawn on top of the map (bottom right) */
+  const f = fmtOf(ind); const b = sc.breaks || []; const n = sc.classes || 0;
+  const lab = c => n === 1 ? f(sc.lo) : c === 0 ? `≤ ${f(b[0])}` : c === n - 1 ? `> ${f(b[c - 1])}` : `${f(b[c - 1])} – ${f(b[c])}`;
+  const rows = []; for (let c = n - 1; c >= 0; c--) rows.push(`<div class="lgrow"><i style="background:${mkShade(n > 1 ? c / (n - 1) : .5, key)}"></i>${lab(c)}</div>`);
+  return `<div class="lgtitle">${esc(ind.short || ind.label)}<span>${esc(ind.unit || "")}</span></div>` +
+    (n ? rows.join("") : `<div class="lgrow dim">no data</div>`) +
+    `<div class="lgrow"><i style="background:#C4CBC4"></i>no data</div>${note ? `<div class="lgnote">${note}</div>` : ""}`;
+}
+function setLegend(id, sc, ind, key, note) { const el = document.getElementById(id); if (el) el.innerHTML = legendHtml(sc, ind, key, note); }
 const GROUP_ORDER = ["Demographics", "Income & jobs", "Housing stock", "Housing stock (BBR)", "Rents", "Prices & market", "Construction"];
 function indSelect() {
   const L = curInds();
@@ -259,15 +296,20 @@ function indSelect() {
   return `<select id="indsel" class="indsel" aria-label="Indicator">${groups.map(gname => `<optgroup label="${esc(gname)}">${L.filter(i => (i.group || "Other") === gname).map(i =>
     `<option value="${i.key}" ${MK.ind === i.key ? "selected" : ""}>${esc(i.label)}${i.unit ? " · " + esc(i.unit) : ""}</option>`).join("")}</optgroup>`).join("")}</select>`;
 }
+function indQuick() {
+  /* the six figures people ask for first, one click each */
+  const L = curInds(); const ks = QUICK_KEYS.map(k => L.find(i => i.key === k)).filter(Boolean);
+  return ks.length > 1 ? `<div class="iq">${ks.map(i => `<button class="iqb ${MK.ind === i.key ? "on" : ""}" data-indq="${i.key}" title="${esc(i.label)}">${esc(i.short || i.label)}</button>`).join("")}</div>` : "";
+}
 /* searchable area box: municipalities open on the map, postal codes and quarters open their page */
-const AREA_OPTS = [];
+const AREA_OPTS = [{ t: "Denmark — whole country", h: "map", k: ["denmark", "danmark", "dk"] }];
 MUNI.slice().sort((a, b) => a.name.localeCompare(b.name, LOCALE)).forEach(m => AREA_OPTS.push({ t: `${m.name} — municipality, ${m.region || ""}`, h: `map/${m.code}`, k: [m.name.toLowerCase(), m.code] }));
 AREAS.slice().sort((a, b) => a.nr.localeCompare(b.nr)).forEach(a => AREA_OPTS.push({ t: `${a.nr} ${a.name} — postal code, ${(byCode[a.muni] || {}).name || ""}`, h: `area/postnr/${a.nr}`, k: [a.nr, (a.name || "").toLowerCase()] }));
 if (CPH) CPH.areas.slice().sort((a, b) => (a.name || "").localeCompare(b.name || "", LOCALE)).forEach(q => AREA_OPTS.push({ t: `${q.name} — Copenhagen quarter, ${q.bydel || ""}`, h: `area/kvarter/${q.code}`, k: [(q.name || "").toLowerCase(), q.code] }));
 function areaSearch() {
   const m = MK.muni ? byCode[MK.muni] : null;
   return `<span class="asrch"><input id="areaq" list="arealist" class="indsel" placeholder="${m ? esc(m.name) + " — search another area…" : "Search municipality, postal code or quarter…"}" autocomplete="off" aria-label="Area">
-    <datalist id="arealist">${AREA_OPTS.map(o => `<option value="${esc(o.t)}"></option>`).join("")}</datalist>${m ? `<button class="lk mini" data-go="map?ind=${MK.ind}" title="Back to the whole country">× Denmark</button>` : ""}</span>`;
+    <datalist id="arealist">${AREA_OPTS.map(o => `<option value="${esc(o.t)}"></option>`).join("")}</datalist></span>`;
 }
 function areaSearchGo(txt) {
   const q = (txt || "").trim(); if (!q) return;
@@ -284,12 +326,14 @@ function indExplain(i) {
   const cov = i.level === "kvarter" ? `${CPH.areas.filter(a => a[i.key] != null).length}/${CPH.areas.length} quarters` : `${MUNI.filter(m => m[i.key] != null).length}/${MUNI.length} municipalities${i.level === "postnr" ? `, ${AREAS.filter(a => a[i.key] != null).length}/${AREAS.length} postal codes` : ""}`;
   const ys = yearsForPool(i.key, pool);
   const asof = asofText(i);
-  return `<div class="indx">
-    <div class="indx-head"><b>${esc(i.label)}</b><span class="tag">${i.level === "kvarter" ? "Copenhagen quarter level" : i.level === "postnr" ? "postal-code level" : "municipality level"}</span><span class="tag">${esc(i.unit || "")}</span></div>
-    <p>${esc(i.desc || "")}</p>
+  /* one line by default — label, level, unit, period; the definition, source, coverage and caveat open on ⓘ */
+  const asofShort = asofSrc => { const src = (MK.year !== LATEST && i.hist_asof && i.hist_asof[MK.year]) || i.asof || {}; return src.kommune || src.postnr || src.kvarter || ""; };
+  return `<details class="indx" ${UI.indxOpen ? "open" : ""}>
+    <summary><b>${esc(i.label)}</b><span class="tag">${i.level === "kvarter" ? "quarter level" : i.level === "postnr" ? "postal-code level" : "municipality level"}</span><span class="tag">${esc(i.unit || "")}</span>${asofShort() ? `<span class="dim">as of ${esc(asofShort())}</span>` : ""}${i.warn ? `<span class="warnline">⚠</span>` : ""}<i class="more">ⓘ details</i></summary>
+    <div class="indx-body"><p>${esc(i.desc || "")}</p>
     <p class="dim"><em>Source</em> ${esc(i.source || "–")}${asof ? ` · <em>As of</em> ${asof}` : ""} · <em>Coverage</em> ${cov}${ys.length > 1 ? ` · <em>History</em> ${ys[0]}–${LATEST}` : ""}</p>
-    ${i.warn ? `<p class="warnline">⚠ ${esc(i.warn)}</p>` : ""}
-  </div>`;
+    ${i.warn ? `<p class="warnline">⚠ ${esc(i.warn)}</p>` : ""}</div>
+  </details>`;
 }
 function yearSelect() {
   const ys = yearsFor(MK.ind);
@@ -330,32 +374,29 @@ function rankOf(o, key, peers) {
 }
 function muniStrip(m) {
   /* the selected municipality in one line: population, region, selected indicator + rank, link to its page */
-  const ind = curInd(); const inds = cphMode() ? IND_CPH : IND;
-  const key = ["growth", "price_m2", "rent_private", "unemp", "renters"].map(k => inds.find(i => i.key === k)).filter(i => i && V(m, i.key) != null).slice(0, 4);
+  const inds = cphMode() ? IND_CPH : IND;
+  const key = HL_KEYS.map(k => inds.find(i => i.key === k)).filter(i => i && V(m, i.key) != null).slice(0, 4);
   const cell = i => { const rk = rankOf(m, i.key, MUNI); return `<div><span>${esc(i.short || i.label)}</span><b>${fmtOf(i)(V(m, i.key))}</b><em>${rk ? `#${rk.r} of ${rk.n}` : ""}</em></div>`; };
   return `<div class="mstrip">
     <div class="mstrip-id"><b>${esc(m.name)}</b><span class="dim">${esc(m.region || "")} · ${m.pop != null ? nf(m.pop, 0) + " inhabitants" : ""} · ${muniAreas(m.code).length} ${cphMode() ? "quarters" : "postal codes"}</span></div>
     <div class="mstrip-k">${key.map(cell).join("")}</div>
-    <div class="mstrip-act"><button class="lk primary" data-go="${withQ(pageOf(m))}">Open ${esc(m.name)} page ›</button><button class="lk" data-go="map?ind=${MK.ind}">‹ Denmark</button></div>
+    <div class="mstrip-act"><button class="lk primary" data-go="${withQ(pageOf(m))}">Open ${esc(m.name)} page ›</button><button class="lk" data-go="${chartLink(MK.ind, "kommune", m.code)}" title="Open the chart generator with this municipality">↗ Chart</button></div>
   </div>`;
 }
 function vMakro() {
   if (!AREAS.length || !MUNI.length) return `<div class="card"><p class="empty">No macro data built yet — run <code>make fetch</code>, <code>make geo</code> and <code>make build</code>.</p></div>`;
   const ind = curInd();
   setTimeout(lfInit, 0);
-  const legend = [0, .25, .5, .75, 1].map(x => `<i style="background:${mkShade(x, microMode() ? "micro:" + curMind().key : ind.key)}"></i>`).join("");
   const muni = MK.muni ? byCode[MK.muni] : null;
   return `
   <div class="card accent" id="mapcard">
-    <div class="card-head"><h3>${muni ? esc(muni.name) + (microMode() ? " — buildings" : cphMode() ? " — quarters" : " — postal codes") : "Macro map — Denmark"}</h3>
-      <div class="tools">${areaSearch()}${muni && microAvail(muni.code) ? `<div class="seg"><button class="sg ${!MK.micro ? "on" : ""}" data-micro="0">Areas</button><button class="sg ${MK.micro ? "on" : ""}" data-micro="1">Buildings (${nf(MICRO_IDX[String(Number(muni.code))].n, 0)})</button></div>` : ""}${muni && muni.code === CPH_MUNI && CPH && !microMode() ? `<div class="seg"><button class="sg ${MK.cphView !== "postnr" ? "on" : ""}" data-cphview="kvarter">Quarters (${CPH.areas.length})</button><button class="sg ${MK.cphView === "postnr" ? "on" : ""}" data-cphview="postnr">Postal codes</button></div>` : ""}${microMode() ? mindSelect() : indSelect() + yearSelect()}${D.portfolio ? `<button class="lk mini ${MK.own ? "primary" : ""}" data-mkown>● Own properties</button>` : ""}<button class="lk" data-fs title="Full screen (Esc to exit)">⤢ Full screen</button></div></div>
+    <div class="card-head tools-only">
+      <div class="tools">${areaSearch()}${muni && microAvail(muni.code) ? `<div class="seg"><button class="sg ${!MK.micro ? "on" : ""}" data-micro="0">Areas</button><button class="sg ${MK.micro ? "on" : ""}" data-micro="1">Buildings (${nf(MICRO_IDX[String(Number(muni.code))].n, 0)})</button></div>` : ""}${muni && muni.code === CPH_MUNI && CPH && !microMode() ? `<div class="seg"><button class="sg ${MK.cphView !== "postnr" ? "on" : ""}" data-cphview="kvarter">Quarters (${CPH.areas.length})</button><button class="sg ${MK.cphView === "postnr" ? "on" : ""}" data-cphview="postnr">Postal codes</button></div>` : ""}${microMode() ? mindSelect() : indSelect() + yearSelect()}${D.portfolio ? `<button class="lk mini ${MK.own ? "primary" : ""}" data-mkown>● Own properties</button>` : ""}<button class="lk" data-fs title="Full screen (Esc to exit)">⤢ Full screen</button></div>
+      ${microMode() ? "" : indQuick()}</div>
     ${microMode() ? microExplain() : indExplain(ind)}
     ${muni && !microMode() ? muniStrip(muni) : ""}
-    <div id="lfmap"></div>
-    <div class="mklegend"><span>low</span><span id="lglo" class="lgv"></span>${legend}<span id="lghi" class="lgv"></span><span>high</span>
-      <span class="dim">· ${microMode() ? esc(curMind().label) + ", " + esc(curMind().unit) + " · dot size = dwellings" : esc(ind.label) + (ind.unit ? ", " + esc(ind.unit) : "") + " · scaled to the visible level"}</span>
-      <span style="margin-left:auto" class="dim">${microMode() ? "buildings — BBR register" : cphMode() ? "Copenhagen quarters — Københavns Kommune statbank" : ind.level === "postnr" ? "zoom in → postal-code values" : "municipality-level indicator — postal codes take the municipality value"}</span></div>
-    ${srcNote(`<p class="cap">${muni ? "Click a polygon for its figures and a link to its page." : "Click a polygon for its figures; open a municipality with the search box above or from the popup. Table view lists everything side by side."} Boundaries: DAGI, Klimadatastyrelsen (simplified); basemap OpenStreetMap.</p>`)}
+    <div class="mapwrap"><div id="lfmap"></div><div class="maplegend" id="maplegend"></div></div>
+    ${srcNote(`<p class="cap">${muni ? "Click a polygon for its figures and a link to its page." : "Click a polygon for its figures; open a municipality with the search box above or from the popup. Table view lists everything side by side."} Colour classes: quintiles of the visible areas. Boundaries: DAGI, Klimadatastyrelsen (simplified); basemap OpenStreetMap.</p>`)}
   </div>`;
 }
 
@@ -383,7 +424,7 @@ function tableBodyHtml() {
   if (!rows.length) return `<tr><td colspan="${cols.length + 5}" class="empty">no rows match the filters</td></tr>`;
   return rows.map(r => {
     const m = T.level === "postnr" ? (byCode[r.muni] || {}) : r;
-    const lead = `<tr class="clickrow" data-go="${withQ(pageOf(r))}"><th>${esc(r.name)} <span class="go">›</span></th>`;
+    const lead = `<tr class="clickrow" data-go="${withQ(pageOf(r))}"><th><span class="thn">${esc(r.name)} <span class="go">›</span></span><button class="tch" data-go="${chartLink(ind.key, T.level, T.level === "postnr" ? r.nr : r.code)}" title="Open in Charts">↗</button></th>`;
     if (T.level === "kvarter") return `${lead}<td class="dim">${esc(r.code)}</td><td class="dim">${esc(r.bydel || "")}</td><td class="num dim" data-v="${r.pop || 0}">${r.pop != null ? nf(r.pop, 0) : "–"}</td>
       ${fmtCell(ind, V(r, ind.key), false)}${y0 && y0 !== MK.year ? deltaCell(r, ind, pool) : ""}${cols.filter(i => i.key !== ind.key).map(i => fmtCell(i, V(r, i.key), false)).join("")}</tr>`;
     const cell = i => { const own = V(r, i.key); return own != null ? fmtCell(i, own, false) : (T.level === "postnr" ? fmtCell(i, V(m, i.key), true) : fmtCell(i, null, false)); };
@@ -400,8 +441,7 @@ function vTable() {
   const ind = curInd(), cols = tableCols(), y0 = yearsFor(ind.key)[0];
   return `
   <div class="card accent">
-    <div class="card-head"><h3>Table${MK.year !== LATEST ? " · " + MK.year : ""}</h3>
-      <div class="tools">${indSelect()}${yearSelect()}</div></div>
+    <div class="card-head tools-only"><div class="tools">${indSelect()}${yearSelect()}</div>${indQuick()}</div>
     ${indExplain(ind)}
     <div class="tfilters">
       <input id="tq" type="search" placeholder="Search municipality, postal code or name…" value="${esc(T.q)}">
@@ -416,7 +456,7 @@ function vTable() {
       <th class="num hi">${esc(ind.label)}<br><span class="dim">${esc(ind.unit || "")}</span></th>${y0 && y0 !== MK.year ? `<th class="num">Δ since ${y0}<br><span class="dim">${isPct(ind) ? "pp" : "%"}</span></th>` : ""}
       ${cols.filter(i => i.key !== ind.key).map(i => `<th class="num">${esc(i.label)}<br><span class="dim">${esc(i.unit || "")}</span></th>`).join("")}</tr></thead>
       <tbody id="tbody">${tableBodyHtml()}</tbody></table></div>
-    <p class="cap">Sorted by the selected indicator; click a column header to re-sort, a row to open the area's page. ° = municipality value shown on a postal code. Rows: ${T.level === "postnr" ? "postal codes (street-level codes in central Copenhagen merged by name)" : T.level === "kvarter" ? "Copenhagen quarters (kvarterer), source Københavns Kommune statbank" : "municipalities"}.</p>
+    <p class="cap">Sorted by the selected indicator; click a column header to re-sort, a row to open the area's page, ↗ to chart it. ° = municipality value shown on a postal code. Rows: ${T.level === "postnr" ? "postal codes (street-level codes in central Copenhagen merged by name)" : T.level === "kvarter" ? "Copenhagen quarters (kvarterer), source Københavns Kommune statbank" : "municipalities"}.</p>
     ${srcNote()}
   </div>`;
 }
@@ -474,7 +514,6 @@ function areaEntity() {
   }
   return null;
 }
-function crumbText(e) { return ["Denmark", e.region, e.muni ? e.muni.name : null, e.bydel].filter(Boolean).map(esc).join(" › "); }
 /* value for the entity: its own figure, or the municipality's (inherited, °) for postal codes */
 function eVal(e, k, y) { const own = V(e.o, k, y); if (own != null) return { v: own, own: true }; if (e.type === "postnr" && e.muni) { const mv = V(e.muni, k, y); if (mv != null) return { v: mv, own: false }; } return { v: null, own: false }; }
 function eYears(e, k) { return histYears(k, e.type === "postnr" && V(e.o, k) == null ? MUNI : e.peers); }
@@ -493,8 +532,9 @@ function tileSpark(ys, own, med, i) {
     <text class="ax" x="${L0}" y="${H - 3}">${ys[0]}</text><text class="ax" x="${W - R}" y="${H - 3}" text-anchor="end">${ys[ys.length - 1]}</text>
     ${own.map((v, k) => v == null ? "" : `<circle cx="${x(k).toFixed(1)}" cy="${y(v).toFixed(1)}" r="6" fill="transparent"><title>${ys[k]}: ${fmtOf(i)(v)}${med[k] != null ? " · median " + fmtOf(i)(med[k]) : ""}</title></circle>`).join("")}</svg>`;
 }
-function tileHtml(e, i, on) {
-  const cur = eVal(e, i.key); if (cur.v == null) return "";
+/* everything a tile, headline cell or popup needs about one indicator for one area */
+function tileStats(e, i) {
+  const cur = eVal(e, i.key); if (cur.v == null) return null;
   const ys = eYears(e, i.key), y0 = ys[0];
   const own = ys.map(y => eVal(e, i.key, y).v), med = ys.map(y => median(e.peers.map(p => V(p, i.key, y))));
   const dlt = (a, b) => a == null || b == null ? null : isPct(i) ? b - a : (a ? (b / a - 1) * 100 : null);
@@ -502,17 +542,28 @@ function tileHtml(e, i, on) {
   const li = own.map((v, k) => v == null ? -1 : k).filter(k => k >= 0).pop(); const idx = MK.year === LATEST ? li : ys.indexOf(MK.year);
   const yoy = idx > 0 ? dlt(own[idx - 1], own[idx]) : null;
   const since = y0 && y0 !== MK.year ? dlt(own[0], cur.v) : null;
-  const medNow = median(e.peers.map(p => V(p, i.key))); const vsMed = dlt(medNow, cur.v);
-  const rk = cur.own ? rankOf(e.o, i.key, e.peers) : null; const pct = rk ? (rk.n > 1 ? 1 - (rk.r - 1) / (rk.n - 1) : 1) : null;
-  const cls = d => d > 0 ? "up" : d < 0 ? "dn" : "";
+  const vsMed = dlt(median(e.peers.map(p => V(p, i.key))), cur.v);
+  const rk = cur.own ? rankOf(e.o, i.key, e.peers) : null;
+  return { cur, ys, y0, own, med, yoy, since, vsMed, rk, unit };
+}
+const cls = d => d > 0 ? "up" : d < 0 ? "dn" : "";
+function tileHtml(e, i, on) {
+  const s = tileStats(e, i); if (!s) return "";
   return `<div class="tile ${on ? "on" : ""}" data-arind="${esc(i.key)}" title="${esc(i.desc || i.label)} — click to focus the chart and map">
-    <span class="tl">${esc(i.label)}${cur.own ? "" : " °"}</span>
-    <div class="tv"><b>${fmtOf(i)(cur.v)}</b>${yoy != null ? `<i class="${cls(yoy)}">${sign(yoy, x => nf(x, 1))}${unit} y/y</i>` : ""}</div>
-    ${tileSpark(ys, own, med, i)}
-    <div class="tm">${rk ? `<span class="rk"><em class="rkbar"><i style="left:${(pct * 100).toFixed(0)}%"></i></em>#${rk.r} of ${rk.n}</span>` : `<span class="rk dim">municipality value</span>`}
-      <span>${since != null ? `<i class="${cls(since)}">${sign(since, x => nf(x, 1))}${unit}</i> since ${y0}` : ""}</span>
-      <span>${vsMed != null ? `<i class="${cls(vsMed)}">${sign(vsMed, x => nf(x, 1))}${unit}</i> vs median` : ""}</span></div>
+    <button class="tch" data-go="${chartLink(i.key, e.type, e.code)}" title="Open in Charts">↗</button>
+    <span class="tl">${esc(i.label)}${s.cur.own ? "" : " °"}</span>
+    <div class="tv"><b>${fmtOf(i)(s.cur.v)}</b>${s.yoy != null ? `<i class="${cls(s.yoy)}">${sign(s.yoy, x => nf(x, 1))}${s.unit} y/y</i>` : ""}</div>
+    ${tileSpark(s.ys, s.own, s.med, i)}
+    <div class="tm">${s.rk ? `<span>#${s.rk.r} of ${s.rk.n}</span>` : `<span class="dim">municipality value</span>`}${s.vsMed != null ? `<span><i class="${cls(s.vsMed)}">${sign(s.vsMed, x => nf(x, 1))}${s.unit}</i> vs median</span>` : ""}</div>
   </div>`;
+}
+/* headline row under the area title: the five figures that answer "what kind of area is this" */
+function headlineHtml(e) {
+  const inds = HL_KEYS.map(k => e.inds.find(i => i.key === k)).filter(i => i && eVal(e, i.key).v != null).slice(0, 5);
+  if (!inds.length) return "";
+  return `<div class="hl">${inds.map(i => { const s = tileStats(e, i); return `<button class="hlc ${MK.ind === i.key ? "on" : ""}" data-arind="${esc(i.key)}" title="${esc(i.desc || i.label)} — click to focus the chart and map">
+    <span>${esc(i.short || i.label)}${s.cur.own ? "" : " °"}</span><b>${fmtOf(i)(s.cur.v)}</b>
+    <em>${s.yoy != null ? `<i class="${cls(s.yoy)}">${sign(s.yoy, x => nf(x, 1))}${s.unit}</i> y/y` : ""}${s.rk ? `${s.yoy != null ? " · " : ""}#${s.rk.r} of ${s.rk.n}` : ""}</em></button>`; }).join("")}</div>`;
 }
 function multiLine(series, ind, ys) {
   const all = series.flatMap(s => s.pts.map(p => p.v)).filter(v => v != null);
@@ -546,7 +597,7 @@ function areaCompareTable(e) {
       const ys = eYears(e, i.key), y0 = ys[0]; const first = y0 && y0 !== MK.year ? eVal(e, i.key, y0).v : null;
       const d = first == null ? null : isPct(i) ? cur.v - first : (first ? (cur.v / first - 1) * 100 : null);
       const rk = cur.own ? rankOf(e.o, i.key, e.peers) : null; const med = median(e.peers.map(p => V(p, i.key)));
-      return `<tr class="clickrow ${i.key === ind.key ? "hi" : ""}" data-arind="${esc(i.key)}"><th>${esc(i.label)} <span class="dim">${esc(i.unit || "")}</span></th>
+      return `<tr class="clickrow ${i.key === ind.key ? "hi" : ""}" data-arind="${esc(i.key)}"><th><span class="thn">${esc(i.label)} <span class="dim">${esc(i.unit || "")}</span></span><button class="tch" data-go="${chartLink(i.key, e.type, e.code)}" title="Open in Charts">↗</button></th>
         ${fmtCell(i, cur.v, !cur.own)}${e.muni ? (muniCmp(e, i.key) ? fmtCell(i, V(e.muni, i.key), false) : `<td class="num dim" title="different definition at municipality level">n/c</td>`) : ""}${fmtCell(i, med, false)}
         <td class="num" data-v="${rk ? rk.r : ""}">${rk ? `#${rk.r} / ${rk.n}` : "–"}</td>
         <td class="num ${d > 0 ? "good" : d < 0 ? "bad" : ""}" data-v="${d ?? ""}">${d != null ? sign(d, x => nf(x, 1)) + (isPct(i) ? " pp" : " %") + ` <span class="dim">(${y0})</span>` : "–"}</td>
@@ -559,16 +610,13 @@ function areaSubTable(e) {
   const ind = cols.find(i => i.key === MK.ind) || cols[0];
   const pool = sub === "kvarter" ? CPH.areas : AREAS, y0 = yearsForPool(ind.key, pool)[0];
   const rows = list.slice().sort((a, b) => (V(b, ind.key) ?? -1e9) - (V(a, ind.key) ?? -1e9));
-  return `<div class="card">
-    <div class="card-head"><h3>${esc(e.name)} by ${sub === "kvarter" ? "quarter" : "postal code"}</h3>
-      <div class="tools">${keys.length > 1 ? `<div class="seg">${keys.map(k => `<button class="sg ${k === sub ? "on" : ""}" data-arsub="${k}">${k === "kvarter" ? `Quarters (${e.subs[k].length})` : `Postal codes (${e.subs[k].length})`}</button>`).join("")}</div>` : ""}<span class="hint">sorted by ${esc(ind.label.toLowerCase())} · click a row for its page</span></div></div>
+  return `<div class="tfilters">${keys.length > 1 ? `<div class="seg">${keys.map(k => `<button class="sg ${k === sub ? "on" : ""}" data-arsub="${k}">${k === "kvarter" ? `Quarters (${e.subs[k].length})` : `Postal codes (${e.subs[k].length})`}</button>`).join("")}</div>` : ""}<span class="hint">sorted by ${esc(ind.label.toLowerCase())} · click a row for its page, ↗ to chart it</span></div>
     <div class="scrollx"><table class="tbl compact wraphead" data-sortable><thead><tr><th>${sub === "kvarter" ? "Quarter" : "Area"}</th><th>${sub === "kvarter" ? "District" : "Postal code"}</th><th class="num">Population</th>
       <th class="num hi">${esc(ind.label)}<br><span class="dim">${esc(ind.unit || "")}</span></th>${y0 && y0 !== MK.year ? `<th class="num">Δ since ${y0}<br><span class="dim">${isPct(ind) ? "pp" : "%"}</span></th>` : ""}
       ${cols.filter(i => i.key !== ind.key).map(i => `<th class="num">${esc(i.label)}<br><span class="dim">${esc(i.unit || "")}</span></th>`).join("")}</tr></thead>
-    <tbody>${rows.map(a => `<tr class="clickrow" data-go="${withQ(pageOf(a))}"><th>${esc(a.name)} <span class="go">›</span></th><td class="dim">${esc(sub === "kvarter" ? a.bydel || "" : a.nr)}</td><td class="num dim" data-v="${a.pop || 0}">${a.pop != null ? nf(a.pop, 0) : "–"}</td>
+    <tbody>${rows.map(a => `<tr class="clickrow" data-go="${withQ(pageOf(a))}"><th><span class="thn">${esc(a.name)} <span class="go">›</span></span><button class="tch" data-go="${chartLink(ind.key, sub, sub === "kvarter" ? a.code : a.nr)}" title="Open in Charts">↗</button></th><td class="dim">${esc(sub === "kvarter" ? a.bydel || "" : a.nr)}</td><td class="num dim" data-v="${a.pop || 0}">${a.pop != null ? nf(a.pop, 0) : "–"}</td>
       ${fmtCell(ind, V(a, ind.key), false)}${y0 && y0 !== MK.year ? deltaCell(a, ind, pool) : ""}${cols.filter(i => i.key !== ind.key).map(i => fmtCell(i, V(a, i.key), false)).join("")}</tr>`).join("")}</tbody></table></div>
-    <p class="cap">${sub === "kvarter" ? `${list.length} quarters (kvarterer). ${esc((CPH.meta && CPH.meta.attribution) || "")}` : `${list.length} postal-code areas; only postal-code-level indicators are listed — the rest take the municipality value (see the comparison table).`}</p>
-  </div>`;
+    <p class="cap">${sub === "kvarter" ? `${list.length} quarters (kvarterer). ${esc((CPH.meta && CPH.meta.attribution) || "")}` : `${list.length} postal-code areas; only postal-code-level indicators are listed — the rest take the municipality value (see All indicators).`}</p>`;
 }
 /* Housing stock from BBR: four distributions as bars, parent (municipality) as a reference tick */
 const BBR_DIST = [["rooms", "Rooms", ["1", "2", "3", "4+"]], ["size", "Dwelling size", ["< 50 m²", "50–79", "80–119", "120+ m²"]],
@@ -579,37 +627,37 @@ function bbrCard(e) {
   const pct = (arr, i) => { const t = arr.reduce((x, y) => x + y, 0); return t ? arr[i] / t * 100 : 0; };
   const block = ([k, title, labels]) => `<div class="bbrblk"><h4>${title}</h4>${labels.map((l, i) => { const v = pct(b.dist[k], i), r = ref ? pct(ref[k], i) : null;
     return `<div class="bbrrow"><span>${esc(l)}</span><em><i style="width:${v.toFixed(1)}%"></i>${r != null ? `<u style="left:${r.toFixed(1)}%" title="${esc(e.muni.name)} ${nf(r, 0)} %"></u>` : ""}</em><b>${nf(v, 0)} %</b><span class="dim">${nf(b.dist[k][i], 0)}</span></div>`; }).join("")}</div>`;
-  return `<div class="card">
-    <div class="card-head"><h3>Housing stock — BBR register</h3><span class="hint">${nf(b.n, 0)} dwellings in ${nf(b.n_bld, 0)} buildings${ref ? ` · tick = ${esc(e.muni.name)}` : ""}</span></div>
+  return `<p class="hint" style="margin:0 0 10px">${nf(b.n, 0)} dwellings in ${nf(b.n_bld, 0)} buildings${ref ? ` · tick = ${esc(e.muni.name)}` : ""}</p>
     <div class="bbrgrid">${BBR_DIST.map(block).join("")}</div>
-    <p class="cap">Source: BBR (Bygnings- og Boligregistret) via Datafordeler, current dwellings (status 6, boligtype 1–5) placed by their building's coordinate. Register data as reported by owners.</p>
-  </div>`;
+    <p class="cap">Source: BBR (Bygnings- og Boligregistret) via Datafordeler, current dwellings (status 6, boligtype 1–5) placed by their building's coordinate. Register data as reported by owners.</p>`;
 }
 function vArea() {
   const e = areaEntity();
   if (!e) return `<div class="back"><button data-go="map">‹ Macro map</button></div><div class="card"><p class="empty">Unknown area.</p></div>`;
   const ind = curInd();
   setTimeout(arMapInit, 0);
-  const groups = ["key"].concat(GROUP_ORDER.filter(gn => e.inds.some(i => (i.group || "Other") === gn && eVal(e, i.key).v != null)));
-  const grp = groups.includes(AR.group) ? AR.group : "key";
-  const tiles = (grp === "key" ? KEY_INDS.map(k => e.inds.find(i => i.key === k)).filter(i => i && eVal(e, i.key).v != null).slice(0, MAX_TILES) : e.inds.filter(i => (i.group || "Other") === grp));
-  const glabel = g => g === "key" ? "All figures" : g;
+  const groups = GROUP_ORDER.filter(gn => e.inds.some(i => (i.group || "Other") === gn && eVal(e, i.key).v != null));
+  const grp = groups.includes(AR.group) ? AR.group : groups[0];
+  const tiles = e.inds.filter(i => (i.group || "Other") === grp && eVal(e, i.key).v != null);
   const mapHash = e.type === "kommune" ? `map/${e.code}` : e.type === "kvarter" ? `map/${CPH_MUNI}` : `map/${e.o.muni}/postnr`;
+  const microCode = e.type === "kommune" ? e.code : e.type === "kvarter" ? CPH_MUNI : e.o.muni;
+  /* lower panel: the full indicator list, the BBR housing stock and the sub-areas as tabs of one card */
+  const tabs = [["ind", "All indicators"]].concat(e.o.bbr && e.o.bbr.dist ? [["bbr", "Housing stock (BBR)"]] : []).concat(e.subs ? [["sub", e.subs.kvarter ? "Quarters & postal codes" : "Postal codes"]] : []);
+  const tab = tabs.some(t => t[0] === AR.tab) ? AR.tab : "ind";
+  const hint = `y/y = change from the previous year · "vs median" = against the median of ${e.peerLabel} (pp for shares, % otherwise) · #rank among ${e.peerLabel}, #1 = highest value · ° = municipality value where no ${e.type === "postnr" ? "postal-code" : "finer"} statistic exists${e.type === "kvarter" ? " · n/c = not comparable (different definition at municipality level)" : ""}. Solid line = ${e.name}, dashed = median of ${e.peerLabel}. Click a tile to focus the chart and map, ↗ to open it in Charts.`;
   return `
-  <div class="back"><button data-go="${withQ(mapHash)}">‹ Back to the map</button> <span class="dim"> · </span> <button data-go="table/${e.type}?ind=${MK.ind}">Table</button>${e.muni ? ` <span class="dim"> · </span> <button data-go="${withQ(pageOf(e.muni))}">${esc(e.muni.name)} page</button>` : ""}</div>
   <div class="card accent arhead">
     <div class="arid">
-      <div class="crumb">${crumbText(e)}</div>
       <h2>${esc(e.name)}</h2>
       <div class="artags"><span class="tag">${esc(e.typeLabel)}</span><span class="tag">code ${esc(e.code)}</span>${e.o.pop != null ? `<span class="tag">${nf(e.o.pop, 0)} inhabitants</span>` : ""}${e.type === "kommune" ? `<span class="tag">${e.ctx.length} postal codes</span>` : ""}${e.type === "postnr" && e.o.codes && e.o.codes.length > 1 ? `<span class="tag">merged codes ${esc(e.o.codes.join(", "))}</span>` : ""}</div>
     </div>
-    <div class="tools">${yearSelect()}<button class="lk" data-go="${withQ(mapHash)}">Show on map</button>${microAvail(e.type === "kommune" ? e.code : e.type === "kvarter" ? CPH_MUNI : e.o.muni) ? `<button class="lk primary" data-go="map/${e.type === "kommune" ? e.code : e.type === "kvarter" ? CPH_MUNI : e.o.muni}?ind=${MK.ind}&micro=1&mind=${MK.mind}">Buildings map ›</button>` : ""}</div>
+    <div class="tools">${yearSelect()}<button class="lk" data-go="${withQ(mapHash)}">Show on map</button><button class="lk" data-go="${chartLink(MK.ind, e.type, e.code)}">↗ Chart</button>${microAvail(microCode) ? `<button class="lk primary" data-go="map/${microCode}?ind=${MK.ind}&micro=1&mind=${MK.mind}">Buildings ›</button>` : ""}</div>
+    ${headlineHtml(e)}
   </div>
   <div class="card">
-    <div class="card-head"><h3>Key figures${MK.year !== LATEST ? " · " + MK.year : ""}</h3><span class="hint">solid = ${esc(e.name)} · dashed = median of ${e.peerLabel} · hover a line for values</span>
-      <div class="seg">${groups.map(g => `<button class="sg ${g === grp ? "on" : ""}" data-argroup="${esc(g)}">${esc(glabel(g))}</button>`).join("")}</div></div>
+    <div class="card-head"><h3>Key figures${MK.year !== LATEST ? " · " + MK.year : ""} <span class="hq" title="${esc(hint)}">ⓘ</span></h3>
+      <div class="seg">${groups.map(g => `<button class="sg ${g === grp ? "on" : ""}" data-argroup="${esc(g)}">${esc(g)}</button>`).join("")}</div></div>
     <div class="hero wrap">${tiles.map(i => tileHtml(e, i, i.key === ind.key)).join("") || `<div><span>no data</span></div>`}</div>
-    <p class="cap">y/y = change from the previous year; "since ${YEARS[0]}" = change over the whole series; "vs median" = against the median of ${e.peerLabel} (pp for shares, % otherwise). Rank bar: position among ${e.peerLabel}, right = highest value.${e.type === "kvarter" ? " n/c = not comparable: the municipality figure uses a different definition (national tables)." : ""} ° = municipality value (no ${e.type === "postnr" ? "postal-code" : "finer"} statistic). Click a tile to focus the chart and map on it.</p>
   </div>
   <div class="grid-2">
     <div class="card">
@@ -619,16 +667,13 @@ function vArea() {
     </div>
     <div class="card">
       <div class="card-head"><h3>${esc(ind.short || ind.label)} — ${(() => { const mm = arMapMode(e, ind); return e.type === "kommune" ? (mm.kommuneLevel ? esc(e.name) + " among municipalities" : esc(e.name) + " by " + (mm.useQ ? "quarter" : "postal code")) : "neighbours"; })()}</h3><span class="hint">${(() => { const mm = arMapMode(e, ind); return mm.kommuneLevel ? "municipality-level indicator · click a neighbour to open it" : e.type === "kommune" ? "click an area to open it" : "click a neighbour to open it"; })()}</span></div>
-      <div id="armap"></div>
-      <div class="mklegend"><span>low</span><span id="aglo" class="lgv"></span>${[0, .25, .5, .75, 1].map(x => `<i style="background:${mkShade(x, ind.key)}"></i>`).join("")}<span id="aghi" class="lgv"></span><span>high</span></div>
+      <div class="mapwrap"><div id="armap"></div><div class="maplegend small" id="arlegend"></div></div>
     </div>
   </div>
   <div class="card">
-    <div class="card-head"><h3>All indicators — ${esc(e.name)} in context</h3><span class="hint">click a row to focus the chart</span></div>
-    ${areaCompareTable(e)}
+    <div class="card-head"><div class="seg tabs">${tabs.map(([k, l]) => `<button class="sg ${k === tab ? "on" : ""}" data-artab="${k}">${esc(l)}</button>`).join("")}</div><span class="hint">${tab === "ind" ? "click a row to focus the chart, ↗ to chart it" : tab === "bbr" ? "current dwellings from the building register" : "click a row for its page"}</span></div>
+    ${tab === "ind" ? areaCompareTable(e) : tab === "bbr" ? bbrCard(e) : areaSubTable(e)}
   </div>
-  ${bbrCard(e)}
-  ${areaSubTable(e)}
   ${srcNote()}`;
 }
 function arMapMode(e, ind) {
@@ -663,23 +708,34 @@ function arMapInit() {
     else if (e.type === "kommune" && !kommuneLevel) { p.on("click", () => go(withQ(pageOf(a)))); }
     p.addTo(map);
   });
-  const lo = document.getElementById("aglo"), hi = document.getElementById("aghi");
-  if (lo && hi && sind) { lo.textContent = sc.lo != null ? fmtOf(sind)(sc.lo) : ""; hi.textContent = sc.hi != null ? fmtOf(sind)(sc.hi) : ""; }
+  if (sind) setLegend("arlegend", sc, sind, ind.key, kommuneLevel ? "municipalities" : useQ ? "quarters" : "postal codes");
   const b = boundsOf(own); if (b) map.fitBounds(b, { padding: kommuneLevel ? [90, 90] : e.type === "kommune" ? [10, 10] : [70, 70], maxZoom: kommuneLevel ? 9 : 13 });
 }
 
 /* ---------- Leaflet layers (macro map) ---------- */
 function lfPopup(a, muni) {
+  /* two levels: the selected indicator big + four headline figures and the ways onward; every value behind "all values" */
   const row = (i, v, own) => `<span class="lfrow"><span>${esc(i.short || i.label)}</span><b>${fmtOf(i)(v)}${own ? "" : " °"}</b></span>`;
-  const LI = curInds();
+  const LI = curInds(); const ind = curInd(); const isQ = a.bydel != null;
+  const val = i => { const v = V(a, i.key); if (v != null) return { v, own: true }; if (muni && V(muni, i.key) != null) return { v: V(muni, i.key), own: false }; return null; };
+  const peers = isQ ? CPH.areas : AREAS; const sel = val(ind);
+  const rk = sel ? (sel.own ? rankOf(a, ind.key, peers) : (muni ? rankOf(muni, ind.key, MUNI) : null)) : null;
+  const keys = HL_KEYS.filter(k => k !== ind.key).map(k => LI.find(i => i.key === k)).filter(Boolean).map(i => ({ i, x: val(i) })).filter(x => x.x).slice(0, 4);
   const native = LI.filter(i => V(a, i.key) != null).map(i => row(i, V(a, i.key), true)).join("");
   const inherited = LI.filter(i => V(a, i.key) == null && muni && V(muni, i.key) != null).map(i => row(i, V(muni, i.key), false)).join("");
+  const n = LI.filter(i => val(i)).length; const type = isQ ? "kvarter" : "postnr", code = isQ ? a.code : a.nr;
   return `<div class="lfpop"><b>${esc(a.nr || a.code)} ${esc(a.name)}</b>${MK.year !== LATEST ? ` <span class="tag">${MK.year}</span>` : ""}
     <span class="dim">${a.bydel ? esc(a.bydel) + " · " : ""}${muni ? esc(muni.name) : ""}${a.pop != null ? " · " + nf(a.pop, 0) + " inhabitants" : ""}</span>
-    <span class="lfact"><button class="lk mini primary" data-go="${withQ(pageOf(a))}">${a.bydel ? "Quarter" : "Postal code"} page ›</button>${muni ? `<button class="lk mini" data-go="${withQ(pageOf(muni))}">${esc(muni.name)} ›</button>` : ""}${!MK.muni && muni ? `<button class="lk mini" data-go="map/${muni.code}?ind=${MK.ind}">Zoom in</button>` : ""}</span>
-    ${native ? `<span class="lfsec">${a.bydel ? "Quarter" : "Postal code"}</span><div class="lfrows">${native}</div>` : ""}
-    ${inherited ? `<span class="lfsec">Municipality °</span><div class="lfrows">${inherited}</div>` : ""}</div>`;
+    ${sel ? `<div class="lfbig"><span>${esc(ind.label)}${sel.own ? "" : " °"}</span><b>${fmtOf(ind)(sel.v)}</b><em>${rk ? `#${rk.r} of ${rk.n} ${sel.own ? (isQ ? "quarters" : "postal codes") : "municipalities"}` : ""}</em></div>` : `<div class="lfbig dim"><span>${esc(ind.label)}</span><b>–</b></div>`}
+    ${keys.length ? `<div class="lfkey">${keys.map(({ i, x }) => `<div><span>${esc(i.short || i.label)}${x.own ? "" : " °"}</span><b>${fmtOf(i)(x.v)}</b></div>`).join("")}</div>` : ""}
+    <span class="lfact"><button class="lk mini primary" data-go="${withQ(pageOf(a))}">Open page ›</button>${muni && !MK.muni ? `<button class="lk mini" data-go="map/${muni.code}?ind=${MK.ind}">Zoom to ${esc(muni.name)}</button>` : ""}${muni && microAvail(muni.code) ? `<button class="lk mini" data-go="map/${muni.code}?ind=${MK.ind}&micro=1&mind=${MK.mind}">Buildings ›</button>` : ""}<button class="lk mini" data-go="${chartLink(ind.key, type, code)}">↗ Chart</button></span>
+    <details class="lfmore"><summary>All ${n} values</summary>
+    ${native ? `<span class="lfsec">${isQ ? "Quarter" : "Postal code"}</span><div class="lfrows">${native}</div>` : ""}
+    ${inherited ? `<span class="lfsec">Municipality °</span><div class="lfrows">${inherited}</div>` : ""}</details></div>`;
 }
+/* which sub-area (quarter / postal code) of the drilled municipality a point lies in — ray casting on the rings */
+function pip(pt, ring) { let ins = false; for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) { const yi = ring[i][0], xi = ring[i][1], yj = ring[j][0], xj = ring[j][1]; if ((yi > pt[0]) !== (yj > pt[0]) && pt[1] < (xj - xi) * (pt[0] - yi) / (yj - yi) + xi) ins = !ins; } return ins; }
+function areaAt(lat, lon) { return muniAreas(MK.muni).find(a => (a.rings || []).some(r => pip([lat, lon], r))) || null; }
 function lfLabels() {
   /* labels are rebuilt on every zoom step: a name is shown only when its polygon is wide enough on screen */
   if (!LF.map || !LF.ctx) return;
@@ -687,21 +743,27 @@ function lfLabels() {
   if (LF.labG) LF.map.removeLayer(LF.labG);
   if (MK.muni || zoom >= MICRO_ZOOM) {
     const px = ring => { const xs = [], ys = []; ring.forEach(q => { const c = LF.map.latLngToContainerPoint(q); xs.push(c.x); ys.push(c.y); }); return [Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)]; };
-    areas.slice().sort((x, y) => (y.pop || 0) - (x.pop || 0)).slice(0, 60).forEach(a => {
-      const [w, h] = px(mainRing(a)); if (w < 44 || h < 20) return;
+    /* sub-areas: a value only where the polygon is clearly wide enough, the name only when there is room for both */
+    areas.slice().sort((x, y) => (y.pop || 0) - (x.pop || 0)).slice(0, 40).forEach(a => {
+      const [w, h] = px(mainRing(a)); if (w < 64 || h < 26) return;
       const m = byCode[a.muni]; const own = micro && vk(a) != null; const v = own ? vk(a) : (m ? vk(m) : null);
       const t = sc.t(v), dark = t != null && t > .55; const val = v != null ? fmtOf(ind)(v) + (own ? "" : " °") : "–";
-      const name = w >= 96 && h >= 30 ? `<b>${esc(a.name)}</b><br>` : "";
+      const name = w >= 120 && h >= 36 ? `<b>${esc(a.name)}</b><br>` : "";
       labs.push(L.marker(centroid(mainRing(a)), { interactive: false, icon: L.divIcon({ className: "lflab" + (dark ? " lflab-dark" : ""), iconSize: null, html: name + val }) }));
     });
   } else {
-    munis.forEach(m => {
+    /* municipalities: the 12 largest by name only at the national zoom; the 40 largest with values from zoom 8 */
+    const big = MUNI.slice().sort((a, b) => (b.pop || 0) - (a.pop || 0)).slice(0, zoom < 8 ? 12 : 40).filter(m => munis.includes(m));
+    const placed = [];   /* larger municipalities first; a label that would sit on top of one already placed is skipped */
+    big.forEach(m => {
       const ma = muniAreas(m.code); let x = 0, y = 0, w = 0;
       ma.forEach(a => { const c = centroid(mainRing(a)); const ww = a.pop || 1; x += c[0] * ww; y += c[1] * ww; w += ww; });
       if (!w) return;
+      const ll = [x / w, y / w], pt = LF.map.latLngToContainerPoint(ll);
+      if (placed.some(q => Math.abs(q.x - pt.x) < 70 && Math.abs(q.y - pt.y) < 26)) return;
+      placed.push(pt);
       const t = sc.t(vk(m)), dark = t != null && t > .55;
-      if (zoom < 8 && (m.pop || 0) < 90000) return; /* declutter at national zoom */
-      labs.push(L.marker([x / w, y / w], { interactive: false, icon: L.divIcon({ className: "lflab" + (dark ? " lflab-dark" : ""), iconSize: null, html: `<b>${esc(m.name)}</b><br>${vk(m) != null ? fmtOf(ind)(vk(m)) : "–"}` }) }));
+      labs.push(L.marker(ll, { interactive: false, icon: L.divIcon({ className: "lflab" + (dark ? " lflab-dark" : ""), iconSize: null, html: `<b>${esc(m.name)}</b>${zoom >= 8 ? `<br>${vk(m) != null ? fmtOf(ind)(vk(m)) : "–"}` : ""}` }) }));
     });
   }
   LF.labG = L.layerGroup(labs).addTo(LF.map);
@@ -712,23 +774,29 @@ function mindSelect() {
 }
 function microExplain() {
   const i = curMind(), idx = MICRO_IDX[String(Number(MK.muni))] || {}; const m = byCode[MK.muni];
-  return `<div class="indx">
-    <div class="indx-head"><b>${esc(i.label)} — buildings</b><span class="tag">building level</span><span class="tag">${esc(i.unit)}</span></div>
-    <p>${{ rented_pct: "Dwellings registered as rented (incl. andel) as % of the building's dwellings with a known tenure.", vacant_pct: "Dwellings registered as 'not in use' as % of the building's dwellings — owner-reported, lags.",
+  const nAct = mfActive();
+  return `<details class="indx" ${UI.indxOpen ? "open" : ""}>
+    <summary><b>${esc(i.label)} — buildings</b><span class="tag">building level</span><span class="tag">${esc(i.unit)}</span><span class="dim">${nf(idx.n || 0, 0)} buildings in ${esc(m ? m.name : "")} · BBR ${esc((D.micro && D.micro.built) || "")}</span><i class="more">ⓘ details</i></summary>
+    <div class="indx-body"><p>${{ rented_pct: "Dwellings registered as rented (incl. andel) as % of the building's dwellings with a known tenure.", vacant_pct: "Dwellings registered as 'not in use' as % of the building's dwellings — owner-reported, lags.",
       avg_m2: "Mean registered dwelling area in the building.", year: "Year of commissioning (byg026).", dwellings: "Number of current dwellings (boligtype 1–5) in the building.",
       small_pct: "Dwellings under 50 m² as % of the building's dwellings.", floors: "Number of floors (byg054)." }[i.key]}</p>
-    <p class="dim"><em>Source</em> BBR via Datafordeler, buildings with ≥ ${idx.min_dwellings || (D.micro && D.micro.min_dwellings) || 2} dwellings · <em>Coverage</em> ${nf(idx.n || 0, 0)} buildings in ${esc(m ? m.name : "")} · <em>As of</em> ${esc((D.micro && D.micro.built) || "")}</p>
-    <div class="tfilters mfilters">
-      <label class="hint">min. dwellings <input id="mf-mindw" type="number" min="1" step="1" value="${MF.minDw}" style="width:60px"></label>
-      <label class="hint">built <input id="mf-yfrom" type="number" placeholder="from" value="${esc(MF.yFrom)}" style="width:64px"> – <input id="mf-yto" type="number" placeholder="to" value="${esc(MF.yTo)}" style="width:64px"></label>
-      <select id="mf-type" class="indsel"><option value="">All building types</option>${Object.entries(MTYPE).map(([k, v]) => `<option value="${k}" ${MF.type === k ? "selected" : ""}>${v}</option>`).join("")}</select>
-      <label class="hint">rented ≥ <input id="mf-rent" type="number" min="0" max="100" step="5" value="${MF.rentMin}" style="width:56px"> %</label>
-      <span class="hint" id="mcount"></span>
-      <button class="lk mini" data-mcsv>⤓ Export buildings CSV</button>
-      <input id="mf-addr" type="search" placeholder="Find address… (Enter)" style="min-width:220px">
-    </div>
+    <p class="dim"><em>Source</em> BBR via Datafordeler, buildings with ≥ ${idx.min_dwellings || (D.micro && D.micro.min_dwellings) || 2} dwellings · <em>Coverage</em> ${nf(idx.n || 0, 0)} buildings in ${esc(m ? m.name : "")} · <em>As of</em> ${esc((D.micro && D.micro.built) || "")}. Click a dot for the building's card; the address search jumps to a building and opens it.</p></div>
+  </details>
+  <div class="tfilters mfbar">
+    <input id="mf-addr" type="search" placeholder="Find address… (Enter)" style="min-width:260px">
+    <span class="hint" id="mcount"></span>
+    <button class="lk mini ${UI.mfOpen ? "on" : ""}" data-mftoggle>Filters${nAct ? ` (${nAct} active)` : ""} ▾</button>
+    <button class="lk mini" data-mcsv>⤓ Buildings CSV</button>
+  </div>
+  <div class="tfilters mfilters" id="mfpanel" ${UI.mfOpen ? "" : 'style="display:none"'}>
+    <label class="hint">min. dwellings <input id="mf-mindw" type="number" min="1" step="1" value="${MF.minDw}" style="width:60px"></label>
+    <label class="hint">built <input id="mf-yfrom" type="number" placeholder="from" value="${esc(MF.yFrom)}" style="width:64px"> – <input id="mf-yto" type="number" placeholder="to" value="${esc(MF.yTo)}" style="width:64px"></label>
+    <select id="mf-type" class="indsel"><option value="">All building types</option>${Object.entries(MTYPE).map(([k, v]) => `<option value="${k}" ${MF.type === k ? "selected" : ""}>${v}</option>`).join("")}</select>
+    <label class="hint">rented ≥ <input id="mf-rent" type="number" min="0" max="100" step="5" value="${MF.rentMin}" style="width:56px"> %</label>
   </div>`;
 }
+function mfActive() { return (MF.minDw > 2 ? 1 : 0) + (MF.yFrom ? 1 : 0) + (MF.yTo ? 1 : 0) + (MF.type ? 1 : 0) + (MF.rentMin > 0 ? 1 : 0); }
+function mfBtn() { const b = document.querySelector("[data-mftoggle]"); if (b) { const n = mfActive(); b.textContent = `Filters${n ? ` (${n} active)` : ""} ▾`; } }
 function microRows(code) {
   const d = MICRO[String(Number(code))]; if (!d) return [];
   return d.b.filter(r => r[2] >= MF.minDw && (!MF.yFrom || (r[6] != null && r[6] >= Number(MF.yFrom))) && (!MF.yTo || (r[6] != null && r[6] <= Number(MF.yTo)))
@@ -745,7 +813,9 @@ function microPopup(r) {
   const m = byCode[MK.muni]; const rooms = r.slice(9, 13); const rt = rooms.reduce((a, b) => a + b, 0);
   const row = (l, v) => `<span class="lfrow"><span>${l}</span><b>${v}</b></span>`;
   const d = MICRO[String(Number(MK.muni))]; const same = r[16] && d ? d.b.filter(x => x[16] === r[16]).length - 1 : 0;
-  return `<div class="lfpop"><b>${r[15] ? esc(r[15]) : (esc(MTYPE[r[8]] || "building") + " · " + r[2] + " dwellings")}</b><span class="dim">${r[15] ? esc(MTYPE[r[8]] || "building") + " · " : ""}${m ? esc(m.name) : ""}${r[16] ? ` · BFE ${esc(r[16])}${same > 0 ? ` (+${same} more building${same > 1 ? "s" : ""} on this property)` : ""}` : ""} · BBR ${esc(r[14])}…</span>
+  const area = areaAt(r[0], r[1]);
+  return `<div class="lfpop"><b>${r[15] ? esc(r[15]) : (esc(MTYPE[r[8]] || "building") + " · " + r[2] + " dwellings")}</b><span class="dim">${r[15] ? esc(MTYPE[r[8]] || "building") + " · " : ""}${area ? esc(area.name) + " · " : ""}${m ? esc(m.name) : ""}${r[16] ? ` · BFE ${esc(r[16])}${same > 0 ? ` (+${same} more building${same > 1 ? "s" : ""} on this property)` : ""}` : ""} · BBR ${esc(r[14])}…</span>
+    ${area ? `<span class="lfact"><button class="lk mini primary" data-go="${withQ(pageOf(area))}">${area.bydel != null ? "Quarter" : "Postal code"}: ${esc(area.name)} ›</button>${m ? `<button class="lk mini" data-go="${withQ(pageOf(m))}">${esc(m.name)} ›</button>` : ""}</span>` : ""}
     <span class="lfsec">Building</span>${row("Built", r[6] ?? "–")}${row("Floors", r[7] ?? "–")}${row("Dwellings", r[2])}
     <span class="lfsec">Dwellings</span>${row("Rented (incl. andel)", r[3] != null ? r[3] + " %" : "–")}${row("Unoccupied", r[4] != null ? r[4] + " %" : "–")}${row("Ø size", r[5] != null ? r[5] + " m²" : "–")}${row("< 50 m²", r[13] != null ? r[13] + " %" : "–")}
     ${rt ? row("Rooms 1 / 2 / 3 / 4+", rooms.map(x => nf(x / rt * 100, 0) + "%").join(" / ")) : ""}
@@ -781,18 +851,15 @@ function lfMicroLayers() {
   const cnt = document.getElementById("mcount");
   if (!d) { loadMicro(code); if (cnt && !MICRO["_error_" + String(Number(code))]) cnt.textContent = "loading buildings…"; return; }
   const ind = curMind(), rows = microRows(code), c = ind.col;
-  const vals = rows.map(r => r[c]).filter(v => v != null);
-  /* colour scale on the 5th–95th percentile so a few outliers do not flatten the ramp */
-  const sorted = vals.slice().sort((a, b) => a - b); const lo = sorted[Math.floor(sorted.length * .05)] ?? null, hi = sorted[Math.floor(sorted.length * .95)] ?? null;
-  const t = v => v == null || lo == null ? null : hi > lo ? Math.max(0, Math.min(1, (v - lo) / (hi - lo))) : .5;
+  /* same quintile classes as the area maps, computed on the buildings that pass the filters */
+  const sc = scaleOf(rows, r => r[c], ind.breaks); const t = sc.t;
   if (!LF.canvas) LF.canvas = L.canvas({ padding: .3 });
   const marks = rows.map(r => { const tt = t(r[c]);
     const m = L.circleMarker([r[0], r[1]], { renderer: LF.canvas, radius: microRadius(r[2]), color: "#141C18", weight: .6, opacity: .7, fillColor: tt == null ? "#C4CBC4" : mkShade(tt, "micro:" + ind.key), fillOpacity: .85 });
     m._dw = r[2]; m._row = r; m.bindPopup(() => microPopup(r), { maxWidth: 440, autoPanPadding: [24, 24] }); return m; });
   LF.microG = L.layerGroup(marks).addTo(LF.map); LF.microMarks = marks;
-  const lg = document.getElementById("lglo"), hg = document.getElementById("lghi");
-  if (lg && hg) { lg.textContent = lo != null ? fmtOf(ind)(lo) : ""; hg.textContent = hi != null ? fmtOf(ind)(hi) : ""; }
-  if (cnt) cnt.textContent = `${nf(rows.length, 0)} of ${nf(d.meta.n, 0)} buildings · ${nf(rows.reduce((s_, r) => s_ + r[2], 0), 0)} dwellings shown`;
+  setLegend("maplegend", sc, ind, "micro:" + ind.key, "buildings with ≥ 2 dwellings · dot size = dwellings");
+  if (cnt) cnt.textContent = `${nf(rows.length, 0)} of ${nf(d.meta.n, 0)} buildings · ${nf(rows.reduce((s_, r) => s_ + r[2], 0), 0)} dwellings`;
 }
 function lfLayers() {
   if (LF.map && microMode()) { lfMicroLayers(); return; }
@@ -824,8 +891,7 @@ function lfLayers() {
   LF.areaG = L.layerGroup(polys).addTo(LF.map);
   LF.ctx = { areas, munis, sc, micro, ind, vk };
   lfLabels();
-  const lo = document.getElementById("lglo"), hi = document.getElementById("lghi");
-  if (lo && hi) { lo.textContent = sc.lo != null ? fmtOf(ind)(sc.lo) : ""; hi.textContent = sc.hi != null ? fmtOf(ind)(sc.hi) : ""; }
+  setLegend("maplegend", sc, ind, ind.key, micro ? (cphMode() ? "quarters" : "postal codes") : (ind.level === "postnr" && !MK.muni ? "municipalities · zoom in for postal codes" : "municipalities" + (fine ? " · ° postal codes take the municipality value" : "")));
   if (LF.ownG) { LF.map.removeLayer(LF.ownG); LF.ownG = null; }
   if (MK.own && D.portfolio) {
     const marks = D.portfolio.properties.filter(p => p.lat != null).map(p => {
@@ -847,7 +913,10 @@ function lfInit() {
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · Boundaries: DAGI, Klimadatastyrelsen' }).addTo(map);
   map.on("moveend", () => { const c = map.getCenter(); LF.center = [c.lat, c.lng]; LF.zoom = map.getZoom(); });
   /* Leaflet stops click propagation inside popups, so page links in popups are wired here */
-  map.on("popupopen", ev => { const el = ev.popup.getElement(); if (el) el.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => go(b.dataset.go))); });
+  map.on("popupopen", ev => { const el = ev.popup.getElement(); if (!el) return;
+    el.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => go(b.dataset.go)));
+    /* re-fit the popup when "all values" opens — popup.update() would rebuild the content and close the fold again */
+    el.querySelectorAll("details").forEach(d => d.addEventListener("toggle", () => { const pp = ev.popup; if (pp._updateLayout) { pp._updateLayout(); pp._updatePosition(); pp._adjustPan(); } })); });
   map.on("zoomend", () => {
     /* rebuild polygons only when the display level changes — rebuilding on every pan would kill open popups */
     if (microMode()) { (LF.microMarks || []).forEach(m => m.setRadius(microRadius(m._dw))); return; }
@@ -991,26 +1060,28 @@ function vCharts() {
   const { series } = chartSeries();
   return `
   <div class="card accent">
-    <div class="card-head"><h3>Chart generator</h3><div class="tools">
+    <div class="card-head tools-only"><div class="tools">
       <select id="chind" class="indsel">${groups.map(gn => `<optgroup label="${esc(gn)}">${L.filter(i => (i.group || "Other") === gn).map(i => `<option value="${i.key}" ${CH.ind === i.key ? "selected" : ""}>${esc(i.label)}${i.unit ? " · " + esc(i.unit) : ""}</option>`).join("")}</optgroup>`).join("")}</select>
       <select id="chy0" class="indsel"><option value="">from ${YEARS[0]}</option>${YEARS.map(y => `<option value="${y}" ${CH.y0 === y ? "selected" : ""}>${y}</option>`).join("")}</select>
       <select id="chy1" class="indsel"><option value="">to ${LATEST}</option>${YEARS.map(y => `<option value="${y}" ${CH.y1 === y ? "selected" : ""}>${y}</option>`).join("")}</select>
       <label class="hint" style="display:flex;align-items:center;gap:5px"><input type="checkbox" id="chmed" ${CH.median ? "checked" : ""}> median</label>
       <div class="seg">${[["auto", "Auto"], ["line", "Line"], ["bar", "Bars"], ["dist", "Distribution"]].map(([m, l]) => `<button class="sg ${CH.mode === m ? "on" : ""}" data-chmode="${m}">${l}</button>`).join("")}</div>
       ${chartMode() === "dist" ? `<select id="chdist" class="indsel">${Object.entries(DIST_DEFS).map(([k, v]) => `<option value="${k}" ${CH.dist === k ? "selected" : ""}>${v[0]}</option>`).join("")}</select>` : ""}</div></div>
-    ${chartMode() === "bar" && chartYears().length < 2 ? `<p class="hint" style="margin:0 0 8px">No time series for this indicator (single snapshot) — shown as bars of the latest value. BBR distributions are under <b>Distribution</b>.</p>` : ""}
+    ${ents.length && CH.mode === "auto" && chartMode() === "bar" && chartYears().length < 2 ? `<p class="hint" style="margin:0 0 8px">This indicator is a single snapshot (no history) — shown as bars of the latest value. BBR distributions are under <b>Distribution</b>.</p>` : ""}
     <div class="tfilters">
       <span class="asrch"><input id="chq" list="arealist" class="indsel" placeholder="Add municipality, postal code or quarter… (Enter)" autocomplete="off"><datalist id="arealist">${AREA_OPTS.map(o => `<option value="${esc(o.t)}"></option>`).join("")}</datalist></span>
       ${quick.map(([l, ids]) => `<button class="lk mini" data-chadd="${ids.join("|")}">+ ${l}</button>`).join("")}
       ${CH.areas.length ? `<button class="lk mini" data-chclear>clear</button>` : ""}
     </div>
-    <div class="chips">${ents.map((e, k) => `<span class="chip" style="border-color:${CH_COLORS[k % CH_COLORS.length]}"><i style="background:${CH_COLORS[k % CH_COLORS.length]}"></i>${esc(e.name)}${!e.inds.some(i => i.key === ind.key) ? ' <em title="indicator not available at this level">n/a</em>' : ""}<button data-chrm="${esc(e.id)}" title="remove">×</button></span>`).join("") || `<span class="hint">no areas yet — type a name above or use a quick pick; up to 8 series</span>`}</div>
+    <div class="chips">${ents.map((e, k) => `<span class="chip" style="border-color:${CH_COLORS[k % CH_COLORS.length]}"><i style="background:${CH_COLORS[k % CH_COLORS.length]}"></i>${esc(e.name)}${!e.inds.some(i => i.key === ind.key) ? ' <em title="indicator not available at this level">n/a</em>' : ""}<button data-chrm="${esc(e.id)}" title="remove">×</button></span>`).join("")}</div>
     <div class="tfilters"><label class="hint" style="flex:1;display:flex;gap:8px;align-items:center">title <input id="chtitle" type="text" value="${esc(CH.title)}" placeholder="${esc(chartAutoTitle())}" style="flex:1;min-width:200px"></label>
       <button class="lk primary" data-chpng>⤓ Download PNG</button><button class="lk" data-chcsv>⤓ Data CSV</button><span class="hint">link: copy the address bar — it holds the whole setup</span></div>
-    <div class="chartbox">${chartSvg(true)}</div>
+    <div class="chartbox">${ents.length ? chartSvg(true) : `<div class="chempty"><b>Nothing to plot yet</b><p>Type a municipality, postal code or Copenhagen quarter in the box above (up to 8), or start with a set:</p>
+      <div class="tools">${quick.map(([l, ids]) => `<button class="lk" data-chadd="${ids.join("|")}">+ ${l}</button>`).join("")}</div>
+      <p class="dim">Tip: every area page and table row has a ↗ that opens it here with the indicator pre-selected.</p></div>`}</div>
     <p class="cap">${esc(ind.desc || "")} ${ind.warn ? "⚠ " + esc(ind.warn) : ""} Same sub-period each year (e.g. Q3 or July); values are those shown in the dashboard.</p>
   </div>
-  ${chartMode() === "line" && series.length ? `<div class="card"><div class="card-head"><h3>Data</h3><span class="hint">${esc(ind.unit || "")}</span></div>
+  ${chartMode() === "line" && ents.length && series.length ? `<div class="card"><div class="card-head"><h3>Data</h3><span class="hint">${esc(ind.unit || "")}</span></div>
     <div class="scrollx"><table class="tbl compact" data-sortable><thead><tr><th>Year</th>${series.map(s_ => `<th class="num">${esc(s_.name)}</th>`).join("")}</tr></thead>
     <tbody>${ys.map((yy, i) => `<tr><th>${yy}</th>${series.map(s_ => fmtCell(ind, s_.pts[i].v, false)).join("")}</tr>`).join("")}</tbody></table></div></div>` : ""}
   ${chartMode() === "dist" && ents.some(e => e.o.bbr) ? `<div class="card"><div class="card-head"><h3>Data</h3><span class="hint">share of dwellings · count</span></div>
