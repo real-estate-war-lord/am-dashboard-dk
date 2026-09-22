@@ -18,6 +18,7 @@
 | Copenhagen sub-areas | **Københavns Kommune statbank** via sub-database **`s30`** | REST, no key | 10 bydele / ~400 roder | ✅ catalogue |
 | Macro (CPI, net price index, rates, GDP, HPI) | DST + Danmarks Nationalbank mirror tables (DNRENTM etc.) + Eurostat NUTS3 | REST, no key | national / region / province | ✅ |
 | Planning & zoning | **Plandata.dk WFS** (kommuneplanrammer, lokalplaner) | WFS, JSON, no key | polygons | ✅ capabilities |
+| Safety — reported crime, charges | **Statistics Denmark StatBank API** `STRAF11` (quarterly) / `STRAF22` (annual) | REST, no key | 98 municipalities (place of offence) | ✅ live pulls |
 
 **What is *not* openly available in Denmark** (and how the Finnish edition's equivalents map): private asking rents at postal-code level (BoligPortal / Boligsiden / husleje.dk are proprietary), owner names (EJF is restricted), energy-label bulk data (Energistyrelsen issues credentials on request), income/education below municipality level (DST sells it as *Nøgletal på postnumre*).
 
@@ -114,6 +115,7 @@ Full table list used by the Danish edition (all verified to exist):
 | construction | `BYGV33` `BYGV22` `BYGV11` `BYGV80` |
 | prices & sales | `EJ56` `EJ99` `EJEN77` `EJ121` `TVANG1` `TVANG3` |
 | rents | `HUS1` `LABY32` `PRIS01` (041000 actual rentals) |
+| crime | `STRAF11` (quarterly, place of offence) `STRAF22` (annual, reports and charges) — see §3.8 |
 | macro | `PRIS01` `PRIS04` (net price index — used in NPI-indexed leases) `ILON12` `SBLON1` `NKN1` `NAN1` `DNRENTM` `DNRENTD` `MPK3` `DNRNURI` `DNRUURI` |
 
 ### 3.2 Finans Danmark Boligmarkedsstatistik — sub-database `s20`
@@ -198,6 +200,46 @@ Not usable at quarter level: KKLEDIG2 (unemployment, bydel only), KKIND* other t
 - **noegletal.dk** — municipal tax rate (kommuneskat), land tax (grundskyldspromille), liquidity; Excel export from the web UI, no API.
 - **Energy labels** — Energistyrelsen EMOData (`emoweb.dk/emodata`, Basic-auth credentials by email to emo-info@ens.dk); aggregate share of A–C labels per area only if a bulk extract is granted.
 
+### 3.8 Safety (crime) — `STRAF11` / `STRAF22` (implemented v2.0)
+
+| table | content | geography (`OMRÅDE`, 106 codes) | period | raw pull |
+|---|---|---|---|---|
+| `STRAF11` | Reported criminal offences (*anmeldelser*) by **place of offence** (*gerningskommune*) and type of offence (`OVERTRÆD`, 77 codes); excludes the traffic law | `000` Denmark, 5 regions, 98 municipalities | quarterly, 2007K1– (latest 2026K2, updated 2026-07-16) | `dst_STRAF11_offences` |
+| `STRAF22` | Reported offences and reports that led to a charge (`ANMSIGT`: `ANM` reported, `SIG` with a charge) | same | annual, 2007– (latest 2025, updated 2026-02-19) | `dst_STRAF22_charges` |
+| `FOLK1A` | Population, 1st day of the quarter (`KØN=TOT`, `ALDER=IALT`, `Tid=*`) — denominator | same | quarterly, 2008K1– | `dst_FOLK1A_pop_long` |
+| `BOL101` | Dwellings, occupied + unoccupied (`BEBO=1000,2000`, other dimensions summed by the API, `Tid=*`) — denominator | same | annual (1 Jan), 2010– **without 2021 and 2022** | `dst_BOL101_dw_long` |
+
+Codes fetched: `STRAF11` `OVERTRÆD` = `TOT` total · `1` Criminal Code total (headline) · `11` sexual · `12` violence · `13` property · `14` other penal · `1320` residential burglary · `1345` bicycle theft · `3` special acts total · `3210` Euphoriants Act (drugs) · `3410` Weapons Act. `STRAF22` `OVERTRÆD` = `1`, `12`, `1320` × `ANMSIGT` = `ANM`, `SIG`. Full time range (`Tid=*`) regardless of `history_years`.
+
+| key | indicator | codes | calc (`scripts/build_makro.py`) | direction |
+|---|---|---|---|---|
+| `crime_1000` | Reported crime per 1,000 inhabitants — chip *Crime* | `1` | `rolling4q_per_1000_pop` | lower better |
+| `violence_1000` | Violent crime per 1,000 inh. | `12` | `rolling4q_per_1000_pop` | lower better |
+| `property_1000` | Property crime per 1,000 inh. | `13` | `rolling4q_per_1000_pop` | lower better |
+| `burglary_1000dw` | Residential burglaries per 1,000 dwellings | `1320` | `rolling4q_per_1000_dwellings` | lower better |
+| `drugs_weapons_1000` | Drug and weapons offences per 1,000 inh. | `3210` + `3410` | `rolling4q_per_1000_pop` | lower better |
+| `crime_trend` | Reported crime, y/y % | `1` | `rolling4q_yoy_pct` | lower better |
+| `clearance_pct` | Penal-code reports with a charge, % | `STRAF22` `1`: `SIG` ÷ `ANM` × 100 | `ratio_pct` | higher better |
+
+Calculation rules:
+- **Rolling 4 quarters** (the counts are not seasonally adjusted): the live value is the sum of the four quarters ending at the latest quarter (`2025K3→2026K2`). A window with a missing quarter gives no value; nothing is imputed.
+- **Population at the end of the window.** FOLK1A counts the 1st day of a quarter, so the end of 2026K2 is FOLK1A 2026K3 (falls back to the window's last quarter while the next one is unpublished). Dwellings: BOL101 on 1 Jan of the following year, else 1 Jan of the window's year.
+- **Yearly history** (map year selector, area pages, Charts *Yearly*): each calendar year is its Q1–Q4 sum ÷ population at the end of Q4. `history_from: 2007` → Charts reach 2007 (burglary 2009, crime_trend 2008); `map_from: 2008` → the map/table year selector starts in 2008.
+- **Quarterly series** (Charts *Quarterly*): one rolling-4Q value per quarter from 2008K1 (crime_trend 2008K4, burglary 2009K1 with a gap in 2021), municipalities and Denmark (`000`, the dashed reference line).
+- Verified in `tests/test_safety.py`: København 2025K3–2026K2 code 1 = 15 323 + 14 713 + 15 205 + 15 045 = 60 286 ÷ 670.389 → **89.9**; clearance 2025 = 11 763 ÷ 68 802 → **17.1 %**.
+
+**Geography — what is true where.** Every Safety figure exists **per municipality only** (place of offence). Postal codes and Copenhagen quarters show their municipality's value, marked `°`, on the map, in the table, in popups and on area pages; ranks are computed among municipalities only. No police-district (*politikreds*) or finer police data is used.
+
+Caveats (also in each indicator's `note`):
+- Reported offences, not solved cases (reported ≠ solved); place of offence, not the offender's residence; the traffic law is excluded.
+- Series breaks: 2007 (police reform — the series starts there); **1 July 2013** Criminal Code amendments on sexual offences (DST footnote; marked in Charts on the penal-code series `crime_1000`, `crime_trend`, `clearance_pct`); **2023** ≈ 1 700 reports missing in *Legislation on animals, hunting etc.* (DST footnote) — a special-acts category that none of the dashboard series include, so no marker is drawn.
+- `suppressedDataValue` is `0` in both tables: a suppressed cell and a true zero look the same. Zeros occur only on small islands (Christiansø, Ærø, Fanø, Samsø, Læsø) and are taken as counts.
+- Drug and weapons offences largely reflect police activity (stop-and-search, visitation zones), not incidence.
+- Clearance counts charges for reports of the same year, so the latest year can still rise as cases are processed.
+- Christiansø (91 inhabitants) has per-1,000 rates that are noise; burglary per dwelling and crime y/y are empty there (no BOL101 dwellings; zero base).
+
+> **Internal note.** v1 = STRAF11/STRAF22 via API. Planned: v2.0.1 Copenhagen 13 bydele from KK Tryghedsundersøgelse PDF. Available later if needed: Tryghedsundersøgelsen (Justitsministeriet, kommune, PDF), udsatte boligområder list (SBST, PDF), politi.dk statistics (politikreds).
+
 ---
 
 ## 4. What the Danish `makro` view looks like (design carried over, data replaced)
@@ -269,6 +311,8 @@ am-dashboard-dk/
 | 2026-09-14 | boligstat.dk PxWeb API, rkr.statistikbank.dk `/api/v1/` | ❌ 404 — use `s20` / scrape |
 | 2026-09-14 | Nationalbank sub-database on `api.statbank.dk` | ❌ not found |
 | — | Datafordeler GraphQL with a real key, EMOData, Rejseplanen GTFS download | not yet (need credentials) |
+| 2026-09-22 | `STRAF11`, `STRAF22` tableinfo + `validate_config.py` (all 11 + 3 × 2 codes ✓); test cells `STRAF11` code 1 2026K2 København / Aarhus / Odense / Denmark, `STRAF22` København 2025 | ✅ 15 045 / 5 202 / 2 977 / 76 275; ANM 68 802, SIG 11 763 |
+| 2026-09-22 | Safety indicators, 10-area check against statistikbanken.dk (§7c) | ⏳ statistikbanken values pending |
 
 ### 7b. Calculation verification (phase B, 2026-09-14)
 
@@ -290,4 +334,22 @@ Each dashboard value below was recomputed by hand from separate API pulls of the
 
 Definitions confirmed against the source metadata in the same pass: FOLK1E origin codes 24/25/34/35 = immigrants + descendants; HFUDD11 H40–H80 = short-, medium- and long-cycle higher education incl. PhD; BYGV33 phase 3 = completed.
 
-Sources: Danmarks Statistik API docs (https://www.dst.dk/en/Statistik/brug-statistikken/muligheder-i-statistikbanken/api) · Finans Danmark Boligmarkedsstatistikken (https://finansdanmark.dk/tal-og-data/boligstatistik/boligmarkedsstatistikken/) · Klimadatastyrelsen, DAWA lukker 1. oktober 2026 (https://www.klimadatastyrelsen.dk/om-klimadatastyrelsen/nyheder/nyhedsarkiv/2026/jul/dawa-lukker-d-1-oktober-2026) · Datafordeler transition plan (https://datafordeler.dk/vejledning/transitionsnetvaerk/) · BBR GraphQL (https://datafordeler.dk/dataoversigt/bygnings-og-boligregistret-bbr/bbr-graphql/) · boligstat.dk om husleje (https://boligstat.dk/boligstat/dokumenter/omhusleje.html) · Landsbyggefonden Huslejestatistik 2026 (https://lbf.dk/viden/statistikker/huslejestatistik/huslejestatistik-2026) · Plandata WFS (https://geoserver.plandata.dk/geoserver/wfs?request=GetCapabilities&service=WFS) · Eurostat API (https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nama_10r_3gdp?geo=DK011&unit=EUR_HAB&time=2023) · Frie geografiske data, vilkår (https://dataforsyningen.dk/asset/PDF/rettigheder_vilkaar/Vilk%C3%A5r%20for%20brug%20af%20frie%20geografiske%20data.pdf)
+
+### 7c. Safety check against statistikbanken.dk (2026-09-22)
+
+Dashboard values as built on 2026-09-22 (window 2025K3→2026K2; clearance 2025). The raw cells are what statistikbanken.dk shows directly: `STRAF11` code 1 summed over 2025K3–2026K2, `FOLK1A` 2026K3, `STRAF22` code 1 `SIG` / `ANM` 2025. The *statistikbanken.dk* column is filled in from a manual lookup.
+
+| area | code | STRAF11 code 1, 4Q sum | FOLK1A 2026K3 | crime_1000 | violence_1000 | burglary_1000dw | crime_trend | clearance (SIG / ANM) | statistikbanken.dk | result |
+|---|---|---|---|---|---|---|---|---|---|---|
+| København | 101 | 60 286 | 670 389 | 89,9 | 6,3 | 2,8 | −5,6 % | 11 763 / 68 802 → 17,1 % | ⟨statistikbanken⟩ | pending |
+| Aarhus | 751 | 20 430 | 378 270 | 54,0 | 4,4 | 7,1 | −10,7 % | 4 644 / 22 603 → 20,5 % | ⟨statistikbanken⟩ | pending |
+| Odense | 461 | 12 078 | 213 140 | 56,7 | 6,3 | 8,5 | +3,2 % | 4 158 / 12 675 → 32,8 % | ⟨statistikbanken⟩ | pending |
+| Aalborg | 851 | 8 818 | 226 404 | 38,9 | 4,4 | 3,4 | −1,9 % | 2 825 / 9 265 → 30,5 % | ⟨statistikbanken⟩ | pending |
+| Frederiksberg | 147 | 6 423 | 105 947 | 60,6 | 3,5 | 2,3 | −11,4 % | 1 135 / 7 576 → 15,0 % | ⟨statistikbanken⟩ | pending |
+| Gentofte | 157 | 3 557 | 75 241 | 47,3 | 3,6 | 12,9 | −16,8 % | 786 / 4 206 → 18,7 % | ⟨statistikbanken⟩ | pending |
+| Lyngby-Taarbæk | 173 | 3 203 | 58 671 | 54,6 | 4,1 | 8,8 | −12,1 % | 793 / 3 335 → 23,8 % | ⟨statistikbanken⟩ | pending |
+| Esbjerg | 561 | 4 878 | 114 824 | 42,5 | 4,7 | 3,8 | −12,3 % | 2 096 / 5 421 → 38,7 % | ⟨statistikbanken⟩ | pending |
+| Randers | 730 | 3 671 | 100 921 | 36,4 | 5,0 | 4,1 | −11,6 % | 1 282 / 4 176 → 30,7 % | ⟨statistikbanken⟩ | pending |
+| Denmark | 000 | 300 999 | 6 031 699 | 49,9 | 5,0 | 5,3 | −5,0 % | 84 741 / 327 755 → 25,9 % | ⟨statistikbanken⟩ | pending |
+
+Sources: Danmarks Statistik API docs (https://www.dst.dk/en/Statistik/brug-statistikken/muligheder-i-statistikbanken/api) · Finans Danmark Boligmarkedsstatistikken (https://finansdanmark.dk/tal-og-data/boligstatistik/boligmarkedsstatistikken/) · Klimadatastyrelsen, DAWA lukker 1. oktober 2026 (https://www.klimadatastyrelsen.dk/om-klimadatastyrelsen/nyheder/nyhedsarkiv/2026/jul/dawa-lukker-d-1-oktober-2026) · Datafordeler transition plan (https://datafordeler.dk/vejledning/transitionsnetvaerk/) · BBR GraphQL (https://datafordeler.dk/dataoversigt/bygnings-og-boligregistret-bbr/bbr-graphql/) · boligstat.dk om husleje (https://boligstat.dk/boligstat/dokumenter/omhusleje.html) · Landsbyggefonden Huslejestatistik 2026 (https://lbf.dk/viden/statistikker/huslejestatistik/huslejestatistik-2026) · DST STRAF11 documentation (https://www.dst.dk/documentationofstatistics/c1ac7749-1e15-4d3a-8ed0-fb2d26a9fe93) · Plandata WFS (https://geoserver.plandata.dk/geoserver/wfs?request=GetCapabilities&service=WFS) · Eurostat API (https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nama_10r_3gdp?geo=DK011&unit=EUR_HAB&time=2023) · Frie geografiske data, vilkår (https://dataforsyningen.dk/asset/PDF/rettigheder_vilkaar/Vilk%C3%A5r%20for%20brug%20af%20frie%20geografiske%20data.pdf)

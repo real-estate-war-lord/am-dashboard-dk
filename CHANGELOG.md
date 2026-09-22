@@ -1,5 +1,14 @@
 # Changelog
 
+## v2.0 — unreleased (Safety; ships together with the infrastructure overlay)
+- **Safety indicators** from Statistics Denmark — `STRAF11` (reported offences by place of offence, quarterly from 2007) and `STRAF22` (reports and charges, annual): reported crime, violent crime, property crime and drug/weapons offences per 1,000 inhabitants, residential burglaries per 1,000 dwellings, reported crime y/y and the share of penal-code reports with a charge. Rolling four quarters, municipality level; postal codes and Copenhagen quarters inherit the municipality value (°). Registry fields `direction`, `note`, `chip`, `history_from`, `map_from`, `breaks`.
+- **Map and table**: *Crime* chip, *Safety* group in the indicator select (terracotta ramp), fifth figure *Crime* in the municipality card, Safety block in popups and on area pages, Safety columns in the table while a Safety indicator is selected; the details line shows the registry note and "Danmarks Statistik, STRAF11 / FOLK1A, as of 2025K3→2026K2, fetched …".
+- **Direction-aware ranks**: "#n of 98" counts from the best end — for *lower is better* indicators (Safety, unemployment) #1 is the lowest value; y/y and vs-median colours and the first click on a table column follow the same sense; legends say "↓ lower is better · darkest = highest".
+- **Charts**: axis starts at each indicator's first year (crime 2007); *Yearly | Quarterly* toggle for rolling-quarter series (2008 Q1 → latest); overlays of related indicators; dashed *Denmark* reference line (DST area 000); series breaks from the registry drawn as markers with the source's wording as tooltip; the axis stays at 0 for all-positive series.
+- **Year selector**: Safety indicators offer 2008 → latest; rolling indicators whose window ends in the latest year are labelled "2026 (latest)" instead of "latest (2025 data)".
+- **Sources**: *Fetched* column filled for every table (date of the raw pull); STRAF11/STRAF22 listed with their `updated` stamps.
+- Tests: `tests/test_safety.py` (`python3 -m unittest discover -s tests`) — rolling window, suppression, multi-code select, yearly filing, København 89.9 per 1,000 and clearance 17.1 % from the raw pulls.
+
 ## v1.9 — 2026-09-20
 - **Overview first**: the top bar is a breadcrumb (Denmark › municipality › area — every step a link) and the sidebar shows names only; the duplicate card titles, back-links and "× Denmark" chips are gone, so the map starts ~110 px higher.
 - **Indicator picker**: grouped select plus quick chips (Growth · Price/m² · Rent · Unemp. · Rented · Supply) on the map and in the table; the indicator's definition, source, coverage and history are folded behind *ⓘ details* (one line by default).
