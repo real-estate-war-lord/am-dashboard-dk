@@ -76,7 +76,8 @@ def rows_for_year(rs, year, calc):
 def apply_select(rs, select):
     if not select:
         return rs
-    return [r for r in rs if all(r.get(k) == v for k, v in select.items())]
+    # a list value selects several codes (their rows are summed by the calc)
+    return [r for r in rs if all(r.get(k) in v if isinstance(v, list) else r.get(k) == v for k, v in select.items())]
 
 
 # ---------- calcs: each returns {area_code: value} ----------
@@ -193,6 +194,98 @@ def calc_sum4q_per_1000(rs, src):
     return {a: v / dw[a] * 1000 for a, v in by.items() if dw.get(a)}, f"{ps[0]}–{ps[-1]}"
 
 
+# ---------- rolling 4-quarter calcs (Safety: STRAF11 counts, not seasonally adjusted) ----------
+
+def q_shift(t, n):
+    """'2026K2' shifted by n quarters: q_shift('2026K2', 1) -> '2026K3'."""
+    y, _, q = period_parts(t)
+    i = y * 4 + q - 1 + n
+    return f"{i // 4}K{i % 4 + 1}"
+
+
+def rolling_window(rs, year=None, end=None):
+    """The four quarters ending at `end`, at Q4 of `year` (yearly history) or at the latest
+    quarter (live value); None when any of them is not in the data."""
+    have = {r["TID"] for r in rs}
+    end = end or (f"{year}K4" if year else max(have, key=period_key))
+    win = [q_shift(end, -k) for k in (3, 2, 1, 0)]
+    return win if set(win) <= have else None
+
+
+def window_sums(rs, col, win):
+    """{area: sum over the window}; an area with a suppressed ('..') or missing cell gets None — never imputed."""
+    cells = {}
+    for r in rs:
+        if r["TID"] in win:
+            cells.setdefault(norm_area(col, r[col]), {}).setdefault(r["TID"], []).append(r["INDHOLD"])
+    return {a: None if set(d) != set(win) or any(v is None for vs in d.values() for v in vs) else sum(v for vs in d.values() for v in vs)
+            for a, d in cells.items()}
+
+
+def rolling4q(calc, num_rows, num_src, den_rows=None, year=None, end=None):
+    """Returns ({area: value}, period), or ({}, None) when the window is incomplete.
+    rolling4q_per_1000_pop       4Q sum ÷ population at the end of the window × 1000. FOLK1A counts
+                                 the 1st day of a quarter, so the end of 2026K2 is FOLK1A 2026K3
+                                 (falls back to the window's last quarter if not yet published).
+    rolling4q_per_1000_dwellings 4Q sum ÷ BOL101 dwellings at the end of the window (1 Jan of the
+                                 following year, else 1 Jan of the window's year) × 1000.
+    rolling4q_yoy_pct            4Q sum vs the 4 quarters before, %."""
+    rs = apply_select(num_rows, num_src.get("select"))
+    col = area_col(rs[0])
+    win = rolling_window(rs, year, end)
+    if not win:
+        return {}, None
+    cur = window_sums(rs, col, win)
+    per = f"{win[0]}→{win[-1]}"
+    if calc == "rolling4q_yoy_pct":
+        prev_win = [q_shift(t, -4) for t in win]
+        if not set(prev_win) <= {r["TID"] for r in rs}:
+            return {}, None
+        prev = window_sums(rs, col, prev_win)
+        # the label names only the current window: the history loop files a value under the last period it names
+        return {a: (v / prev[a] - 1) * 100 if v is not None and prev.get(a) else None for a, v in cur.items()}, f"{per} vs 4Q before"
+    dcol = area_col(den_rows[0]); dper = {r["TID"] for r in den_rows}
+    if calc == "rolling4q_per_1000_pop":
+        dp = next((p for p in (q_shift(win[-1], 1), win[-1]) if p in dper), None)
+    elif calc == "rolling4q_per_1000_dwellings":
+        ey = period_parts(win[-1])[0]
+        dp = next((p for p in (str(ey + 1), str(ey)) if p in dper), None)
+    else:
+        raise ValueError(f"unknown rolling calc {calc}")
+    if dp is None:
+        return {}, None
+    den = sum_by_area(den_rows, dcol, dp)
+    return {a: v / den[a] * 1000 if v is not None and den.get(a) else None for a, v in cur.items()}, per
+
+
+def rolling_inputs(ind):
+    srcs = ind["sources"]; s = srcs[0]
+    num = rows(s.get("db", ""), s["table"], s.get("pull"))
+    den = rows(srcs[1].get("db", ""), srcs[1]["table"], srcs[1].get("pull")) if len(srcs) > 1 else None
+    return num, s, den
+
+
+def calc_rolling4q(ind, year=None):
+    num, s, den = rolling_inputs(ind)
+    return rolling4q(ind["calc"], num, s, den, year)
+
+
+def rolling4q_series(ind, start):
+    """Quarterly rolling-4Q series: [(end quarter, {area: value})] for every window end from
+    `start` to the latest quarter that has a complete window and denominator."""
+    num, s, den = rolling_inputs(ind)
+    num = apply_select(num, s.get("select"))          # select once, not per quarter
+    qs = sorted({r["TID"] for r in num}, key=period_key)
+    out = []
+    for q in qs:
+        if period_key(q) < period_key(start):
+            continue
+        vals, per = rolling4q(ind["calc"], num, {}, den, end=q)
+        if per:
+            out.append((q, vals))
+    return out
+
+
 CALCS = {
     "passthrough": calc_passthrough, "value_div_1000": calc_passthrough,
     "share_of_total": calc_share_of_total, "yoy_pct": calc_yoy_pct,
@@ -241,6 +334,9 @@ def compute(ind, year=None):
         per = f"BBR {b['meta']['built']}"
         return {"kommune": ({k: v.get(ind["key"]) for k, v in b["kommune"].items()}, per),
                 "postnr": ({k: v.get(ind["key"]) for k, v in b["postnr"].items()}, per)}
+    if calc.startswith("rolling4q"):
+        vals, p = calc_rolling4q(ind, year)
+        return {srcs[0]["geo"]: (vals, p)} if p else {}
     sel = (lambda rs: rows_for_year(rs, year, calc)) if year else (lambda rs: rs)
     if calc == "ratio_pct":
         numr, p = calc_passthrough(sel(rows(srcs[0].get("db", ""), srcs[0]["table"], srcs[0].get("pull"))), srcs[0])
@@ -261,6 +357,12 @@ def compute(ind, year=None):
         vals, p = CALCS[calc](rs, s)
         res[s["geo"]] = (vals, p)
     return res
+
+
+def fetched(db, table):
+    """Date of the newest raw pull of a table (from the file name, e.g. dst_STRAF11_offences_2026-09-22.csv)."""
+    files = list(RAW.glob(f"{db or 'dst'}_{table}_20*.csv")) + list(RAW.glob(f"{db or 'dst'}_{table}_*_20*.csv"))
+    return max((f.stem[-10:] for f in files), default="")
 
 
 def load_geo(name):
@@ -329,6 +431,9 @@ def main():
     n_hist = int(c.get("history_years", 4))
     latest_year = period_parts(p)[0]
     years = list(range(latest_year - n_hist + 1, latest_year + 1))
+    all_years = set(years)
+    # Denmark as a whole (area code 000 → "0") where a calc yields it: the dashed reference line in Charts
+    national = {"code": "0", "name": "Denmark", "hist": {}, "q": {}}
     for m in munis.values():
         m["hist"] = {}
     for a in areas.values():
@@ -336,7 +441,9 @@ def main():
     for ind in c["indicators"]:
         # history: same calc, rows cut at each reference year
         hist_asof = {}
-        for y in years:
+        # `history_from` extends one indicator's yearly history beyond history_years (Safety: STRAF11 from 2007)
+        ind_years = list(range(min(int(ind.get("history_from", years[0])), years[0]), latest_year + 1))
+        for y in ind_years:
             CURRENT_YEAR = y
             try:
                 res_y = compute(ind, y)
@@ -349,7 +456,10 @@ def main():
                 if ay != str(y):
                     continue
                 hist_asof.setdefault(ay, {})[geo] = per
+                all_years.add(y)
                 if geo == "kommune":
+                    if vals.get("0") is not None:
+                        national["hist"].setdefault(ind["key"], {})[ay] = round(vals["0"], 2)
                     for a_, v in vals.items():
                         if a_ in munis and v is not None:
                             munis[a_]["hist"].setdefault(ind["key"], {})[ay] = round(v, 2)
@@ -374,6 +484,8 @@ def main():
         for geo, (vals, per) in res.items():
             asof[geo] = per
             if geo == "kommune":
+                if vals.get("0") is not None:
+                    national[ind["key"]] = round(vals["0"], 2)
                 for a, v in vals.items():
                     if a in munis and v is not None:
                         munis[a][ind["key"]] = round(v, 2)
@@ -394,10 +506,19 @@ def main():
                     for a in areas.values():
                         if (a.get("pop") or 0) < MIN_POP_GROWTH:
                             a.pop("growth", None)
-        indicators_out.append({k: ind[k] for k in ("key", "label", "short", "unit", "level", "hue", "group") if k in ind} |
+        indicators_out.append({k: ind[k] for k in ("key", "label", "short", "unit", "level", "hue", "group", "direction", "note", "note_short", "chip") if k in ind} |
                               {"fmt": ind.get("fmt", "pct1"), "desc": ind.get("desc", ""), "source": ind.get("source", ""),
                                "warn": ind.get("warn", ""), "table_only": ind.get("table_only", False), "asof": asof,
-                               "hist_asof": hist_asof})
+                               "hist_asof": hist_asof,
+                               "tables": list(dict.fromkeys(f"{s.get('db') or 'dst'}/{s['table']}" for s in ind["sources"] if s.get("db", "") in ("", "s20", "s30")))} |
+                              {k: ind[k] for k in ("history_from", "map_from", "breaks") if k in ind})
+        # quarterly rolling series (municipalities + Denmark), from `map_from` Q1; one array per indicator aligned to q_periods
+        if ind["calc"].startswith("rolling4q"):
+            ser = rolling4q_series(ind, f"{ind.get('map_from', years[0])}K1")
+            if len(ser) >= 2:
+                indicators_out[-1]["q_periods"] = [q for q, _ in ser]
+                for code, m in list(munis.items()) + [("0", national)]:
+                    m.setdefault("q", {})[ind["key"]] = [None if vals.get(code) is None else round(vals[code], 2) for _, vals in ser]
 
     # BBR housing-stock distributions for the area pages
     bbr = load_bbr()
@@ -418,7 +539,7 @@ def main():
             seen.add(key)
             m = meta(*key)
             sources.append({"key": f"{key[0] or 'dst'}/{key[1]}", "label": f"{'Finans Danmark' if key[0]=='s20' else 'Københavns Kommune' if key[0]=='s30' else 'Danmarks Statistik'} {key[1]}",
-                            "tables": m.get("text", ""), "asof": m.get("updated", "")[:10], "url": f"https://api.statbank.dk/v1/{key[0] + '/' if key[0] else ''}tableinfo/{key[1]}",
+                            "tables": m.get("text", ""), "asof": m.get("updated", "")[:10], "fetched": fetched(*key), "url": f"https://api.statbank.dk/v1/{key[0] + '/' if key[0] else ''}tableinfo/{key[1]}",
                             "licence": "free reuse with attribution"})
     if bbr:
         sources.append({"key": "bbr", "label": f"BBR via Datafordeler — housing stock ({len(bbr['meta']['municipalities'])} municipalities, {bbr['meta']['dwellings']:,} dwellings)".replace(",", " "),
@@ -430,10 +551,11 @@ def main():
     attribution = ["Danmarks Statistik", "Finans Danmark, Boligmarkedsstatistikken", "Social- og Boligstyrelsen", "Landsbyggefonden",
                    "Indeholder data fra Klimadatastyrelsen (DAGI, BBR)", "Danmarks Nationalbank"]
     out = {
-        "meta": {"built": dt.date.today().isoformat(), "sources": sources, "attribution": attribution, "years": [str(y) for y in years], "latest_year": str(latest_year),
+        "meta": {"built": dt.date.today().isoformat(), "sources": sources, "attribution": attribution, "years": [str(y) for y in sorted(all_years)], "latest_year": str(latest_year),
                  "note": "Postal codes take their dominant municipality. Cells with too few observations are suppressed by the source and shown as –.",
                  "warnings": warnings},
         "indicators": indicators_out,
+        "national": national,
         "municipalities": sorted(munis.values(), key=lambda m: -(m["pop"] or 0)),
         "areas": [a for a in areas.values() if a.get("muni") in munis],
     }

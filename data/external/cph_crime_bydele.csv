@@ -1,0 +1,15 @@
+year;crime_year;bydel_pdf;safe_pct;crime_1000;reports_n;violence_1000inh;burglary_1000inh;source_page;note
+2026;2025;Hele København;86;75;50337;;;2/29;"city total; includes reports not placed in any bydel, so it is above the population-weighted mean of the bydele"
+2026;2025;Amager Vest;89;72;6558;2;1;35-36/39;
+2026;2025;Amager Øst;85;48;3070;2;1;42-43/46;
+2026;2025;Bispebjerg;80;45;2484;3;1;49-50/53;"fact box p. 49 says 76 % (and a different evening/night share) — results page p. 50 and the p. 7 map say 80 %; results page used"
+2026;2025;Brønshøj-Husum;76;37;1668;2;3;56-57/60;
+2026;2025;Christianshavn;74;94;1271;5;1;63-64/67;
+2026;2025;Indre By;90;263;11544;12;1;70-71/74;
+2026;2025;Indre Nørrebro;88;48;1642;3;2;77-78/81;
+2026;2025;Ydre Nørrebro;84;48;2184;3;1;84-85/88;
+2026;2025;Kgs. Enghave;84;46;1597;3;1;91-92/95;
+2026;2025;Valby;79;43;2849;2;2;98-99/102;single figure published for neighbourhood and evening/night safety
+2026;2025;Vanløse;90;38;1562;2;2;105-106/109;
+2026;2025;Vesterbro;89;120;5994;4;1;112-113/116;
+2026;2025;Østerbro;92;45;3672;2;1;119-120/123;
