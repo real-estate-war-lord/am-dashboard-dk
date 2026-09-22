@@ -1,0 +1,931 @@
+{
+ "id": "STRAF22",
+ "text": "Reported criminal offences and charges",
+ "description": "Reported criminal offences and charges by region, type of offence, reported criminal offences and charges and time",
+ "unit": "Number",
+ "suppressedDataValue": "0",
+ "updated": "2026-02-19T08:00:00",
+ "active": true,
+ "contacts": [
+  {
+   "name": "Iben Birgitte Pedersen",
+   "phone": "+4523603711",
+   "mail": "ipe@dst.dk"
+  }
+ ],
+ "documentation": {
+  "id": "028a7e24-ff82-4219-89ae-67520ea95adf",
+  "url": "https://www.dst.dk/documentationofstatistics/028a7e24-ff82-4219-89ae-67520ea95adf"
+ },
+ "footnote": {
+  "text": "The number of reported criminal offences for Legislation on animals, hunting, etc. is too low in 2023. There are approximately 1,700 registrations missing.    \r\n \r\n  The provisions of the Danish Criminal Code regarding sexual offences went through essential amendments taking effect from 1 July 2013. The amendments resulted in e.g. more categories of sexual offences than previously being placed under the provisions about rape (section 216). See more in the documentation of statistics, in the chapter Comparability: http://www.dst.dk/declarations//028a7e24-ff82-4219-89ae-67520ea95adf",
+  "mandatory": true
+ },
+ "variables": [
+  {
+   "id": "OMRÅDE",
+   "text": "region",
+   "elimination": true,
+   "time": false,
+   "map": "denmark_municipality_07",
+   "values": [
+    {
+     "id": "000",
+     "text": "All Denmark"
+    },
+    {
+     "id": "084",
+     "text": "Region Hovedstaden"
+    },
+    {
+     "id": "101",
+     "text": "Copenhagen"
+    },
+    {
+     "id": "147",
+     "text": "Frederiksberg"
+    },
+    {
+     "id": "155",
+     "text": "Dragør"
+    },
+    {
+     "id": "185",
+     "text": "Tårnby"
+    },
+    {
+     "id": "165",
+     "text": "Albertslund"
+    },
+    {
+     "id": "151",
+     "text": "Ballerup"
+    },
+    {
+     "id": "153",
+     "text": "Brøndby"
+    },
+    {
+     "id": "157",
+     "text": "Gentofte"
+    },
+    {
+     "id": "159",
+     "text": "Gladsaxe"
+    },
+    {
+     "id": "161",
+     "text": "Glostrup"
+    },
+    {
+     "id": "163",
+     "text": "Herlev"
+    },
+    {
+     "id": "167",
+     "text": "Hvidovre"
+    },
+    {
+     "id": "169",
+     "text": "Høje-Taastrup"
+    },
+    {
+     "id": "183",
+     "text": "Ishøj"
+    },
+    {
+     "id": "173",
+     "text": "Lyngby-Taarbæk"
+    },
+    {
+     "id": "175",
+     "text": "Rødovre"
+    },
+    {
+     "id": "187",
+     "text": "Vallensbæk"
+    },
+    {
+     "id": "201",
+     "text": "Allerød"
+    },
+    {
+     "id": "240",
+     "text": "Egedal"
+    },
+    {
+     "id": "210",
+     "text": "Fredensborg"
+    },
+    {
+     "id": "250",
+     "text": "Frederikssund"
+    },
+    {
+     "id": "190",
+     "text": "Furesø"
+    },
+    {
+     "id": "270",
+     "text": "Gribskov"
+    },
+    {
+     "id": "260",
+     "text": "Halsnæs"
+    },
+    {
+     "id": "217",
+     "text": "Helsingør"
+    },
+    {
+     "id": "219",
+     "text": "Hillerød"
+    },
+    {
+     "id": "223",
+     "text": "Hørsholm"
+    },
+    {
+     "id": "230",
+     "text": "Rudersdal"
+    },
+    {
+     "id": "400",
+     "text": "Bornholm"
+    },
+    {
+     "id": "411",
+     "text": "Christiansø"
+    },
+    {
+     "id": "085",
+     "text": "Region Sjælland"
+    },
+    {
+     "id": "253",
+     "text": "Greve"
+    },
+    {
+     "id": "259",
+     "text": "Køge"
+    },
+    {
+     "id": "350",
+     "text": "Lejre"
+    },
+    {
+     "id": "265",
+     "text": "Roskilde"
+    },
+    {
+     "id": "269",
+     "text": "Solrød"
+    },
+    {
+     "id": "320",
+     "text": "Faxe"
+    },
+    {
+     "id": "376",
+     "text": "Guldborgsund"
+    },
+    {
+     "id": "316",
+     "text": "Holbæk"
+    },
+    {
+     "id": "326",
+     "text": "Kalundborg"
+    },
+    {
+     "id": "360",
+     "text": "Lolland"
+    },
+    {
+     "id": "370",
+     "text": "Næstved"
+    },
+    {
+     "id": "306",
+     "text": "Odsherred"
+    },
+    {
+     "id": "329",
+     "text": "Ringsted"
+    },
+    {
+     "id": "330",
+     "text": "Slagelse"
+    },
+    {
+     "id": "340",
+     "text": "Sorø"
+    },
+    {
+     "id": "336",
+     "text": "Stevns"
+    },
+    {
+     "id": "390",
+     "text": "Vordingborg"
+    },
+    {
+     "id": "083",
+     "text": "Region Syddanmark"
+    },
+    {
+     "id": "420",
+     "text": "Assens"
+    },
+    {
+     "id": "430",
+     "text": "Faaborg-Midtfyn"
+    },
+    {
+     "id": "440",
+     "text": "Kerteminde"
+    },
+    {
+     "id": "482",
+     "text": "Langeland"
+    },
+    {
+     "id": "410",
+     "text": "Middelfart"
+    },
+    {
+     "id": "480",
+     "text": "Nordfyns"
+    },
+    {
+     "id": "450",
+     "text": "Nyborg"
+    },
+    {
+     "id": "461",
+     "text": "Odense"
+    },
+    {
+     "id": "479",
+     "text": "Svendborg"
+    },
+    {
+     "id": "492",
+     "text": "Ærø"
+    },
+    {
+     "id": "530",
+     "text": "Billund"
+    },
+    {
+     "id": "561",
+     "text": "Esbjerg"
+    },
+    {
+     "id": "563",
+     "text": "Fanø"
+    },
+    {
+     "id": "607",
+     "text": "Fredericia"
+    },
+    {
+     "id": "510",
+     "text": "Haderslev"
+    },
+    {
+     "id": "621",
+     "text": "Kolding"
+    },
+    {
+     "id": "540",
+     "text": "Sønderborg"
+    },
+    {
+     "id": "550",
+     "text": "Tønder"
+    },
+    {
+     "id": "573",
+     "text": "Varde"
+    },
+    {
+     "id": "575",
+     "text": "Vejen"
+    },
+    {
+     "id": "630",
+     "text": "Vejle"
+    },
+    {
+     "id": "580",
+     "text": "Aabenraa"
+    },
+    {
+     "id": "082",
+     "text": "Region Midtjylland"
+    },
+    {
+     "id": "710",
+     "text": "Favrskov"
+    },
+    {
+     "id": "766",
+     "text": "Hedensted"
+    },
+    {
+     "id": "615",
+     "text": "Horsens"
+    },
+    {
+     "id": "707",
+     "text": "Norddjurs"
+    },
+    {
+     "id": "727",
+     "text": "Odder"
+    },
+    {
+     "id": "730",
+     "text": "Randers"
+    },
+    {
+     "id": "741",
+     "text": "Samsø"
+    },
+    {
+     "id": "740",
+     "text": "Silkeborg"
+    },
+    {
+     "id": "746",
+     "text": "Skanderborg"
+    },
+    {
+     "id": "706",
+     "text": "Syddjurs"
+    },
+    {
+     "id": "751",
+     "text": "Aarhus"
+    },
+    {
+     "id": "657",
+     "text": "Herning"
+    },
+    {
+     "id": "661",
+     "text": "Holstebro"
+    },
+    {
+     "id": "756",
+     "text": "Ikast-Brande"
+    },
+    {
+     "id": "665",
+     "text": "Lemvig"
+    },
+    {
+     "id": "760",
+     "text": "Ringkøbing-Skjern"
+    },
+    {
+     "id": "779",
+     "text": "Skive"
+    },
+    {
+     "id": "671",
+     "text": "Struer"
+    },
+    {
+     "id": "791",
+     "text": "Viborg"
+    },
+    {
+     "id": "081",
+     "text": "Region Nordjylland"
+    },
+    {
+     "id": "810",
+     "text": "Brønderslev"
+    },
+    {
+     "id": "813",
+     "text": "Frederikshavn"
+    },
+    {
+     "id": "860",
+     "text": "Hjørring"
+    },
+    {
+     "id": "849",
+     "text": "Jammerbugt"
+    },
+    {
+     "id": "825",
+     "text": "Læsø"
+    },
+    {
+     "id": "846",
+     "text": "Mariagerfjord"
+    },
+    {
+     "id": "773",
+     "text": "Morsø"
+    },
+    {
+     "id": "840",
+     "text": "Rebild"
+    },
+    {
+     "id": "787",
+     "text": "Thisted"
+    },
+    {
+     "id": "820",
+     "text": "Vesthimmerlands"
+    },
+    {
+     "id": "851",
+     "text": "Aalborg"
+    },
+    {
+     "id": "998",
+     "text": "Not stated municipality"
+    }
+   ]
+  },
+  {
+   "id": "OVERTRÆD",
+   "text": "type of offence",
+   "elimination": true,
+   "time": false,
+   "values": [
+    {
+     "id": "TOT",
+     "text": "Nature of the offence, total"
+    },
+    {
+     "id": "1",
+     "text": "Criminal code, total"
+    },
+    {
+     "id": "1000",
+     "text": "Criminal code, unspecified"
+    },
+    {
+     "id": "11",
+     "text": "Sexual offenses, total"
+    },
+    {
+     "id": "1110",
+     "text": "Incest, etc."
+    },
+    {
+     "id": "1120",
+     "text": "Rape, etc."
+    },
+    {
+     "id": "1130",
+     "text": "Heterosexual offence against a child under 12 (Repealed in 2013)"
+    },
+    {
+     "id": "1131",
+     "text": "Sexual offence against a child under 12 (New from 2013)"
+    },
+    {
+     "id": "1140",
+     "text": "Any other kind of heterosexual offence (Repealed in 2013)"
+    },
+    {
+     "id": "1141",
+     "text": "Sexual offence against a child under 15 (New from 2013)"
+    },
+    {
+     "id": "1145",
+     "text": "Any other kind of sexual offence (New from 2013)"
+    },
+    {
+     "id": "1146",
+     "text": "Grooming"
+    },
+    {
+     "id": "1150",
+     "text": "Homosexual offence against a child under 12 (Repealed in 2013)"
+    },
+    {
+     "id": "1160",
+     "text": "Any other kind of homosexual offence (Repealed in 2013)"
+    },
+    {
+     "id": "1172",
+     "text": "Offence against public decency by groping"
+    },
+    {
+     "id": "1174",
+     "text": "Offence against public decency by indecent exposure"
+    },
+    {
+     "id": "1176",
+     "text": "Any other kind of offence against public decency"
+    },
+    {
+     "id": "1180",
+     "text": "Prostitution, etc."
+    },
+    {
+     "id": "12",
+     "text": "Crimes of violence, total"
+    },
+    {
+     "id": "1210",
+     "text": "Violence against public authority"
+    },
+    {
+     "id": "1220",
+     "text": "Unlawful assembly/disturbance of public order"
+    },
+    {
+     "id": "1230",
+     "text": "Homicide"
+    },
+    {
+     "id": "1240",
+     "text": "Attempted homicide"
+    },
+    {
+     "id": "1250",
+     "text": "Coercive control etc"
+    },
+    {
+     "id": "1252",
+     "text": "Common assault"
+    },
+    {
+     "id": "1255",
+     "text": "Assault causing actual bodily harm"
+    },
+    {
+     "id": "1258",
+     "text": "Particularly aggravated assault"
+    },
+    {
+     "id": "1260",
+     "text": "Unprovoked assault"
+    },
+    {
+     "id": "1270",
+     "text": "Any other kind of intentional trespass to the person"
+    },
+    {
+     "id": "1280",
+     "text": "Intentional bodily harm"
+    },
+    {
+     "id": "1283",
+     "text": "Causing death or bodily harm by negligence"
+    },
+    {
+     "id": "1286",
+     "text": "Offences against life and limb"
+    },
+    {
+     "id": "1289",
+     "text": "Offences against personal liberty"
+    },
+    {
+     "id": "1292",
+     "text": "Threats"
+    },
+    {
+     "id": "13",
+     "text": "Offences against property, total"
+    },
+    {
+     "id": "1304",
+     "text": "Forgery "
+    },
+    {
+     "id": "1308",
+     "text": "Cheque forgery "
+    },
+    {
+     "id": "1312",
+     "text": "Arson"
+    },
+    {
+     "id": "1316",
+     "text": "Burglary - business and community"
+    },
+    {
+     "id": "1320",
+     "text": "Residential burglaries"
+    },
+    {
+     "id": "1324",
+     "text": "Burglary (uninhabited buildings)"
+    },
+    {
+     "id": "1328",
+     "text": "Theft from conveyances"
+    },
+    {
+     "id": "1332",
+     "text": "Shoplifting, etc."
+    },
+    {
+     "id": "1336",
+     "text": "Other kinds of theft"
+    },
+    {
+     "id": "1339",
+     "text": "Theft of/taking vehicle without the owners consent (TWOC)"
+    },
+    {
+     "id": "1342",
+     "text": "Theft of/taking moped without the owners consent (TWOC)"
+    },
+    {
+     "id": "1345",
+     "text": "Theft of/taking bicycle without the owners consent (TWOC)"
+    },
+    {
+     "id": "1348",
+     "text": "Theft of/taking other objects without the owners consent (TWOC)"
+    },
+    {
+     "id": "1351",
+     "text": "Theft by finding"
+    },
+    {
+     "id": "1354",
+     "text": "Embezzlement "
+    },
+    {
+     "id": "1357",
+     "text": "Fraud "
+    },
+    {
+     "id": "1360",
+     "text": "Fraud by cheque "
+    },
+    {
+     "id": "1363",
+     "text": "Fraud by abuse of position"
+    },
+    {
+     "id": "1366",
+     "text": "Blackmail and usury"
+    },
+    {
+     "id": "1372",
+     "text": "Fraud against creditors "
+    },
+    {
+     "id": "1376",
+     "text": "Handling stolen goods"
+    },
+    {
+     "id": "1380",
+     "text": "Robbery"
+    },
+    {
+     "id": "1384",
+     "text": "Aggravated tax evasion etc."
+    },
+    {
+     "id": "1390",
+     "text": "Malicious damage to property"
+    },
+    {
+     "id": "1394",
+     "text": "Receiving stolen goods by negligence"
+    },
+    {
+     "id": "1398",
+     "text": "Offence against and infringement of property"
+    },
+    {
+     "id": "14",
+     "text": "Other offences, total"
+    },
+    {
+     "id": "1410",
+     "text": "Offences against public authority, etc."
+    },
+    {
+     "id": "1415",
+     "text": "Offences by public servants "
+    },
+    {
+     "id": "1420",
+     "text": "Perjury"
+    },
+    {
+     "id": "1425",
+     "text": "Any other kind of false statement"
+    },
+    {
+     "id": "1430",
+     "text": "Offences concerning money and evidence "
+    },
+    {
+     "id": "1435",
+     "text": "Trafficking of drugs, etc."
+    },
+    {
+     "id": "1440",
+     "text": "Smuggling etc. of drugs"
+    },
+    {
+     "id": "1445",
+     "text": "General public offences etc."
+    },
+    {
+     "id": "1450",
+     "text": "Illegal trade, etc."
+    },
+    {
+     "id": "1455",
+     "text": "Family relation offences "
+    },
+    {
+     "id": "1460",
+     "text": "Involuntary manslaughter etc. in connection with traffic accident"
+    },
+    {
+     "id": "1475",
+     "text": "Non-molestation order (Repealed in 2012)"
+    },
+    {
+     "id": "1485",
+     "text": "Invasion of privacy and defamation"
+    },
+    {
+     "id": "3",
+     "text": "Special acts, total"
+    },
+    {
+     "id": "3210",
+     "text": "Euphoriants Act "
+    },
+    {
+     "id": "3410",
+     "text": "The Offensive Weapons Act"
+    },
+    {
+     "id": "3610",
+     "text": "Tax legislation and fiscal acts, etc."
+    },
+    {
+     "id": "3810",
+     "text": "Other special acts in criminal law"
+    },
+    {
+     "id": "3815",
+     "text": "Health and social security legislation "
+    },
+    {
+     "id": "3820",
+     "text": "Building and housing legislation "
+    },
+    {
+     "id": "3825",
+     "text": "The environmental protection act"
+    },
+    {
+     "id": "3830",
+     "text": "Legislation on animals, hunting, etc."
+    },
+    {
+     "id": "3835",
+     "text": "Legislation on employment, transport, etc."
+    },
+    {
+     "id": "3840",
+     "text": "The Companies Act "
+    },
+    {
+     "id": "3845",
+     "text": "Legislation on the national defence"
+    },
+    {
+     "id": "3850",
+     "text": "Legislation applying to public utilities "
+    },
+    {
+     "id": "3855",
+     "text": "Legislation on gambling, licencing, trade "
+    },
+    {
+     "id": "3865",
+     "text": "Any other special legislation"
+    },
+    {
+     "id": "3870",
+     "text": "Special legislation, unspecified"
+    }
+   ]
+  },
+  {
+   "id": "ANMSIGT",
+   "text": "reported criminal offences and charges",
+   "elimination": false,
+   "time": false,
+   "values": [
+    {
+     "id": "ANM",
+     "text": "Reported criminal offences"
+    },
+    {
+     "id": "SIG",
+     "text": "Reported criminal offences with charge"
+    }
+   ]
+  },
+  {
+   "id": "Tid",
+   "text": "time",
+   "elimination": false,
+   "time": true,
+   "values": [
+    {
+     "id": "2007",
+     "text": "2007"
+    },
+    {
+     "id": "2008",
+     "text": "2008"
+    },
+    {
+     "id": "2009",
+     "text": "2009"
+    },
+    {
+     "id": "2010",
+     "text": "2010"
+    },
+    {
+     "id": "2011",
+     "text": "2011"
+    },
+    {
+     "id": "2012",
+     "text": "2012"
+    },
+    {
+     "id": "2013",
+     "text": "2013"
+    },
+    {
+     "id": "2014",
+     "text": "2014"
+    },
+    {
+     "id": "2015",
+     "text": "2015"
+    },
+    {
+     "id": "2016",
+     "text": "2016"
+    },
+    {
+     "id": "2017",
+     "text": "2017"
+    },
+    {
+     "id": "2018",
+     "text": "2018"
+    },
+    {
+     "id": "2019",
+     "text": "2019"
+    },
+    {
+     "id": "2020",
+     "text": "2020"
+    },
+    {
+     "id": "2021",
+     "text": "2021"
+    },
+    {
+     "id": "2022",
+     "text": "2022"
+    },
+    {
+     "id": "2023",
+     "text": "2023"
+    },
+    {
+     "id": "2024",
+     "text": "2024"
+    },
+    {
+     "id": "2025",
+     "text": "2025"
+    }
+   ]
+  }
+ ]
+}

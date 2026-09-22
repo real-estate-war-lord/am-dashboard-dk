@@ -1,5 +1,5 @@
 {
- "_doc": "Indicator registry for the Danish makro view. `db` = '' (Statistics Denmark), 's20' (Finans Danmark) or 's30' (Copenhagen). `level` = finest geography the indicator natively exists at. `calc` describes the post-processing in build_makro.py. `hue` = RGB target for the choropleth ramp (paper #EFF2EE → hue). `pull` names a raw file when one table is fetched with several selections. `SUM` = omit the variable so the API returns its total. `TODO:word` = placeholder; validate_config.py lists codes whose label contains the word.",
+ "_doc": "Indicator registry for the Danish makro view. `db` = '' (Statistics Denmark), 's20' (Finans Danmark) or 's30' (Copenhagen). `level` = finest geography the indicator natively exists at. `calc` describes the post-processing in build_makro.py. `hue` = RGB target for the choropleth ramp (paper #EFF2EE → hue). `pull` names a raw file when one table is fetched with several selections. `SUM` = omit the variable so the API returns its total. `TODO:word` = placeholder; validate_config.py lists codes whose label contains the word. `direction` = 'higher_better' | 'lower_better' — which end of the scale is favourable (ranking and good/bad colouring). `note` = glossary text for the indicator's details. `chip` = true puts the indicator in the quick-pick chip row. Rolling-quarter calcs (Safety): `rolling4q_per_1000_pop` = sum of the numerator over the latest 4 quarters ÷ FOLK1A population at the same end quarter × 1000; `rolling4q_per_1000_dwellings` = same sum ÷ BOL101 dwellings of the latest year × 1000; `rolling4q_yoy_pct` = latest 4Q sum vs the 4 quarters before, %. For the yearly history each calendar year is filed as its Q1–Q4 sum (÷ population at Q4); the live value is the rolling 4Q ending at the latest quarter. A `select` value may be a list of codes (rows matching any of them are summed).",
  "indicators": [
   {
    "key": "growth",
@@ -56,7 +56,8 @@
    "fmt": "signpct1",
    "desc": "Population change over the last 12 months, % (same period previous year).",
    "source": "DST FOLK1A (municipality, quarterly) · POSTNR1 (postal code, 1 Jan)",
-   "group": "Demographics"
+   "group": "Demographics",
+   "direction": "higher_better"
   },
   {
    "key": "income",
@@ -98,7 +99,8 @@
    "desc": "Average disposable income per person, DKK/yr (INDKP101, all persons).",
    "source": "DST INDKP101",
    "warn": "Published with ~11-month lag.",
-   "group": "Income & jobs"
+   "group": "Income & jobs",
+   "direction": "higher_better"
   },
   {
    "key": "income_med",
@@ -133,7 +135,8 @@
    "fmt": "kdkk",
    "desc": "Median equivalised disposable income (5th decile).",
    "source": "DST IFOR22",
-   "group": "Income & jobs"
+   "group": "Income & jobs",
+   "direction": "higher_better"
   },
   {
    "key": "young",
@@ -244,7 +247,8 @@
    "fmt": "pct0",
    "desc": "Residents aged 20–34 as % of population.",
    "source": "DST FOLK1A · POSTNR1",
-   "group": "Demographics"
+   "group": "Demographics",
+   "direction": "higher_better"
   },
   {
    "key": "single",
@@ -292,7 +296,8 @@
    "fmt": "pct0",
    "desc": "Single-person households as % of all households.",
    "source": "DST FAM55N",
-   "group": "Demographics"
+   "group": "Demographics",
+   "direction": "higher_better"
   },
   {
    "key": "benefit",
@@ -357,7 +362,8 @@
    "desc": "Households receiving housing benefit (boligsikring/boligydelse, December) as % of households.",
    "source": "DST BOST63 / FAM55N",
    "group": "Income & jobs",
-   "warn": "All housing-benefit types (boligsikring incl. students and boligydelse for pensioners); student cities and municipalities with many pensioners score high."
+   "warn": "All housing-benefit types (boligsikring incl. students and boligydelse for pensioners); student cities and municipalities with many pensioners score high.",
+   "direction": "higher_better"
   },
   {
    "key": "rent_private",
@@ -384,7 +390,8 @@
    "desc": "Average rent DKK/m²/yr in private rental dwellings (private udlejningsboliger i alt, all construction years).",
    "source": "Social- og Boligstyrelsen, boligstat.dk Huslejestatistik — computed from the housing-benefit register × BBR",
    "warn": "Based on households receiving housing benefit, upscaled to the stock (≈87 % coverage); skews to the cheaper end — asking rents in the market are typically higher. Small municipalities suppressed.",
-   "group": "Rents"
+   "group": "Rents",
+   "direction": "higher_better"
   },
   {
    "key": "rent_social",
@@ -409,7 +416,8 @@
    "fmt": "dkk0",
    "desc": "Average rent DKK/m²/yr in social (almene) family dwellings, 1 Jan 2026.",
    "source": "Landsbyggefonden, Huslejestatistik 2026, Tabel 7 (100 % coverage via Huslejeregisteret)",
-   "group": "Rents"
+   "group": "Rents",
+   "direction": "higher_better"
   },
   {
    "key": "renters",
@@ -468,7 +476,8 @@
    "desc": "Rented dwellings as % of occupied dwellings.",
    "source": "DST BOL101",
    "group": "Housing stock",
-   "warn": "DST counts residents of cooperative dwellings (andelsboliger) as tenants, so in Copenhagen ~⅓ of the stock is 'rented' via andel. Private rental + almene + andel together."
+   "warn": "DST counts residents of cooperative dwellings (andelsboliger) as tenants, so in Copenhagen ~⅓ of the stock is 'rented' via andel. Private rental + almene + andel together.",
+   "direction": "higher_better"
   },
   {
    "key": "unemp",
@@ -506,7 +515,8 @@
    "fmt": "pct1",
    "desc": "Registered unemployed as % of the labour force (provisional, latest month).",
    "source": "DST AUP01",
-   "group": "Income & jobs"
+   "group": "Income & jobs",
+   "direction": "lower_better"
   },
   {
    "key": "higher_ed",
@@ -568,7 +578,8 @@
    "fmt": "pct0",
    "desc": "Residents 15–69 with short-, medium- or long-cycle higher education, %.",
    "source": "DST HFUDD11",
-   "group": "Income & jobs"
+   "group": "Income & jobs",
+   "direction": "higher_better"
   },
   {
    "key": "flats",
@@ -623,7 +634,8 @@
    "fmt": "pct0",
    "desc": "Dwellings in multi-dwelling buildings as % of all dwellings.",
    "source": "DST BOL101",
-   "group": "Housing stock"
+   "group": "Housing stock",
+   "direction": "higher_better"
   },
   {
    "key": "foreign",
@@ -680,7 +692,8 @@
    "fmt": "pct1",
    "desc": "Immigrants and descendants as % of population.",
    "source": "DST FOLK1E",
-   "group": "Demographics"
+   "group": "Demographics",
+   "direction": "higher_better"
   },
   {
    "key": "price_m2",
@@ -738,7 +751,8 @@
    "desc": "Realised sale price of owner-occupied flats, DKK/m², mean of last 4 quarters.",
    "source": "Finans Danmark BM010 / BM011",
    "warn": "Postal codes with few trades are suppressed by the source; small-n quarters are noisy.",
-   "group": "Prices & market"
+   "group": "Prices & market",
+   "direction": "higher_better"
   },
   {
    "key": "discount",
@@ -799,7 +813,8 @@
    "fmt": "pct1",
    "desc": "(first asking price − realised price) / asking price, %, mean of last 4 quarters.",
    "source": "Finans Danmark BM011",
-   "group": "Prices & market"
+   "group": "Prices & market",
+   "direction": "higher_better"
   },
   {
    "key": "dom",
@@ -850,7 +865,8 @@
    "fmt": "days",
    "desc": "Days on market of sold owner-occupied flats, mean of last 4 quarters.",
    "source": "Finans Danmark BM030 / BM031",
-   "group": "Prices & market"
+   "group": "Prices & market",
+   "direction": "higher_better"
   },
   {
    "key": "supply",
@@ -889,7 +905,8 @@
    "fmt": "per1000",
    "desc": "Homes listed for sale per 1,000 dwellings (latest month).",
    "source": "Finans Danmark UDB010 / DST BOL101",
-   "group": "Prices & market"
+   "group": "Prices & market",
+   "direction": "higher_better"
   },
   {
    "key": "supply_n",
@@ -928,7 +945,8 @@
    "fmt": "int",
    "desc": "Number of homes (houses + owner-occupied flats) listed for sale, latest month. The per-1,000 version above normalises this by the dwelling stock.",
    "source": "Finans Danmark UDB010",
-   "group": "Prices & market"
+   "group": "Prices & market",
+   "direction": "higher_better"
   },
   {
    "key": "pipeline",
@@ -970,7 +988,8 @@
    "desc": "Dwellings completed in the last 4 quarters per 1,000 dwellings.",
    "source": "DST BYGV33",
    "warn": "Not adjusted for reporting delays — recent quarters are revised upward.",
-   "group": "Construction"
+   "group": "Construction",
+   "direction": "higher_better"
   },
   {
    "key": "completions_n",
@@ -1012,7 +1031,8 @@
    "desc": "Number of dwellings completed in the last 4 quarters (all uses, all developers). The per-1,000 version above normalises this by the dwelling stock.",
    "source": "DST BYGV33",
    "warn": "Not adjusted for reporting delays — recent quarters are revised upward.",
-   "group": "Construction"
+   "group": "Construction",
+   "direction": "higher_better"
   },
   {
    "key": "almene",
@@ -1067,7 +1087,8 @@
    "fmt": "pct0",
    "desc": "Social housing (almene boliger) as % of all dwellings.",
    "source": "DST BOL101",
-   "group": "Housing stock"
+   "group": "Housing stock",
+   "direction": "higher_better"
   },
   {
    "key": "avg_m2",
@@ -1106,7 +1127,8 @@
    "fmt": "m2",
    "desc": "Average floor area per dwelling.",
    "source": "DST BOL106",
-   "group": "Housing stock"
+   "group": "Housing stock",
+   "direction": "higher_better"
   },
   {
    "key": "renters_bbr",
@@ -1130,7 +1152,8 @@
    "desc": "Dwellings registered as rented (enh045 = 1, includes andel) as % of dwellings with a known tenure — BBR unit register, postal-code level.",
    "source": "BBR via Datafordeler (Klimadatastyrelsen)",
    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings.",
-   "group": "Housing stock (BBR)"
+   "group": "Housing stock (BBR)",
+   "direction": "higher_better"
   },
   {
    "key": "vacant_bbr",
@@ -1154,7 +1177,8 @@
    "desc": "Dwellings registered as 'not in use' (enh045 = 3) as % of dwellings with a known tenure. Owner-reported and slow to update — use as a relative signal between areas, not as a vacancy rate.",
    "source": "BBR via Datafordeler (Klimadatastyrelsen)",
    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings.",
-   "group": "Housing stock (BBR)"
+   "group": "Housing stock (BBR)",
+   "direction": "higher_better"
   },
   {
    "key": "avg_m2_bbr",
@@ -1178,7 +1202,8 @@
    "desc": "Mean registered dwelling area (enh026), all dwellings.",
    "source": "BBR via Datafordeler (Klimadatastyrelsen)",
    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings.",
-   "group": "Housing stock (BBR)"
+   "group": "Housing stock (BBR)",
+   "direction": "higher_better"
   },
   {
    "key": "small_bbr",
@@ -1202,7 +1227,8 @@
    "desc": "Dwellings under 50 m² as % of dwellings with a registered area — the studio / one-room segment.",
    "source": "BBR via Datafordeler (Klimadatastyrelsen)",
    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings.",
-   "group": "Housing stock (BBR)"
+   "group": "Housing stock (BBR)",
+   "direction": "higher_better"
   },
   {
    "key": "new_stock_bbr",
@@ -1226,7 +1252,8 @@
    "desc": "Dwellings in buildings commissioned 2010 or later (byg026) as % of dwellings with a known year.",
    "source": "BBR via Datafordeler (Klimadatastyrelsen)",
    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings.",
-   "group": "Housing stock (BBR)"
+   "group": "Housing stock (BBR)",
+   "direction": "higher_better"
   },
   {
    "key": "flats_bbr",
@@ -1250,7 +1277,8 @@
    "desc": "Dwellings in multi-dwelling buildings (byg021 = 140) as % of dwellings.",
    "source": "BBR via Datafordeler (Klimadatastyrelsen)",
    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings.",
-   "group": "Housing stock (BBR)"
+   "group": "Housing stock (BBR)",
+   "direction": "higher_better"
   },
   {
    "key": "dw_per_bld",
@@ -1274,7 +1302,506 @@
    "desc": "Dwellings divided by residential buildings — building scale: 1–2 = houses, 10+ = blocks.",
    "source": "BBR via Datafordeler (Klimadatastyrelsen)",
    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings.",
-   "group": "Housing stock (BBR)"
+   "group": "Housing stock (BBR)",
+   "direction": "higher_better"
+  },
+  {
+   "key": "crime_1000",
+   "label": "Reported crime · per 1,000 inh.",
+   "short": "Crime",
+   "unit": "per 1,000 inh. / yr",
+   "level": "kommune",
+   "hue": [
+    128,
+    36,
+    52
+   ],
+   "sources": [
+    {
+     "db": "",
+     "table": "STRAF11",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "OVERTRÆD": [
+       "TOT",
+       "1",
+       "11",
+       "12",
+       "13",
+       "14",
+       "1320",
+       "1345",
+       "3",
+       "3210",
+       "3410"
+      ],
+      "Tid": [
+       "*"
+      ]
+     },
+     "geo": "kommune",
+     "pull": "STRAF11_offences",
+     "select": {
+      "OVERTRÆD": "1"
+     }
+    },
+    {
+     "db": "",
+     "table": "FOLK1A",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "KØN": [
+       "TOT"
+      ],
+      "ALDER": [
+       "IALT"
+      ],
+      "Tid": [
+       "(-n+45)"
+      ]
+     },
+     "geo": "kommune",
+     "role": "denominator"
+    }
+   ],
+   "calc": "rolling4q_per_1000_pop",
+   "fmt": "per1000",
+   "desc": "Penal-code offences (straffelov i alt) reported in the municipality over the latest 4 quarters, per 1,000 inhabitants.",
+   "source": "DST STRAF11 (reported offences by place of offence, quarterly) · FOLK1A",
+   "note": "Place of offence (gerningskommune). Reported offences — reported ≠ solved. Excludes the traffic law. Series breaks: 2007 (police reform), 1 July 2013 (new definition of sexual offences), 2023 (~1,700 animal-welfare reports missing nationally). Not seasonally adjusted — hence rolling 4 quarters.",
+   "group": "Safety",
+   "direction": "lower_better",
+   "chip": true
+  },
+  {
+   "key": "violence_1000",
+   "label": "Violent crime · per 1,000 inh.",
+   "short": "Violence",
+   "unit": "per 1,000 inh. / yr",
+   "level": "kommune",
+   "hue": [
+    128,
+    36,
+    52
+   ],
+   "sources": [
+    {
+     "db": "",
+     "table": "STRAF11",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "OVERTRÆD": [
+       "TOT",
+       "1",
+       "11",
+       "12",
+       "13",
+       "14",
+       "1320",
+       "1345",
+       "3",
+       "3210",
+       "3410"
+      ],
+      "Tid": [
+       "*"
+      ]
+     },
+     "geo": "kommune",
+     "pull": "STRAF11_offences",
+     "select": {
+      "OVERTRÆD": "12"
+     }
+    },
+    {
+     "db": "",
+     "table": "FOLK1A",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "KØN": [
+       "TOT"
+      ],
+      "ALDER": [
+       "IALT"
+      ],
+      "Tid": [
+       "(-n+45)"
+      ]
+     },
+     "geo": "kommune",
+     "role": "denominator"
+    }
+   ],
+   "calc": "rolling4q_per_1000_pop",
+   "fmt": "per1000",
+   "desc": "Reported crimes of violence (forbrydelser mod liv og legeme) over the latest 4 quarters, per 1,000 inhabitants.",
+   "source": "DST STRAF11 (reported offences by place of offence, quarterly) · FOLK1A",
+   "note": "Place of offence (gerningskommune). Reported offences — reported ≠ solved. Excludes the traffic law. Series breaks: 2007 (police reform), 1 July 2013 (new definition of sexual offences), 2023 (~1,700 animal-welfare reports missing nationally). Not seasonally adjusted — hence rolling 4 quarters.",
+   "group": "Safety",
+   "direction": "lower_better"
+  },
+  {
+   "key": "property_1000",
+   "label": "Property crime · per 1,000 inh.",
+   "short": "Property",
+   "unit": "per 1,000 inh. / yr",
+   "level": "kommune",
+   "hue": [
+    128,
+    36,
+    52
+   ],
+   "sources": [
+    {
+     "db": "",
+     "table": "STRAF11",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "OVERTRÆD": [
+       "TOT",
+       "1",
+       "11",
+       "12",
+       "13",
+       "14",
+       "1320",
+       "1345",
+       "3",
+       "3210",
+       "3410"
+      ],
+      "Tid": [
+       "*"
+      ]
+     },
+     "geo": "kommune",
+     "pull": "STRAF11_offences",
+     "select": {
+      "OVERTRÆD": "13"
+     }
+    },
+    {
+     "db": "",
+     "table": "FOLK1A",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "KØN": [
+       "TOT"
+      ],
+      "ALDER": [
+       "IALT"
+      ],
+      "Tid": [
+       "(-n+45)"
+      ]
+     },
+     "geo": "kommune",
+     "role": "denominator"
+    }
+   ],
+   "calc": "rolling4q_per_1000_pop",
+   "fmt": "per1000",
+   "desc": "Reported offences against property (ejendomsforbrydelser) over the latest 4 quarters, per 1,000 inhabitants.",
+   "source": "DST STRAF11 (reported offences by place of offence, quarterly) · FOLK1A",
+   "note": "Place of offence (gerningskommune). Reported offences — reported ≠ solved. Excludes the traffic law. Series breaks: 2007 (police reform), 1 July 2013 (new definition of sexual offences), 2023 (~1,700 animal-welfare reports missing nationally). Not seasonally adjusted — hence rolling 4 quarters.",
+   "group": "Safety",
+   "direction": "lower_better"
+  },
+  {
+   "key": "burglary_1000dw",
+   "label": "Residential burglaries · per 1,000 dwellings",
+   "short": "Burglary",
+   "unit": "per 1,000 dwellings / yr",
+   "level": "kommune",
+   "hue": [
+    128,
+    36,
+    52
+   ],
+   "sources": [
+    {
+     "db": "",
+     "table": "STRAF11",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "OVERTRÆD": [
+       "TOT",
+       "1",
+       "11",
+       "12",
+       "13",
+       "14",
+       "1320",
+       "1345",
+       "3",
+       "3210",
+       "3410"
+      ],
+      "Tid": [
+       "*"
+      ]
+     },
+     "geo": "kommune",
+     "pull": "STRAF11_offences",
+     "select": {
+      "OVERTRÆD": "1320"
+     }
+    },
+    {
+     "db": "",
+     "table": "BOL101",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "BEBO": [
+       "1000",
+       "2000"
+      ],
+      "ANVENDELSE": [
+       "*"
+      ],
+      "UDLFORH": [
+       "SUM"
+      ],
+      "EJER": [
+       "SUM"
+      ],
+      "OPFØRELSESÅR": [
+       "SUM"
+      ],
+      "Tid": [
+       "(-n+11)"
+      ]
+     },
+     "geo": "kommune",
+     "pull": "BOL101_stock",
+     "role": "denominator"
+    }
+   ],
+   "calc": "rolling4q_per_1000_dwellings",
+   "fmt": "per1000",
+   "desc": "Reported residential burglaries (indbrud i privat beboelse) over the latest 4 quarters, per 1,000 dwellings (BOL101, latest year).",
+   "source": "DST STRAF11 · BOL101",
+   "note": "Place of offence (gerningskommune). Reported offences — reported ≠ solved. Excludes the traffic law. Series breaks: 2007 (police reform), 1 July 2013 (new definition of sexual offences), 2023 (~1,700 animal-welfare reports missing nationally). Not seasonally adjusted — hence rolling 4 quarters.",
+   "group": "Safety",
+   "direction": "lower_better"
+  },
+  {
+   "key": "drugs_weapons_1000",
+   "label": "Drug and weapons offences · per 1,000 inh.",
+   "short": "Drugs/weap.",
+   "unit": "per 1,000 inh. / yr",
+   "level": "kommune",
+   "hue": [
+    128,
+    36,
+    52
+   ],
+   "sources": [
+    {
+     "db": "",
+     "table": "STRAF11",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "OVERTRÆD": [
+       "TOT",
+       "1",
+       "11",
+       "12",
+       "13",
+       "14",
+       "1320",
+       "1345",
+       "3",
+       "3210",
+       "3410"
+      ],
+      "Tid": [
+       "*"
+      ]
+     },
+     "geo": "kommune",
+     "pull": "STRAF11_offences",
+     "select": {
+      "OVERTRÆD": [
+       "3210",
+       "3410"
+      ]
+     }
+    },
+    {
+     "db": "",
+     "table": "FOLK1A",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "KØN": [
+       "TOT"
+      ],
+      "ALDER": [
+       "IALT"
+      ],
+      "Tid": [
+       "(-n+45)"
+      ]
+     },
+     "geo": "kommune",
+     "role": "denominator"
+    }
+   ],
+   "calc": "rolling4q_per_1000_pop",
+   "fmt": "per1000",
+   "desc": "Reported offences against the Euphoriants Act (3210) and the Weapons Act (3410) over the latest 4 quarters, per 1,000 inhabitants.",
+   "source": "DST STRAF11 (reported offences by place of offence, quarterly) · FOLK1A",
+   "note": "Place of offence (gerningskommune). Reported offences — reported ≠ solved. Excludes the traffic law. Series breaks: 2007 (police reform), 1 July 2013 (new definition of sexual offences), 2023 (~1,700 animal-welfare reports missing nationally). Not seasonally adjusted — hence rolling 4 quarters. Driven largely by police activity (stop-and-search, visitation zones, targeted operations) rather than by underlying incidence.",
+   "warn": "Police-activity driven: a high value can reflect enforcement effort, not more offences.",
+   "group": "Safety",
+   "direction": "lower_better"
+  },
+  {
+   "key": "crime_trend",
+   "label": "Reported crime · y/y %",
+   "short": "Crime y/y",
+   "unit": "% / yr",
+   "level": "kommune",
+   "hue": [
+    128,
+    36,
+    52
+   ],
+   "sources": [
+    {
+     "db": "",
+     "table": "STRAF11",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "OVERTRÆD": [
+       "TOT",
+       "1",
+       "11",
+       "12",
+       "13",
+       "14",
+       "1320",
+       "1345",
+       "3",
+       "3210",
+       "3410"
+      ],
+      "Tid": [
+       "*"
+      ]
+     },
+     "geo": "kommune",
+     "pull": "STRAF11_offences",
+     "select": {
+      "OVERTRÆD": "1"
+     }
+    }
+   ],
+   "calc": "rolling4q_yoy_pct",
+   "fmt": "signpct1",
+   "desc": "Penal-code offences reported over the latest 4 quarters vs the 4 quarters before, %.",
+   "source": "DST STRAF11",
+   "note": "Place of offence (gerningskommune). Reported offences — reported ≠ solved. Excludes the traffic law. Series breaks: 2007 (police reform), 1 July 2013 (new definition of sexual offences), 2023 (~1,700 animal-welfare reports missing nationally). Not seasonally adjusted — hence rolling 4 quarters.",
+   "group": "Safety",
+   "direction": "lower_better"
+  },
+  {
+   "key": "clearance_pct",
+   "label": "Penal-code reports with a charge · %",
+   "short": "Charged",
+   "unit": "% of reports",
+   "level": "kommune",
+   "hue": [
+    128,
+    36,
+    52
+   ],
+   "sources": [
+    {
+     "db": "",
+     "table": "STRAF22",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "OVERTRÆD": [
+       "1",
+       "12",
+       "1320"
+      ],
+      "ANMSIGT": [
+       "ANM",
+       "SIG"
+      ],
+      "Tid": [
+       "*"
+      ]
+     },
+     "geo": "kommune",
+     "pull": "STRAF22_charges",
+     "select": {
+      "OVERTRÆD": "1",
+      "ANMSIGT": "SIG"
+     }
+    },
+    {
+     "db": "",
+     "table": "STRAF22",
+     "vars": {
+      "OMRÅDE": [
+       "*"
+      ],
+      "OVERTRÆD": [
+       "1",
+       "12",
+       "1320"
+      ],
+      "ANMSIGT": [
+       "ANM",
+       "SIG"
+      ],
+      "Tid": [
+       "*"
+      ]
+     },
+     "geo": "kommune",
+     "pull": "STRAF22_charges",
+     "select": {
+      "OVERTRÆD": "1",
+      "ANMSIGT": "ANM"
+     },
+     "role": "denominator"
+    }
+   ],
+   "calc": "ratio_pct",
+   "fmt": "pct1",
+   "desc": "Penal-code reports in the year that led to a charge (sigtelse), as % of all penal-code reports (annual).",
+   "source": "DST STRAF22 (reports and charges, annual)",
+   "note": "Place of offence (gerningskommune). Reported offences — reported ≠ solved. Excludes the traffic law. Series breaks: 2007 (police reform), 1 July 2013 (new definition of sexual offences), 2023 (~1,700 animal-welfare reports missing nationally). Annual table; charges are counted for the reports of the same year, so the latest year can still rise as cases are processed.",
+   "group": "Safety",
+   "direction": "higher_better"
   }
  ],
  "macro": [
@@ -1621,7 +2148,8 @@
      }
     ],
     "desc": "Population change over 12 months, same quarter previous year.",
-    "source": "Københavns Kommune, KKBEF1"
+    "source": "Københavns Kommune, KKBEF1",
+    "direction": "higher_better"
    },
    {
     "key": "young",
@@ -1700,7 +2228,8 @@
      }
     ],
     "desc": "Residents aged 20–34 as % of population.",
-    "source": "Københavns Kommune, KKBEF1"
+    "source": "Københavns Kommune, KKBEF1",
+    "direction": "higher_better"
    },
    {
     "key": "single",
@@ -1751,7 +2280,8 @@
      }
     ],
     "desc": "One-person households as % of all households (household size = 1).",
-    "source": "Københavns Kommune, KKHUS1"
+    "source": "Københavns Kommune, KKHUS1",
+    "direction": "higher_better"
    },
    {
     "key": "income_med",
@@ -1785,7 +2315,8 @@
      }
     ],
     "desc": "Median (5th decile boundary) disposable income of persons over 14, DKK/yr.",
-    "source": "Københavns Kommune, KKIND4"
+    "source": "Københavns Kommune, KKIND4",
+    "direction": "higher_better"
    },
    {
     "key": "higher_ed",
@@ -1843,7 +2374,8 @@
      }
     ],
     "desc": "Residents 15–69 with short-, medium- or long-cycle higher education, %.",
-    "source": "Københavns Kommune, KKUDD1"
+    "source": "Københavns Kommune, KKUDD1",
+    "direction": "higher_better"
    },
    {
     "key": "renters",
@@ -1903,7 +2435,8 @@
      }
     ],
     "desc": "Private rental + andel + almene + public dwellings as % of dwellings with known tenure (andel counted as rented, as DST does).",
-    "source": "Københavns Kommune, KKBOL3"
+    "source": "Københavns Kommune, KKBOL3",
+    "direction": "higher_better"
    },
    {
     "key": "private_rental",
@@ -1960,7 +2493,8 @@
      }
     ],
     "desc": "Privately rented dwellings as % of dwellings with known tenure.",
-    "source": "Københavns Kommune, KKBOL3"
+    "source": "Københavns Kommune, KKBOL3",
+    "direction": "higher_better"
    },
    {
     "key": "andel",
@@ -2017,7 +2551,8 @@
      }
     ],
     "desc": "Andelsboliger as % of dwellings with known tenure.",
-    "source": "Københavns Kommune, KKBOL3"
+    "source": "Københavns Kommune, KKBOL3",
+    "direction": "higher_better"
    },
    {
     "key": "almene",
@@ -2074,7 +2609,8 @@
      }
     ],
     "desc": "Almene boliger as % of dwellings with known tenure.",
-    "source": "Københavns Kommune, KKBOL3"
+    "source": "Københavns Kommune, KKBOL3",
+    "direction": "higher_better"
    },
    {
     "key": "avg_m2",
@@ -2118,7 +2654,8 @@
      }
     ],
     "desc": "Average floor area per dwelling.",
-    "source": "Københavns Kommune, KKBOL3"
+    "source": "Københavns Kommune, KKBOL3",
+    "direction": "higher_better"
    },
    {
     "key": "new_stock",
@@ -2186,7 +2723,8 @@
      }
     ],
     "desc": "Dwellings taken into use 2010 or later as % of all dwellings.",
-    "source": "Københavns Kommune, KKBOL3"
+    "source": "Københavns Kommune, KKBOL3",
+    "direction": "higher_better"
    },
    {
     "key": "unemp",
@@ -2245,7 +2783,8 @@
     "desc": "Registered unemployed at end of November as % of residents. Published for the 10 districts (bydele) only — every quarter shows its district's value.",
     "source": "Københavns Kommune, KKLEDIG2 / KKBEF1",
     "warn": "District-level (bydel) figure repeated on each quarter. Denominator is total population, not labour force; comparable between districts, not with the national AUP01 rate.",
-    "geo_level": "bydel"
+    "geo_level": "bydel",
+    "direction": "lower_better"
    },
    {
     "key": "renters_bbr",
@@ -2268,7 +2807,8 @@
     "fmt": "pct0",
     "desc": "Dwellings registered as rented (enh045 = 1, includes andel) as % of dwellings with a known tenure — BBR unit register, postal-code level.",
     "source": "BBR via Datafordeler (Klimadatastyrelsen)",
-    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings."
+    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings.",
+    "direction": "higher_better"
    },
    {
     "key": "vacant_bbr",
@@ -2291,7 +2831,8 @@
     "fmt": "pct1",
     "desc": "Dwellings registered as 'not in use' (enh045 = 3) as % of dwellings with a known tenure. Owner-reported and slow to update — use as a relative signal between areas, not as a vacancy rate.",
     "source": "BBR via Datafordeler (Klimadatastyrelsen)",
-    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings."
+    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings.",
+    "direction": "higher_better"
    },
    {
     "key": "avg_m2_bbr",
@@ -2314,7 +2855,8 @@
     "fmt": "m2",
     "desc": "Mean registered dwelling area (enh026), all dwellings.",
     "source": "BBR via Datafordeler (Klimadatastyrelsen)",
-    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings."
+    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings.",
+    "direction": "higher_better"
    },
    {
     "key": "small_bbr",
@@ -2337,7 +2879,8 @@
     "fmt": "pct0",
     "desc": "Dwellings under 50 m² as % of dwellings with a registered area — the studio / one-room segment.",
     "source": "BBR via Datafordeler (Klimadatastyrelsen)",
-    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings."
+    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings.",
+    "direction": "higher_better"
    },
    {
     "key": "new_stock_bbr",
@@ -2360,7 +2903,8 @@
     "fmt": "pct0",
     "desc": "Dwellings in buildings commissioned 2010 or later (byg026) as % of dwellings with a known year.",
     "source": "BBR via Datafordeler (Klimadatastyrelsen)",
-    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings."
+    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings.",
+    "direction": "higher_better"
    },
    {
     "key": "flats_bbr",
@@ -2383,7 +2927,8 @@
     "fmt": "pct0",
     "desc": "Dwellings in multi-dwelling buildings (byg021 = 140) as % of dwellings.",
     "source": "BBR via Datafordeler (Klimadatastyrelsen)",
-    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings."
+    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings.",
+    "direction": "higher_better"
    },
    {
     "key": "dw_per_bld",
@@ -2406,7 +2951,8 @@
     "fmt": "idx",
     "desc": "Dwellings divided by residential buildings — building scale: 1–2 = houses, 10+ = blocks.",
     "source": "BBR via Datafordeler (Klimadatastyrelsen)",
-    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings."
+    "warn": "BBR snapshot (no history). Owner-reported register data; tenure 'rented' includes cooperative (andel) dwellings.",
+    "direction": "higher_better"
    }
   ]
  }
