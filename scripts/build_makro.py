@@ -76,7 +76,8 @@ def rows_for_year(rs, year, calc):
 def apply_select(rs, select):
     if not select:
         return rs
-    return [r for r in rs if all(r.get(k) == v for k, v in select.items())]
+    # a list value selects several codes (their rows are summed by the calc)
+    return [r for r in rs if all(r.get(k) in v if isinstance(v, list) else r.get(k) == v for k, v in select.items())]
 
 
 # ---------- calcs: each returns {area_code: value} ----------
@@ -193,6 +194,77 @@ def calc_sum4q_per_1000(rs, src):
     return {a: v / dw[a] * 1000 for a, v in by.items() if dw.get(a)}, f"{ps[0]}–{ps[-1]}"
 
 
+# ---------- rolling 4-quarter calcs (Safety: STRAF11 counts, not seasonally adjusted) ----------
+
+def q_shift(t, n):
+    """'2026K2' shifted by n quarters: q_shift('2026K2', 1) -> '2026K3'."""
+    y, _, q = period_parts(t)
+    i = y * 4 + q - 1 + n
+    return f"{i // 4}K{i % 4 + 1}"
+
+
+def rolling_window(rs, year=None):
+    """The four quarters ending at the latest quarter (live value) or Q1–Q4 of `year`
+    (history); None when any of them is not in the data."""
+    have = {r["TID"] for r in rs}
+    end = f"{year}K4" if year else max(have, key=period_key)
+    win = [q_shift(end, -k) for k in (3, 2, 1, 0)]
+    return win if set(win) <= have else None
+
+
+def window_sums(rs, col, win):
+    """{area: sum over the window}; an area with a suppressed ('..') or missing cell gets None — never imputed."""
+    cells = {}
+    for r in rs:
+        if r["TID"] in win:
+            cells.setdefault(norm_area(col, r[col]), {}).setdefault(r["TID"], []).append(r["INDHOLD"])
+    return {a: None if set(d) != set(win) or any(v is None for vs in d.values() for v in vs) else sum(v for vs in d.values() for v in vs)
+            for a, d in cells.items()}
+
+
+def rolling4q(calc, num_rows, num_src, den_rows=None, year=None):
+    """Returns ({area: value}, period), or ({}, None) when the window is incomplete.
+    rolling4q_per_1000_pop       4Q sum ÷ population at the end of the window × 1000. FOLK1A counts
+                                 the 1st day of a quarter, so the end of 2026K2 is FOLK1A 2026K3
+                                 (falls back to the window's last quarter if not yet published).
+    rolling4q_per_1000_dwellings 4Q sum ÷ BOL101 dwellings at the end of the window (1 Jan of the
+                                 following year, else 1 Jan of the window's year) × 1000.
+    rolling4q_yoy_pct            4Q sum vs the 4 quarters before, %."""
+    rs = apply_select(num_rows, num_src.get("select"))
+    col = area_col(rs[0])
+    win = rolling_window(rs, year)
+    if not win:
+        return {}, None
+    cur = window_sums(rs, col, win)
+    per = f"{win[0]}→{win[-1]}"
+    if calc == "rolling4q_yoy_pct":
+        prev_win = [q_shift(t, -4) for t in win]
+        if not set(prev_win) <= {r["TID"] for r in rs}:
+            return {}, None
+        prev = window_sums(rs, col, prev_win)
+        # the label names only the current window: the history loop files a value under the last period it names
+        return {a: (v / prev[a] - 1) * 100 if v is not None and prev.get(a) else None for a, v in cur.items()}, f"{per} vs 4Q before"
+    dcol = area_col(den_rows[0]); dper = {r["TID"] for r in den_rows}
+    if calc == "rolling4q_per_1000_pop":
+        dp = next((p for p in (q_shift(win[-1], 1), win[-1]) if p in dper), None)
+    elif calc == "rolling4q_per_1000_dwellings":
+        ey = period_parts(win[-1])[0]
+        dp = next((p for p in (str(ey + 1), str(ey)) if p in dper), None)
+    else:
+        raise ValueError(f"unknown rolling calc {calc}")
+    if dp is None:
+        return {}, None
+    den = sum_by_area(den_rows, dcol, dp)
+    return {a: v / den[a] * 1000 if v is not None and den.get(a) else None for a, v in cur.items()}, per
+
+
+def calc_rolling4q(ind, year=None):
+    srcs = ind["sources"]; s = srcs[0]
+    num = rows(s.get("db", ""), s["table"], s.get("pull"))
+    den = rows(srcs[1].get("db", ""), srcs[1]["table"], srcs[1].get("pull")) if len(srcs) > 1 else None
+    return rolling4q(ind["calc"], num, s, den, year)
+
+
 CALCS = {
     "passthrough": calc_passthrough, "value_div_1000": calc_passthrough,
     "share_of_total": calc_share_of_total, "yoy_pct": calc_yoy_pct,
@@ -241,6 +313,9 @@ def compute(ind, year=None):
         per = f"BBR {b['meta']['built']}"
         return {"kommune": ({k: v.get(ind["key"]) for k, v in b["kommune"].items()}, per),
                 "postnr": ({k: v.get(ind["key"]) for k, v in b["postnr"].items()}, per)}
+    if calc.startswith("rolling4q"):
+        vals, p = calc_rolling4q(ind, year)
+        return {srcs[0]["geo"]: (vals, p)} if p else {}
     sel = (lambda rs: rows_for_year(rs, year, calc)) if year else (lambda rs: rs)
     if calc == "ratio_pct":
         numr, p = calc_passthrough(sel(rows(srcs[0].get("db", ""), srcs[0]["table"], srcs[0].get("pull"))), srcs[0])
@@ -394,7 +469,7 @@ def main():
                     for a in areas.values():
                         if (a.get("pop") or 0) < MIN_POP_GROWTH:
                             a.pop("growth", None)
-        indicators_out.append({k: ind[k] for k in ("key", "label", "short", "unit", "level", "hue", "group") if k in ind} |
+        indicators_out.append({k: ind[k] for k in ("key", "label", "short", "unit", "level", "hue", "group", "direction", "note", "chip") if k in ind} |
                               {"fmt": ind.get("fmt", "pct1"), "desc": ind.get("desc", ""), "source": ind.get("source", ""),
                                "warn": ind.get("warn", ""), "table_only": ind.get("table_only", False), "asof": asof,
                                "hist_asof": hist_asof})

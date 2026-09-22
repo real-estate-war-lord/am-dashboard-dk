@@ -101,7 +101,7 @@ def main():
         for a, v in spread(vals).items():
             if a in areas and v is not None:
                 areas[a][ind["key"]] = round(v, 2)
-        inds.append({k: ind[k] for k in ("key", "label", "short", "unit", "hue", "group", "fmt") if k in ind} |
+        inds.append({k: ind[k] for k in ("key", "label", "short", "unit", "hue", "group", "fmt", "direction", "note") if k in ind} |
                     {"level": "kvarter", "geo_level": ind.get("geo_level", "kvarter"), "desc": ind.get("desc", ""), "source": ind.get("source", ""), "warn": ind.get("warn", ""), "asof": {"kvarter": per}, "hist_asof": hist_asof})
     b = bm.load_bbr()
     if b:
