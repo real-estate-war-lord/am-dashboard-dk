@@ -16,3 +16,6 @@ data/raw/bbr_schema.graphql
 dist/micro/
 data/raw/dar/
 data/raw/dar_schema.graphql
+
+# source PDFs (re-downloaded per data/external/SOURCES.md; the extracted CSVs are committed)
+data/external/*.pdf
