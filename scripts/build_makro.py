@@ -338,6 +338,12 @@ def compute(ind, year=None):
     return res
 
 
+def fetched(db, table):
+    """Date of the newest raw pull of a table (from the file name, e.g. dst_STRAF11_offences_2026-09-22.csv)."""
+    files = list(RAW.glob(f"{db or 'dst'}_{table}_20*.csv")) + list(RAW.glob(f"{db or 'dst'}_{table}_*_20*.csv"))
+    return max((f.stem[-10:] for f in files), default="")
+
+
 def load_geo(name):
     p = GEO / f"{name}.geojson"
     return json.loads(p.read_text(encoding="utf-8")) if p.exists() else None
@@ -472,7 +478,8 @@ def main():
         indicators_out.append({k: ind[k] for k in ("key", "label", "short", "unit", "level", "hue", "group", "direction", "note", "chip") if k in ind} |
                               {"fmt": ind.get("fmt", "pct1"), "desc": ind.get("desc", ""), "source": ind.get("source", ""),
                                "warn": ind.get("warn", ""), "table_only": ind.get("table_only", False), "asof": asof,
-                               "hist_asof": hist_asof})
+                               "hist_asof": hist_asof,
+                               "tables": list(dict.fromkeys(f"{s.get('db') or 'dst'}/{s['table']}" for s in ind["sources"] if s.get("db", "") in ("", "s20", "s30")))})
 
     # BBR housing-stock distributions for the area pages
     bbr = load_bbr()
@@ -493,7 +500,7 @@ def main():
             seen.add(key)
             m = meta(*key)
             sources.append({"key": f"{key[0] or 'dst'}/{key[1]}", "label": f"{'Finans Danmark' if key[0]=='s20' else 'Københavns Kommune' if key[0]=='s30' else 'Danmarks Statistik'} {key[1]}",
-                            "tables": m.get("text", ""), "asof": m.get("updated", "")[:10], "url": f"https://api.statbank.dk/v1/{key[0] + '/' if key[0] else ''}tableinfo/{key[1]}",
+                            "tables": m.get("text", ""), "asof": m.get("updated", "")[:10], "fetched": fetched(*key), "url": f"https://api.statbank.dk/v1/{key[0] + '/' if key[0] else ''}tableinfo/{key[1]}",
                             "licence": "free reuse with attribution"})
     if bbr:
         sources.append({"key": "bbr", "label": f"BBR via Datafordeler — housing stock ({len(bbr['meta']['municipalities'])} municipalities, {bbr['meta']['dwellings']:,} dwellings)".replace(",", " "),

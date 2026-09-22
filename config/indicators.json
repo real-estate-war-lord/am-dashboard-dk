@@ -1309,12 +1309,12 @@
    "key": "crime_1000",
    "label": "Reported crime · per 1,000 inh.",
    "short": "Crime",
-   "unit": "per 1,000 inh. / yr",
+   "unit": "per 1,000 inh. · rolling 4Q",
    "level": "kommune",
    "hue": [
-    128,
-    36,
-    52
+    200,
+    88,
+    62
    ],
    "sources": [
     {
@@ -1381,12 +1381,12 @@
    "key": "violence_1000",
    "label": "Violent crime · per 1,000 inh.",
    "short": "Violence",
-   "unit": "per 1,000 inh. / yr",
+   "unit": "per 1,000 inh. · rolling 4Q",
    "level": "kommune",
    "hue": [
-    128,
-    36,
-    52
+    200,
+    88,
+    62
    ],
    "sources": [
     {
@@ -1452,12 +1452,12 @@
    "key": "property_1000",
    "label": "Property crime · per 1,000 inh.",
    "short": "Property",
-   "unit": "per 1,000 inh. / yr",
+   "unit": "per 1,000 inh. · rolling 4Q",
    "level": "kommune",
    "hue": [
-    128,
-    36,
-    52
+    200,
+    88,
+    62
    ],
    "sources": [
     {
@@ -1523,12 +1523,12 @@
    "key": "burglary_1000dw",
    "label": "Residential burglaries · per 1,000 dwellings",
    "short": "Burglary",
-   "unit": "per 1,000 dwellings / yr",
+   "unit": "per 1,000 dwellings · rolling 4Q",
    "level": "kommune",
    "hue": [
-    128,
-    36,
-    52
+    200,
+    88,
+    62
    ],
    "sources": [
     {
@@ -1605,12 +1605,12 @@
    "key": "drugs_weapons_1000",
    "label": "Drug and weapons offences · per 1,000 inh.",
    "short": "Drugs/weap.",
-   "unit": "per 1,000 inh. / yr",
+   "unit": "per 1,000 inh. · rolling 4Q",
    "level": "kommune",
    "hue": [
-    128,
-    36,
-    52
+    200,
+    88,
+    62
    ],
    "sources": [
     {
@@ -1680,12 +1680,12 @@
    "key": "crime_trend",
    "label": "Reported crime · y/y %",
    "short": "Crime y/y",
-   "unit": "% / yr",
+   "unit": "y/y % · rolling 4Q",
    "level": "kommune",
    "hue": [
-    128,
-    36,
-    52
+    200,
+    88,
+    62
    ],
    "sources": [
     {
@@ -1734,9 +1734,9 @@
    "unit": "% of reports",
    "level": "kommune",
    "hue": [
-    128,
-    36,
-    52
+    200,
+    88,
+    62
    ],
    "sources": [
     {

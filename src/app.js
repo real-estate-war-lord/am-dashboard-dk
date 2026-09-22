@@ -45,6 +45,14 @@ const CPH = D.cph && D.cph.areas && D.cph.areas.length ? D.cph : null;
 const IND_CPH = CPH ? CPH.indicators : [];
 const CPH_MUNI = "101";
 const byQ = {}; if (CPH) CPH.areas.forEach(a => byQ[a.code] = a);
+/* Safety (STRAF11/STRAF22) exists per municipality only: postal codes and Copenhagen quarters show the municipality value (°) */
+const SAFETY = IND.filter(i => i.group === "Safety");
+const isSafety = i => !!i && i.group === "Safety";
+const cphOwn = key => IND_CPH.some(i => i.key === key);
+/* the quarter layer's own indicators plus the inherited Safety family */
+const IND_Q = IND_CPH.concat(SAFETY.filter(i => !cphOwn(i.key)));
+/* registry `direction`: for lower_better indicators rank #1 is the lowest value and a fall is the good change */
+const lowerBetter = key => IND.concat(IND_CPH).some(i => i.key === key && i.direction === "lower_better");
 const cphMode = () => !!(CPH && MK.muni === CPH_MUNI && MK.cphView !== "postnr");
 const S = { view: "makro" };
 const YEARS = [...new Set([...((D.meta && D.meta.years) || []), ...((D.cph && D.cph.meta && D.cph.meta.years) || [])])].sort();
@@ -76,11 +84,13 @@ const LF = { map: null, center: [56.0, 10.5], zoom: 7 };
 const MICRO_ZOOM = 10;
 /* quarter indicators whose definition matches the national one closely enough to put København next to a quarter */
 const CPH_CMP = new Set(["growth", "young", "higher_ed", "renters", "almene", "avg_m2"]);
-const muniCmp = (e, key) => !!e.muni && (e.type !== "kvarter" || CPH_CMP.has(key));
+const muniCmp = (e, key) => !!e.muni && (e.type !== "kvarter" || CPH_CMP.has(key) || !cphOwn(key));
 /* headline figures (area page header, map popups, municipality strip) — the first five available, in this order */
 const HL_KEYS = ["growth", "price_m2", "rent_private", "unemp", "renters", "income_med", "young", "almene", "supply"];
-/* quick-pick indicator chips next to the indicator select */
-const QUICK_KEYS = ["growth", "price_m2", "rent_private", "unemp", "renters", "supply"];
+/* the municipality card on the map adds these after the first four headline figures */
+const STRIP_EXTRA = ["crime_1000"];
+/* quick-pick indicator chips next to the indicator select; registry entries with `chip: true` follow */
+const QUICK_KEYS = ["growth", "price_m2", "rent_private", "unemp", "renters", "supply"].concat(IND.filter(i => i.chip).map(i => i.key));
 /* link into the chart generator with one area pre-selected */
 const chartLink = (key, type, code) => `charts?ind=${encodeURIComponent(key)}&a=${type}:${code}&y0=&y1=&med=1`;
 /* value of indicator k for municipality/area o in the selected year (latest = live field, else history) */
@@ -90,7 +100,7 @@ const yearsForPool = (k, pool) => YEARS.filter(y => y === LATEST || pool.some(m 
 const histYears = (k, pool) => YEARS.filter(y => pool.some(m => m.hist && m.hist[k] && m.hist[k][y] != null));
 function curPool() { if (S.view === "area") { const e = areaEntity(); return e ? e.peers : MUNI; } if (S.view === "table" && T.level === "kvarter") return CPH ? CPH.areas : MUNI; return cphMode() ? CPH.areas : MUNI; }
 const yearsFor = k => yearsForPool(k, curPool());
-const curInds = () => { if (S.view === "area") { const e = areaEntity(); return e ? e.inds : IND; } if (S.view === "table") return T.level === "kvarter" ? IND_CPH : IND; return cphMode() ? IND_CPH : IND; };
+const curInds = () => { if (S.view === "area") { const e = areaEntity(); return e ? e.inds : IND; } if (S.view === "table") return T.level === "kvarter" ? IND_Q : IND; return cphMode() ? IND_Q : IND; };
 const curInd = () => { const L = curInds(); return L.find(i => i.key === MK.ind) || L[0] || { key: "", label: "", fmt: "pct1" }; };
 
 /* ---------- routing (hash) ---------- */
@@ -234,7 +244,8 @@ function tipToggle(el) { if (TIPFOR === el) { tipHide(); return; } tipShow(el); 
 function tipShow(el) {
   const i = IND.concat(IND_CPH).find(x => x.key === el.dataset.m); if (!i) return;
   if (!TIPEL) { TIPEL = document.createElement("div"); TIPEL.className = "imtip"; document.body.appendChild(TIPEL); }
-  TIPEL.innerHTML = `<b>${esc(i.label)}</b><p><em>Definition</em>${esc(i.desc || "")}</p>` + (i.source ? `<p><em>Source</em>${esc(i.source)}</p>` : "") + (i.warn ? `<p class="warn"><em>Caveat</em>${esc(i.warn)}</p>` : "");
+  TIPEL.innerHTML = `<b>${esc(i.label)}</b>${lowerBetter(i.key) ? `<p class="dim">↓ lower is better</p>` : ""}<p><em>Definition</em>${esc(i.desc || "")}</p>` + (i.source ? `<p><em>Source</em>${esc(i.source)}</p>` : "") +
+    (i.note ? `<p><em>Note</em>${esc(i.note)}</p>` : "") + (i.warn ? `<p class="warn"><em>Caveat</em>${esc(i.warn)}</p>` : "");
   TIPEL.style.visibility = "hidden"; TIPEL.style.display = "block";
   const r = el.getBoundingClientRect(), t = TIPEL.getBoundingClientRect();
   let x = Math.max(8, Math.min(r.left + r.width / 2 - t.width / 2, window.innerWidth - t.width - 8));
@@ -250,7 +261,8 @@ function enableSort(root) {
       th.classList.add("sth"); th.style.cursor = "pointer";
       th.addEventListener("click", () => {
         const tb = tbl.tBodies[0], rows = Array.from(tb.rows);
-        const dir = th.dataset.dir === "asc" ? -1 : 1; th.dataset.dir = dir === 1 ? "asc" : "desc";
+        /* the first click on an indicator column puts the best value on top (data-best), later clicks toggle */
+        const dir = th.dataset.dir ? (th.dataset.dir === "asc" ? -1 : 1) : (th.dataset.best === "desc" ? -1 : 1); th.dataset.dir = dir === 1 ? "asc" : "desc";
         const val = r => { const c = r.cells[idx]; if (!c) return null; const v = parseFloat((c.dataset.v ?? c.textContent).replace(/\s/g, "").replace(",", ".")); return isNaN(v) ? null : v; };
         rows.sort((a, b) => { const x = val(a), y = val(b); if (x == null && y == null) return (a.cells[idx] ? a.cells[idx].textContent : "").localeCompare(b.cells[idx] ? b.cells[idx].textContent : ""); if (x == null) return 1; if (y == null) return -1; return (x - y) * dir; });
         rows.forEach(r => tb.appendChild(r));
@@ -286,15 +298,23 @@ function legendHtml(sc, ind, key, note) {
   const rows = []; for (let c = n - 1; c >= 0; c--) rows.push(`<div class="lgrow"><i style="background:${mkShade(n > 1 ? c / (n - 1) : .5, key)}"></i>${lab(c)}</div>`);
   return `<div class="lgtitle">${esc(ind.short || ind.label)}<span>${esc(ind.unit || "")}</span></div>` +
     (n ? rows.join("") : `<div class="lgrow dim">no data</div>`) +
-    `<div class="lgrow"><i style="background:#C4CBC4"></i>no data</div>${note ? `<div class="lgnote">${note}</div>` : ""}`;
+    `<div class="lgrow"><i style="background:#C4CBC4"></i>no data</div>` +
+    /* same ramp for every direction: darkest = highest value, which is the worst end when lower is better */
+    (lowerBetter(ind.key || "") ? `<div class="lgnote">↓ lower is better · darkest = highest</div>` : "") +
+    `${note ? `<div class="lgnote">${note}</div>` : ""}`;
 }
 function setLegend(id, sc, ind, key, note) { const el = document.getElementById(id); if (el) el.innerHTML = legendHtml(sc, ind, key, note); }
-const GROUP_ORDER = ["Demographics", "Income & jobs", "Housing stock", "Housing stock (BBR)", "Rents", "Prices & market", "Construction"];
+const GROUP_ORDER = ["Demographics", "Income & jobs", "Housing stock", "Housing stock (BBR)", "Rents", "Prices & market", "Construction", "Safety"];
+/* "label · unit" for selects, leaving out unit parts the label already says ("Reported crime · per 1,000 inh." + "rolling 4Q") */
+function optLabel(i) {
+  const parts = (i.unit || "").split(" · ").filter(u => u && !i.label.includes(u) && !i.label.endsWith("· " + u.split(" ")[0]));
+  return i.label + (parts.length ? " · " + parts.join(" · ") : "");
+}
 function indSelect() {
   const L = curInds();
   const groups = GROUP_ORDER.filter(gname => L.some(i => (i.group || "Other") === gname)).concat(L.some(i => !GROUP_ORDER.includes(i.group || "Other")) ? ["Other"] : []);
   return `<select id="indsel" class="indsel" aria-label="Indicator">${groups.map(gname => `<optgroup label="${esc(gname)}">${L.filter(i => (i.group || "Other") === gname).map(i =>
-    `<option value="${i.key}" ${MK.ind === i.key ? "selected" : ""}>${esc(i.label)}${i.unit ? " · " + esc(i.unit) : ""}</option>`).join("")}</optgroup>`).join("")}</select>`;
+    `<option value="${i.key}" ${MK.ind === i.key ? "selected" : ""}>${esc(optLabel(i))}</option>`).join("")}</optgroup>`).join("")}</select>`;
 }
 function indQuick() {
   /* the six figures people ask for first, one click each */
@@ -328,19 +348,34 @@ function indExplain(i) {
   const asof = asofText(i);
   /* one line by default — label, level, unit, period; the definition, source, coverage and caveat open on ⓘ */
   const asofShort = asofSrc => { const src = (MK.year !== LATEST && i.hist_asof && i.hist_asof[MK.year]) || i.asof || {}; return src.kommune || src.postnr || src.kvarter || ""; };
+  const lb = lowerBetter(i.key);
+  const src = srcLine(i, asofShort());
   return `<details class="indx" ${UI.indxOpen ? "open" : ""}>
-    <summary><b>${esc(i.label)}</b><span class="tag">${i.level === "kvarter" ? "quarter level" : i.level === "postnr" ? "postal-code level" : "municipality level"}</span><span class="tag">${esc(i.unit || "")}</span>${asofShort() ? `<span class="dim">as of ${esc(asofShort())}</span>` : ""}${i.warn ? `<span class="warnline">⚠</span>` : ""}<i class="more">ⓘ details</i></summary>
-    <div class="indx-body"><p>${esc(i.desc || "")}</p>
+    <summary><b>${esc(i.label)}</b><span class="tag">${i.level === "kvarter" ? "quarter level" : i.level === "postnr" ? "postal-code level" : "municipality level"}</span><span class="tag">${esc(i.unit || "")}</span>${lb ? `<span class="tag">↓ lower is better</span>` : ""}${asofShort() ? `<span class="dim">as of ${esc(asofShort())}</span>` : ""}${i.warn ? `<span class="warnline">⚠</span>` : ""}<i class="more">ⓘ details</i></summary>
+    <div class="indx-body"><p>${esc(i.desc || "")}${lb ? ` <b>↓ Lower is better</b> — rank #1 is the lowest value.` : ""}</p>
+    ${i.note ? `<p class="dim"><em>Note</em> ${esc(i.note)}</p>` : ""}
     <p class="dim"><em>Source</em> ${esc(i.source || "–")}${asof ? ` · <em>As of</em> ${asof}` : ""} · <em>Coverage</em> ${cov}${ys.length > 1 ? ` · <em>History</em> ${ys[0]}–${LATEST}` : ""}</p>
+    ${src ? `<p class="dim">${esc(src)}</p>` : ""}
     ${i.warn ? `<p class="warnline">⚠ ${esc(i.warn)}</p>` : ""}</div>
   </details>`;
+}
+/* "Danmarks Statistik, STRAF11 / FOLK1A, as of 2025K3→2026K2, fetched 2026-09-22" from the indicator's tables and the source stamps */
+function srcLine(i, asof) {
+  const S_ = {}; ((D.meta && D.meta.sources) || []).forEach(s => S_[s.key] = s);
+  const PUB = { dst: "Danmarks Statistik", s20: "Finans Danmark", s30: "Københavns Kommune" };
+  const by = {}; (i.tables || []).forEach(t => { const [db, tb] = t.split("/"); (by[db] = by[db] || []).push(tb); });
+  const fetched = (i.tables || []).map(t => (S_[t] || {}).fetched).filter(Boolean).sort().pop();
+  const pubs = Object.entries(by).map(([db, tbs]) => `${PUB[db] || db}, ${tbs.join(" / ")}`);
+  return pubs.length ? `${pubs.join(" · ")}${asof ? `, as of ${asof}` : ""}${fetched ? `, fetched ${fetched}` : ""}` : "";
 }
 function yearSelect() {
   const ys = yearsFor(MK.ind);
   if (ys.length < 2) return "";
   const hy = ys.filter(y => y !== LATEST); const lastHist = hy[hy.length - 1];
   const pool = curPool();
-  const label = y => y === LATEST ? (lastHist && lastHist !== LATEST && !pool.some(m => m.hist && m.hist[MK.ind] && m.hist[MK.ind][LATEST] != null) ? `latest (${lastHist} data)` : `${y} (latest)`) : y;
+  /* rolling indicators (Safety) have no calendar value for the latest year but their live window ends in it */
+  const a = curInd().asof || {}; const endYr = (String(a.kommune || a.postnr || a.kvarter || "").split("→").pop().split("–").pop().match(/\d{4}/) || [""])[0];
+  const label = y => y === LATEST ? (lastHist && lastHist !== LATEST && endYr !== LATEST && !pool.some(m => m.hist && m.hist[MK.ind] && m.hist[MK.ind][LATEST] != null) ? `latest (${lastHist} data)` : `${y} (latest)`) : y;
   return `<select id="yearsel" class="indsel" aria-label="Year">${ys.filter(y => !(y === lastHist && label(LATEST).startsWith("latest ("))).map(y => `<option value="${y}" ${MK.year === y ? "selected" : ""}>${label(y)}</option>`).join("")}</select>`;
 }
 
@@ -370,12 +405,18 @@ function srcNote(extra = "") {
 function rankOf(o, key, peers) {
   const v = V(o, key); if (v == null) return null;
   const vals = peers.map(p => V(p, key)).filter(x => x != null);
-  return { r: 1 + vals.filter(x => x > v).length, n: vals.length };
+  const lb = lowerBetter(key);   /* #1 = best: the highest value, or the lowest where lower is better */
+  return { r: 1 + vals.filter(x => lb ? x < v : x > v).length, n: vals.length };
 }
+/* good/bad sense of a change d in indicator key: "up" = favourable (green), "dn" = unfavourable */
+const cls = (d, key) => { const s = lowerBetter(key || "") ? -d : d; return s > 0 ? "up" : s < 0 ? "dn" : ""; };
+const goodBad = (d, key) => d == null ? "" : ({ up: "good", dn: "bad" })[cls(d, key)] || "";
 function muniStrip(m) {
-  /* the selected municipality in one line: population, region, selected indicator + rank, link to its page */
-  const inds = cphMode() ? IND_CPH : IND;
-  const key = HL_KEYS.map(k => inds.find(i => i.key === k)).filter(i => i && V(m, i.key) != null).slice(0, 4);
+  /* the selected municipality in one line: population, region, four headline figures + crime with rank, link to its page.
+     The figures are the municipality's own, so the national indicator list applies in quarter mode too. */
+  const has = i => i && V(m, i.key) != null;
+  const key = HL_KEYS.filter(k => !STRIP_EXTRA.includes(k)).map(k => IND.find(i => i.key === k)).filter(has).slice(0, 4)
+    .concat(STRIP_EXTRA.map(k => IND.find(i => i.key === k)).filter(has));
   const cell = i => { const rk = rankOf(m, i.key, MUNI); return `<div><span>${esc(i.short || i.label)}</span><b>${fmtOf(i)(V(m, i.key))}</b><em>${rk ? `#${rk.r} of ${rk.n}` : ""}</em></div>`; };
   return `<div class="mstrip">
     <div class="mstrip-id"><b>${esc(m.name)}</b><span class="dim">${esc(m.region || "")} · ${m.pop != null ? nf(m.pop, 0) + " inhabitants" : ""} · ${muniAreas(m.code).length} ${cphMode() ? "quarters" : "postal codes"}</span></div>
@@ -409,7 +450,7 @@ function deltaCell(o, i, pool) {
   const y0 = yearsForPool(i.key, pool || curPool())[0]; if (!y0 || y0 === MK.year) return `<td class="num dim">–</td>`;
   const a = V(o, i.key, y0), b = V(o, i.key); if (a == null || b == null) return `<td class="num dim">–</td>`;
   const d = isPct(i) ? b - a : (a ? (b / a - 1) * 100 : null); if (d == null) return `<td class="num dim">–</td>`;
-  return `<td class="num ${d > 0 ? "good" : d < 0 ? "bad" : ""}" data-v="${d}">${sign(d, x => nf(x, 1))}${isPct(i) ? " pp" : " %"}</td>`;
+  return `<td class="num ${goodBad(d, i.key)}" data-v="${d}">${sign(d, x => nf(x, 1))}${isPct(i) ? " pp" : " %"}</td>`;
 }
 function tableRows() {
   const q = T.q;
@@ -417,26 +458,34 @@ function tableRows() {
   if (T.level === "kommune") return MUNI.filter(m => (!T.region || m.region === T.region) && (m.pop || 0) >= T.minPop && (!q || m.name.toLowerCase().includes(q) || m.code.includes(q)));
   return AREAS.filter(a => { const m = byCode[a.muni] || {}; return (!T.region || m.region === T.region) && (a.pop || 0) >= T.minPop && (!q || (a.name || "").toLowerCase().includes(q) || a.nr.includes(q) || (m.name || "").toLowerCase().includes(q)); });
 }
-function tableCols() { return T.level === "kvarter" ? IND_CPH : T.level === "postnr" ? IND.filter(i => i.level === "postnr").concat(IND.filter(i => i.level !== "postnr")) : IND; }
+function tableCols(all) {
+  const L = T.level === "kvarter" ? IND_Q : T.level === "postnr" ? IND.filter(i => i.level === "postnr").concat(IND.filter(i => i.level !== "postnr")) : IND;
+  /* Safety columns only while a Safety indicator (group or Crime chip) is selected; the CSV export always has everything */
+  return all || isSafety(curInd()) ? L : L.filter(i => !isSafety(i));
+}
 function tableBodyHtml() {
   const cols = tableCols(), ind = curInd(), pool = curPool(), y0 = yearsForPool(ind.key, pool)[0];
-  const rows = tableRows().slice().sort((a, b) => ((V(b, ind.key) ?? V(byCode[b.muni], ind.key)) ?? -1e9) - ((V(a, ind.key) ?? V(byCode[a.muni], ind.key)) ?? -1e9));
+  const sv = r => V(r, ind.key) ?? V(byCode[r.muni], ind.key), lb = lowerBetter(ind.key);   /* best first; no value last */
+  const rows = tableRows().slice().sort((a, b) => { const x = sv(a), y = sv(b); return x == null ? (y == null ? 0 : 1) : y == null ? -1 : lb ? x - y : y - x; });
   if (!rows.length) return `<tr><td colspan="${cols.length + 5}" class="empty">no rows match the filters</td></tr>`;
   return rows.map(r => {
     const m = T.level === "postnr" ? (byCode[r.muni] || {}) : r;
     const lead = `<tr class="clickrow" data-go="${withQ(pageOf(r))}"><th><span class="thn">${esc(r.name)} <span class="go">›</span></span><button class="tch" data-go="${chartLink(ind.key, T.level, T.level === "postnr" ? r.nr : r.code)}" title="Open in Charts">↗</button></th>`;
     if (T.level === "kvarter") return `${lead}<td class="dim">${esc(r.code)}</td><td class="dim">${esc(r.bydel || "")}</td><td class="num dim" data-v="${r.pop || 0}">${r.pop != null ? nf(r.pop, 0) : "–"}</td>
-      ${fmtCell(ind, V(r, ind.key), false)}${y0 && y0 !== MK.year ? deltaCell(r, ind, pool) : ""}${cols.filter(i => i.key !== ind.key).map(i => fmtCell(i, V(r, i.key), false)).join("")}</tr>`;
+      ${qCell(r, ind)}${y0 && y0 !== MK.year ? deltaCell(r, ind, pool) : ""}${cols.filter(i => i.key !== ind.key).map(i => qCell(r, i)).join("")}</tr>`;
     const cell = i => { const own = V(r, i.key); return own != null ? fmtCell(i, own, false) : (T.level === "postnr" ? fmtCell(i, V(m, i.key), true) : fmtCell(i, null, false)); };
     return `${lead}<td class="dim">${T.level === "postnr" ? esc(r.nr) : esc(r.code)}</td><td class="dim">${T.level === "postnr" ? esc(m.name || "") : esc(r.region || "")}</td>
       <td class="num dim" data-v="${r.pop || 0}">${r.pop != null ? nf(r.pop, 0) : "–"}</td>
       ${cell(ind)}${y0 && y0 !== MK.year ? deltaCell(r, ind, pool) : ""}${cols.filter(i => i.key !== ind.key).map(cell).join("")}</tr>`; }).join("");
 }
+/* a quarter's own value, or København's for indicators the quarter layer does not have (°) */
+function qCell(r, i) { const own = V(r, i.key); return own != null || cphOwn(i.key) ? fmtCell(i, own, false) : fmtCell(i, V(byCode[CPH_MUNI], i.key), true); }
 function renderTableBody() {
   const tb = document.getElementById("tbody"); if (!tb) return;
   tb.innerHTML = tableBodyHtml();
   const n = document.getElementById("tcount"); if (n) n.textContent = `${tableRows().length} rows`;
 }
+const best = i => lowerBetter(i.key) ? "asc" : "desc";
 function vTable() {
   const ind = curInd(), cols = tableCols(), y0 = yearsFor(ind.key)[0];
   return `
@@ -453,18 +502,18 @@ function vTable() {
     </div>
     <div class="scrollx"><table class="tbl compact wraphead" data-sortable><thead><tr>
       <th>${T.level === "kvarter" ? "Quarter" : T.level === "postnr" ? "Area" : "Municipality"}</th><th>${T.level === "postnr" ? "Postal code" : "Code"}</th><th>${T.level === "kvarter" ? "District" : T.level === "postnr" ? "Municipality" : "Region"}</th><th class="num">Population</th>
-      <th class="num hi">${esc(ind.label)}<br><span class="dim">${esc(ind.unit || "")}</span></th>${y0 && y0 !== MK.year ? `<th class="num">Δ since ${y0}<br><span class="dim">${isPct(ind) ? "pp" : "%"}</span></th>` : ""}
-      ${cols.filter(i => i.key !== ind.key).map(i => `<th class="num">${esc(i.label)}<br><span class="dim">${esc(i.unit || "")}</span></th>`).join("")}</tr></thead>
+      <th class="num hi" data-best="${best(ind)}">${esc(ind.label)}<br><span class="dim">${esc(ind.unit || "")}</span></th>${y0 && y0 !== MK.year ? `<th class="num">Δ since ${y0}<br><span class="dim">${isPct(ind) ? "pp" : "%"}</span></th>` : ""}
+      ${cols.filter(i => i.key !== ind.key).map(i => `<th class="num" data-best="${best(i)}">${esc(i.label)}${lowerBetter(i.key) ? " ↓" : ""}<br><span class="dim">${esc(i.unit || "")}</span></th>`).join("")}</tr></thead>
       <tbody id="tbody">${tableBodyHtml()}</tbody></table></div>
-    <p class="cap">Sorted by the selected indicator; click a column header to re-sort, a row to open the area's page, ↗ to chart it. ° = municipality value shown on a postal code. Rows: ${T.level === "postnr" ? "postal codes (street-level codes in central Copenhagen merged by name)" : T.level === "kvarter" ? "Copenhagen quarters (kvarterer), source Københavns Kommune statbank" : "municipalities"}.</p>
+    <p class="cap">Sorted by the selected indicator, best first (↓ = lower is better); click a column header to re-sort, a row to open the area's page, ↗ to chart it. ° = municipality value shown on a postal code or quarter.${isSafety(curInd()) ? "" : " Safety columns appear when a Safety indicator is selected."} Rows: ${T.level === "postnr" ? "postal codes (street-level codes in central Copenhagen merged by name)" : T.level === "kvarter" ? "Copenhagen quarters (kvarterer), source Københavns Kommune statbank" : "municipalities"}.</p>
     ${srcNote()}
   </div>`;
 }
 function exportCsv() {
-  const cols = tableCols(), rows = tableRows();
+  const cols = tableCols(true), rows = tableRows();
   const head = [T.level === "kvarter" ? "quarter" : T.level === "postnr" ? "area" : "municipality", T.level === "postnr" ? "postal_code" : "code", T.level === "kvarter" ? "district" : T.level === "postnr" ? "municipality" : "region", "population"].concat(cols.map(i => i.key));
   const lines = [head.join(";")].concat(rows.map(r => { const m = T.level === "postnr" ? (byCode[r.muni] || {}) : r;
-    return [r.name, T.level === "postnr" ? r.nr : r.code, T.level === "kvarter" ? (r.bydel || "") : T.level === "postnr" ? (m.name || "") : (r.region || ""), r.pop ?? ""].concat(cols.map(i => V(r, i.key) ?? (T.level === "postnr" ? (V(m, i.key) ?? "") : ""))).map(v => String(v).replace(/;/g, ",")).join(";"); }));
+    return [r.name, T.level === "postnr" ? r.nr : r.code, T.level === "kvarter" ? (r.bydel || "") : T.level === "postnr" ? (m.name || "") : (r.region || ""), r.pop ?? ""].concat(cols.map(i => V(r, i.key) ?? (T.level === "postnr" || (T.level === "kvarter" && !cphOwn(i.key)) ? (V(T.level === "kvarter" ? byCode[CPH_MUNI] : m, i.key) ?? "") : ""))).map(v => String(v).replace(/;/g, ",")).join(";"); }));
   const blob = new Blob(["﻿" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
   a.download = `am-dashboard-dk_${T.level}_${MK.year}_${(D.meta && D.meta.built) || "data"}.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
@@ -509,14 +558,16 @@ function areaEntity() {
   }
   if (AR.type === "kvarter" && CPH) {
     const q = byQ[AR.code]; if (!q) return null; const m = byCode[CPH_MUNI];
-    return { type: "kvarter", typeLabel: "Copenhagen quarter", o: q, name: q.name, code: q.code, muni: m, region: m && m.region, bydel: q.bydel, inds: IND_CPH, peers: CPH.areas, peerLabel: "quarters",
+    return { type: "kvarter", typeLabel: "Copenhagen quarter", o: q, name: q.name, code: q.code, muni: m, region: m && m.region, bydel: q.bydel, inds: IND_Q, peers: CPH.areas, peerLabel: "quarters",
              ctx: CPH.areas, own: [q], subs: null };
   }
   return null;
 }
-/* value for the entity: its own figure, or the municipality's (inherited, °) for postal codes */
-function eVal(e, k, y) { const own = V(e.o, k, y); if (own != null) return { v: own, own: true }; if (e.type === "postnr" && e.muni) { const mv = V(e.muni, k, y); if (mv != null) return { v: mv, own: false }; } return { v: null, own: false }; }
-function eYears(e, k) { return histYears(k, e.type === "postnr" && V(e.o, k) == null ? MUNI : e.peers); }
+/* value for the entity: its own figure, or the municipality's (inherited, °) for postal codes — and for quarters
+   on indicators the quarter layer does not have (Safety) */
+const inherits = (e, k) => !!e.muni && (e.type === "postnr" || (e.type === "kvarter" && !cphOwn(k)));
+function eVal(e, k, y) { const own = V(e.o, k, y); if (own != null) return { v: own, own: true }; if (inherits(e, k)) { const mv = V(e.muni, k, y); if (mv != null) return { v: mv, own: false }; } return { v: null, own: false }; }
+function eYears(e, k) { return histYears(k, inherits(e, k) && V(e.o, k) == null ? MUNI : e.peers); }
 function tileSpark(ys, own, med, i) {
   /* area (solid) against the median of its peers (dashed), last point marked, first/last year on the axis */
   const all = own.concat(med).filter(v => v != null); if (own.filter(v => v != null).length < 2) return "";
@@ -546,15 +597,14 @@ function tileStats(e, i) {
   const rk = cur.own ? rankOf(e.o, i.key, e.peers) : null;
   return { cur, ys, y0, own, med, yoy, since, vsMed, rk, unit };
 }
-const cls = d => d > 0 ? "up" : d < 0 ? "dn" : "";
 function tileHtml(e, i, on) {
   const s = tileStats(e, i); if (!s) return "";
   return `<div class="tile ${on ? "on" : ""}" data-arind="${esc(i.key)}" title="${esc(i.desc || i.label)} — click to focus the chart and map">
     <button class="tch" data-go="${chartLink(i.key, e.type, e.code)}" title="Open in Charts">↗</button>
     <span class="tl">${esc(i.label)}${s.cur.own ? "" : " °"}</span>
-    <div class="tv"><b>${fmtOf(i)(s.cur.v)}</b>${s.yoy != null ? `<i class="${cls(s.yoy)}">${sign(s.yoy, x => nf(x, 1))}${s.unit} y/y</i>` : ""}</div>
+    <div class="tv"><b>${fmtOf(i)(s.cur.v)}</b>${s.yoy != null ? `<i class="${cls(s.yoy, i.key)}">${sign(s.yoy, x => nf(x, 1))}${s.unit} y/y</i>` : ""}</div>
     ${tileSpark(s.ys, s.own, s.med, i)}
-    <div class="tm">${s.rk ? `<span>#${s.rk.r} of ${s.rk.n}</span>` : `<span class="dim">municipality value</span>`}${s.vsMed != null ? `<span><i class="${cls(s.vsMed)}">${sign(s.vsMed, x => nf(x, 1))}${s.unit}</i> vs median</span>` : ""}</div>
+    <div class="tm">${s.rk ? `<span>#${s.rk.r} of ${s.rk.n}</span>` : `<span class="dim">municipality value</span>`}${s.vsMed != null ? `<span><i class="${cls(s.vsMed, i.key)}">${sign(s.vsMed, x => nf(x, 1))}${s.unit}</i> vs median</span>` : ""}</div>
   </div>`;
 }
 /* headline row under the area title: the five figures that answer "what kind of area is this" */
@@ -563,7 +613,7 @@ function headlineHtml(e) {
   if (!inds.length) return "";
   return `<div class="hl">${inds.map(i => { const s = tileStats(e, i); return `<button class="hlc ${MK.ind === i.key ? "on" : ""}" data-arind="${esc(i.key)}" title="${esc(i.desc || i.label)} — click to focus the chart and map">
     <span>${esc(i.short || i.label)}${s.cur.own ? "" : " °"}</span><b>${fmtOf(i)(s.cur.v)}</b>
-    <em>${s.yoy != null ? `<i class="${cls(s.yoy)}">${sign(s.yoy, x => nf(x, 1))}${s.unit}</i> y/y` : ""}${s.rk ? `${s.yoy != null ? " · " : ""}#${s.rk.r} of ${s.rk.n}` : ""}</em></button>`; }).join("")}</div>`;
+    <em>${s.yoy != null ? `<i class="${cls(s.yoy, i.key)}">${sign(s.yoy, x => nf(x, 1))}${s.unit}</i> y/y` : ""}${s.rk ? `${s.yoy != null ? " · " : ""}#${s.rk.r} of ${s.rk.n}` : ""}</em></button>`; }).join("")}</div>`;
 }
 function multiLine(series, ind, ys) {
   const all = series.flatMap(s => s.pts.map(p => p.v)).filter(v => v != null);
@@ -600,7 +650,7 @@ function areaCompareTable(e) {
       return `<tr class="clickrow ${i.key === ind.key ? "hi" : ""}" data-arind="${esc(i.key)}"><th><span class="thn">${esc(i.label)} <span class="dim">${esc(i.unit || "")}</span></span><button class="tch" data-go="${chartLink(i.key, e.type, e.code)}" title="Open in Charts">↗</button></th>
         ${fmtCell(i, cur.v, !cur.own)}${e.muni ? (muniCmp(e, i.key) ? fmtCell(i, V(e.muni, i.key), false) : `<td class="num dim" title="different definition at municipality level">n/c</td>`) : ""}${fmtCell(i, med, false)}
         <td class="num" data-v="${rk ? rk.r : ""}">${rk ? `#${rk.r} / ${rk.n}` : "–"}</td>
-        <td class="num ${d > 0 ? "good" : d < 0 ? "bad" : ""}" data-v="${d ?? ""}">${d != null ? sign(d, x => nf(x, 1)) + (isPct(i) ? " pp" : " %") + ` <span class="dim">(${y0})</span>` : "–"}</td>
+        <td class="num ${goodBad(d, i.key)}" data-v="${d ?? ""}">${d != null ? sign(d, x => nf(x, 1)) + (isPct(i) ? " pp" : " %") + ` <span class="dim">(${y0})</span>` : "–"}</td>
         <td class="dim">${asofText(i)}</td></tr>`; }).join("")}</tbody></table></div>`;
 }
 function areaSubTable(e) {
@@ -644,7 +694,7 @@ function vArea() {
   /* lower panel: the full indicator list, the BBR housing stock and the sub-areas as tabs of one card */
   const tabs = [["ind", "All indicators"]].concat(e.o.bbr && e.o.bbr.dist ? [["bbr", "Housing stock (BBR)"]] : []).concat(e.subs ? [["sub", e.subs.kvarter ? "Quarters & postal codes" : "Postal codes"]] : []);
   const tab = tabs.some(t => t[0] === AR.tab) ? AR.tab : "ind";
-  const hint = `y/y = change from the previous year · "vs median" = against the median of ${e.peerLabel} (pp for shares, % otherwise) · #rank among ${e.peerLabel}, #1 = highest value · ° = municipality value where no ${e.type === "postnr" ? "postal-code" : "finer"} statistic exists${e.type === "kvarter" ? " · n/c = not comparable (different definition at municipality level)" : ""}. Solid line = ${e.name}, dashed = median of ${e.peerLabel}. Click a tile to focus the chart and map, ↗ to open it in Charts.`;
+  const hint = `y/y = change from the previous year · "vs median" = against the median of ${e.peerLabel} (pp for shares, % otherwise) · #rank among ${e.peerLabel}, #1 = highest value (lowest where ↓ lower is better) · ° = municipality value where no ${e.type === "postnr" ? "postal-code" : "finer"} statistic exists${e.type === "kvarter" ? " · n/c = not comparable (different definition at municipality level)" : ""}. Solid line = ${e.name}, dashed = median of ${e.peerLabel}. Click a tile to focus the chart and map, ↗ to open it in Charts.`;
   return `
   <div class="card accent arhead">
     <div class="arid">
@@ -680,6 +730,8 @@ function arMapMode(e, ind) {
   /* what the small map shows: Copenhagen quarters, the municipality's postal codes, or (for a municipality-level
      indicator on a municipality page) the municipality among all others */
   const useQ = e.type === "kvarter" || (e.type === "kommune" && e.subs && e.subs.kvarter && AR.sub !== "postnr");
+  /* an indicator the quarter layer does not have (Safety) is drawn with the municipality values */
+  if (useQ && !cphOwn(ind.key) && IND.some(i => i.key === ind.key)) return { useQ: false, sind: IND.find(i => i.key === ind.key), kommuneLevel: true };
   const subInds = useQ ? IND_CPH : IND; const sind = subInds.find(i => i.key === ind.key) || null;
   const kommuneLevel = e.type === "kommune" && !useQ && !!sind && sind.level !== "postnr";
   return { useQ, sind, kommuneLevel };
@@ -721,8 +773,9 @@ function lfPopup(a, muni) {
   const peers = isQ ? CPH.areas : AREAS; const sel = val(ind);
   const rk = sel ? (sel.own ? rankOf(a, ind.key, peers) : (muni ? rankOf(muni, ind.key, MUNI) : null)) : null;
   const keys = HL_KEYS.filter(k => k !== ind.key).map(k => LI.find(i => i.key === k)).filter(Boolean).map(i => ({ i, x: val(i) })).filter(x => x.x).slice(0, 4);
-  const native = LI.filter(i => V(a, i.key) != null).map(i => row(i, V(a, i.key), true)).join("");
-  const inherited = LI.filter(i => V(a, i.key) == null && muni && V(muni, i.key) != null).map(i => row(i, V(muni, i.key), false)).join("");
+  const native = LI.filter(i => !isSafety(i) && V(a, i.key) != null).map(i => row(i, V(a, i.key), true)).join("");
+  const inherited = LI.filter(i => !isSafety(i) && V(a, i.key) == null && muni && V(muni, i.key) != null).map(i => row(i, V(muni, i.key), false)).join("");
+  const safety = LI.filter(isSafety).map(i => ({ i, x: val(i) })).filter(o => o.x).map(({ i, x }) => row(i, x.v, x.own)).join("");
   const n = LI.filter(i => val(i)).length; const type = isQ ? "kvarter" : "postnr", code = isQ ? a.code : a.nr;
   return `<div class="lfpop"><b>${esc(a.nr || a.code)} ${esc(a.name)}</b>${MK.year !== LATEST ? ` <span class="tag">${MK.year}</span>` : ""}
     <span class="dim">${a.bydel ? esc(a.bydel) + " · " : ""}${muni ? esc(muni.name) : ""}${a.pop != null ? " · " + nf(a.pop, 0) + " inhabitants" : ""}</span>
@@ -731,7 +784,8 @@ function lfPopup(a, muni) {
     <span class="lfact"><button class="lk mini primary" data-go="${withQ(pageOf(a))}">Open page ›</button>${muni && !MK.muni ? `<button class="lk mini" data-go="map/${muni.code}?ind=${MK.ind}">Zoom to ${esc(muni.name)}</button>` : ""}${muni && microAvail(muni.code) ? `<button class="lk mini" data-go="map/${muni.code}?ind=${MK.ind}&micro=1&mind=${MK.mind}">Buildings ›</button>` : ""}<button class="lk mini" data-go="${chartLink(ind.key, type, code)}">↗ Chart</button></span>
     <details class="lfmore"><summary>All ${n} values</summary>
     ${native ? `<span class="lfsec">${isQ ? "Quarter" : "Postal code"}</span><div class="lfrows">${native}</div>` : ""}
-    ${inherited ? `<span class="lfsec">Municipality °</span><div class="lfrows">${inherited}</div>` : ""}</details></div>`;
+    ${inherited ? `<span class="lfsec">Municipality °</span><div class="lfrows">${inherited}</div>` : ""}
+    ${safety ? `<span class="lfsec">Safety${muni ? " · municipality °" : ""}</span><div class="lfrows">${safety}</div>` : ""}</details></div>`;
 }
 /* which sub-area (quarter / postal code) of the drilled municipality a point lies in — ray casting on the rings */
 function pip(pt, ring) { let ins = false; for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) { const yi = ring[i][0], xi = ring[i][1], yj = ring[j][0], xj = ring[j][1]; if ((yi > pt[0]) !== (yj > pt[0]) && pt[1] < (xj - xi) * (pt[0] - yi) / (yj - yi) + xi) ins = !ins; } return ins; }
@@ -869,7 +923,7 @@ function lfLayers() {
   const ind = curInd();
   /* a drilled-in municipality always shows its sub-areas, whatever the zoom (small screens fit it below zoom 10) */
   const fine = !!MK.muni || zoom >= MICRO_ZOOM;
-  const micro = fine && (cphMode() || ind.level === "postnr");
+  const micro = fine && (cphMode() ? cphOwn(ind.key) : ind.level === "postnr");
   LF.level = (fine ? "micro" : zoom < 8 ? "national" : "macro") + (cphMode() ? "-cph" : "") + (MK.muni || "");
   if (LF.areaG) LF.map.removeLayer(LF.areaG);
   if (LF.labG) LF.map.removeLayer(LF.labG);
@@ -891,7 +945,7 @@ function lfLayers() {
   LF.areaG = L.layerGroup(polys).addTo(LF.map);
   LF.ctx = { areas, munis, sc, micro, ind, vk };
   lfLabels();
-  setLegend("maplegend", sc, ind, ind.key, micro ? (cphMode() ? "quarters" : "postal codes") : (ind.level === "postnr" && !MK.muni ? "municipalities · zoom in for postal codes" : "municipalities" + (fine ? " · ° postal codes take the municipality value" : "")));
+  setLegend("maplegend", sc, ind, ind.key, micro ? (cphMode() ? "quarters" : "postal codes") : (ind.level === "postnr" && !MK.muni ? "municipalities · zoom in for postal codes" : "municipalities" + (fine ? ` · ° ${cphMode() ? "quarters" : "postal codes"} take the municipality value` : "")));
   if (LF.ownG) { LF.map.removeLayer(LF.ownG); LF.ownG = null; }
   if (MK.own && D.portfolio) {
     const marks = D.portfolio.properties.filter(p => p.lat != null).map(p => {
@@ -1061,7 +1115,7 @@ function vCharts() {
   return `
   <div class="card accent">
     <div class="card-head tools-only"><div class="tools">
-      <select id="chind" class="indsel">${groups.map(gn => `<optgroup label="${esc(gn)}">${L.filter(i => (i.group || "Other") === gn).map(i => `<option value="${i.key}" ${CH.ind === i.key ? "selected" : ""}>${esc(i.label)}${i.unit ? " · " + esc(i.unit) : ""}</option>`).join("")}</optgroup>`).join("")}</select>
+      <select id="chind" class="indsel">${groups.map(gn => `<optgroup label="${esc(gn)}">${L.filter(i => (i.group || "Other") === gn).map(i => `<option value="${i.key}" ${CH.ind === i.key ? "selected" : ""}>${esc(optLabel(i))}</option>`).join("")}</optgroup>`).join("")}</select>
       <select id="chy0" class="indsel"><option value="">from ${YEARS[0]}</option>${YEARS.map(y => `<option value="${y}" ${CH.y0 === y ? "selected" : ""}>${y}</option>`).join("")}</select>
       <select id="chy1" class="indsel"><option value="">to ${LATEST}</option>${YEARS.map(y => `<option value="${y}" ${CH.y1 === y ? "selected" : ""}>${y}</option>`).join("")}</select>
       <label class="hint" style="display:flex;align-items:center;gap:5px"><input type="checkbox" id="chmed" ${CH.median ? "checked" : ""}> median</label>
