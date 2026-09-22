@@ -1,6 +1,6 @@
 # AM Dashboard — Denmark Edition: Open Data Map
 
-**Status:** v0.1 · 2026-09-14 · research & verification round complete, no data ingested yet
+**Status:** v2.0 · 2026-09-22 · Safety (crime) added; see §3.8 and the verification log in §7
 **Scope:** the *Macro / Market* layer of the dashboard (the Finnish edition's `makro` view plus a Denmark-specific market panel). Portfolio data (rent roll, lettings, capex, etc.) is out of scope for this document — it comes from the owner's own systems and is joined in later.
 **Principle:** same design and logic as the Finnish edition (choropleth map with an indicator chip row, municipality → sub-area drill-down, comparison tables, source notes), but every number comes from **Danish open sources**. Nothing is carried over from the Finnish data.
 
@@ -313,6 +313,10 @@ am-dashboard-dk/
 | — | Datafordeler GraphQL with a real key, EMOData, Rejseplanen GTFS download | not yet (need credentials) |
 | 2026-09-22 | `STRAF11`, `STRAF22` tableinfo + `validate_config.py` (all 11 + 3 × 2 codes ✓); test cells `STRAF11` code 1 2026K2 København / Aarhus / Odense / Denmark, `STRAF22` København 2025 | ✅ 15 045 / 5 202 / 2 977 / 76 275; ANM 68 802, SIG 11 763 |
 | 2026-09-22 | Safety indicators, 10-area check against statistikbanken.dk (§7c) | ⏳ statistikbanken values pending |
+| 2026-09-22 | `crime_1000` København recomputed by hand from `data/raw`: STRAF11 code 1 15323 + 14713 + 15205 + 15045 = 60 286 ÷ FOLK1A 2026K3 670 389 × 1000 | ✅ 89.93 = dashboard 89.93 |
+| 2026-09-22 | `crime_1000` Aarhus recomputed by hand from `data/raw`: STRAF11 code 1 5937 + 5010 + 4281 + 5202 = 20 430 ÷ FOLK1A 2026K3 378 270 × 1000 | ✅ 54.01 = dashboard 54.01 |
+| 2026-09-22 | `crime_1000` Odense recomputed by hand from `data/raw`: STRAF11 code 1 2970 + 3608 + 2523 + 2977 = 12 078 ÷ FOLK1A 2026K3 213 140 × 1000 | ✅ 56.67 = dashboard 56.67 |
+| 2026-09-22 | Copenhagen bydele from the KK Tryghedsundersøgelse PDF, three rows read off the pages: Indre By 90 % / 263 per 1 000 (pp. 70, 74), Bispebjerg 80 % (pp. 49–50), Valby 79 % / 43 (p. 98) | ✅ CSV matches; Bispebjerg fact box p. 49 prints Brønshøj-Husum's 76 % / 64 % — results page p. 50 and the p. 7 map give 80 % / 70 %, which is what the CSV uses |
 
 ### 7b. Calculation verification (phase B, 2026-09-14)
 
