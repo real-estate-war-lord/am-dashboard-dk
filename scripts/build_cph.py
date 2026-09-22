@@ -48,6 +48,9 @@ def compute(ind, year=None):
 
 # ---------- Københavns Kommunes Tryghedsundersøgelse (safety survey + Københavns Politi crime), per bydel ----------
 KK_SURVEY = "Københavns Kommune, Tryghedsundersøgelsen {year} (Epinion) / Københavns Politi"
+KK_FOOTFALL = ("Denominator is resident population. City-centre areas with heavy daytime and night-time footfall (tourists, shopping, nightlife) "
+               "score high because offences such as theft from person happen there, not because residents are unsafe — compare with Feeling safe (%), "
+               "which is 90 % in Indre By.")
 KK_NOTE = ("Published per bydel (13 areas in the report); every quarter of a bydel shows its bydel's figure. "
            "Safety share: survey of residents ({year}). Crime: reports recorded by Københavns Politi in the municipality "
            "({crime_year}), per 1,000 inhabitants — a different source and period from the national STRAF11 indicators, "
@@ -81,7 +84,8 @@ def kk_indicators(year, crime_year):
     common = {"level": "kvarter", "geo_level": "bydel", "level_label": "bydel (KK survey)", "source": KK_SURVEY.format(year=year), "hist_asof": {},
               "note": KK_NOTE.format(year=year, crime_year=crime_year)}
     return [
-        common | {"key": "crime_1000", "label": "Reported crime · per 1,000 inh.", "short": "Crime", "unit": "per 1,000 inh. · " + crime_year,
+        common | {"note": KK_FOOTFALL + " " + common["note"], "note_short": KK_FOOTFALL,
+                  "key": "crime_1000", "label": "Reported crime · per 1,000 inh.", "short": "Crime", "unit": "per 1,000 inh. · " + crime_year,
                   "hue": [200, 88, 62], "group": "Safety", "fmt": "per1000", "direction": "lower_better", "asof": {"kvarter": f"{crime_year} (Københavns Politi)"},
                   "desc": f"Penal-code offences reported to Københavns Politi in {crime_year} per 1,000 inhabitants of the bydel, as published in the city's safety survey.",
                   "warn": "Bydel-level figure from the city's report — not the same source, period or geography as the national crime indicators (DST STRAF11, rolling 4 quarters)."},
@@ -149,7 +153,7 @@ def main():
         for a, v in spread(vals).items():
             if a in areas and v is not None:
                 areas[a][ind["key"]] = round(v, 2)
-        inds.append({k: ind[k] for k in ("key", "label", "short", "unit", "hue", "group", "fmt", "direction", "note") if k in ind} |
+        inds.append({k: ind[k] for k in ("key", "label", "short", "unit", "hue", "group", "fmt", "direction", "note", "note_short") if k in ind} |
                     {"level": "kvarter", "geo_level": ind.get("geo_level", "kvarter"), "desc": ind.get("desc", ""), "source": ind.get("source", ""), "warn": ind.get("warn", ""), "asof": {"kvarter": per}, "hist_asof": hist_asof})
     # KK Tryghedsundersøgelse: crime_1000 (Københavns Politi) and safe_pct per bydel → every quarter of that bydel
     kk, kk_year, kk_crime_year = load_kk()

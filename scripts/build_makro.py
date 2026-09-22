@@ -506,7 +506,7 @@ def main():
                     for a in areas.values():
                         if (a.get("pop") or 0) < MIN_POP_GROWTH:
                             a.pop("growth", None)
-        indicators_out.append({k: ind[k] for k in ("key", "label", "short", "unit", "level", "hue", "group", "direction", "note", "chip") if k in ind} |
+        indicators_out.append({k: ind[k] for k in ("key", "label", "short", "unit", "level", "hue", "group", "direction", "note", "note_short", "chip") if k in ind} |
                               {"fmt": ind.get("fmt", "pct1"), "desc": ind.get("desc", ""), "source": ind.get("source", ""),
                                "warn": ind.get("warn", ""), "table_only": ind.get("table_only", False), "asof": asof,
                                "hist_asof": hist_asof,

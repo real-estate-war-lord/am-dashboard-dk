@@ -33,9 +33,14 @@ const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&am
 const FMT = {
   pct0: v => nf(v, 0) + " %", pct1: v => nf(v, 1) + " %", signpct1: v => sign(v, x => nf(x, 1) + " %"),
   kdkk: v => nf(v / 1000, 0) + " kDKK", dkk0: v => nf(v, 0) + " DKK", dkk1: v => nf(v, 1) + " DKK",
-  int: v => nf(v, 0), days: v => nf(v, 0) + " d", m2: v => nf(v, 0) + " m²", per1000: v => nf(v, 1) + " ‰", idx: v => nf(v, 1)
+  int: v => nf(v, 0), days: v => nf(v, 0) + " d", m2: v => nf(v, 0) + " m²", per1000: v => per1000(v) + " / 1,000", idx: v => nf(v, 1)
 };
+/* rates per 1,000 (crime, homes for sale): no % sign — the unit is in the label, the legend title and the column head.
+   Whole numbers once the rate is large enough for a decimal to be noise. */
+const per1000 = v => nf(v, Math.abs(v) >= 20 ? 0 : 1);
+const FMT_TIGHT = { per1000 };                       /* map labels, legend bins, chart axis ticks: value only */
 const fmtOf = i => FMT[i.fmt] || FMT.pct1;
+const fmtTight = i => FMT_TIGHT[i.fmt] || fmtOf(i);
 const isPct = i => (i.fmt || "").startsWith("pct") || i.fmt === "signpct1";
 const median = arr => { const v = arr.filter(x => x != null && !isNaN(x)).sort((a, b) => a - b); if (!v.length) return null; const m = v.length >> 1; return v.length % 2 ? v[m] : (v[m - 1] + v[m]) / 2; };
 const byCode = {}; MUNI.forEach(m => byCode[m.code] = m);
@@ -304,7 +309,7 @@ function scaleOf(list, vk, fixed) {
 }
 function legendHtml(sc, ind, key, note) {
   /* class-break legend drawn on top of the map (bottom right) */
-  const f = fmtOf(ind); const b = sc.breaks || []; const n = sc.classes || 0;
+  const f = fmtTight(ind); const b = sc.breaks || []; const n = sc.classes || 0;
   const lab = c => n === 1 ? f(sc.lo) : c === 0 ? `≤ ${f(b[0])}` : c === n - 1 ? `> ${f(b[c - 1])}` : `${f(b[c - 1])} – ${f(b[c])}`;
   const rows = []; for (let c = n - 1; c >= 0; c--) rows.push(`<div class="lgrow"><i style="background:${mkShade(n > 1 ? c / (n - 1) : .5, key)}"></i>${lab(c)}</div>`);
   return `<div class="lgtitle">${esc(ind.short || ind.label)}<span>${esc(ind.unit || "")}</span></div>` +
@@ -638,7 +643,7 @@ function multiLine(series, ind, ys) {
     return `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="${s.w || 2}" ${s.dash ? 'stroke-dasharray="5 4"' : ""}/>` + s.pts.map((p, i) => p.v == null ? "" : `<circle cx="${x(i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="${s.w ? 3 : 2.4}" fill="${s.color}"><title>${esc(s.name)} ${p.y}: ${fmtOf(ind)(p.v)}</title></circle>`).join(""); }).join("");
   const si = ys.indexOf(MK.year); const selX = si >= 0 ? `<line x1="${x(si).toFixed(1)}" x2="${x(si).toFixed(1)}" y1="${T0}" y2="${H - B}" class="splitline"/>` : "";
   return `<svg class="chart" viewBox="0 0 ${W} ${H}">
-      ${ticks.map(t => `<line class="grid" x1="${L0}" x2="${W - R}" y1="${y(t).toFixed(1)}" y2="${y(t).toFixed(1)}"/><text class="ax" x="${L0 - 6}" y="${(y(t) + 3).toFixed(1)}" text-anchor="end">${fmtOf(ind)(t)}</text>`).join("")}
+      ${ticks.map(t => `<line class="grid" x1="${L0}" x2="${W - R}" y1="${y(t).toFixed(1)}" y2="${y(t).toFixed(1)}"/><text class="ax" x="${L0 - 6}" y="${(y(t) + 3).toFixed(1)}" text-anchor="end">${fmtTight(ind)(t)}</text>`).join("")}
       ${ys.map((yy, i) => `<text class="ax" x="${x(i).toFixed(1)}" y="${H - 8}" text-anchor="middle">${yy}</text>`).join("")}
       ${selX}${paths}</svg>
     <div class="bleg">${series.map(s => { const last = [...s.pts].reverse().find(p => p.v != null); return `<span><i style="background:${s.color}${s.dash ? ";height:2px" : ""}"></i>${esc(s.name)}${last ? ` <b>${fmtOf(ind)(last.v)}</b> <span class="dim">${last.y}</span>` : ""}</span>`; }).join("")}</div>`;
@@ -806,6 +811,7 @@ function lfPopup(a, muni) {
   return `<div class="lfpop"><b>${esc(a.nr || a.code)} ${esc(a.name)}</b>${MK.year !== LATEST ? ` <span class="tag">${MK.year}</span>` : ""}
     <span class="dim">${a.bydel ? esc(a.bydel) + " · " : ""}${muni ? esc(muni.name) : ""}${a.pop != null ? " · " + nf(a.pop, 0) + " inhabitants" : ""}</span>
     ${sel ? `<div class="lfbig"><span>${esc(ind.label)}${sel.own ? (isQ ? bydelMark(ind) : "") : " °"}</span><b>${fmtOf(ind)(sel.v)}</b><em>${rk ? `#${rk.r} of ${rk.n} ${sel.own ? (isQ ? "quarters" : "postal codes") : "municipalities"}` : ""}</em></div>` : `<div class="lfbig dim"><span>${esc(ind.label)}</span><b>–</b></div>`}
+    ${ind.note_short ? `<p class="cap">${esc(ind.note_short)}</p>` : ""}
     ${keys.length ? `<div class="lfkey">${keys.map(({ i, x }) => `<div><span>${esc(i.short || i.label)}${x.own ? (isQ ? bydelMark(i) : "") : " °"}</span><b>${fmtOf(i)(x.v)}</b></div>`).join("")}</div>` : ""}
     <span class="lfact"><button class="lk mini primary" data-go="${withQ(pageOf(a))}">Open page ›</button>${muni && !MK.muni ? `<button class="lk mini" data-go="map/${muni.code}?ind=${MK.ind}">Zoom to ${esc(muni.name)}</button>` : ""}${muni && microAvail(muni.code) ? `<button class="lk mini" data-go="map/${muni.code}?ind=${MK.ind}&micro=1&mind=${MK.mind}">Buildings ›</button>` : ""}<button class="lk mini" data-go="${chartLink(ind.key, type, code)}">↗ Chart</button></span>
     <details class="lfmore"><summary>All ${n} values</summary>
@@ -831,14 +837,34 @@ function lfLabels() {
   if (LF.labG) LF.map.removeLayer(LF.labG);
   if (MK.muni || zoom >= MICRO_ZOOM) {
     const px = ring => { const xs = [], ys = []; ring.forEach(q => { const c = LF.map.latLngToContainerPoint(q); xs.push(c.x); ys.push(c.y); }); return [Math.max(...xs) - Math.min(...xs), Math.max(...ys) - Math.min(...ys)]; };
-    /* sub-areas: a value only where the polygon is clearly wide enough, the name only when there is room for both */
-    areas.slice().sort((x, y) => (y.pop || 0) - (x.pop || 0)).slice(0, 40).forEach(a => {
-      const [w, h] = px(mainRing(a)); if (w < 64 || h < 26) return;
-      const m = byCode[a.muni]; const own = micro && vk(a) != null; const v = own ? vk(a) : (m ? vk(m) : null);
-      const t = sc.t(v), dark = t != null && t > .55; const val = v != null ? fmtOf(ind)(v) + (own ? "" : " °") : "–";
-      const name = w >= 120 && h >= 36 ? `<b>${esc(a.name)}</b><br>` : "";
-      labs.push(L.marker(centroid(mainRing(a)), { interactive: false, icon: L.divIcon({ className: "lflab" + (dark ? " lflab-dark" : ""), iconSize: null, html: name + val }) }));
-    });
+    const placed = [];   /* a label that would sit on top of one already placed is skipped */
+    const put = (ll, html, dark) => {
+      const pt = LF.map.latLngToContainerPoint(ll);
+      if (placed.some(q => Math.abs(q.x - pt.x) < 70 && Math.abs(q.y - pt.y) < 26)) return;
+      placed.push(pt);
+      labs.push(L.marker(ll, { interactive: false, icon: L.divIcon({ className: "lflab" + (dark ? " lflab-dark" : ""), iconSize: null, html }) }));
+    };
+    if (micro && bydelLevel(ind)) {
+      /* the figure is published per bydel, so label it once per bydel (the KK survey splits Nørrebro in two) */
+      const g = {};
+      areas.forEach(a => { const k = (a.kk && a.kk.bydel) || a.bydel || a.name; (g[k] = g[k] || []).push(a); });
+      Object.entries(g).sort((x, y) => y[1].length - x[1].length).forEach(([name, list]) => {
+        let la = 0, lo = 0, w_ = 0;
+        list.forEach(a => { const c = centroid(mainRing(a)), ww = a.pop || 1; la += c[0] * ww; lo += c[1] * ww; w_ += ww; });
+        const v = vk(list[0]); if (!w_ || v == null) return;
+        const t = sc.t(v), dark = t != null && t > .55;
+        put([la / w_, lo / w_], `<b>${esc(name)}</b><br>${fmtTight(ind)(v)}`, dark);
+      });
+    } else {
+      /* sub-areas: a value only where the polygon is clearly wide enough, the name only when there is room for both */
+      areas.slice().sort((x, y) => (y.pop || 0) - (x.pop || 0)).slice(0, 40).forEach(a => {
+        const [w, h] = px(mainRing(a)); if (w < 64 || h < 26) return;
+        const m = byCode[a.muni]; const own = micro && vk(a) != null; const v = own ? vk(a) : (m ? vk(m) : null);
+        const t = sc.t(v), dark = t != null && t > .55; const val = v != null ? fmtTight(ind)(v) + (own ? "" : " °") : "–";
+        const name = w >= 120 && h >= 36 ? `<b>${esc(a.name)}</b><br>` : "";
+        put(centroid(mainRing(a)), name + val, dark);
+      });
+    }
   } else {
     /* municipalities: the 12 largest by name only at the national zoom; the 40 largest with values from zoom 8 */
     const big = MUNI.slice().sort((a, b) => (b.pop || 0) - (a.pop || 0)).slice(0, zoom < 8 ? 12 : 40).filter(m => munis.includes(m));
@@ -851,7 +877,7 @@ function lfLabels() {
       if (placed.some(q => Math.abs(q.x - pt.x) < 70 && Math.abs(q.y - pt.y) < 26)) return;
       placed.push(pt);
       const t = sc.t(vk(m)), dark = t != null && t > .55;
-      labs.push(L.marker(ll, { interactive: false, icon: L.divIcon({ className: "lflab" + (dark ? " lflab-dark" : ""), iconSize: null, html: `<b>${esc(m.name)}</b>${zoom >= 8 ? `<br>${vk(m) != null ? fmtOf(ind)(vk(m)) : "–"}` : ""}` }) }));
+      labs.push(L.marker(ll, { interactive: false, icon: L.divIcon({ className: "lflab" + (dark ? " lflab-dark" : ""), iconSize: null, html: `<b>${esc(m.name)}</b>${zoom >= 8 ? `<br>${vk(m) != null ? fmtTight(ind)(vk(m)) : "–"}` : ""}` }) }));
     });
   }
   LF.labG = L.layerGroup(labs).addTo(LF.map);
@@ -1180,7 +1206,7 @@ function chartSvgLine(withTitle) {
   const title = withTitle ? `<text x="${L0}" y="40" font-family="${F}" font-size="24" font-weight="600" fill="#16170F" id="chsvgtitle">${esc(CH.title || chartAutoTitle())}</text><text x="${L0}" y="64" font-family="${M}" font-size="12" fill="#8A8C81">${esc(ind.desc || "")}</text>` : "";
   const foot = `<text x="${L0}" y="${H - 14}" font-family="${M}" font-size="11" fill="#8A8C81">Source: ${esc(ind.source || "")} · Macro Dashboard — Denmark, open data · built ${esc((D.meta && D.meta.built) || "")}${series.some(s_ => s_.inherited) ? " · ° = municipality value shown for a postal code or quarter" : ""}</text>`;
   return `<svg class="chart" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" id="chsvg"><rect width="${W}" height="${H}" fill="#FFFFFF"/>${title}
-    ${ticks.map(t => `<line x1="${L0}" x2="${W - R}" y1="${y(t).toFixed(1)}" y2="${y(t).toFixed(1)}" stroke="#EFEFEA"/><text x="${L0 - 10}" y="${(y(t) + 4).toFixed(1)}" text-anchor="end" font-family="${M}" font-size="12" fill="#8A8C81">${esc(fmtOf(ind)(t))}</text>`).join("")}
+    ${ticks.map(t => `<line x1="${L0}" x2="${W - R}" y1="${y(t).toFixed(1)}" y2="${y(t).toFixed(1)}" stroke="#EFEFEA"/><text x="${L0 - 10}" y="${(y(t) + 4).toFixed(1)}" text-anchor="end" font-family="${M}" font-size="12" fill="#8A8C81">${esc(fmtTight(ind)(t))}</text>`).join("")}
     ${ys.map((yy, i) => q && !yy.endsWith("K1") ? "" : `<text x="${x(i).toFixed(1)}" y="${H - B + 22}" text-anchor="middle" font-family="${M}" font-size="12" fill="#8A8C81">${q ? yy.slice(0, 4) : yy}</text>`).join("")}
     ${brks}${paths}${legend}${foot}</svg>`;
 }
