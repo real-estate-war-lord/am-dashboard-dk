@@ -41,6 +41,7 @@ def main():
         "indicators": makro.get("indicators", []),
         "municipalities": makro.get("municipalities", []),
         "areas": makro.get("areas", []),
+        "national": makro.get("national"),
         "macro": market,
         "portfolio": portfolio,
         "cph": cph,

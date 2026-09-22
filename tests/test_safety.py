@@ -93,6 +93,17 @@ class RawData(unittest.TestCase):
         self.assertEqual(per, "2025K3→2026K2")
         self.assertAlmostEqual(vals["101"], sum(cells[t] for t in ("2025K3", "2025K4", "2026K1", "2026K2")) / 670.389, places=9)
 
+    def test_quarterly_series_and_long_history(self):
+        ind = IND["crime_1000"]
+        ser = bm.rolling4q_series(ind, "2008K1")
+        self.assertEqual(ser[0][0], "2008K1")
+        live, per = bm.compute(ind)["kommune"]
+        self.assertEqual(ser[-1][0], per.split("→")[-1])                  # last quarterly point = the live value
+        self.assertAlmostEqual(ser[-1][1]["101"], live["101"], places=9)
+        y2007, per2007 = bm.compute(ind, 2007)["kommune"]                   # yearly history reaches STRAF11's first year
+        self.assertEqual(per2007, "2007K1→2007K4")
+        self.assertIsNotNone(y2007["101"])
+
     def test_clearance_copenhagen_2025(self):
         vals, per = bm.compute(IND["clearance_pct"])["kommune"]
         self.assertEqual(per, "2025")
