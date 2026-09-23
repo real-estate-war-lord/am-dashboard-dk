@@ -64,6 +64,12 @@ def main():
     out = pathlib.Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html, encoding="utf-8")
+    # the infrastructure layer is inlined in the page, and also served as files so it can be reused
+    for src in (ROOT / "data" / "geo" / "infra_projects.geojson", PROC / "infra_index.json"):
+        if src.exists():
+            import shutil
+            shutil.copy(src, out.parent / src.name)
+            print(f"copied {src.name} → {out.parent}")
     # building-level files are loaded on demand by the page (dist/micro/<kommune>.json)
     if micro_idx:
         import shutil
