@@ -854,53 +854,82 @@ function infraHatch() {
   pat.appendChild(line); defs.appendChild(pat); svg.insertBefore(defs, svg.firstChild);
   return true;
 }
+/* one popup opener for every way into a project: the shape, its wide hit line, its label */
+function openInfra(p, latlng) {
+  if (!LF.map || !latlng) return;
+  L.popup({ maxWidth: 440, autoPanPadding: [24, 24] }).setLatLng(latlng).setContent(infraPopup(p)).openOn(LF.map);
+}
 function lfInfraLayers() {
-  ["infraG", "infraStG", "infraLabG"].forEach(k => { if (LF[k]) { LF.map.removeLayer(LF[k]); LF[k] = null; } });
+  ["infraG", "infraHitG", "infraStG", "infraLabG"].forEach(k => { if (LF[k]) { LF.map.removeLayer(LF[k]); LF[k] = null; } });
   if (!LF.map || !MK.infra || !INFRA.length) return;
-  const lines = [], stations = [];
+  const lines = [], hits = [], stations = [];
   INFRA.forEach(f => {
     const p = f.properties;
     if (isPt(f)) { stations.push(f); return; }
-    const style = isArea(f) ? { ...infraStyle(p), weight: 1.2, fillColor: infraSt(p).color, fillOpacity: .14 } : infraStyle(p);
-    const layer = L.geoJSON(f, { style, interactive: true });
-    layer.bindPopup(() => infraPopup(p), { maxWidth: 440, autoPanPadding: [24, 24] });
+    const area = isArea(f);
+    const style = area ? { ...infraStyle(p), weight: 1.2, fillColor: infraSt(p).color, fillOpacity: .14 } : infraStyle(p);
+    const layer = L.geoJSON(f, { style, interactive: area, className: "infra-shape" });
     layer._infra = p;
     lines.push(layer);
+    if (area) {
+      /* the whole area is clickable; hovering lifts the fill a little */
+      layer.on("click", e => openInfra(p, e.latlng));
+      layer.on("mouseover", () => layer.setStyle({ fillOpacity: .26 })).on("mouseout", () => layer.setStyle({ fillOpacity: .14 }));
+    } else {
+      /* a 14 px invisible line on top of a 2 px dotted one, so thin study corridors are easy to hit.
+         Render-only: it is not in the legend, not in the GeoJSON and not in any export. */
+      const hit = L.geoJSON(f, { style: { color: "#000000", weight: 14, opacity: 0, lineCap: "round", lineJoin: "round" }, className: "infra-hit" });
+      hit._infra = p;
+      hit.on("click", e => openInfra(p, e.latlng));
+      hits.push(hit);
+    }
   });
   LF.infraG = L.layerGroup(lines).addTo(LF.map);
+  LF.infraHitG = L.layerGroup(hits).addTo(LF.map);
   if (infraHatch()) lines.forEach(l => { const f = l.toGeoJSON().features[0]; if (f && (f.geometry.type === "Polygon" || f.geometry.type === "MultiPolygon"))
     l.eachLayer(x => x._path && x._path.setAttribute("fill", "url(#infra-hatch)")); });
-  /* stations sit above their line */
-  LF.infraStG = L.layerGroup(stations.map(f => {
-    const p = f.properties, s = infraSt(p), c = f.geometry.coordinates;
-    const m = L.circleMarker([c[1], c[0]], { radius: 5, color: s.color, weight: 2, opacity: .95,
-      fillColor: s.fill ? s.color : "#FFFFFF", fillOpacity: s.fill ? .9 : 1 });
-    m.bindPopup(() => infraPopup(p), { maxWidth: 440, autoPanPadding: [24, 24] });
-    m._infra = p; m._ll = [c[1], c[0]];
-    return m;
-  })).addTo(LF.map);
+  /* stations sit above their line: a white halo under the status circle keeps them readable on any fill */
+  const marks = [];
+  stations.forEach(f => {
+    const p = f.properties, s = infraSt(p), c = f.geometry.coordinates, ll = [c[1], c[0]];
+    const halo = L.circleMarker(ll, { radius: 9, stroke: false, fillColor: "#FFFFFF", fillOpacity: .95, interactive: false });
+    const m = L.circleMarker(ll, { radius: 7, color: s.color, weight: 2, opacity: .95,
+      fillColor: s.fill ? s.color : "#FFFFFF", fillOpacity: s.fill ? .9 : 1, className: "infra-shape" });
+    m.on("click", e => openInfra(p, e.latlng || ll));
+    m.on("mouseover", () => { m.setRadius(9); halo.setRadius(11); }).on("mouseout", () => { m.setRadius(7); halo.setRadius(9); });
+    m._infra = p; m._ll = ll;
+    marks.push(halo, m);
+  });
+  LF.infraStG = L.layerGroup(marks).addTo(LF.map);
   lfInfraLabels();
 }
 function lfInfraLabels() {
   if (LF.infraLabG) { LF.map.removeLayer(LF.infraLabG); LF.infraLabG = null; }
   if (!LF.map || !MK.infra || !INFRA.length) return;
   const z = LF.map.getZoom(), labs = [], placed = [];
-  const put = (ll, html, cls) => {
+  const size = LF.map.getSize();
+  /* full name once there is room for it, the short label further out */
+  const text = p => z >= 11 ? infraShort(p) : (p.label_short || infraShort(p));
+  const put = (ll, html, cls, p) => {
     const pt = LF.map.latLngToContainerPoint(ll);
     if (placed.some(q => Math.abs(q.x - pt.x) < 78 && Math.abs(q.y - pt.y) < 20)) return;
     placed.push(pt);
-    labs.push(L.marker(ll, { interactive: false, icon: L.divIcon({ className: "lflab infralab " + cls, iconSize: null, html }) }));
+    /* keep the label inside the map: near an edge it hangs off the anchor the other way */
+    const edge = pt.x > size.x - 95 ? " infralab-e" : pt.x < 95 ? " infralab-w" : "";
+    const m = L.marker(ll, { interactive: true, keyboard: false, icon: L.divIcon({ className: "lflab infralab " + cls + edge, iconSize: null, html }) });
+    m.on("click", () => openInfra(p, ll));
+    labs.push(m);
   };
   if (z >= 12) INFRA.filter(isPt).forEach(f => {
     const p = f.properties, c = f.geometry.coordinates;
-    put([c[1], c[0]], `<b>${esc(infraShort(p))}</b>${p.open_year ? ` <i>· ${p.open_year}</i>` : ""}`, "infralab-st");
+    put([c[1], c[0]], `<b>${esc(text(p))}</b>${p.open_year ? ` <i>· ${p.open_year}</i>` : ""}`, "infralab-st", p);
   });
   /* one label per line, at mid-zoom: national view is too crowded, close-up the station labels take over */
   if (z >= 8 && z < 12) INFRA.filter(f => !isPt(f) && !isArea(f)).forEach(f => {
     const p = f.properties;
     const cs = f.geometry.type === "MultiLineString" ? f.geometry.coordinates.flat() : f.geometry.coordinates;
     const c = cs[Math.floor(cs.length / 2)];
-    put([c[1], c[0]], `<b>${esc(infraShort(p))}</b>`, "infralab-line");
+    put([c[1], c[0]], `<b>${esc(text(p))}</b>`, "infralab-line", p);
   });
   LF.infraLabG = L.layerGroup(labs).addTo(LF.map);
 }

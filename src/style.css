@@ -1432,3 +1432,8 @@ th .thn{display:inline}
 .lfpop .ipill.st-construction{color:#1C6B5C;border-color:#BBD8CF}
 .lfpop .ipill.st-decided{color:#5C5F52;border-color:#D6D8CE}
 .lfpop .ipill.st-opened{color:#8A8C81}
+/* overlay hit areas and clickable labels */
+#lfmap path.infra-shape,#lfmap path.infra-hit{cursor:pointer}
+.infralab{pointer-events:auto;cursor:pointer}
+.infralab.infralab-e{transform:translate(-100%,-50%)}
+.infralab.infralab-w{transform:translate(0,-50%)}

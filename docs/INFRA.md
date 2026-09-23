@@ -30,6 +30,7 @@ they show *where* a project runs, never how it will be built, and must not be me
 |---|---|---|
 | `id` | slug | stable identifier, e.g. `m5-phase-1`; stations use `<line>-st-<name>` |
 | `name` | string | project name, Danish where that is the published name |
+| `label_short` | string | short map label for zoomed-out views ("M5 phase 1", "Ring 3"); from the CSV column of the same name, defaulting to the first three words of `name` |
 | `type` | enum | `metro` · `letbane` · `brt` · `rail` · `road` · `bridge_tunnel` · `urban_dev` · `hospital` · `university` |
 | `status` | enum | `study` · `decided` · `construction` · `opened` (see §5) |
 | `open_year` | int \| null | currently expected opening year |

@@ -54,6 +54,12 @@ TYPES = {"metro", "letbane", "brt", "rail", "road", "bridge_tunnel", "urban_dev"
 STATUSES = {"study", "decided", "construction", "opened"}
 
 
+def short_label(row):
+    """Map label for zoomed-out views: the CSV's `label_short`, else the first three words of the name."""
+    s = (row.get("label_short") or "").strip()
+    return s or " ".join((row["name"] or "").split()[:3])
+
+
 def num(v, cast=float):
     v = (v or "").strip()
     return cast(v) if v else None
@@ -209,7 +215,7 @@ def main():
         feats.append({
             "type": "Feature",
             "properties": {
-                "id": row["id"], "name": row["name"], "type": row["type"], "status": row["status"],
+                "id": row["id"], "name": row["name"], "label_short": short_label(row), "type": row["type"], "status": row["status"],
                 "open_year": num(row["open_year"], int), "open_year_original": num(row["open_year_original"], int),
                 "budget_mdkk": num(row["budget_mdkk"]), "agency": row["agency"] or None,
                 "kommuner": kommuner_of(g, komm, row.get("kommuner_override", "")), "parent_id": row["parent_id"] or None,
