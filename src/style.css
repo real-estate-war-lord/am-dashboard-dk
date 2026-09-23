@@ -1364,6 +1364,8 @@ details.indx .indx-body p{margin:0 0 3px}
 .maplegend .lgrow i{width:16px;height:12px;border-radius:2px;flex:0 0 16px;border:1px solid rgba(0,0,0,.08)}
 .maplegend .lgnote{margin-top:5px;font-size:9.5px;color:var(--muted);white-space:normal;max-width:190px;line-height:1.35}
 .maplegend.small{right:8px;bottom:8px;padding:6px 8px 5px;font-size:10px;min-width:120px}
+/* a legend box with nothing in it is never painted — no empty white bar over the map */
+.maplegend:empty{display:none}
 .maplegend.small .lgrow i{width:13px;height:10px;flex-basis:13px}
 #mapcard:fullscreen .maplegend,#mapcard.fs-fallback .maplegend{bottom:20px}
 .mklegend{display:none}
@@ -1419,7 +1421,7 @@ th .thn{display:inline}
 .lk.mini.on{background:var(--ink);color:#fff;border-color:var(--ink)}
 
 /* ---- infrastructure projects overlay ---- */
-.maplegend.infralegend{bottom:auto;top:12px;right:12px;min-width:170px}
+.maplegend.infralegend{min-width:170px}
 .maplegend .lgrow i.ilg{width:18px;height:0;flex:0 0 18px;border:0;border-top:2.5px solid;border-radius:0}
 .maplegend .lgrow.gk{gap:5px;color:var(--muted);margin-top:4px;font-size:9.5px}
 .maplegend .lgrow.gk i{border:0;border-radius:0;background:none;width:14px;flex-basis:14px}
@@ -1448,8 +1450,11 @@ th .thn{display:inline}
 .tag.st-construction{color:#1C6B5C;border-color:#BBD8CF}
 #prmap{height:360px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}
 /* public buildings overlay */
-.maplegend.publiclegend{bottom:auto;top:12px;right:12px;min-width:180px}
-.maplegend.publiclegend ~ .infralegend{top:196px}
+.maplegend.publiclegend{min-width:180px}
+/* the overlay legends stack in one column at the top right: the public one grows in grade mode, so a
+   fixed offset for the infra box below it would overlap. The column scrolls rather than leaving the map. */
+.maplegs{position:absolute;top:12px;right:12px;z-index:800;display:flex;flex-direction:column;align-items:flex-end;gap:8px;max-height:calc(100% - 24px);overflow-y:auto;pointer-events:none}
+.maplegs .maplegend{position:static;top:auto;right:auto;bottom:auto;flex:0 0 auto}
 .maplegend .lgrow.gk i.pk-exist{width:10px;flex-basis:10px;height:10px;border-radius:50%;background:var(--muted);border:0}
 .maplegend .lgrow.gk i.pk-case{width:10px;flex-basis:10px;height:10px;border-radius:50%;background:#fff;border:2px dashed var(--muted)}
 .publab b{font-size:10px}
@@ -1461,6 +1466,11 @@ th .thn{display:inline}
 .maplegend .only{font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-left:auto;padding-left:6px;cursor:pointer}
 .maplegend .only:hover{color:var(--ink);text-decoration:underline}
 .maplegend .lgrow.gk .pubtog{display:inline-flex;align-items:center;gap:4px}
+/* every category stays listed, so an off one needs a way back: greyed, struck through, hollow swatch */
+.maplegend .lgrow.gk.allhidden{color:var(--ink);margin-top:5px;white-space:normal;line-height:1.35}
+.maplegend .lgrow.gk.allhidden .only{margin-left:0;padding-left:0;color:var(--ink);text-decoration:underline}
+.maplegend .lgsub{font-family:var(--body);font-weight:600;font-size:11px;margin:6px 0 3px;padding-top:6px;border-top:1px solid var(--line);line-height:1.2}
+.maplegend .lgsub span{display:block;font-family:var(--mono);font-weight:400;font-size:9.5px;color:var(--muted);margin-top:1px}
 
 /* ---- Schools (docs/SCHOOLS.md) ---- */
 .schpop { border-top: 1px solid var(--line, #E2E7E1); margin-top: 8px; padding-top: 8px; }
@@ -1515,6 +1525,14 @@ th .thn{display:inline}
 /* the empty state has the whole card to itself — the box does not have to share a toolbar */
 .card>.tools .tpbox .tpq{min-width:min(460px,60vw)}
 #anmap{height:clamp(320px,calc(100vh - 520px),460px);border:1px solid var(--line);border-radius:10px;background:var(--panel2);position:relative;z-index:0;isolation:isolate}
+/* with overlays on there is more to read on the mini map, so it gets the room for it */
+.anmapwrap.haslayers #anmap{height:clamp(460px,calc(100vh - 380px),680px)}
+/* the overlay legends own the right-hand column, so the choropleth one moves out of their way */
+.anmapwrap #anlegend{right:auto;left:8px;bottom:8px}
+/* three overlay legends are taller than the mini map, so this column scrolls (the map does not drag) */
+.anmapwrap .maplegs{pointer-events:auto;scrollbar-width:thin}
+.anlaybar{margin:0 0 10px}
+.anlaybar .hint{margin-left:2px}
 #anmap path{cursor:pointer}
 /* the indicator table: group headers, then the percentile bar column */
 .antbl tbody tr.angrp>th,.tbl tbody tr.angrp>th{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;

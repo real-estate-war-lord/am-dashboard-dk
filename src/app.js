@@ -96,10 +96,22 @@ const SC = { nr: null };                                                        
 const SL = { key: "" };                                                           /* school list panel: "<level>:<code>" */
 /* public-buildings filter, shared by the map, the legend and the area card. cats = null means all. */
 const PF = { cats: null, kind: "both" };
+const PF_NONE = "none";                                                           /* hash value for "every category off" */
+const pubAllOff = () => !!(PF.cats && !PF.cats.size);
 const PF_SHORT = { education: "edu", institutions: "inst", health: "health", culture: "culture" };
 const PF_LONG = Object.fromEntries(Object.entries(PF_SHORT).map(([k, v]) => [v, k]));
 const PIPE = { type: "", status: "" };                                            /* pipeline filters */
 const AN = { a: "", label: "" };                                                  /* analysis view: the pinned coordinates */
+/* Analysis sheet: which overlays the "Where it is" map draws — the same three the Macro map offers.
+   Defaults: infra on, public buildings on where the BBR pull reaches the pin, buildings off (its
+   micro/<kommune>.json is fetched only once the pill is switched on). The set lives in the hash as lay=. */
+const ANL = { infra: true, pub: true, micro: false };
+const anLayerList = () => [ANL.infra ? "infra" : "", ANL.pub ? "public" : "", ANL.micro ? "buildings" : ""].filter(Boolean);
+function anParseLayers(q) {
+  if (q.lay == null) { ANL.infra = true; ANL.pub = true; ANL.micro = false; return; }
+  const set = new Set(q.lay.split(",").filter(Boolean));
+  ANL.infra = set.has("infra"); ANL.pub = set.has("public"); ANL.micro = set.has("buildings");
+}
 /* Test property: one pin dropped from a pasted Google Maps link or a "lat, lon" pair (parseLocation, src/testprop.js).
    It lives in the map hash (pin=, pl=), so it survives a reload and every level change. */
 const TP_LABEL = "Test property";
@@ -141,10 +153,7 @@ function hashFor() {
   if (S.view === "makro" && MK.micro) { q.push("micro=1"); q.push(`mind=${MK.mind}`); }
   if (S.view === "makro" && MK.infra) q.push("infra=1");   /* the overlay survives every level change */
   if (S.view === "makro" && MK.pub) q.push("public=1");
-  if (MK.pub || S.view === "publist") {
-    if (PF.cats) q.push(`pub=${[...PF.cats].map(c => PF_SHORT[c]).join(",")}`);
-    if (PF.kind !== "both") q.push(`pubkind=${PF.kind}`);
-  }
+  if (MK.pub || S.view === "publist") q.push(...pubHashParts());
   if (S.view === "makro" && MK.focus) q.push(`focus=${encodeURIComponent(MK.focus)}`);
   /* the test-property pin rides along with the map hash so the link opens on the same spot */
   if (S.view === "makro" && TP.lat != null) { q.push(`pin=${TP.lat.toFixed(5)},${TP.lon.toFixed(5)}`); if (TP.label && TP.label !== TP_LABEL) q.push(`pl=${encodeURIComponent(TP.label)}`); }
@@ -153,7 +162,10 @@ function hashFor() {
   else if (S.view === "table") p = `table/${T.level}`;
   else if (S.view === "charts") { p = "charts"; q.length = 0; q.push(`ind=${encodeURIComponent(CH.ind)}`, `a=${CH.areas.join(",")}`, `y0=${CH.y0}`, `y1=${CH.y1}`, `med=${CH.median ? 1 : 0}`); if (CH.mode !== "auto") q.push(`mode=${CH.mode}`); if (CH.mode === "dist") q.push(`dist=${CH.dist}`);
     if (CH.fq === "q") q.push("fq=q"); if (CH.ov.length) q.push(`ov=${CH.ov.join(",")}`); if (!CH.nat) q.push("nat=0"); }
-  else if (S.view === "analysis") { p = "analysis"; q.length = 0; if (AN.a) q.push(`a=${AN.a}`); if (AN.label) q.push(`la=${encodeURIComponent(AN.label)}`); }
+  else if (S.view === "analysis") { p = "analysis"; q.length = 0; if (AN.a) q.push(`a=${AN.a}`); if (AN.label) q.push(`la=${encodeURIComponent(AN.label)}`);
+    /* the mini map rides in the link too: the headline tile that colours it, the overlays, the public filter */
+    q.push(`ind=${encodeURIComponent(MK.ind || "")}`); if (MK.year && MK.year !== LATEST) q.push(`y=${MK.year}`);
+    q.push(`lay=${anLayerList().join(",") || "none"}`); if (ANL.pub) q.push(...pubHashParts()); }
   else if (S.view === "market") { p = "market"; if (MKT.src) q.push("src=1"); }
   else if (S.view === "project") { p = `project/${PR.id}`; }
   else if (S.view === "public") { p = `public/${PB.kom}/${PB.id}`; }
@@ -183,7 +195,7 @@ function parseHash() {
   else if (v === "school" && parts[1]) { S.view = "school"; SC.nr = decodeURIComponent(parts[1]); schoolsLoad(); }
   else if (v === "schoollist" && parts[1]) { S.view = "schoollist"; SL.key = decodeURIComponent(parts.slice(1).join(":")); schoolsLoad(); }
   else if (v === "pipeline") { S.view = "pipeline"; PIPE.type = q.ptype || ""; PIPE.status = q.pstatus || ""; }
-  else if (v === "analysis") { S.view = "analysis"; AN.a = q.a || ""; AN.label = q.la || "";
+  else if (v === "analysis") { S.view = "analysis"; AN.a = q.a || ""; AN.label = q.la || ""; anParseLayers(q); pubParseFilter(q);
     /* the sheet cannot say which kommune the point is in until the rings are there — chain once, not on every hashchange */
     if (!KOM.list && !KOM.err) komLoad().then(() => { if (S.view === "analysis") renderKeep(); }); }
   else if (v === "charts") { S.view = "charts"; CH.ind = q.ind || CH.ind; CH.areas = q.a ? q.a.split(",").filter(Boolean) : CH.areas; CH.y0 = q.y0 || CH.y0; CH.y1 = q.y1 || CH.y1; CH.median = q.med !== "0"; CH.mode = q.mode || "auto"; CH.dist = q.dist || "size";
@@ -279,6 +291,9 @@ document.addEventListener("click", e => {
   if (g("[data-chclear]")) { CH.areas = []; syncHash(); renderKeep(); return; }
   if ((el = g("[data-micro]"))) { MK.micro = el.dataset.micro === "1"; syncHash(); renderKeep(); return; }
   if (g("[data-infra]")) { MK.infra = !MK.infra; syncHash(); renderKeep(); return; }
+  if ((el = g("[data-anlay]"))) { if (el.disabled) return; const k = el.dataset.anlay;
+    if (k === "infra") ANL.infra = !ANL.infra; else if (k === "public") ANL.pub = !ANL.pub; else ANL.micro = !ANL.micro;
+    syncHash(); renderKeep(); return; }
   if (g("[data-public]")) { MK.pub = !MK.pub; syncHash(); renderKeep(); return; }
   if ((el = g("[data-pubonly]"))) { pubSetFilter({ cats: new Set([el.dataset.pubonly]) }); return; }
   if (g("[data-puball]")) { pubSetFilter({ cats: null, kind: "both" }); return; }
@@ -412,11 +427,12 @@ function legendHtml(sc, ind, key, note) {
     (lowerBetter(ind.key || "") ? `<div class="lgnote">↓ lower is better · darkest = highest</div>` : "") +
     `${note ? `<div class="lgnote">${note}</div>` : ""}`;
 }
-function setLegend(id, sc, ind, key, note) { const el = document.getElementById(id); if (el) el.innerHTML = legendHtml(sc, ind, key, note); setInfraLegend(); }
+function setLegend(id, sc, ind, key, note) { const el = document.getElementById(id); if (el) el.innerHTML = legendHtml(sc, ind, key, note); setInfraLegend(); setPublicLegend(); }
 function setInfraLegend() {
   const el = document.getElementById("infralegend"); if (!el) return;
-  el.style.display = MK.infra && INFRA.length ? "" : "none";
-  if (MK.infra && INFRA.length) el.innerHTML = infraLegendHtml();
+  const live = !!(MK.infra && INFRA.length);
+  el.style.display = live ? "" : "none";
+  el.innerHTML = live ? infraLegendHtml(INFRA.length) : "";
 }
 const GROUP_ORDER = ["Demographics", "Income & jobs", "Housing stock", "Housing stock (BBR)", "Rents", "Prices & market", "Construction", "Safety", "Schools", "Growth signals"];
 /* "label · unit" for selects, leaving out unit parts the label already says ("Reported crime · per 1,000 inh." + "rolling 4Q") */
@@ -557,7 +573,7 @@ function vMakro() {
       ${microMode() ? "" : indQuick()}<div class="tperr" id="tperr" role="status" ${TP.msg ? "" : 'style="display:none"'}>${esc(TP.msg)}</div></div>
     ${microMode() ? microExplain() : indExplain(ind)}
     ${muni && !microMode() ? muniStrip(muni) : ""}
-    <div class="mapwrap"><div id="lfmap"></div><div class="maplegend publiclegend" id="publiclegend"></div><div class="maplegend infralegend" id="infralegend"></div><div class="maplegend" id="maplegend"></div></div>
+    <div class="mapwrap"><div id="lfmap"></div><div class="maplegs"><div class="maplegend publiclegend" id="publiclegend"></div><div class="maplegend infralegend" id="infralegend"></div></div><div class="maplegend" id="maplegend"></div></div>
     ${srcNote(`<p class="cap">${muni ? "Click a polygon for its figures and a link to its page." : "Click a polygon for its figures; open a municipality with the search box above or from the popup. Table view lists everything side by side."} Colour classes: quintiles of the visible areas. Boundaries: DAGI, Klimadatastyrelsen (simplified); basemap OpenStreetMap.</p>`)}
   </div>`;
 }
@@ -977,9 +993,10 @@ function infraHatch() {
   return true;
 }
 /* one popup opener for every way into a project: the shape, its wide hit line, its label */
-function openInfra(p, latlng) {
-  if (!LF.map || !latlng) return;
-  L.popup({ maxWidth: 440, autoPanPadding: [24, 24] }).setLatLng(latlng).setContent(infraPopup(p)).openOn(LF.map);
+function openInfra(p, latlng, map) {
+  const m = map || LF.map;
+  if (!m || !latlng) return;
+  L.popup({ maxWidth: 440, autoPanPadding: [24, 24] }).setLatLng(latlng).setContent(infraPopup(p)).openOn(m);
 }
 function lfInfraLayers() {
   ["infraG", "infraHitG", "infraStG", "infraLabG"].forEach(k => { if (LF[k]) { LF.map.removeLayer(LF[k]); LF[k] = null; } });
@@ -1064,9 +1081,9 @@ function lfInfraLabels() {
   });
   LF.infraLabG = L.layerGroup(labs).addTo(LF.map);
 }
-function infraLegendHtml() {
+function infraLegendHtml(n) {
   const sw = s => `<div class="lgrow"><i class="ilg" style="border-color:${INFRA_ST[s].color};${INFRA_ST[s].dash ? `border-top-style:dashed` : ""};${INFRA_ST[s].fill ? `background:${INFRA_ST[s].color}22` : ""}"></i>${INFRA_ST[s].label}</div>`;
-  return `<div class="lgtitle">Infra projects<span>${INFRA.length} projects · Fingerplan, Anlægsstatus, OSM</span></div>
+  return `<div class="lgtitle">Infra projects<span>${n == null ? INFRA.length : n} projects · Fingerplan, Anlægsstatus, OSM</span></div>
     ${["study", "decided", "construction", "opened"].map(sw).join("")}
     <div class="lgrow gk"><i class="gk-line"></i>line<i class="gk-st"></i>station<i class="gk-area"></i>area</div>
     <div class="lgnote">dotted = schematic corridor, not an official alignment</div>`;
@@ -1342,6 +1359,113 @@ function anHead(pt, r, e) {
     ${e ? headlineHtml(e) : ""}
   </div>`;
 }
+const AN_PUB_MAP_M = 2000;         /* public buildings drawn around the pin — twice the ring the cards count */
+/* the municipalities near the pin whose BBR pull exists — the coverage rule for the Public buildings pill */
+const anPubKoms = (pt, r) => anKomsNear(pt, r && r.kommune && r.kommune.code, AN_RING_M).filter(pubAvail);
+const anPubRows = (pt, koms) => koms.flatMap(k => ((PUB_FILES[k] || {}).buildings || []))
+  .filter(b => pubCatOn(b.cat) && pubKindOn(b.kind) && (b.kind === "existing" || b.recent)
+    && havM(pt.lat, pt.lon, b.lat, b.lon) <= AN_PUB_MAP_M);
+/* the layer pills above the mini map — the same three segments, styling and wording as the Macro map.
+   Schools are not a fourth overlay there either: they ride inside Public buildings, and isolating
+   Education ("only") recolours the school markers by their FP9 grade on both maps. */
+function anLayerBar(pt, r) {
+  const koms = anPubKoms(pt, r);
+  const kom = r && r.kommune ? r.kommune.code : null, name = r && r.kommune ? r.kommune.name : "this municipality";
+  const hasMicro = microAvail(kom);
+  const pill = (k, label, on, off, tip) => `<div class="seg"><button class="sg ${on ? "on" : ""}" data-anlay="${k}"${off ? " disabled" : ""} title="${esc(tip)}">${esc(label)}</button></div>`;
+  return `<div class="tools anlaybar">
+    ${INFRA.length ? pill("infra", "Infra projects", ANL.infra, false, `Every project in the layer within ${nf((AN_INFRA_M + 1500) / 1000, 1)} km of the pin, in its status tones`) : ""}
+    ${PUB ? pill("public", "Public buildings", ANL.pub && koms.length > 0, !koms.length,
+        koms.length ? `Schools, daycare, health and culture from BBR within ${nf(AN_PUB_MAP_M, 0)} m · the legend filters the categories`
+                    : "Not covered yet: Copenhagen metro area only") : ""}
+    ${pill("buildings", "Buildings", ANL.micro && hasMicro, !hasMicro,
+        hasMicro ? `BBR buildings with ≥ 2 dwellings in ${name} — the file is fetched when you switch this on`
+                 : `Not covered yet: no BBR building file for ${name}`)}
+    <span class="hint">${esc(curInd().short || curInd().label)} colours the areas underneath · click a headline tile above to change it</span></div>`;
+}
+/* Leaflet swallows clicks inside a popup, so the page links are wired when one opens — the same set the
+   Macro map rewires, which is what makes "Open … sheet ›" work from a popup on this map too. */
+function anPopupWire(popup) {
+  const el = popup && popup.getElement(); if (!el) return;
+  const on = (sel, fn) => el.querySelectorAll(sel).forEach(b => b.addEventListener("click", () => fn(b)));
+  on("[data-go]", b => go(b.dataset.go));
+  on("[data-project]", b => go(`project/${b.dataset.project}`));
+  on("[data-school]", b => go(`school/${encodeURIComponent(b.dataset.school)}`));
+  on("[data-pubsheet]", b => { const row = b.closest("[data-pubkom]"); go(`public/${(row && row.dataset.pubkom) || (LF.anKom || CPH_MUNI)}/${b.dataset.pubsheet}`); });
+  el.querySelectorAll("details").forEach(d => d.addEventListener("toggle", () => {
+    if (popup._updateLayout) { popup._updateLayout(); popup._updatePosition(); popup._adjustPan(); } }));
+}
+/* The three overlays on the mini map, redrawn in place (never a full re-render, so an open popup and the
+   reader's zoom survive a file landing). Each one fills or hides its own legend box. */
+function anMapOverlays() {
+  const map = LF.anmap, pt = LF.anPt, r = LF.anR;
+  if (!map || !pt || !document.getElementById("anmap")) return;
+  ["anInfraG", "anInfraHitG", "anPubG", "anMicroG"].forEach(k => { if (LF[k]) { try { map.removeLayer(LF[k]); } catch (e) {} LF[k] = null; } });
+
+  /* --- a. infrastructure, in its status tones, with the project popup the Macro map opens --- */
+  const inf = ANL.infra ? INFRA.map(f => ({ f, d: featDistM(f, pt.lat, pt.lon) })).filter(x => x.d != null && x.d <= AN_INFRA_M + 1500) : [];
+  if (inf.length) {
+    const lines = [], hits = [];
+    inf.forEach(({ f, d }) => {
+      const p = f.properties, st = infraSt(p);
+      const tip = `<b>${esc(p.name)}</b><br>${esc(INFRA_TYPE[p.type] || p.type)} · ${esc(st.label)} · ${anDist(d)}`;
+      if (isPt(f)) {
+        const ll = [f.geometry.coordinates[1], f.geometry.coordinates[0]];
+        lines.push(L.circleMarker(ll, { radius: 7, stroke: false, fillColor: "#FFFFFF", fillOpacity: .95, interactive: false }));
+        const m = L.circleMarker(ll, { radius: 5, color: st.color, weight: 2, opacity: .95, className: "infra-shape",
+          fillColor: st.fill ? st.color : "#FFFFFF", fillOpacity: st.fill ? .9 : 1 });
+        m.bindTooltip(tip); m.on("click", e => openInfra(p, e.latlng || ll, map));
+        lines.push(m); return;
+      }
+      const lay = L.geoJSON(f, { style: isArea(f) ? { ...infraStyle(p), weight: 1.2, fillColor: st.color, fillOpacity: .14 } : infraStyle(p) });
+      lay.bindTooltip(tip); lay.on("click", e => openInfra(p, e.latlng, map));
+      lines.push(lay);
+      if (!isArea(f)) {   /* an invisible fat line so a thin study corridor is easy to hit */
+        const hit = L.geoJSON(f, { style: { color: "#000000", weight: 12, opacity: 0, lineCap: "round", lineJoin: "round" }, className: "infra-hit" });
+        hit.on("click", e => openInfra(p, e.latlng, map)); hits.push(hit);
+      }
+    });
+    LF.anInfraG = L.layerGroup(lines).addTo(map);
+    LF.anInfraHitG = L.layerGroup(hits).addTo(map);
+  }
+  const infLeg = document.getElementById("aninfralegend");
+  if (infLeg) { const live = ANL.infra && inf.length > 0; infLeg.style.display = live ? "" : "none"; infLeg.innerHTML = live ? infraLegendHtml(inf.length) : ""; }
+
+  /* --- b. public buildings, the same markers, popups and category filter as the Macro map --- */
+  const koms = anPubKoms(pt, r), pubOn = ANL.pub && !!PUB && koms.length > 0;
+  let pubRowsN = [];
+  if (pubOn) {
+    koms.forEach(pubLoad);
+    pubRowsN = anPubRows(pt, koms);
+    LF.anPubG = L.layerGroup(pubMarkers(pubRowsN, map, gradeMode(true))).addTo(map);
+  }
+  const waiting = pubOn ? koms.filter(k => !PUB_FILES[k] && !PUB_FILES["_error_" + k]).length : 0;
+  setPubLegendIn("anpublegend", pubOn, pubRowsN,
+    `${koms.length} municipality file${koms.length === 1 ? "" : "s"}`,
+    waiting ? ` · loading ${waiting} more…` : ` · within ${nf(AN_PUB_MAP_M, 0)} m of the pin`, gradeMode(true));
+
+  /* --- c. BBR buildings, lazy: the micro file is only fetched once the pill is on --- */
+  const kom = r && r.kommune ? r.kommune.code : null;
+  const microOn = ANL.micro && microAvail(kom);
+  const mLeg = document.getElementById("anmicrolegend");
+  if (microOn) loadMicro(kom);
+  const md = microOn ? MICRO[String(Number(kom))] : null;
+  if (md) {
+    const mind = curMind(), rows = microRows(kom), z = map.getZoom();
+    const msc = scaleOf(rows, x => x[mind.col], mind.breaks);
+    LF.anMicroG = L.layerGroup(rows.map(x => { const t = msc.t(x[mind.col]);
+      const m = L.circleMarker([x[0], x[1]], { renderer: LF.anCanvas, radius: microRadius(x[2], z), color: "#141C18", weight: .6, opacity: .7,
+        fillColor: t == null ? "#C4CBC4" : mkShade(t, "micro:" + mind.key), fillOpacity: .85 });
+      m.bindPopup(() => microPopup(x, kom), { maxWidth: 440, autoPanPadding: [24, 24] }); return m; })).addTo(map);
+    if (mLeg) { mLeg.style.display = ""; mLeg.innerHTML = legendHtml(msc, mind, "micro:" + mind.key, `${nf(rows.length, 0)} buildings · dot size = dwellings`); }
+  } else if (mLeg) {
+    const loading = microOn && !MICRO["_error_" + String(Number(kom))];
+    mLeg.style.display = loading ? "" : "none";
+    mLeg.innerHTML = loading ? `<div class="lgtitle">Buildings<span>loading ${esc((byCode[kom] || {}).name || "")}…</span></div>` : "";
+  }
+  /* the pin and its rings stay on top of every overlay */
+  if (LF.anPinG) LF.anPinG.eachLayer(l => { if (l.bringToFront) l.bringToFront(); });
+}
 function anMapInit() {
   const el = document.getElementById("anmap"); if (!el || typeof L === "undefined") return;
   const pt = anLoc(); if (!pt) return;
@@ -1349,7 +1473,8 @@ function anMapInit() {
   if (LF.anmap) { try { LF.anmap.remove(); } catch (e) {} LF.anmap = null; }
   /* zoom only: the rings frame the property and a drag would lose it */
   const map = L.map(el, { center: [pt.lat, pt.lon], zoom: 15, scrollWheelZoom: true, dragging: false, zoomSnap: .5, attributionControl: false });
-  LF.anmap = map;
+  LF.anmap = map; LF.anPt = pt; LF.anR = r; LF.anKom = r.kommune ? r.kommune.code : null;
+  LF.anCanvas = L.canvas({ padding: .3 });   /* one renderer per map — a cached one redraws into a dead context */
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, className: "basemap" }).addTo(map);
   /* the current choropleth underneath, at the finest level the indicator reaches */
   const ind = curInd();
@@ -1364,21 +1489,18 @@ function anMapInit() {
     const t = sc.t(useQ ? own : micro && own != null ? own : V(byCode[a.muni], ind.key));
     L.polygon(a.rings, { color: "#FFFFFF", weight: .8, fillColor: t == null ? "#C4CBC4" : mkShade(t, ind.key), fillOpacity: .5, interactive: false }).addTo(map);
   });
-  /* the infrastructure overlay in its own status tones — the same shapes, hit lines and colours as the map */
-  INFRA.forEach(f => {
-    const d = featDistM(f, pt.lat, pt.lon); if (d == null || d > AN_INFRA_M + 1500) return;
-    const p = f.properties;
-    const lay = isPt(f)
-      ? L.circleMarker([f.geometry.coordinates[1], f.geometry.coordinates[0]], { radius: 5, color: infraSt(p).color, weight: 2, fillColor: "#FFFFFF", fillOpacity: 1 })
-      : L.geoJSON(f, { style: isArea(f) ? { ...infraStyle(p), weight: 1.2, fillColor: infraSt(p).color, fillOpacity: .14 } : infraStyle(p) });
-    lay.bindTooltip(`<b>${esc(p.name)}</b><br>${esc(INFRA_TYPE[p.type] || p.type)} · ${esc(infraSt(p).label)} · ${anDist(d)}`);
-    lay.on("click", () => go(`project/${p.id}`));
-    lay.addTo(map);
-  });
   const col = cssVar("--pin", "#33372C"), ll = [pt.lat, pt.lon];
-  const rings = TP_RINGS.map(m => L.circle(ll, { radius: m, color: col, weight: 1, opacity: .8, dashArray: "5 6", fill: false, interactive: false }).addTo(map));
-  L.marker(ll, { icon: L.divIcon({ className: "tp-pin", iconSize: [22, 22], iconAnchor: [11, 11], html: "<i></i>" }), zIndexOffset: 1200, interactive: false }).addTo(map);
-  map.fitBounds(rings[rings.length - 1].getBounds(), { padding: [14, 14] });
+  const rings = TP_RINGS.map(m => L.circle(ll, { radius: m, color: col, weight: 1, opacity: .8, dashArray: "5 6", fill: false, interactive: false }));
+  LF.anPinG = L.layerGroup(rings.concat([
+    L.marker(ll, { icon: L.divIcon({ className: "tp-pin", iconSize: [22, 22], iconAnchor: [11, 11], html: "<i></i>" }), zIndexOffset: 1200, interactive: false })])).addTo(map);
+  map.on("popupopen", ev => anPopupWire(ev.popup));
+  /* the public zoom rule and the building dot size both follow the zoom, as on the Macro map */
+  map.on("zoomend", () => { LF.anZoom = map.getZoom(); anMapOverlays(); });
+  anMapOverlays();
+  /* a pill toggle re-renders the sheet, so the reader's own zoom is kept rather than re-fitted */
+  const key = `${pt.lat},${pt.lon}`;
+  if (LF.anKey === key && LF.anZoom) map.setView(ll, LF.anZoom);
+  else { map.fitBounds(rings[rings.length - 1].getBounds(), { padding: [14, 14] }); LF.anKey = key; LF.anZoom = map.getZoom(); }
   setLegend("anlegend", sc, ind, ind.key, useQ ? "quarters" : micro ? "postal codes" : "municipalities");
 }
 /* --- e. infrastructure nearby --- */
@@ -1528,8 +1650,11 @@ function vAnalysis() {
   return `
   ${anHead(pt, r, e)}
   <div class="card"><div class="card-head"><h3>Where it is</h3>
-      <span class="hint">rings at ${TP_RINGS.map(m => nf(m, 0) + " m").join(" · ")} · ${esc(curInd().short || curInd().label)} underneath · infrastructure in its status tones</span></div>
-    <div class="mapwrap anmapwrap"><div id="anmap"></div><div class="maplegend small" id="anlegend"></div></div></div>
+      <span class="hint">rings at ${TP_RINGS.map(m => nf(m, 0) + " m").join(" · ")} · the layers below sit on top, each with its legend</span></div>
+    ${anLayerBar(pt, r)}
+    <div class="mapwrap anmapwrap${anLayerList().length ? " haslayers" : ""}"><div id="anmap"></div>
+      <div class="maplegs"><div class="maplegend small publiclegend" id="anpublegend"></div><div class="maplegend small infralegend" id="aninfralegend"></div><div class="maplegend small" id="anmicrolegend"></div></div>
+      <div class="maplegend small" id="anlegend"></div></div></div>
   ${e ? `<div class="card"><div class="card-head"><h3>Area profile — ${esc(e.typeLabel)} ${esc(e.name)} <span class="hq" title="${esc(hint)}">ⓘ</span></h3>
       <span class="hint">${profile.length} indicator${profile.length === 1 ? "" : "s"}${MK.year !== LATEST ? " · " + MK.year : ""}</span></div>
     ${anIndTable(e, r, profile)}</div>
@@ -1632,13 +1757,14 @@ function loadMicro(code) {
   const k = String(Number(code)); const e = MICRO_IDX[k]; if (!e || MICRO[k] || MICRO["_loading_" + k]) return;
   MICRO["_loading_" + k] = true;
   fetch(e.file).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then(d => { MICRO[k] = d; delete MICRO["_loading_" + k]; if (microMode() && LF.map) lfLayers(); })
+    .then(d => { MICRO[k] = d; delete MICRO["_loading_" + k]; if (microMode() && LF.map) lfLayers(); anMapOverlays(); })
     .catch(() => { MICRO["_error_" + k] = true; delete MICRO["_loading_" + k]; const el = document.getElementById("mcount"); if (el) el.textContent = "buildings could not be loaded — open the dashboard via make serve or the GitHub Pages link (not as a file)"; });
 }
-function microPopup(r) {
-  const m = byCode[MK.muni]; const rooms = r.slice(9, 13); const rt = rooms.reduce((a, b) => a + b, 0);
+function microPopup(r, code) {
+  const kom = code || MK.muni;
+  const m = byCode[kom]; const rooms = r.slice(9, 13); const rt = rooms.reduce((a, b) => a + b, 0);
   const row = (l, v) => `<span class="lfrow"><span>${l}</span><b>${v}</b></span>`;
-  const d = MICRO[String(Number(MK.muni))]; const same = r[16] && d ? d.b.filter(x => x[16] === r[16]).length - 1 : 0;
+  const d = MICRO[String(Number(kom))]; const same = r[16] && d ? d.b.filter(x => x[16] === r[16]).length - 1 : 0;
   const area = areaAt(r[0], r[1]);
   return `<div class="lfpop"><b>${r[15] ? esc(r[15]) : (esc(MTYPE[r[8]] || "building") + " · " + r[2] + " dwellings")}</b><span class="dim">${r[15] ? esc(MTYPE[r[8]] || "building") + " · " : ""}${area ? esc(area.name) + " · " : ""}${m ? esc(m.name) : ""}${r[16] ? ` · BFE ${esc(r[16])}${same > 0 ? ` (+${same} more building${same > 1 ? "s" : ""} on this property)` : ""}` : ""} · BBR ${esc(r[14])}…</span>
     ${area ? `<span class="lfact"><button class="lk mini primary" data-go="${withQ(pageOf(area))}">${area.bydel != null ? "Quarter" : "Postal code"}: ${esc(area.name)} ›</button>${m ? `<button class="lk mini" data-go="${withQ(pageOf(m))}">${esc(m.name)} ›</button>` : ""}</span>` : ""}
@@ -1665,7 +1791,7 @@ function exportMicroCsv() {
   downloadCsv([["municipality"].concat(cols).join(";")].concat(rows.map(r => [(byCode[MK.muni] || {}).name || MK.muni].concat(r).map(v => String(v ?? "")).join(";"))), `macro-dashboard-dk_buildings_${MK.muni}_${d.meta.built}.csv`);
 }
 /* dot radius grows with zoom so buildings separate when zoomed in and do not blanket the municipality when zoomed out */
-function microRadius(dw) { const z = LF.map ? LF.map.getZoom() : 12; const k = z < 12 ? .7 : z < 13.5 ? 1.0 : z < 15 ? 1.5 : 2.2; return Math.max(2, Math.min(16, k * Math.sqrt(dw) + 1)); }
+function microRadius(dw, zoom) { const z = zoom != null ? zoom : (LF.map ? LF.map.getZoom() : 12); const k = z < 12 ? .7 : z < 13.5 ? 1.0 : z < 15 ? 1.5 : 2.2; return Math.max(2, Math.min(16, k * Math.sqrt(dw) + 1)); }
 function lfMicroLayers() {
   const code = MK.muni; const d = MICRO[String(Number(code))];
   if (LF.areaG) LF.map.removeLayer(LF.areaG);
@@ -1679,10 +1805,9 @@ function lfMicroLayers() {
   const ind = curMind(), rows = microRows(code), c = ind.col;
   /* same quintile classes as the area maps, computed on the buildings that pass the filters */
   const sc = scaleOf(rows, r => r[c], ind.breaks); const t = sc.t;
-  if (!LF.canvas) LF.canvas = L.canvas({ padding: .3 });
   const marks = rows.map(r => { const tt = t(r[c]);
     const m = L.circleMarker([r[0], r[1]], { renderer: LF.canvas, radius: microRadius(r[2]), color: "#141C18", weight: .6, opacity: .7, fillColor: tt == null ? "#C4CBC4" : mkShade(tt, "micro:" + ind.key), fillOpacity: .85 });
-    m._dw = r[2]; m._row = r; m.bindPopup(() => microPopup(r), { maxWidth: 440, autoPanPadding: [24, 24] }); return m; });
+    m._dw = r[2]; m._row = r; m.bindPopup(() => microPopup(r, code), { maxWidth: 440, autoPanPadding: [24, 24] }); return m; });
   LF.microG = L.layerGroup(marks).addTo(LF.map); LF.microMarks = marks;
   tpLayers();
   setLegend("maplegend", sc, ind, "micro:" + ind.key, "buildings with ≥ 2 dwellings · dot size = dwellings");
@@ -1741,6 +1866,7 @@ function lfInit() {
   if (LF.map) { try { LF.map.remove(); } catch (e) {} LF.map = null; }
   const map = L.map(el, { center: LF.center, zoom: LF.zoom, scrollWheelZoom: true, zoomSnap: 0.5, zoomDelta: 1, wheelPxPerZoomLevel: 30, wheelDebounceTime: 20 });
   LF.map = map;
+  LF.canvas = L.canvas({ padding: .3 });     /* likewise: the building dots' renderer dies with its map */
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, className: "basemap",
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · Boundaries: DAGI, Klimadatastyrelsen' }).addTo(map);
   map.on("moveend", () => { const c = map.getCenter(); LF.center = [c.lat, c.lng]; LF.zoom = map.getZoom();
@@ -2019,15 +2145,25 @@ function pubLoad(code) {
   if (!PUB || !pubAvail(k) || PUB_FILES[k] || PUB_FILES["_loading_" + k]) return;
   PUB_FILES["_loading_" + k] = true;
   fetch(`public/${String(k).padStart(4, "0")}.json`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then(d => { PUB_FILES[k] = d; delete PUB_FILES["_loading_" + k]; if (MK.pub && LF.map) lfPublicLayers(); anFill(); })
+    .then(d => { PUB_FILES[k] = d; delete PUB_FILES["_loading_" + k]; if (MK.pub && LF.map) lfPublicLayers(); anMapOverlays(); anFill(); })
     .catch(() => { delete PUB_FILES["_loading_" + k]; PUB_FILES["_error_" + k] = true; });
 }
 /* what to draw: the municipality in view, else every loaded file — and at national zoom only the open cases */
 function pubParseFilter(q) {
   const raw = (q.pub || "").trim();
-  PF.cats = !raw || raw === "all" ? null : new Set(raw.split(",").map(c => PF_LONG[c]).filter(Boolean));
-  if (PF.cats && !PF.cats.size) PF.cats = null;
+  /* "none" is a real state — every category off. An empty or unreadable value still means "all", so a
+     hand-typed link cannot blank the map, but a link copied with everything hidden reopens hidden. */
+  if (raw === PF_NONE) PF.cats = new Set();
+  else if (!raw || raw === "all") PF.cats = null;
+  else { const set = new Set(raw.split(",").map(c => PF_LONG[c]).filter(Boolean)); PF.cats = set.size ? set : null; }
   PF.kind = ["existing", "open"].includes(q.pubkind) ? q.pubkind : "both";
+}
+/* the filter as hash parameters — the map, the public list and the Analysis sheet write the same names */
+function pubHashParts() {
+  const q = [];
+  if (PF.cats) q.push(`pub=${PF.cats.size ? [...PF.cats].map(c => PF_SHORT[c]).join(",") : PF_NONE}`);
+  if (PF.kind !== "both") q.push(`pubkind=${PF.kind}`);
+  return q;
 }
 const pubCatOn = c => !PF.cats || PF.cats.has(c);
 const pubKindOn = kind => PF.kind === "both" || (PF.kind === "existing" ? kind === "existing" : kind === "case");
@@ -2084,19 +2220,23 @@ function pubPopup(b) {
     <p class="cap dim">BBR ${esc(b.code)} · id ${esc(b.id.slice(0, 8))}… · BBR via Datafordeler, ${esc((PUB || {}).built || "")}</p></div>`;
 }
 function lfPublicLayers() {
-  ["pubG", "pubHitG", "pubLabG"].forEach(k => { if (LF[k]) { LF.map.removeLayer(LF[k]); LF[k] = null; } });
-  if (!LF.map || !MK.pub || !PUB) return;
+  ["pubG", "pubLabG"].forEach(k => { if (LF[k] && LF.map) { LF.map.removeLayer(LF[k]); LF[k] = null; } });
+  if (!LF.map || !MK.pub || !PUB) { setPublicLegend(); return; }
   pubLoadVisible();
-  const rows = pubRows(), marks = [], hits = [];
-  /* grade mode: Education on its own → the markers carry the school's FP9 grade instead of the category */
-  const gm = gradeMode(), gsc = gm ? gradeScale() : null;
+  LF.pubG = L.layerGroup(pubMarkers(pubRows(), LF.map, gradeMode())).addTo(LF.map);
+  lfPublicLabels();
+  setPublicLegend();
+}
+/* the same circle markers on either map — grade mode: Education on its own carries the school's FP9
+   grade instead of the category hue. No grade (0.–6. klasse, suppressed, special, or not a school at
+   all) keeps the base hue, drawn hollow, so it reads as "not on this scale", never as a low grade. */
+function pubMarkers(rows, map, gm) {
+  const gsc = gm ? gradeScale() : null, marks = [];
   rows.forEach(b => {
     const c = pubCat(b), existing = b.kind === "existing";
     let stroke = c.color, fill = existing ? c.color : "#FFFFFF", fop = existing ? .85 : 1, wt = 2;
     if (gm && b.cat === "education") {
       const gc = gradeColor(b, gsc);
-      /* no grade (0.–6. klasse, suppressed, special, or not a school at all) keeps the base hue,
-         drawn hollow with a thin outline so it reads as "not on this scale", never as a low grade */
       if (gc) { fill = gc; fop = .95; stroke = "#2F3B55"; wt = 1.4; }
       else { fill = c.color; fop = .18; stroke = c.color; wt = 1; }
     }
@@ -2104,14 +2244,11 @@ function lfPublicLayers() {
     const m = L.circleMarker([b.lat, b.lon], { radius: 6, color: stroke, weight: wt, opacity: .95, className: "infra-shape",
       fillColor: fill, fillOpacity: fop, dashArray: existing ? null : "3 3" });
     m.on("mouseover", () => { m.setRadius(8); halo.setRadius(10); }).on("mouseout", () => { m.setRadius(6); halo.setRadius(8); });
-    m.on("click", e => L.popup({ maxWidth: 420, autoPanPadding: [24, 24] }).setLatLng(e.latlng || [b.lat, b.lon]).setContent(pubPopup(b)).openOn(LF.map));
+    m.on("click", e => L.popup({ maxWidth: 420, autoPanPadding: [24, 24] }).setLatLng(e.latlng || [b.lat, b.lon]).setContent(pubPopup(b)).openOn(map));
     m._pub = b;
     marks.push(halo, m);
   });
-  LF.pubG = L.layerGroup(marks).addTo(LF.map);
-  LF.pubHitG = L.layerGroup(hits).addTo(LF.map);
-  lfPublicLabels();
-  setPublicLegend();
+  return marks;
 }
 function lfPublicLabels() {
   if (LF.pubLabG) { LF.map.removeLayer(LF.pubLabG); LF.pubLabG = null; }
@@ -2128,35 +2265,54 @@ function lfPublicLabels() {
   });
   LF.pubLabG = L.layerGroup(labs).addTo(LF.map);
 }
-function setPublicLegend() {
-  const el = document.getElementById("publiclegend"); if (!el) return;
-  el.style.display = MK.pub && PUB ? "" : "none";
-  if (!(MK.pub && PUB)) return;
-  const rows = pubRows(), n = rows.length, cases = rows.filter(b => b.kind === "case").length;
+/* The public-buildings legend, shared by the Macro map and the Analysis mini map.
+
+   It is built from the full category list, never from the active filter, so switching a category off
+   greys its row instead of removing it — the way back on is always on screen. Grade mode adds the FP9
+   ramp underneath the categories rather than replacing them. `rows` is what the caller actually drew,
+   so the counts line always describes the markers in front of the reader. */
+function pubLegendHtml(rows, note, zoomNote, gm) {
+  const n = rows.length, cases = rows.filter(b => b.kind === "case").length;
   const filtered = !!PF.cats || PF.kind !== "both";
+  const allOff = pubAllOff();
   /* the rows are toggles: click hides or shows a category, shift-click (or "only") isolates it */
-  const catRow = (k, c) => `<div class="lgrow pubtog ${pubCatOn(k) ? "" : "off"}" data-pubcat="${k}" title="click to hide or show · shift-click for only this one">
-      <i style="background:${c.color};border-radius:50%"></i>${esc(c.label)}<b class="only" data-pubonly="${k}">only</b></div>`;
+  const catRow = (k, c) => { const on = pubCatOn(k);
+    return `<div class="lgrow pubtog ${on ? "" : "off"}" data-pubcat="${k}" title="click to ${on ? "hide" : "show"} · shift-click for only this one">
+      <i style="${on ? `background:${c.color}` : `background:transparent;box-shadow:inset 0 0 0 2px ${c.color}`};border-radius:50%"></i>${esc(c.label)}<b class="only" data-pubonly="${k}">only</b></div>`; };
   const kindRow = `<div class="lgrow gk">
       <span class="pubtog ${pubKindOn("existing") ? "" : "off"}" data-pubkind="existing"><i class="pk-exist"></i>existing</span>
       <span class="pubtog ${pubKindOn("case") ? "" : "off"}" data-pubkind="open"><i class="pk-case"></i>open case</span></div>`;
-  if (gradeMode()) {
-    const sc = gradeScale(), ind = gradeInd(), n = sc.classes || 0, b = sc.breaks || [];
-    const lab = i2 => n === 1 ? nf(sc.lo, 1) : i2 === 0 ? `≤ ${nf(b[0], 1)}` : i2 === n - 1 ? `> ${nf(b[i2 - 1], 1)}` : `${nf(b[i2 - 1], 1)} – ${nf(b[i2], 1)}`;
-    const bins = []; for (let i2 = n - 1; i2 >= 0; i2--) bins.push(`<div class="lgrow"><i style="background:${mkShade(n > 1 ? i2 / (n - 1) : .5, GRADE_KEY)}"></i>${lab(i2)}</div>`);
-    el.innerHTML = `<div class="lgtitle">FP9 grade avg<span>bundne prøver · ${esc(SCH_LATEST)}</span></div>
-      ${n ? bins.join("") : `<div class="lgrow dim">no grades loaded</div>`}
+  let grade = "";
+  if (gm === undefined ? gradeMode() : gm) {
+    const sc = gradeScale(), gn = sc.classes || 0, b = sc.breaks || [];
+    const lab = i2 => gn === 1 ? nf(sc.lo, 1) : i2 === 0 ? `≤ ${nf(b[0], 1)}` : i2 === gn - 1 ? `> ${nf(b[i2 - 1], 1)}` : `${nf(b[i2 - 1], 1)} – ${nf(b[i2], 1)}`;
+    const bins = []; for (let i2 = gn - 1; i2 >= 0; i2--) bins.push(`<div class="lgrow"><i style="background:${mkShade(gn > 1 ? i2 / (gn - 1) : .5, GRADE_KEY)}"></i>${lab(i2)}</div>`);
+    grade = `<div class="lgsub">FP9 grade avg<span>bundne prøver · ${esc(SCH_LATEST)}</span></div>
+      ${gn ? bins.join("") : `<div class="lgrow dim">no grades loaded</div>`}
       <div class="lgrow"><i style="background:${PUB_CAT.education.color};opacity:.18;border:1px solid ${PUB_CAT.education.color}"></i>no grade published</div>
-      <div class="lgrow gk"><b class="only" data-puball>All categories</b></div>
       <div class="lgnote">${sc.n || 0} schools classed over the loaded municipalities. A school with no grade teaches no 9th grade, or the source suppressed it — never read it as a low grade. Kilde: Uddannelsesstatistik.dk</div>`;
-    return;
   }
-  el.innerHTML = `<div class="lgtitle">Public buildings<span>BBR ${esc(PUB.built)} · ${PUB.kommuner.length} municipalities${filtered ? ` · <b class="only" data-puball>All</b>` : ""}</span></div>
+  return `<div class="lgtitle">Public buildings<span>BBR ${esc((PUB || {}).built || "")} · ${note || `${(PUB || {}).kommuner ? PUB.kommuner.length : 0} municipalities`}${filtered ? ` · <b class="only" data-puball>All</b>` : ""}</span></div>
     ${Object.entries(PUB_CAT).map(([k, c]) => catRow(k, c)).join("")}
     ${kindRow}
-    <div class="lgnote">${nf(n - cases, 0)} existing · ${nf(cases, 0)} open cases (permit ≤ ${PUB.recent_years} yr) drawn${
-      pubZoom() < 9 ? " · open cases only — zoom in for the stock"
-      : pubZoom() < 13 ? ` · showing large buildings (≥ ${nf(PUB_BIG_M2, 0)} m²) — zoom in for all` : ""}</div>`;
+    ${allOff ? `<div class="lgrow gk allhidden">All categories hidden · <b class="only" data-puball>Show all</b></div>` : ""}
+    ${grade}
+    <div class="lgnote">${allOff ? "nothing drawn"
+      : `${nf(n - cases, 0)} existing · ${nf(cases, 0)} open cases (permit ≤ ${(PUB || {}).recent_years} yr) drawn${zoomNote || ""}`}</div>`;
+}
+/* Fill one legend box, or hide it when its layer is off. The box is never left as an empty white bar:
+   either it has content or it is display:none (and `.maplegend:empty` catches any path that misses this). */
+function setPubLegendIn(id, live, rows, note, zoomNote, gm) {
+  const el = document.getElementById(id); if (!el) return;
+  if (!live) { el.innerHTML = ""; el.style.display = "none"; return; }
+  el.style.display = "";
+  el.innerHTML = pubLegendHtml(rows || [], note, zoomNote, gm);
+}
+function setPublicLegend() {
+  const live = !!(MK.pub && PUB && document.getElementById("lfmap"));
+  setPubLegendIn("publiclegend", live, live ? pubRows() : [], null,
+    !live ? "" : pubZoom() < 9 ? " · open cases only — zoom in for the stock"
+    : pubZoom() < 13 ? ` · showing large buildings (≥ ${nf(PUB_BIG_M2, 0)} m²) — zoom in for all` : "");
 }
 /* the PUBLIC line on an area card */
 function publicLine(level, code) {
@@ -2181,6 +2337,7 @@ function schoolsLoad() {
   fetch("schools.json").then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(d => { SCHOOLS = d; (d.schools || []).forEach(s => SCH_BY[s.nr] = s); SCH_LOADING = false;
       if (LF.map && MK.pub) lfPublicLayers();
+      anMapOverlays();
       if (["school", "schoollist", "area", "charts"].includes(S.view)) renderKeep(); anFill(); })
     .catch(() => { SCH_LOADING = false; SCHOOLS = { schools: [] }; });
 }
@@ -2212,8 +2369,11 @@ function schoolsInView() {
 /* --- grade colouring: only when the public filter is showing Education and nothing else --- */
 const GRADE_KEY = "school_grade_avg";
 const gradeInd = () => IND.find(i => i.key === GRADE_KEY) || { key: GRADE_KEY, short: "FP9 grade", label: "FP9 grade average", unit: "grade 0–12", fmt: "idx" };
-function gradeMode() {
-  return !!(MK.pub && SCH_META && PF.cats && PF.cats.size === 1 && PF.cats.has("education") && SCHOOLS);
+function gradeMode(on) {
+  /* Education on its own: the Education markers carry the school's FP9 grade instead of the category
+     hue. `on` is the layer state of the map asking — the Macro map's by default, the mini map's on the
+     Analysis sheet. */
+  return !!((on === undefined ? MK.pub : on) && SCH_META && PF.cats && PF.cats.size === 1 && PF.cats.has("education") && SCHOOLS);
 }
 function gradeScale() {
   return scaleOf(schoolsInView(), s => schV(s, "grade_avg"));
@@ -2342,7 +2502,7 @@ function vSchoolList() {
       ${e.school_grade_avg != null ? `<span class="hint">area average ${nf(e.school_grade_avg, 1)} · ${e.schools_n} folkeskoler and frie grundskoler · ${nf(e.school_pupils || 0, 0)} pupils</span>` : ""}</div>
     <div class="scrollx"><table class="tbl compact" data-sortable><thead><tr><th>School</th><th>Type</th><th class="num">FP9 grade</th><th class="num">vs expected</th><th class="num">Well-being</th><th class="num">Pupils</th><th class="num">Class size</th></tr></thead>
       <tbody>${sorted.map(s => { const d = schV(s, "soc_ref_diff"), sig = schSig(schV(s, "soc_ref_significant")); return `<tr class="clickrow" data-school="${esc(s.nr)}">
-        <th><span class="thn">${esc(s.name)} <span class="go">›</span></span></th>
+        <th><span class="thn">${esc(s.name)} <span class="go">\u203a</span></span></th>
         <td class="dim">${esc(SCH_TYPE[s.type] || s.type)}</td>
         <td class="num" data-v="${schV(s, "grade_avg") ?? ""}">${schCell(schV(s, "grade_avg"), schGrade)}</td>
         <td class="num" data-v="${d ?? ""}">${d == null ? `<span class="dim" title="${SUPPRESSED}">–</span>` : schDiff(d) + (sig ? ` <em class="schsig">✓</em>` : "")}</td>
