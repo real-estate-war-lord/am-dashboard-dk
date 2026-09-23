@@ -8,6 +8,7 @@ Format for every CSV: header `kommune;value`, municipality code as 3-digit DST c
 | `rent_social.csv` | Social housing rent DKK/m²/yr, family dwellings | Landsbyggefonden, Huslejestatistik 2026, basistabeller Tabel 7 | https://lbf.dk/viden/statistikker/huslejestatistik/ | 1 Jan 2026 | 2026-09-14 | import_lbf.py |
 | `cph_crime_bydele.csv` | Copenhagen quarters: reported crime per 1,000 inhabitants (Københavns Politi) and the share feeling safe in their own neighbourhood (survey) | Københavns Kommune, Tryghedsundersøgelsen 2026 (Epinion) | https://www.kk.dk/tryghedsundersoegelsen (PDF: `data/external/kk_tryghed_2026.pdf`, not committed) | survey 2026 · police figures 2025 | 2026-09-22 | `scripts/import_kk_tryghed.py` |
 | `cph_bydel_map.csv` | Mapping: the report's 13 areas → the 67 quarters (kvarterer) | hand-made from the lokaludvalg codes; checked against each area's population in the report | — | 2026 | 2026-09-22 | hand-written, `population_check` column |
+| `institutionsregister.csv` | Institution register: 4 976 active institutions, all types, with WGS84 coordinates — the institutionsnummer ↔ location join for the Schools layer | Børne- og Undervisningsministeriet / STIL, Institutionsregisteret | https://uddannelsesstatistik.dk (Institutionsregister export) | daily snapshot | 2026-09-23 | downloaded by hand, see `docs/SCHOOLS.md` |
 
 ## Københavns Kommunes Tryghedsundersøgelse — yearly refresh
 
@@ -25,3 +26,17 @@ The report is published each spring (the 2026 edition covers the 2026 survey and
 **Two years in one file:** `safe_pct` is from the survey year, `crime_1000` / `reports_n` / the offence groups are police figures for `crime_year` (the previous year). The dashboard labels them "2026 (survey)" and "2025 (Københavns Politi)".
 
 **Not comparable with the national crime indicators:** these are Københavns Politi's reports for a calendar year per bydel, while the national Safety family is DST STRAF11 over a rolling four quarters per municipality. `burglary_1000inh` is per 1,000 inhabitants, not per 1,000 dwellings, so it is deliberately not mapped onto `burglary_1000dw`. About 8 % of the city's reports (4 242 of 50 337 in 2025) cannot be placed in a bydel, so the city figure (75) is above the population-weighted mean of the bydele (69).
+
+## Institutionsregister — the one file here that is not `kommune;value`
+
+Semicolon-separated, **UTF-8 with BOM** (`encoding="utf-8-sig"`), 30 columns, one row per institution.
+It does not follow the `kommune;value` format above because it is a register export, not an indicator.
+
+Columns the Schools layer uses: `Institutionsnummer` (the join key into the STIL cubes),
+`Institutionsnavn`, `Institutionstype, navn` (the type filter — *Folkeskoler*, *Friskoler og private
+grundskoler*, *Specialskoler for børn*), `Beliggenhedskommune` (a name, `"Københavns Kommune"`, not a
+code), `Enhedsart` (institution / hovedskole / afdeling), and
+`Geokode: Breddegrad` / `Geokode: Længdegrad` — **so no DAR geocoding is needed**.
+
+It changes daily as schools merge, split and close. Re-download it with every build of the Schools
+layer and keep its retrieval date next to the cube retrieval date; see `docs/SCHOOLS.md` §5.
