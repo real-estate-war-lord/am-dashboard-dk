@@ -22,3 +22,5 @@ data/external/*.pdf
 dist/infra_projects.geojson
 dist/infra_index.json
 data/raw/public/
+dist/public_index.json
+dist/public/

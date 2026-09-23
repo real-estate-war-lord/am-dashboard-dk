@@ -69,7 +69,7 @@ def main():
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html, encoding="utf-8")
     # the infrastructure layer is inlined in the page, and also served as files so it can be reused
-    for src in (ROOT / "data" / "geo" / "infra_projects.geojson", PROC / "infra_index.json"):
+    for src in (ROOT / "data" / "geo" / "infra_projects.geojson", PROC / "infra_index.json", PROC / "public_index.json"):
         if src.exists():
             import shutil
             shutil.copy(src, out.parent / src.name)
