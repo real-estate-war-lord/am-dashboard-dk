@@ -1,0 +1,152 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-09-22T08:45:51Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "way",
+  "id": 1381533073,
+  "bounds": {
+    "minlat": 57.0490749,
+    "minlon": 9.9107266,
+    "maxlat": 57.0491097,
+    "maxlon": 9.9110225
+  },
+  "nodes": [
+    12790407395,
+    12790407396
+  ],
+  "geometry": [
+    { "lat": 57.0491097, "lon": 9.9107266 },
+    { "lat": 57.0490749, "lon": 9.9110225 }
+  ],
+  "tags": {
+    "check_date": "2025-07-11",
+    "construction": "cycleway",
+    "highway": "construction",
+    "layer": "-1",
+    "tunnel": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 1381533074,
+  "bounds": {
+    "minlat": 57.0490433,
+    "minlon": 9.9107529,
+    "maxlat": 57.0490841,
+    "maxlon": 9.9110494
+  },
+  "nodes": [
+    12790407397,
+    12790407398
+  ],
+  "geometry": [
+    { "lat": 57.0490841, "lon": 9.9107529 },
+    { "lat": 57.0490433, "lon": 9.9110494 }
+  ],
+  "tags": {
+    "check_date": "2025-07-11",
+    "construction": "cycleway",
+    "highway": "construction",
+    "layer": "-1",
+    "tunnel": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 1442542434,
+  "bounds": {
+    "minlat": 57.0113975,
+    "minlon": 9.9985157,
+    "maxlat": 57.0115344,
+    "maxlon": 10.0015518
+  },
+  "nodes": [
+    13204742635,
+    13236135025,
+    13236135026,
+    13725760904,
+    13725760905,
+    13236135027,
+    13725807630,
+    13725760906,
+    13980440272,
+    13236108914
+  ],
+  "geometry": [
+    { "lat": 57.0115344, "lon": 9.9985157 },
+    { "lat": 57.0114652, "lon": 9.9989392 },
+    { "lat": 57.0113998, "lon": 10.0000064 },
+    { "lat": 57.0113975, "lon": 10.0003293 },
+    { "lat": 57.0114236, "lon": 10.0003312 },
+    { "lat": 57.0114417, "lon": 10.0011119 },
+    { "lat": 57.0114432, "lon": 10.0011502 },
+    { "lat": 57.0114552, "lon": 10.0014495 },
+    { "lat": 57.0114566, "lon": 10.0015112 },
+    { "lat": 57.0114576, "lon": 10.0015518 }
+  ],
+  "tags": {
+    "construction": "cycleway",
+    "highway": "construction"
+  }
+},
+{
+  "type": "way",
+  "id": 1484027428,
+  "bounds": {
+    "minlat": 57.0400830,
+    "minlon": 9.9201948,
+    "maxlat": 57.0401404,
+    "maxlon": 9.9203023
+  },
+  "nodes": [
+    11113994385,
+    11113994397
+  ],
+  "geometry": [
+    { "lat": 57.0400830, "lon": 9.9203023 },
+    { "lat": 57.0401404, "lon": 9.9201948 }
+  ],
+  "tags": {
+    "check_date": "2026-05-01",
+    "construction": "path",
+    "highway": "construction"
+  }
+},
+{
+  "type": "way",
+  "id": 1550846760,
+  "bounds": {
+    "minlat": 57.0425960,
+    "minlon": 9.9348085,
+    "maxlat": 57.0430315,
+    "maxlon": 9.9348492
+  },
+  "nodes": [
+    3793365431,
+    14105641545,
+    14105641546,
+    10908639253
+  ],
+  "geometry": [
+    { "lat": 57.0430315, "lon": 9.9348469 },
+    { "lat": 57.0429199, "lon": 9.9348492 },
+    { "lat": 57.0429199, "lon": 9.9348085 },
+    { "lat": 57.0425960, "lon": 9.9348136 }
+  ],
+  "tags": {
+    "construction": "footway",
+    "highway": "construction",
+    "lit": "yes",
+    "note": "anlægsarbejde ifbm. seperatkloakering",
+    "surface": "paving_stones"
+  }
+}
+
+  ]
+}

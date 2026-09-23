@@ -1,0 +1,627 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-09-22T18:29:34Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "way",
+  "id": 1693137,
+  "bounds": {
+    "minlat": 55.6648325,
+    "minlon": 12.6013215,
+    "maxlat": 55.6653211,
+    "maxlon": 12.6036011
+  },
+  "nodes": [
+    8097282,
+    8097283,
+    1491269358,
+    8097285,
+    12397403480,
+    8086647,
+    8086642
+  ],
+  "geometry": [
+    { "lat": 55.6648325, "lon": 12.6013215 },
+    { "lat": 55.6649898, "lon": 12.6020886 },
+    { "lat": 55.6650235, "lon": 12.6022402 },
+    { "lat": 55.6651631, "lon": 12.6028672 },
+    { "lat": 55.6652074, "lon": 12.6030633 },
+    { "lat": 55.6652152, "lon": 12.6030980 },
+    { "lat": 55.6653211, "lon": 12.6036011 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "residential",
+    "lane_markings": "no",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Prags Boulevard",
+    "name:etymology:wikidata": "Q1085",
+    "sidewalk": "both",
+    "sidewalk:left:surface": "asphalt",
+    "sidewalk:right:surface": "paving_stones",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q10638339",
+    "wikipedia": "da:Prags Boulevard"
+  }
+},
+{
+  "type": "way",
+  "id": 2374134,
+  "bounds": {
+    "minlat": 55.6689088,
+    "minlon": 12.6189120,
+    "maxlat": 55.6689599,
+    "maxlon": 12.6193361
+  },
+  "nodes": [
+    698663,
+    12397737939,
+    3358026157
+  ],
+  "geometry": [
+    { "lat": 55.6689088, "lon": 12.6189120 },
+    { "lat": 55.6689507, "lon": 12.6192600 },
+    { "lat": 55.6689599, "lon": 12.6193361 }
+  ],
+  "tags": {
+    "cycleway": "track",
+    "highway": "tertiary",
+    "lanes": "3",
+    "lanes:backward": "2",
+    "lanes:forward": "1",
+    "lit": "yes",
+    "maxspeed": "40",
+    "maxspeed:type": "sign",
+    "name": "Prags Boulevard",
+    "name:etymology:wikidata": "Q1085",
+    "oneway": "no",
+    "sidewalk": "right",
+    "sidewalk:right:surface": "paving_stones",
+    "surface": "asphalt",
+    "turn:lanes:backward": "left|none",
+    "wikidata": "Q10638339",
+    "wikipedia": "da:Prags Boulevard"
+  }
+},
+{
+  "type": "way",
+  "id": 3481020,
+  "bounds": {
+    "minlat": 55.6660908,
+    "minlon": 12.6060301,
+    "maxlat": 55.6672082,
+    "maxlon": 12.6113702
+  },
+  "nodes": [
+    8099329,
+    2680820789,
+    5297638256,
+    1579437358,
+    3558684287,
+    3468338163,
+    9073520583,
+    3739494252,
+    2700972453,
+    4927669082,
+    8796321054,
+    1712586429
+  ],
+  "geometry": [
+    { "lat": 55.6660908, "lon": 12.6060301 },
+    { "lat": 55.6661152, "lon": 12.6061441 },
+    { "lat": 55.6664508, "lon": 12.6077007 },
+    { "lat": 55.6664653, "lon": 12.6077680 },
+    { "lat": 55.6665673, "lon": 12.6082473 },
+    { "lat": 55.6667132, "lon": 12.6089330 },
+    { "lat": 55.6669474, "lon": 12.6100341 },
+    { "lat": 55.6669598, "lon": 12.6100924 },
+    { "lat": 55.6671404, "lon": 12.6109412 },
+    { "lat": 55.6671878, "lon": 12.6112157 },
+    { "lat": 55.6671917, "lon": 12.6112450 },
+    { "lat": 55.6672082, "lon": 12.6113702 }
+  ],
+  "tags": {
+    "highway": "residential",
+    "lane_markings": "no",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Prags Boulevard",
+    "name:etymology:wikidata": "Q1085",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q10638339",
+    "wikipedia": "da:Prags Boulevard"
+  }
+},
+{
+  "type": "way",
+  "id": 8122257,
+  "bounds": {
+    "minlat": 55.6671829,
+    "minlon": 12.6119850,
+    "maxlat": 55.6674535,
+    "maxlon": 12.6134996
+  },
+  "nodes": [
+    582295825,
+    2700972454,
+    783264705
+  ],
+  "geometry": [
+    { "lat": 55.6671936, "lon": 12.6119850 },
+    { "lat": 55.6671829, "lon": 12.6121981 },
+    { "lat": 55.6674535, "lon": 12.6134996 }
+  ],
+  "tags": {
+    "highway": "service",
+    "lit": "yes",
+    "name": "Prags Boulevard",
+    "name:etymology:wikidata": "Q1085",
+    "service": "parking_aisle",
+    "surface": "asphalt",
+    "wikidata": "Q10638339",
+    "wikipedia": "da:Prags Boulevard"
+  }
+},
+{
+  "type": "way",
+  "id": 62969700,
+  "bounds": {
+    "minlat": 55.6681691,
+    "minlon": 12.6167545,
+    "maxlat": 55.6686560,
+    "maxlon": 12.6190375
+  },
+  "nodes": [
+    8575394676,
+    12397477235,
+    9214588170,
+    8328770
+  ],
+  "geometry": [
+    { "lat": 55.6681691, "lon": 12.6167545 },
+    { "lat": 55.6683661, "lon": 12.6176946 },
+    { "lat": 55.6686315, "lon": 12.6189376 },
+    { "lat": 55.6686560, "lon": 12.6190375 }
+  ],
+  "tags": {
+    "highway": "residential",
+    "lane_markings": "no",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Prags Boulevard",
+    "name:etymology:wikidata": "Q1085",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 64746261,
+  "bounds": {
+    "minlat": 55.6653211,
+    "minlon": 12.6036011,
+    "maxlat": 55.6659411,
+    "maxlon": 12.6061214
+  },
+  "nodes": [
+    8086642,
+    12397735526,
+    12397735527,
+    8099330,
+    10043647155,
+    8579338787,
+    8099332,
+    3628940941,
+    8099333,
+    8099331
+  ],
+  "geometry": [
+    { "lat": 55.6653211, "lon": 12.6036011 },
+    { "lat": 55.6653761, "lon": 12.6036501 },
+    { "lat": 55.6654187, "lon": 12.6036882 },
+    { "lat": 55.6654404, "lon": 12.6037075 },
+    { "lat": 55.6654493, "lon": 12.6037484 },
+    { "lat": 55.6654539, "lon": 12.6037696 },
+    { "lat": 55.6657251, "lon": 12.6050491 },
+    { "lat": 55.6658630, "lon": 12.6057591 },
+    { "lat": 55.6658786, "lon": 12.6058397 },
+    { "lat": 55.6659411, "lon": 12.6061214 }
+  ],
+  "tags": {
+    "bicycle": "designated",
+    "check_date:surface": "2025-03-17",
+    "cycleway:surface": "asphalt",
+    "foot": "designated",
+    "footway:surface": "asphalt",
+    "highway": "cycleway",
+    "lit": "yes",
+    "name": "Prags Boulevard",
+    "name:etymology:wikidata": "Q1085",
+    "segregated": "yes",
+    "surface": "asphalt",
+    "wikidata": "Q10638339",
+    "wikipedia": "da:Prags Boulevard"
+  }
+},
+{
+  "type": "way",
+  "id": 64746262,
+  "bounds": {
+    "minlat": 55.6646145,
+    "minlon": 12.6002924,
+    "maxlat": 55.6648333,
+    "maxlon": 12.6013215
+  },
+  "nodes": [
+    8097282,
+    6454308380,
+    4945382689,
+    8097281
+  ],
+  "geometry": [
+    { "lat": 55.6648325, "lon": 12.6013215 },
+    { "lat": 55.6648333, "lon": 12.6012607 },
+    { "lat": 55.6646787, "lon": 12.6005284 },
+    { "lat": 55.6646145, "lon": 12.6002924 }
+  ],
+  "tags": {
+    "bicycle": "yes",
+    "highway": "pedestrian",
+    "lit": "yes",
+    "motor_vehicle": "no",
+    "name": "Prags Boulevard",
+    "name:etymology:wikidata": "Q1085",
+    "surface": "asphalt",
+    "wikidata": "Q10638339",
+    "wikipedia": "da:Prags Boulevard"
+  }
+},
+{
+  "type": "way",
+  "id": 159159413,
+  "bounds": {
+    "minlat": 55.6659596,
+    "minlon": 12.6062070,
+    "maxlat": 55.6670154,
+    "maxlon": 12.6111701
+  },
+  "nodes": [
+    8579338812,
+    5460315946,
+    1626954586,
+    3830003474,
+    3739494253,
+    1626954589,
+    5910303228,
+    5910303227
+  ],
+  "geometry": [
+    { "lat": 55.6659596, "lon": 12.6062070 },
+    { "lat": 55.6659683, "lon": 12.6062472 },
+    { "lat": 55.6663044, "lon": 12.6078008 },
+    { "lat": 55.6664219, "lon": 12.6083470 },
+    { "lat": 55.6668171, "lon": 12.6101829 },
+    { "lat": 55.6668566, "lon": 12.6103663 },
+    { "lat": 55.6670154, "lon": 12.6111205 },
+    { "lat": 55.6669515, "lon": 12.6111701 }
+  ],
+  "tags": {
+    "bicycle": "no",
+    "highway": "footway",
+    "lit": "yes",
+    "name": "Prags Boulevard",
+    "name:etymology:wikidata": "Q1085",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 237232176,
+  "bounds": {
+    "minlat": 55.6693569,
+    "minlon": 12.6213176,
+    "maxlat": 55.6699124,
+    "maxlon": 12.6238487
+  },
+  "nodes": [
+    17207401,
+    2206848489,
+    8483842826,
+    4707701832,
+    4707701852,
+    8923334457,
+    4888246713
+  ],
+  "geometry": [
+    { "lat": 55.6693569, "lon": 12.6213176 },
+    { "lat": 55.6693925, "lon": 12.6214952 },
+    { "lat": 55.6694164, "lon": 12.6216028 },
+    { "lat": 55.6696077, "lon": 12.6224605 },
+    { "lat": 55.6697413, "lon": 12.6230691 },
+    { "lat": 55.6698080, "lon": 12.6233732 },
+    { "lat": 55.6699124, "lon": 12.6238487 }
+  ],
+  "tags": {
+    "cycleway": "track",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "40",
+    "name": "Prags Boulevard",
+    "name:etymology:wikidata": "Q1085",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q10638339",
+    "wikipedia": "da:Prags Boulevard"
+  }
+},
+{
+  "type": "way",
+  "id": 497250038,
+  "bounds": {
+    "minlat": 55.6691710,
+    "minlon": 12.6204143,
+    "maxlat": 55.6693215,
+    "maxlon": 12.6211445
+  },
+  "nodes": [
+    12710039379,
+    5922287389,
+    8483842827,
+    8485872859,
+    5583563213
+  ],
+  "geometry": [
+    { "lat": 55.6691710, "lon": 12.6204143 },
+    { "lat": 55.6692180, "lon": 12.6206464 },
+    { "lat": 55.6692853, "lon": 12.6209716 },
+    { "lat": 55.6693065, "lon": 12.6210744 },
+    { "lat": 55.6693215, "lon": 12.6211445 }
+  ],
+  "tags": {
+    "cycleway": "track",
+    "highway": "tertiary",
+    "lanes": "3",
+    "lanes:backward": "1",
+    "lanes:forward": "2",
+    "lit": "yes",
+    "maxspeed": "40",
+    "maxspeed:type": "sign",
+    "name": "Prags Boulevard",
+    "name:etymology:wikidata": "Q1085",
+    "oneway": "no",
+    "sidewalk": "right",
+    "sidewalk:right:surface": "paving_stones",
+    "surface": "asphalt",
+    "turn:lanes:forward": "left|through;right",
+    "wikidata": "Q10638339",
+    "wikipedia": "da:Prags Boulevard"
+  }
+},
+{
+  "type": "way",
+  "id": 502208449,
+  "bounds": {
+    "minlat": 55.6673407,
+    "minlon": 12.6119613,
+    "maxlat": 55.6688932,
+    "maxlon": 12.6183037
+  },
+  "nodes": [
+    1712586432,
+    8796321056,
+    2700972456,
+    7813419580,
+    7813860572,
+    7813897150,
+    6985979740,
+    5879717721,
+    9214588168,
+    2162804235,
+    2162804226,
+    2162804242,
+    366513525
+  ],
+  "geometry": [
+    { "lat": 55.6673407, "lon": 12.6119613 },
+    { "lat": 55.6673687, "lon": 12.6120691 },
+    { "lat": 55.6674380, "lon": 12.6123354 },
+    { "lat": 55.6676432, "lon": 12.6132930 },
+    { "lat": 55.6677407, "lon": 12.6137480 },
+    { "lat": 55.6677457, "lon": 12.6137711 },
+    { "lat": 55.6678490, "lon": 12.6142530 },
+    { "lat": 55.6679826, "lon": 12.6148762 },
+    { "lat": 55.6680840, "lon": 12.6153492 },
+    { "lat": 55.6686563, "lon": 12.6180191 },
+    { "lat": 55.6687036, "lon": 12.6181516 },
+    { "lat": 55.6687449, "lon": 12.6182020 },
+    { "lat": 55.6688932, "lon": 12.6183037 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "residential",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Prags Boulevard",
+    "name:etymology:wikidata": "Q1085",
+    "sidewalk": "left",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q10638339",
+    "wikipedia": "da:Prags Boulevard"
+  }
+},
+{
+  "type": "way",
+  "id": 923805469,
+  "bounds": {
+    "minlat": 55.6677742,
+    "minlon": 12.6150095,
+    "maxlat": 55.6681691,
+    "maxlon": 12.6167545
+  },
+  "nodes": [
+    8328767,
+    9214588164,
+    8328768,
+    18023260,
+    8575394676
+  ],
+  "geometry": [
+    { "lat": 55.6677742, "lon": 12.6150095 },
+    { "lat": 55.6679403, "lon": 12.6157956 },
+    { "lat": 55.6679519, "lon": 12.6158500 },
+    { "lat": 55.6680350, "lon": 12.6162403 },
+    { "lat": 55.6681691, "lon": 12.6167545 }
+  ],
+  "tags": {
+    "highway": "residential",
+    "lane_markings": "no",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Prags Boulevard",
+    "name:etymology:wikidata": "Q1085",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 924390640,
+  "bounds": {
+    "minlat": 55.6659411,
+    "minlon": 12.6061214,
+    "maxlat": 55.6659596,
+    "maxlon": 12.6062070
+  },
+  "nodes": [
+    8099331,
+    3628940940,
+    8579338812
+  ],
+  "geometry": [
+    { "lat": 55.6659411, "lon": 12.6061214 },
+    { "lat": 55.6659527, "lon": 12.6061753 },
+    { "lat": 55.6659596, "lon": 12.6062070 }
+  ],
+  "tags": {
+    "bicycle": "yes",
+    "highway": "footway",
+    "lit": "yes",
+    "name": "Prags Boulevard",
+    "name:etymology:wikidata": "Q1085",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 935405652,
+  "bounds": {
+    "minlat": 55.6699124,
+    "minlon": 12.6238487,
+    "maxlat": 55.6701388,
+    "maxlon": 12.6248806
+  },
+  "nodes": [
+    4888246713,
+    7302089
+  ],
+  "geometry": [
+    { "lat": 55.6699124, "lon": 12.6238487 },
+    { "lat": 55.6701388, "lon": 12.6248806 }
+  ],
+  "tags": {
+    "cycleway": "track",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "40",
+    "name": "Prags Boulevard",
+    "name:etymology:wikidata": "Q1085",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q10638339",
+    "wikipedia": "da:Prags Boulevard"
+  }
+},
+{
+  "type": "way",
+  "id": 1095722303,
+  "bounds": {
+    "minlat": 55.6693215,
+    "minlon": 12.6211445,
+    "maxlat": 55.6693569,
+    "maxlon": 12.6213176
+  },
+  "nodes": [
+    5583563213,
+    17207401
+  ],
+  "geometry": [
+    { "lat": 55.6693215, "lon": 12.6211445 },
+    { "lat": 55.6693569, "lon": 12.6213176 }
+  ],
+  "tags": {
+    "cycleway": "track",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "40",
+    "maxspeed:type": "sign",
+    "name": "Prags Boulevard",
+    "name:etymology:wikidata": "Q1085",
+    "sidewalk": "right",
+    "sidewalk:right:surface": "paving_stones",
+    "surface": "asphalt",
+    "wikidata": "Q10638339",
+    "wikipedia": "da:Prags Boulevard"
+  }
+},
+{
+  "type": "way",
+  "id": 1372690796,
+  "bounds": {
+    "minlat": 55.6689599,
+    "minlon": 12.6193361,
+    "maxlat": 55.6691710,
+    "maxlon": 12.6204143
+  },
+  "nodes": [
+    3358026157,
+    20944563,
+    12710039379
+  ],
+  "geometry": [
+    { "lat": 55.6689599, "lon": 12.6193361 },
+    { "lat": 55.6691010, "lon": 12.6200809 },
+    { "lat": 55.6691710, "lon": 12.6204143 }
+  ],
+  "tags": {
+    "cycleway": "track",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "40",
+    "maxspeed:type": "sign",
+    "name": "Prags Boulevard",
+    "name:etymology:wikidata": "Q1085",
+    "oneway": "no",
+    "sidewalk": "right",
+    "sidewalk:right:surface": "paving_stones",
+    "surface": "asphalt",
+    "wikidata": "Q10638339",
+    "wikipedia": "da:Prags Boulevard"
+  }
+}
+
+  ]
+}

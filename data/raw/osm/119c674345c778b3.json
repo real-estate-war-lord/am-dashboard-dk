@@ -1,0 +1,730 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-09-22T08:45:51Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "way",
+  "id": 756628983,
+  "bounds": {
+    "minlat": 54.7580190,
+    "minlon": 11.8638813,
+    "maxlat": 54.7592160,
+    "maxlon": 11.8680424
+  },
+  "nodes": [
+    7067092966,
+    7067099888,
+    7067092969,
+    8698986506,
+    8698986507,
+    7067092968
+  ],
+  "geometry": [
+    { "lat": 54.7580190, "lon": 11.8638813 },
+    { "lat": 54.7586246, "lon": 11.8661486 },
+    { "lat": 54.7587603, "lon": 11.8666370 },
+    { "lat": 54.7588777, "lon": 11.8670472 },
+    { "lat": 54.7590492, "lon": 11.8675765 },
+    { "lat": 54.7592160, "lon": 11.8680424 }
+  ],
+  "tags": {
+    "bridge": "yes",
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:gauge": "1435",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "layer": "1",
+    "maxspeed": "100",
+    "name": "Ringsted-Femern Banen",
+    "oneway": "yes",
+    "opening_date": "2029-6",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "passenger_lines": "2",
+    "railway": "construction",
+    "railway:etcs:start_date": "2029-6",
+    "source": "bane.dk",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 756628984,
+  "bounds": {
+    "minlat": 54.7592160,
+    "minlon": 11.8680424,
+    "maxlat": 54.7597461,
+    "maxlon": 11.8692796
+  },
+  "nodes": [
+    7067092968,
+    8698986505,
+    7067092982
+  ],
+  "geometry": [
+    { "lat": 54.7592160, "lon": 11.8680424 },
+    { "lat": 54.7594733, "lon": 11.8686758 },
+    { "lat": 54.7597461, "lon": 11.8692796 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:gauge": "1435",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "layer": "2",
+    "maxspeed": "100",
+    "name": "Ringsted-Femern Banen",
+    "oneway": "yes",
+    "opening_date": "2029-6",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "passenger_lines": "2",
+    "railway": "construction",
+    "railway:etcs:start_date": "2029-6",
+    "source": "bane.dk",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 756628985,
+  "bounds": {
+    "minlat": 54.7541345,
+    "minlon": 11.8461980,
+    "maxlat": 54.7568217,
+    "maxlon": 11.8592329
+  },
+  "nodes": [
+    7067092956,
+    7067092984,
+    7067099886,
+    7067092977,
+    7067092964,
+    7067092965,
+    7067092981,
+    7067092971,
+    8551293396
+  ],
+  "geometry": [
+    { "lat": 54.7541345, "lon": 11.8461980 },
+    { "lat": 54.7543304, "lon": 11.8475620 },
+    { "lat": 54.7547035, "lon": 11.8497954 },
+    { "lat": 54.7550408, "lon": 11.8516956 },
+    { "lat": 54.7554888, "lon": 11.8538131 },
+    { "lat": 54.7557902, "lon": 11.8551767 },
+    { "lat": 54.7560624, "lon": 11.8562976 },
+    { "lat": 54.7566770, "lon": 11.8586869 },
+    { "lat": 54.7568217, "lon": 11.8592329 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:gauge": "1435",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "embankment": "yes",
+    "highspeed": "yes",
+    "maxspeed": "200",
+    "name": "Ringsted-Femern Banen",
+    "oneway": "yes",
+    "opening_date": "2029-6",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "railway:etcs:start_date": "2029-6",
+    "source": "bane.dk",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 756628989,
+  "bounds": {
+    "minlat": 54.7599546,
+    "minlon": 11.8697015,
+    "maxlat": 54.7626518,
+    "maxlon": 11.8732338
+  },
+  "nodes": [
+    7067092983,
+    8698986508,
+    7067092952,
+    7067092955,
+    2333568764,
+    2333568766,
+    2333568792,
+    9236181347
+  ],
+  "geometry": [
+    { "lat": 54.7599546, "lon": 11.8697015 },
+    { "lat": 54.7602839, "lon": 11.8703103 },
+    { "lat": 54.7605576, "lon": 11.8707473 },
+    { "lat": 54.7610123, "lon": 11.8714009 },
+    { "lat": 54.7611955, "lon": 11.8716175 },
+    { "lat": 54.7617827, "lon": 11.8722873 },
+    { "lat": 54.7623882, "lon": 11.8729510 },
+    { "lat": 54.7626518, "lon": 11.8732338 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:gauge": "1435",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "layer": "2",
+    "maxspeed": "100",
+    "name": "Ringsted-Femern Banen",
+    "oneway": "yes",
+    "opening_date": "2029-6",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "passenger_lines": "2",
+    "railway": "construction",
+    "railway:etcs:start_date": "2029-6",
+    "source": "bane.dk",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 756628990,
+  "bounds": {
+    "minlat": 54.7597461,
+    "minlon": 11.8692796,
+    "maxlat": 54.7599546,
+    "maxlon": 11.8697015
+  },
+  "nodes": [
+    7067092982,
+    7067092983
+  ],
+  "geometry": [
+    { "lat": 54.7597461, "lon": 11.8692796 },
+    { "lat": 54.7599546, "lon": 11.8697015 }
+  ],
+  "tags": {
+    "bridge": "yes",
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:gauge": "1435",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "layer": "1",
+    "maxspeed": "100",
+    "name": "Ringsted-Femern Banen",
+    "oneway": "yes",
+    "opening_date": "2029-6",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "passenger_lines": "2",
+    "railway": "construction",
+    "railway:etcs:start_date": "2029-6",
+    "source": "bane.dk",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 756628991,
+  "bounds": {
+    "minlat": 54.7541124,
+    "minlon": 11.8460454,
+    "maxlat": 54.7541345,
+    "maxlon": 11.8461980
+  },
+  "nodes": [
+    7067092962,
+    7067092956
+  ],
+  "geometry": [
+    { "lat": 54.7541124, "lon": 11.8460454 },
+    { "lat": 54.7541345, "lon": 11.8461980 }
+  ],
+  "tags": {
+    "bridge": "yes",
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:gauge": "1435",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "highspeed": "yes",
+    "layer": "1",
+    "maxspeed": "200",
+    "name": "Ringsted-Femern Banen",
+    "oneway": "yes",
+    "opening_date": "2029-6",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "railway:etcs:start_date": "2029-6",
+    "source": "bane.dk",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 917572009,
+  "bounds": {
+    "minlat": 54.6451036,
+    "minlon": 11.3633533,
+    "maxlat": 54.6740799,
+    "maxlon": 11.4062178
+  },
+  "nodes": [
+    10965216846,
+    8491516222,
+    13909474945,
+    8743664182,
+    7066736489,
+    8743664184,
+    8491516221,
+    13764156909,
+    7066736487,
+    8491516219,
+    13764156907,
+    7066736494,
+    12903105059,
+    8491465016,
+    13764156924,
+    8491465013,
+    13764156922,
+    8491465015,
+    8522111578
+  ],
+  "geometry": [
+    { "lat": 54.6740799, "lon": 11.4062178 },
+    { "lat": 54.6734687, "lon": 11.4045386 },
+    { "lat": 54.6732272, "lon": 11.4038411 },
+    { "lat": 54.6724705, "lon": 11.4020016 },
+    { "lat": 54.6714024, "lon": 11.3993303 },
+    { "lat": 54.6699616, "lon": 11.3957555 },
+    { "lat": 54.6684598, "lon": 11.3922508 },
+    { "lat": 54.6670950, "lon": 11.3895516 },
+    { "lat": 54.6653511, "lon": 11.3866020 },
+    { "lat": 54.6622934, "lon": 11.3815995 },
+    { "lat": 54.6610454, "lon": 11.3795658 },
+    { "lat": 54.6590412, "lon": 11.3765466 },
+    { "lat": 54.6570876, "lon": 11.3740266 },
+    { "lat": 54.6560830, "lon": 11.3729617 },
+    { "lat": 54.6544791, "lon": 11.3712679 },
+    { "lat": 54.6533518, "lon": 11.3702498 },
+    { "lat": 54.6506351, "lon": 11.3679284 },
+    { "lat": 54.6479636, "lon": 11.3656967 },
+    { "lat": 54.6451036, "lon": 11.3633533 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:gauge": "1435",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "cutting": "track",
+    "highspeed": "yes",
+    "maxspeed": "200",
+    "name": "Ringsted-Femern Banen",
+    "note": "Construction work on the Danish part began on January 1, 2021: https://skandbaunews.e-ls.de/2021/01/05/virtueller-spatenstich-fehmarnbeltquerung/",
+    "oneway": "yes",
+    "opening_date": "2029-6",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "railway:etcs:start_date": "2029-6",
+    "source": "bane.dk",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 917572010,
+  "bounds": {
+    "minlat": 54.6450836,
+    "minlon": 11.3634253,
+    "maxlat": 54.6740444,
+    "maxlon": 11.4062442
+  },
+  "nodes": [
+    8522111577,
+    8491465014,
+    13764156923,
+    8491465012,
+    13764156925,
+    8491516217,
+    12903105060,
+    7066736492,
+    13764156908,
+    8491516218,
+    7066736490,
+    13764156910,
+    13934960426,
+    8491516220,
+    8743664185,
+    7066736491,
+    8743664183,
+    13909474946,
+    8491516223,
+    10965216845
+  ],
+  "geometry": [
+    { "lat": 54.6450836, "lon": 11.3634253 },
+    { "lat": 54.6479376, "lon": 11.3658024 },
+    { "lat": 54.6505721, "lon": 11.3680522 },
+    { "lat": 54.6533190, "lon": 11.3703982 },
+    { "lat": 54.6544111, "lon": 11.3714345 },
+    { "lat": 54.6560139, "lon": 11.3730601 },
+    { "lat": 54.6570672, "lon": 11.3741166 },
+    { "lat": 54.6590259, "lon": 11.3766542 },
+    { "lat": 54.6609867, "lon": 11.3796358 },
+    { "lat": 54.6622345, "lon": 11.3816461 },
+    { "lat": 54.6652954, "lon": 11.3866979 },
+    { "lat": 54.6670313, "lon": 11.3896284 },
+    { "lat": 54.6680278, "lon": 11.3916255 },
+    { "lat": 54.6683712, "lon": 11.3923137 },
+    { "lat": 54.6699011, "lon": 11.3958301 },
+    { "lat": 54.6713396, "lon": 11.3994304 },
+    { "lat": 54.6724223, "lon": 11.4020273 },
+    { "lat": 54.6731716, "lon": 11.4039015 },
+    { "lat": 54.6735371, "lon": 11.4048970 },
+    { "lat": 54.6740444, "lon": 11.4062442 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:gauge": "1435",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "cutting": "track",
+    "highspeed": "yes",
+    "maxspeed": "200",
+    "name": "Ringsted-Femern Banen",
+    "note": "Construction work on the Danish part began on January 1, 2021: https://skandbaunews.e-ls.de/2021/01/05/virtueller-spatenstich-fehmarnbeltquerung/",
+    "oneway": "yes",
+    "opening_date": "2029-6",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "railway:etcs:start_date": "2029-6",
+    "source": "bane.dk",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 921032840,
+  "bounds": {
+    "minlat": 54.7568217,
+    "minlon": 11.8592329,
+    "maxlat": 54.7580190,
+    "maxlon": 11.8638813
+  },
+  "nodes": [
+    8551293396,
+    7067092972,
+    7067092966
+  ],
+  "geometry": [
+    { "lat": 54.7568217, "lon": 11.8592329 },
+    { "lat": 54.7573831, "lon": 11.8613517 },
+    { "lat": 54.7580190, "lon": 11.8638813 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:gauge": "1435",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "embankment": "yes",
+    "maxspeed": "100",
+    "name": "Ringsted-Femern Banen",
+    "oneway": "yes",
+    "opening_date": "2029-6",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "railway:etcs:start_date": "2029-6",
+    "source": "bane.dk",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 1000613587,
+  "bounds": {
+    "minlat": 54.7626518,
+    "minlon": 11.8732338,
+    "maxlat": 54.7629954,
+    "maxlon": 11.8736024
+  },
+  "nodes": [
+    9236181347,
+    1688509717
+  ],
+  "geometry": [
+    { "lat": 54.7626518, "lon": 11.8732338 },
+    { "lat": 54.7629954, "lon": 11.8736024 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:gauge": "1435",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "layer": "2",
+    "maxspeed": "120",
+    "name": "Ringsted-Femern Banen",
+    "oneway": "yes",
+    "opening_date": "2029-6",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "passenger_lines": "2",
+    "railway": "construction",
+    "railway:etcs:start_date": "2029-6",
+    "source": "bane.dk",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 1393993638,
+  "bounds": {
+    "minlat": 54.6950627,
+    "minlon": 11.5410096,
+    "maxlat": 54.6950830,
+    "maxlon": 11.5411803
+  },
+  "nodes": [
+    1396953501,
+    12903187838
+  ],
+  "geometry": [
+    { "lat": 54.6950830, "lon": 11.5411803 },
+    { "lat": 54.6950627, "lon": 11.5410096 }
+  ],
+  "tags": {
+    "bridge": "yes",
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "layer": "1",
+    "maxspeed": "200",
+    "name": "Ringsted-Femern Banen",
+    "oneway": "yes",
+    "opening_date": "2029-6",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "railway:etcs:start_date": "2029-6",
+    "source": "bane.dk",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 1393993640,
+  "bounds": {
+    "minlat": 54.6950263,
+    "minlon": 11.5410242,
+    "maxlat": 54.6950459,
+    "maxlon": 11.5411963
+  },
+  "nodes": [
+    12903187837,
+    12903187836
+  ],
+  "geometry": [
+    { "lat": 54.6950263, "lon": 11.5410242 },
+    { "lat": 54.6950459, "lon": 11.5411963 }
+  ],
+  "tags": {
+    "bridge": "yes",
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "layer": "1",
+    "maxspeed": "200",
+    "name": "Ringsted-Femern Banen",
+    "oneway": "yes",
+    "opening_date": "2029-6",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "railway:etcs:start_date": "2029-6",
+    "source": "bane.dk",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 1507593711,
+  "bounds": {
+    "minlat": 54.6930550,
+    "minlon": 11.5201041,
+    "maxlat": 54.6930779,
+    "maxlon": 11.5203587
+  },
+  "nodes": [
+    13785944720,
+    13785944721
+  ],
+  "geometry": [
+    { "lat": 54.6930550, "lon": 11.5201041 },
+    { "lat": 54.6930779, "lon": 11.5203587 }
+  ],
+  "tags": {
+    "bridge": "yes",
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "layer": "1",
+    "maxspeed": "200",
+    "name": "Ringsted-Femern Banen",
+    "oneway": "yes",
+    "opening_date": "2029-6",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "railway:etcs:start_date": "2029-6",
+    "source": "bane.dk",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 1510676323,
+  "bounds": {
+    "minlat": 54.7525997,
+    "minlon": 11.8241031,
+    "maxlat": 54.7541124,
+    "maxlon": 11.8460454
+  },
+  "nodes": [
+    7067092967,
+    7067099885,
+    8688087605,
+    7067092958,
+    7067092970,
+    7067092957,
+    7067092963,
+    7067092978,
+    7067092961,
+    7067092962
+  ],
+  "geometry": [
+    { "lat": 54.7525997, "lon": 11.8241031 },
+    { "lat": 54.7527574, "lon": 11.8267700 },
+    { "lat": 54.7529206, "lon": 11.8299210 },
+    { "lat": 54.7529777, "lon": 11.8315751 },
+    { "lat": 54.7530994, "lon": 11.8348321 },
+    { "lat": 54.7532366, "lon": 11.8376749 },
+    { "lat": 54.7533674, "lon": 11.8392530 },
+    { "lat": 54.7535774, "lon": 11.8416931 },
+    { "lat": 54.7538479, "lon": 11.8440501 },
+    { "lat": 54.7541124, "lon": 11.8460454 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "maxspeed": "200",
+    "name": "Ringsted-Femern Banen",
+    "oneway": "yes",
+    "opening_date": "2029-6",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "railway:etcs:start_date": "2029-6",
+    "source": "bane.dk",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+}
+
+  ]
+}

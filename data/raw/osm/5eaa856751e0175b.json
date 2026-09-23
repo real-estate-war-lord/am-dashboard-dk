@@ -1,0 +1,1884 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-09-22T08:45:51Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "way",
+  "id": 3475062,
+  "bounds": {
+    "minlat": 55.6833588,
+    "minlon": 12.6101740,
+    "maxlat": 55.6846087,
+    "maxlon": 12.6126748
+  },
+  "nodes": [
+    1233749608,
+    1233749582,
+    1297082068,
+    7112820151,
+    4183125167,
+    17207430,
+    7112820174,
+    1452479224,
+    7112820175,
+    17207431,
+    4082241965,
+    374451270,
+    7112820176,
+    17207432,
+    1452479226,
+    4082241964,
+    6991233317
+  ],
+  "geometry": [
+    { "lat": 55.6833588, "lon": 12.6101740 },
+    { "lat": 55.6833657, "lon": 12.6102744 },
+    { "lat": 55.6834144, "lon": 12.6104580 },
+    { "lat": 55.6834877, "lon": 12.6106979 },
+    { "lat": 55.6835167, "lon": 12.6108014 },
+    { "lat": 55.6836169, "lon": 12.6111672 },
+    { "lat": 55.6836419, "lon": 12.6112567 },
+    { "lat": 55.6836626, "lon": 12.6113045 },
+    { "lat": 55.6837042, "lon": 12.6113704 },
+    { "lat": 55.6837467, "lon": 12.6114147 },
+    { "lat": 55.6840145, "lon": 12.6116475 },
+    { "lat": 55.6842944, "lon": 12.6118971 },
+    { "lat": 55.6843368, "lon": 12.6119494 },
+    { "lat": 55.6843675, "lon": 12.6120026 },
+    { "lat": 55.6844053, "lon": 12.6120941 },
+    { "lat": 55.6845778, "lon": 12.6125865 },
+    { "lat": 55.6846087, "lon": 12.6126748 }
+  ],
+  "tags": {
+    "bicycle": "yes",
+    "cycleway:left": "lane",
+    "cycleway:right": "separate",
+    "foot": "yes",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk:left": "no",
+    "sidewalk:right": "separate",
+    "smoothness": "excellent",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 4873657,
+  "bounds": {
+    "minlat": 55.6900400,
+    "minlon": 12.6118029,
+    "maxlat": 55.6902220,
+    "maxlon": 12.6120126
+  },
+  "nodes": [
+    17207438,
+    12850360408,
+    5646198995
+  ],
+  "geometry": [
+    { "lat": 55.6900400, "lon": 12.6120126 },
+    { "lat": 55.6901062, "lon": 12.6119363 },
+    { "lat": 55.6902220, "lon": 12.6118029 }
+  ],
+  "tags": {
+    "check_date": "2025-01",
+    "cycleway:both": "no",
+    "highway": "service",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "30",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk": "left",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 23790951,
+  "bounds": {
+    "minlat": 55.6744183,
+    "minlon": 12.5997798,
+    "maxlat": 55.6833745,
+    "maxlon": 12.6101274
+  },
+  "nodes": [
+    257798919,
+    14042453907,
+    257802858,
+    2078579062,
+    5157207317,
+    1027313264,
+    1027313282,
+    257798929,
+    11043815260,
+    2787761080,
+    3392225729,
+    3392225731,
+    257798932,
+    257798934,
+    257798936,
+    1319571491,
+    2764083372,
+    257798939,
+    257802885,
+    3160221994,
+    257798941,
+    3452033015,
+    257798942,
+    13671648361,
+    1319483823,
+    257798944,
+    257798945,
+    1319483901,
+    3376779369,
+    257798947,
+    1319483843,
+    257798949,
+    3376779370,
+    464260059,
+    3376779371,
+    13804391303,
+    257802827,
+    1319550280,
+    257802828,
+    1319554914,
+    3376779372,
+    3376779373,
+    1319550274,
+    257802830,
+    5959718204,
+    3376779374,
+    3376779375,
+    460039692,
+    1885386511,
+    6726588728,
+    17207427
+  ],
+  "geometry": [
+    { "lat": 55.6754058, "lon": 12.5997798 },
+    { "lat": 55.6753800, "lon": 12.5998466 },
+    { "lat": 55.6750237, "lon": 12.6007701 },
+    { "lat": 55.6745021, "lon": 12.6021125 },
+    { "lat": 55.6744951, "lon": 12.6021402 },
+    { "lat": 55.6744490, "lon": 12.6023237 },
+    { "lat": 55.6744320, "lon": 12.6025273 },
+    { "lat": 55.6744183, "lon": 12.6030048 },
+    { "lat": 55.6744237, "lon": 12.6031427 },
+    { "lat": 55.6744321, "lon": 12.6033582 },
+    { "lat": 55.6744777, "lon": 12.6037168 },
+    { "lat": 55.6745338, "lon": 12.6039670 },
+    { "lat": 55.6746082, "lon": 12.6041929 },
+    { "lat": 55.6747371, "lon": 12.6044902 },
+    { "lat": 55.6751136, "lon": 12.6050908 },
+    { "lat": 55.6762248, "lon": 12.6067779 },
+    { "lat": 55.6766665, "lon": 12.6074123 },
+    { "lat": 55.6768239, "lon": 12.6076405 },
+    { "lat": 55.6769889, "lon": 12.6078611 },
+    { "lat": 55.6770106, "lon": 12.6078838 },
+    { "lat": 55.6770536, "lon": 12.6079235 },
+    { "lat": 55.6771384, "lon": 12.6080063 },
+    { "lat": 55.6772058, "lon": 12.6080721 },
+    { "lat": 55.6774528, "lon": 12.6082543 },
+    { "lat": 55.6784983, "lon": 12.6090258 },
+    { "lat": 55.6785269, "lon": 12.6090469 },
+    { "lat": 55.6787855, "lon": 12.6092340 },
+    { "lat": 55.6788878, "lon": 12.6092870 },
+    { "lat": 55.6789697, "lon": 12.6093318 },
+    { "lat": 55.6791178, "lon": 12.6094062 },
+    { "lat": 55.6794537, "lon": 12.6095498 },
+    { "lat": 55.6795155, "lon": 12.6095695 },
+    { "lat": 55.6796340, "lon": 12.6096101 },
+    { "lat": 55.6797145, "lon": 12.6096396 },
+    { "lat": 55.6801400, "lon": 12.6097620 },
+    { "lat": 55.6807309, "lon": 12.6099330 },
+    { "lat": 55.6808876, "lon": 12.6099783 },
+    { "lat": 55.6809419, "lon": 12.6099911 },
+    { "lat": 55.6814506, "lon": 12.6101274 },
+    { "lat": 55.6815164, "lon": 12.6101231 },
+    { "lat": 55.6816368, "lon": 12.6101167 },
+    { "lat": 55.6820359, "lon": 12.6100888 },
+    { "lat": 55.6820600, "lon": 12.6100876 },
+    { "lat": 55.6821804, "lon": 12.6100808 },
+    { "lat": 55.6824501, "lon": 12.6100641 },
+    { "lat": 55.6826715, "lon": 12.6100507 },
+    { "lat": 55.6829505, "lon": 12.6100237 },
+    { "lat": 55.6831920, "lon": 12.6100034 },
+    { "lat": 55.6832624, "lon": 12.6100056 },
+    { "lat": 55.6833317, "lon": 12.6100369 },
+    { "lat": 55.6833745, "lon": 12.6100815 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "unclassified",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "maxspeed:advisory": "30",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "shoulder": "no",
+    "sidewalk": "no",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 25646612,
+  "bounds": {
+    "minlat": 55.6929255,
+    "minlon": 12.6119291,
+    "maxlat": 55.6979100,
+    "maxlon": 12.6248870
+  },
+  "nodes": [
+    12558501892,
+    279567946,
+    279567947,
+    6816079197,
+    6816079202,
+    279567948,
+    279567949,
+    279567950,
+    279567951,
+    279567952,
+    12976069738,
+    1331051392,
+    279567953,
+    1208024256
+  ],
+  "geometry": [
+    { "lat": 55.6929255, "lon": 12.6240879 },
+    { "lat": 55.6943739, "lon": 12.6248870 },
+    { "lat": 55.6975642, "lon": 12.6247037 },
+    { "lat": 55.6977278, "lon": 12.6223294 },
+    { "lat": 55.6978626, "lon": 12.6203744 },
+    { "lat": 55.6979100, "lon": 12.6196867 },
+    { "lat": 55.6977455, "lon": 12.6195827 },
+    { "lat": 55.6977113, "lon": 12.6194125 },
+    { "lat": 55.6977745, "lon": 12.6192394 },
+    { "lat": 55.6979020, "lon": 12.6191473 },
+    { "lat": 55.6977660, "lon": 12.6164885 },
+    { "lat": 55.6976593, "lon": 12.6144026 },
+    { "lat": 55.6975371, "lon": 12.6119846 },
+    { "lat": 55.6974699, "lon": 12.6119291 }
+  ],
+  "tags": {
+    "access": "no",
+    "highway": "service",
+    "lit": "no",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 105444244,
+  "bounds": {
+    "minlat": 55.6847076,
+    "minlon": 12.6130321,
+    "maxlat": 55.6851427,
+    "maxlon": 12.6134157
+  },
+  "nodes": [
+    4708316460,
+    6117851041,
+    4708316440,
+    17207426
+  ],
+  "geometry": [
+    { "lat": 55.6851427, "lon": 12.6134157 },
+    { "lat": 55.6851181, "lon": 12.6133965 },
+    { "lat": 55.6847942, "lon": 12.6130977 },
+    { "lat": 55.6847076, "lon": 12.6130321 }
+  ],
+  "tags": {
+    "highway": "residential",
+    "lane_markings": "no",
+    "lit": "no",
+    "maxspeed": "50",
+    "maxspeed:advisory": "40",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 117143726,
+  "bounds": {
+    "minlat": 55.6815102,
+    "minlon": 12.6101231,
+    "maxlat": 55.6815164,
+    "maxlon": 12.6104324
+  },
+  "nodes": [
+    1319554908,
+    1319554914
+  ],
+  "geometry": [
+    { "lat": 55.6815102, "lon": 12.6104324 },
+    { "lat": 55.6815164, "lon": 12.6101231 }
+  ],
+  "tags": {
+    "highway": "service",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 118348805,
+  "bounds": {
+    "minlat": 55.6894091,
+    "minlon": 12.6159983,
+    "maxlat": 55.6909454,
+    "maxlon": 12.6169669
+  },
+  "nodes": [
+    1331051202,
+    2675718248,
+    1331051372,
+    3332778196,
+    11114238748,
+    1331051268,
+    1331051162
+  ],
+  "geometry": [
+    { "lat": 55.6894091, "lon": 12.6159983 },
+    { "lat": 55.6894290, "lon": 12.6160192 },
+    { "lat": 55.6902089, "lon": 12.6168168 },
+    { "lat": 55.6904327, "lon": 12.6169542 },
+    { "lat": 55.6905964, "lon": 12.6169643 },
+    { "lat": 55.6906379, "lon": 12.6169669 },
+    { "lat": 55.6909454, "lon": 12.6168529 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "service",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 118348818,
+  "bounds": {
+    "minlat": 55.6895843,
+    "minlon": 12.6150177,
+    "maxlat": 55.6902643,
+    "maxlon": 12.6154108
+  },
+  "nodes": [
+    1331051250,
+    5532918919,
+    4471573642
+  ],
+  "geometry": [
+    { "lat": 55.6895843, "lon": 12.6150177 },
+    { "lat": 55.6896528, "lon": 12.6150619 },
+    { "lat": 55.6902643, "lon": 12.6154108 }
+  ],
+  "tags": {
+    "highway": "service",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 131944930,
+  "bounds": {
+    "minlat": 55.6915755,
+    "minlon": 12.6074063,
+    "maxlat": 55.6933219,
+    "maxlon": 12.6120791
+  },
+  "nodes": [
+    1579375816,
+    12850417712,
+    3611270802,
+    5901495141,
+    5903547676,
+    1451651968,
+    12850402124,
+    5646199008,
+    1451651961,
+    1451651950,
+    12850402123,
+    1451651952
+  ],
+  "geometry": [
+    { "lat": 55.6933219, "lon": 12.6074063 },
+    { "lat": 55.6932128, "lon": 12.6079885 },
+    { "lat": 55.6930794, "lon": 12.6087006 },
+    { "lat": 55.6929509, "lon": 12.6094077 },
+    { "lat": 55.6928136, "lon": 12.6101632 },
+    { "lat": 55.6926245, "lon": 12.6112041 },
+    { "lat": 55.6923315, "lon": 12.6113668 },
+    { "lat": 55.6921257, "lon": 12.6114811 },
+    { "lat": 55.6921126, "lon": 12.6114888 },
+    { "lat": 55.6916831, "lon": 12.6115082 },
+    { "lat": 55.6916554, "lon": 12.6116552 },
+    { "lat": 55.6915755, "lon": 12.6120791 }
+  ],
+  "tags": {
+    "highway": "service",
+    "maxspeed": "30",
+    "motor_vehicle": "permit",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk": "no",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 131946017,
+  "bounds": {
+    "minlat": 55.6936333,
+    "minlon": 12.6100516,
+    "maxlat": 55.6942146,
+    "maxlon": 12.6133547
+  },
+  "nodes": [
+    1451687805,
+    5664734926,
+    5664734925,
+    1451687802
+  ],
+  "geometry": [
+    { "lat": 55.6942146, "lon": 12.6100516 },
+    { "lat": 55.6939744, "lon": 12.6114162 },
+    { "lat": 55.6938873, "lon": 12.6119117 },
+    { "lat": 55.6936333, "lon": 12.6133547 }
+  ],
+  "tags": {
+    "bicycle": "yes",
+    "cycleway": "no",
+    "foot": "yes",
+    "highway": "service",
+    "maxspeed": "30",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 144174998,
+  "bounds": {
+    "minlat": 55.6908413,
+    "minlon": 12.6116623,
+    "maxlat": 55.6914270,
+    "maxlon": 12.6119845
+  },
+  "nodes": [
+    1577472091,
+    12850494966,
+    13677049865,
+    4199224165
+  ],
+  "geometry": [
+    { "lat": 55.6908413, "lon": 12.6116623 },
+    { "lat": 55.6911201, "lon": 12.6118157 },
+    { "lat": 55.6912686, "lon": 12.6118974 },
+    { "lat": 55.6914270, "lon": 12.6119845 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "service",
+    "lit": "yes",
+    "maxspeed": "30",
+    "motor_vehicle": "permissive",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "oneway": "no",
+    "sidewalk": "right",
+    "sidewalk:right:surface": "pebblestone",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 144175001,
+  "bounds": {
+    "minlat": 55.6922898,
+    "minlon": 12.6089957,
+    "maxlat": 55.6958894,
+    "maxlon": 12.6249548
+  },
+  "nodes": [
+    25106073,
+    25106067,
+    25106064,
+    279567908,
+    12952392795,
+    5646199055,
+    25106060,
+    25106057,
+    25106054,
+    5646199069,
+    5646199072,
+    25106050,
+    25106042,
+    25106038,
+    1331051141,
+    25106030,
+    31468273,
+    3332778197,
+    31468274,
+    6185220065,
+    31468275,
+    6185220066,
+    6185220067,
+    6185220069,
+    6185220068,
+    31468277,
+    31468278,
+    31468280
+  ],
+  "geometry": [
+    { "lat": 55.6922898, "lon": 12.6249548 },
+    { "lat": 55.6923247, "lon": 12.6248804 },
+    { "lat": 55.6923505, "lon": 12.6247706 },
+    { "lat": 55.6925203, "lon": 12.6238631 },
+    { "lat": 55.6926450, "lon": 12.6231967 },
+    { "lat": 55.6936030, "lon": 12.6180750 },
+    { "lat": 55.6940376, "lon": 12.6157486 },
+    { "lat": 55.6941133, "lon": 12.6154551 },
+    { "lat": 55.6942043, "lon": 12.6152701 },
+    { "lat": 55.6942735, "lon": 12.6151944 },
+    { "lat": 55.6943023, "lon": 12.6151659 },
+    { "lat": 55.6943463, "lon": 12.6151296 },
+    { "lat": 55.6945930, "lon": 12.6150049 },
+    { "lat": 55.6947328, "lon": 12.6148282 },
+    { "lat": 55.6948074, "lon": 12.6144516 },
+    { "lat": 55.6948761, "lon": 12.6140853 },
+    { "lat": 55.6946885, "lon": 12.6139748 },
+    { "lat": 55.6945988, "lon": 12.6137184 },
+    { "lat": 55.6945967, "lon": 12.6136275 },
+    { "lat": 55.6952370, "lon": 12.6103608 },
+    { "lat": 55.6952605, "lon": 12.6103093 },
+    { "lat": 55.6952911, "lon": 12.6102966 },
+    { "lat": 55.6954382, "lon": 12.6103628 },
+    { "lat": 55.6954563, "lon": 12.6103681 },
+    { "lat": 55.6954750, "lon": 12.6103572 },
+    { "lat": 55.6954920, "lon": 12.6103403 },
+    { "lat": 55.6957332, "lon": 12.6096577 },
+    { "lat": 55.6958894, "lon": 12.6089957 }
+  ],
+  "tags": {
+    "highway": "unclassified",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 144387951,
+  "bounds": {
+    "minlat": 55.6940696,
+    "minlon": 12.6076712,
+    "maxlat": 55.6944187,
+    "maxlon": 12.6100516
+  },
+  "nodes": [
+    1579375955,
+    5646199018,
+    7098729477,
+    3611270801,
+    1579375822,
+    1451687805
+  ],
+  "geometry": [
+    { "lat": 55.6944103, "lon": 12.6076712 },
+    { "lat": 55.6944187, "lon": 12.6077362 },
+    { "lat": 55.6941312, "lon": 12.6092703 },
+    { "lat": 55.6941268, "lon": 12.6092995 },
+    { "lat": 55.6940696, "lon": 12.6096250 },
+    { "lat": 55.6942146, "lon": 12.6100516 }
+  ],
+  "tags": {
+    "bicycle": "yes",
+    "cycleway": "no",
+    "foot": "yes",
+    "highway": "service",
+    "maxspeed": "30",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 261967651,
+  "bounds": {
+    "minlat": 55.6905092,
+    "minlon": 12.6203084,
+    "maxlat": 55.6915524,
+    "maxlon": 12.6237083
+  },
+  "nodes": [
+    2675985340,
+    2675985348,
+    2675985360,
+    2675985362,
+    5664652025
+  ],
+  "geometry": [
+    { "lat": 55.6905092, "lon": 12.6233778 },
+    { "lat": 55.6905841, "lon": 12.6234625 },
+    { "lat": 55.6907173, "lon": 12.6235797 },
+    { "lat": 55.6909350, "lon": 12.6237083 },
+    { "lat": 55.6915524, "lon": 12.6203084 }
+  ],
+  "tags": {
+    "highway": "service",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "surface": "gravel",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 279864511,
+  "bounds": {
+    "minlat": 55.6901114,
+    "minlon": 12.6107588,
+    "maxlat": 55.6904522,
+    "maxlon": 12.6115376
+  },
+  "nodes": [
+    1579375966,
+    1579375810,
+    5901510328,
+    12850345880,
+    1579376035,
+    1577472090,
+    12850345881,
+    12850360407,
+    17207440
+  ],
+  "geometry": [
+    { "lat": 55.6903340, "lon": 12.6107588 },
+    { "lat": 55.6902758, "lon": 12.6107914 },
+    { "lat": 55.6901362, "lon": 12.6109100 },
+    { "lat": 55.6901114, "lon": 12.6110798 },
+    { "lat": 55.6901686, "lon": 12.6112521 },
+    { "lat": 55.6902039, "lon": 12.6112714 },
+    { "lat": 55.6904080, "lon": 12.6113805 },
+    { "lat": 55.6904352, "lon": 12.6114798 },
+    { "lat": 55.6904522, "lon": 12.6115376 }
+  ],
+  "tags": {
+    "cycleway": "no",
+    "foot": "yes",
+    "highway": "service",
+    "lane_markings": "no",
+    "lit": "yes",
+    "maxspeed": "30",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk": "no",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 330240243,
+  "bounds": {
+    "minlat": 55.6872739,
+    "minlon": 12.6109444,
+    "maxlat": 55.6876650,
+    "maxlon": 12.6110133
+  },
+  "nodes": [
+    9997663070,
+    374452431,
+    17207435,
+    1579375796
+  ],
+  "geometry": [
+    { "lat": 55.6872739, "lon": 12.6110133 },
+    { "lat": 55.6872929, "lon": 12.6109886 },
+    { "lat": 55.6873864, "lon": 12.6109444 },
+    { "lat": 55.6876650, "lon": 12.6109477 }
+  ],
+  "tags": {
+    "bicycle": "yes",
+    "cycleway:left": "track",
+    "cycleway:left:segregated": "no",
+    "cycleway:right": "lane",
+    "cycleway:right:lane": "exclusive",
+    "foot": "yes",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "maxspeed:advisory": "40",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk": "left",
+    "sidewalk:left:surface": "asphalt",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 352982255,
+  "bounds": {
+    "minlat": 55.6876650,
+    "minlon": 12.6109477,
+    "maxlat": 55.6884241,
+    "maxlon": 12.6110284
+  },
+  "nodes": [
+    1579375796,
+    6117851023,
+    1577472076,
+    9997674717
+  ],
+  "geometry": [
+    { "lat": 55.6876650, "lon": 12.6109477 },
+    { "lat": 55.6882930, "lon": 12.6110021 },
+    { "lat": 55.6883921, "lon": 12.6110107 },
+    { "lat": 55.6884241, "lon": 12.6110284 }
+  ],
+  "tags": {
+    "bicycle": "yes",
+    "cycleway:left": "track",
+    "cycleway:left:segregated": "no",
+    "cycleway:right": "separate",
+    "foot": "yes",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "shoulder": "no",
+    "sidewalk": "left",
+    "sidewalk:left:surface": "asphalt",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 352982256,
+  "bounds": {
+    "minlat": 55.6904522,
+    "minlon": 12.6114762,
+    "maxlat": 55.6908413,
+    "maxlon": 12.6116623
+  },
+  "nodes": [
+    17207440,
+    12850345882,
+    1577472091
+  ],
+  "geometry": [
+    { "lat": 55.6904522, "lon": 12.6115376 },
+    { "lat": 55.6905066, "lon": 12.6114762 },
+    { "lat": 55.6908413, "lon": 12.6116623 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "service",
+    "lane_markings": "no",
+    "lit": "yes",
+    "maxspeed": "30",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk": "right",
+    "surface": "sett",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 355536268,
+  "bounds": {
+    "minlat": 55.6893745,
+    "minlon": 12.6120126,
+    "maxlat": 55.6905092,
+    "maxlon": 12.6233778
+  },
+  "nodes": [
+    17207438,
+    5646198982,
+    2892302369,
+    12850345891,
+    1577472086,
+    4199224166,
+    1577472085,
+    12850399553,
+    4199224167,
+    5646198996,
+    1579375793,
+    5646198879,
+    1331051250,
+    1331051202,
+    25106576,
+    1349642779,
+    10778799284,
+    10778799290,
+    10976077134,
+    2675985340
+  ],
+  "geometry": [
+    { "lat": 55.6900400, "lon": 12.6120126 },
+    { "lat": 55.6900731, "lon": 12.6120547 },
+    { "lat": 55.6900901, "lon": 12.6121171 },
+    { "lat": 55.6900893, "lon": 12.6121395 },
+    { "lat": 55.6900874, "lon": 12.6121951 },
+    { "lat": 55.6900835, "lon": 12.6122258 },
+    { "lat": 55.6900735, "lon": 12.6122816 },
+    { "lat": 55.6900540, "lon": 12.6123919 },
+    { "lat": 55.6900382, "lon": 12.6124775 },
+    { "lat": 55.6900074, "lon": 12.6126475 },
+    { "lat": 55.6899871, "lon": 12.6127574 },
+    { "lat": 55.6898219, "lon": 12.6136987 },
+    { "lat": 55.6895843, "lon": 12.6150177 },
+    { "lat": 55.6894091, "lon": 12.6159983 },
+    { "lat": 55.6893745, "lon": 12.6162213 },
+    { "lat": 55.6893984, "lon": 12.6164458 },
+    { "lat": 55.6902428, "lon": 12.6217152 },
+    { "lat": 55.6902581, "lon": 12.6218109 },
+    { "lat": 55.6904938, "lon": 12.6232814 },
+    { "lat": 55.6905092, "lon": 12.6233778 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "fixme": "Is maxspeed 30 or 40 here? See signs at west end. Signage at west end may be needed to clarify.",
+    "highway": "unclassified",
+    "lane_markings": "no",
+    "lit": "yes",
+    "maxspeed": "40",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk": "both",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 363496262,
+  "bounds": {
+    "minlat": 55.6897389,
+    "minlon": 12.6118160,
+    "maxlat": 55.6900142,
+    "maxlon": 12.6119958
+  },
+  "nodes": [
+    3676631194,
+    6925244677,
+    1577472083
+  ],
+  "geometry": [
+    { "lat": 55.6897389, "lon": 12.6118160 },
+    { "lat": 55.6898306, "lon": 12.6118716 },
+    { "lat": 55.6900142, "lon": 12.6119958 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "unclassified",
+    "lanes": "3",
+    "lanes:backward": "1",
+    "lanes:forward": "2",
+    "lit": "yes",
+    "maxspeed": "40",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk": "both",
+    "smoothness": "intermediate",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 363496275,
+  "bounds": {
+    "minlat": 55.6891918,
+    "minlon": 12.6114840,
+    "maxlat": 55.6897389,
+    "maxlon": 12.6118160
+  },
+  "nodes": [
+    3676631197,
+    3676631198,
+    3676631194
+  ],
+  "geometry": [
+    { "lat": 55.6891918, "lon": 12.6114840 },
+    { "lat": 55.6894675, "lon": 12.6116513 },
+    { "lat": 55.6897389, "lon": 12.6118160 }
+  ],
+  "tags": {
+    "bicycle": "yes",
+    "check_date": "2026-08-23",
+    "check_date:smoothness": "2026-08-23",
+    "cycleway:both": "no",
+    "foot": "yes",
+    "highway": "unclassified",
+    "lane_markings": "no",
+    "lit": "yes",
+    "maxspeed": "40",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk": "both",
+    "smoothness": "intermediate",
+    "source:maxspeed": "sign",
+    "surface": "sett",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 419935505,
+  "bounds": {
+    "minlat": 55.6916441,
+    "minlon": 12.6130220,
+    "maxlat": 55.6945961,
+    "maxlon": 12.6146758
+  },
+  "nodes": [
+    12850751147,
+    1451687802,
+    5646199020,
+    1331051234,
+    1331051296,
+    1331051205,
+    1331051393,
+    5646199070,
+    6185220876,
+    1331051278
+  ],
+  "geometry": [
+    { "lat": 55.6932012, "lon": 12.6130904 },
+    { "lat": 55.6936333, "lon": 12.6133547 },
+    { "lat": 55.6943905, "lon": 12.6138148 },
+    { "lat": 55.6944805, "lon": 12.6138682 },
+    { "lat": 55.6945961, "lon": 12.6140922 },
+    { "lat": 55.6945026, "lon": 12.6145953 },
+    { "lat": 55.6944240, "lon": 12.6146758 },
+    { "lat": 55.6943350, "lon": 12.6146273 },
+    { "lat": 55.6933390, "lon": 12.6140336 },
+    { "lat": 55.6916441, "lon": 12.6130220 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "service",
+    "lit": "yes",
+    "maxspeed": "30",
+    "motor_vehicle": "permissive",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "oneway": "no",
+    "sidewalk": "no",
+    "source:maxspeed": "sign",
+    "source:width": "ARCore",
+    "surface": "asphalt",
+    "width": "6.2",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 593915785,
+  "bounds": {
+    "minlat": 55.6932599,
+    "minlon": 12.6110400,
+    "maxlat": 55.6939744,
+    "maxlon": 12.6114162
+  },
+  "nodes": [
+    5664734923,
+    5664734926
+  ],
+  "geometry": [
+    { "lat": 55.6932599, "lon": 12.6110400 },
+    { "lat": 55.6939744, "lon": 12.6114162 }
+  ],
+  "tags": {
+    "highway": "service",
+    "maxspeed": "30",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 593915786,
+  "bounds": {
+    "minlat": 55.6933491,
+    "minlon": 12.6117723,
+    "maxlat": 55.6938873,
+    "maxlon": 12.6119117
+  },
+  "nodes": [
+    5664734924,
+    5664734925
+  ],
+  "geometry": [
+    { "lat": 55.6933491, "lon": 12.6117723 },
+    { "lat": 55.6938873, "lon": 12.6119117 }
+  ],
+  "tags": {
+    "highway": "service",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 625034005,
+  "bounds": {
+    "minlat": 55.6922831,
+    "minlon": 12.6073116,
+    "maxlat": 55.6929509,
+    "maxlon": 12.6094077
+  },
+  "nodes": [
+    5901495141,
+    5903554740,
+    5901495142,
+    5903532962
+  ],
+  "geometry": [
+    { "lat": 55.6929509, "lon": 12.6094077 },
+    { "lat": 55.6924508, "lon": 12.6091324 },
+    { "lat": 55.6922831, "lon": 12.6090399 },
+    { "lat": 55.6925857, "lon": 12.6073116 }
+  ],
+  "tags": {
+    "highway": "service",
+    "lanes": "1",
+    "maxspeed": "30",
+    "motor_vehicle": "permit",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 625235375,
+  "bounds": {
+    "minlat": 55.6926555,
+    "minlon": 12.6072306,
+    "maxlat": 55.6944103,
+    "maxlon": 12.6076712
+  },
+  "nodes": [
+    9686894194,
+    1579375816,
+    5903896386,
+    5903547669,
+    1579375955
+  ],
+  "geometry": [
+    { "lat": 55.6926555, "lon": 12.6072306 },
+    { "lat": 55.6933219, "lon": 12.6074063 },
+    { "lat": 55.6936944, "lon": 12.6074968 },
+    { "lat": 55.6938163, "lon": 12.6075266 },
+    { "lat": 55.6944103, "lon": 12.6076712 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "service",
+    "lane_markings": "no",
+    "lit": "yes",
+    "maxspeed": "30",
+    "motor_vehicle": "permit",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk": "no",
+    "smoothness": "intermediate",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 625246346,
+  "bounds": {
+    "minlat": 55.6924508,
+    "minlon": 12.6075395,
+    "maxlat": 55.6927468,
+    "maxlon": 12.6091324
+  },
+  "nodes": [
+    5903554739,
+    5903554740
+  ],
+  "geometry": [
+    { "lat": 55.6927468, "lon": 12.6075395 },
+    { "lat": 55.6924508, "lon": 12.6091324 }
+  ],
+  "tags": {
+    "highway": "footway",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 736945514,
+  "bounds": {
+    "minlat": 55.6849865,
+    "minlon": 12.6123505,
+    "maxlat": 55.6859451,
+    "maxlon": 12.6128816
+  },
+  "nodes": [
+    10169995003,
+    6925244678,
+    12399418649,
+    6919169290,
+    374451774
+  ],
+  "geometry": [
+    { "lat": 55.6849865, "lon": 12.6128816 },
+    { "lat": 55.6851641, "lon": 12.6127926 },
+    { "lat": 55.6853007, "lon": 12.6127153 },
+    { "lat": 55.6855880, "lon": 12.6125526 },
+    { "lat": 55.6859451, "lon": 12.6123505 }
+  ],
+  "tags": {
+    "bicycle": "yes",
+    "cycleway:left": "lane",
+    "cycleway:left:lane": "exclusive",
+    "cycleway:right": "no",
+    "foot": "yes",
+    "highway": "tertiary",
+    "lane_markings": "no",
+    "lit": "yes",
+    "maxspeed": "50",
+    "maxspeed:advisory": "40",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk": "no",
+    "smoothness": "good",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 738667994,
+  "bounds": {
+    "minlat": 55.6900142,
+    "minlon": 12.6119958,
+    "maxlat": 55.6900400,
+    "maxlon": 12.6120126
+  },
+  "nodes": [
+    1577472083,
+    17207438
+  ],
+  "geometry": [
+    { "lat": 55.6900142, "lon": 12.6119958 },
+    { "lat": 55.6900400, "lon": 12.6120126 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "unclassified",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk": "both",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 738667995,
+  "bounds": {
+    "minlat": 55.6902220,
+    "minlon": 12.6115376,
+    "maxlat": 55.6904522,
+    "maxlon": 12.6118029
+  },
+  "nodes": [
+    5646198995,
+    12850345883,
+    17207440
+  ],
+  "geometry": [
+    { "lat": 55.6902220, "lon": 12.6118029 },
+    { "lat": 55.6903085, "lon": 12.6117032 },
+    { "lat": 55.6904522, "lon": 12.6115376 }
+  ],
+  "tags": {
+    "check_date": "2025-01",
+    "cycleway:both": "no",
+    "highway": "service",
+    "lane_markings": "no",
+    "lit": "yes",
+    "maxspeed": "30",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk": "both",
+    "source:maxspeed": "sign",
+    "surface": "sett",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 747166168,
+  "bounds": {
+    "minlat": 55.6846087,
+    "minlon": 12.6126748,
+    "maxlat": 55.6846697,
+    "maxlon": 12.6128919
+  },
+  "nodes": [
+    6991233317,
+    7112820181
+  ],
+  "geometry": [
+    { "lat": 55.6846087, "lon": 12.6126748 },
+    { "lat": 55.6846697, "lon": 12.6128919 }
+  ],
+  "tags": {
+    "bicycle": "yes",
+    "cycleway:left": "lane",
+    "cycleway:right": "separate",
+    "foot": "yes",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "maxspeed:advisory": "40",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk": "right",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 1091615016,
+  "bounds": {
+    "minlat": 55.6859451,
+    "minlon": 12.6117889,
+    "maxlat": 55.6867422,
+    "maxlon": 12.6123505
+  },
+  "nodes": [
+    374451774,
+    4708316455,
+    5959725584,
+    17207433,
+    9997662819
+  ],
+  "geometry": [
+    { "lat": 55.6859451, "lon": 12.6123505 },
+    { "lat": 55.6862444, "lon": 12.6121465 },
+    { "lat": 55.6866130, "lon": 12.6118952 },
+    { "lat": 55.6866586, "lon": 12.6118641 },
+    { "lat": 55.6867422, "lon": 12.6117889 }
+  ],
+  "tags": {
+    "bicycle": "yes",
+    "cycleway:both": "lane",
+    "cycleway:both:lane": "exclusive",
+    "foot": "yes",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "maxspeed:advisory": "40",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk": "no",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 1091615050,
+  "bounds": {
+    "minlat": 55.6914270,
+    "minlon": 12.6119845,
+    "maxlat": 55.6917891,
+    "maxlon": 12.6122267
+  },
+  "nodes": [
+    4199224165,
+    12850345893,
+    1451651952,
+    12850345892,
+    12850345894,
+    1331051331
+  ],
+  "geometry": [
+    { "lat": 55.6914270, "lon": 12.6119845 },
+    { "lat": 55.6914885, "lon": 12.6120237 },
+    { "lat": 55.6915755, "lon": 12.6120791 },
+    { "lat": 55.6916305, "lon": 12.6121171 },
+    { "lat": 55.6916519, "lon": 12.6121319 },
+    { "lat": 55.6917891, "lon": 12.6122267 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "service",
+    "lit": "yes",
+    "maxspeed": "30",
+    "motor_vehicle": "permissive",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "oneway": "no",
+    "sidewalk": "right",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 1091616107,
+  "bounds": {
+    "minlat": 55.6884241,
+    "minlon": 12.6110284,
+    "maxlat": 55.6886174,
+    "maxlon": 12.6111354
+  },
+  "nodes": [
+    9997674717,
+    3732162166
+  ],
+  "geometry": [
+    { "lat": 55.6884241, "lon": 12.6110284 },
+    { "lat": 55.6886174, "lon": 12.6111354 }
+  ],
+  "tags": {
+    "bicycle": "yes",
+    "cycleway:right": "track",
+    "foot": "yes",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "shoulder": "no",
+    "sidewalk": "left",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 1091616108,
+  "bounds": {
+    "minlat": 55.6886174,
+    "minlon": 12.6111354,
+    "maxlat": 55.6891918,
+    "maxlon": 12.6114840
+  },
+  "nodes": [
+    3732162166,
+    1577472077,
+    12850411226,
+    3676631197
+  ],
+  "geometry": [
+    { "lat": 55.6886174, "lon": 12.6111354 },
+    { "lat": 55.6888618, "lon": 12.6112828 },
+    { "lat": 55.6890792, "lon": 12.6114154 },
+    { "lat": 55.6891918, "lon": 12.6114840 }
+  ],
+  "tags": {
+    "bicycle": "yes",
+    "cycleway:both": "no",
+    "foot": "yes",
+    "highway": "tertiary",
+    "lane_markings": "no",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk": "left",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 1091616583,
+  "bounds": {
+    "minlat": 55.6867422,
+    "minlon": 12.6116691,
+    "maxlat": 55.6868756,
+    "maxlon": 12.6117889
+  },
+  "nodes": [
+    9997662819,
+    9997663069
+  ],
+  "geometry": [
+    { "lat": 55.6867422, "lon": 12.6117889 },
+    { "lat": 55.6868756, "lon": 12.6116691 }
+  ],
+  "tags": {
+    "bicycle": "yes",
+    "cycleway:both": "lane",
+    "cycleway:both:lane": "exclusive",
+    "foot": "yes",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "maxspeed:advisory": "40",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk": "no",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 1091616584,
+  "bounds": {
+    "minlat": 55.6868756,
+    "minlon": 12.6114770,
+    "maxlat": 55.6870165,
+    "maxlon": 12.6116691
+  },
+  "nodes": [
+    9997663069,
+    17207434,
+    374452427
+  ],
+  "geometry": [
+    { "lat": 55.6868756, "lon": 12.6116691 },
+    { "lat": 55.6869040, "lon": 12.6116436 },
+    { "lat": 55.6870165, "lon": 12.6114770 }
+  ],
+  "tags": {
+    "bicycle": "yes",
+    "cycleway:left": "lane",
+    "cycleway:left:lane": "exclusive",
+    "cycleway:right": "track",
+    "foot": "yes",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "maxspeed:advisory": "40",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk": "no",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 1091616585,
+  "bounds": {
+    "minlat": 55.6870165,
+    "minlon": 12.6110133,
+    "maxlat": 55.6872739,
+    "maxlon": 12.6114770
+  },
+  "nodes": [
+    374452427,
+    1254092588,
+    9997663070
+  ],
+  "geometry": [
+    { "lat": 55.6870165, "lon": 12.6114770 },
+    { "lat": 55.6872146, "lon": 12.6110903 },
+    { "lat": 55.6872739, "lon": 12.6110133 }
+  ],
+  "tags": {
+    "bicycle": "yes",
+    "cycleway:both": "lane",
+    "cycleway:both:lane": "exclusive",
+    "foot": "yes",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "maxspeed:advisory": "40",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk": "no",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 1093249613,
+  "bounds": {
+    "minlat": 55.6912295,
+    "minlon": 12.6245696,
+    "maxlat": 55.6922898,
+    "maxlon": 12.6250789
+  },
+  "nodes": [
+    1577472092,
+    25106097,
+    25106076,
+    5122652596,
+    5122652595,
+    25106073
+  ],
+  "geometry": [
+    { "lat": 55.6912295, "lon": 12.6245696 },
+    { "lat": 55.6920408, "lon": 12.6250554 },
+    { "lat": 55.6921066, "lon": 12.6250789 },
+    { "lat": 55.6921735, "lon": 12.6250691 },
+    { "lat": 55.6922362, "lon": 12.6250266 },
+    { "lat": 55.6922898, "lon": 12.6249548 }
+  ],
+  "tags": {
+    "highway": "unclassified",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 1093249614,
+  "bounds": {
+    "minlat": 55.6905092,
+    "minlon": 12.6233778,
+    "maxlat": 55.6912295,
+    "maxlon": 12.6245696
+  },
+  "nodes": [
+    2675985340,
+    12850360433,
+    25106551,
+    10586291623,
+    374455568,
+    25106549,
+    1577472092
+  ],
+  "geometry": [
+    { "lat": 55.6905092, "lon": 12.6233778 },
+    { "lat": 55.6905758, "lon": 12.6237875 },
+    { "lat": 55.6906155, "lon": 12.6240321 },
+    { "lat": 55.6906368, "lon": 12.6240972 },
+    { "lat": 55.6906708, "lon": 12.6242014 },
+    { "lat": 55.6907382, "lon": 12.6242854 },
+    { "lat": 55.6912295, "lon": 12.6245696 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "unclassified",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk": "both",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 1111608147,
+  "bounds": {
+    "minlat": 55.6833588,
+    "minlon": 12.6100815,
+    "maxlat": 55.6833745,
+    "maxlon": 12.6101740
+  },
+  "nodes": [
+    17207427,
+    1233749608
+  ],
+  "geometry": [
+    { "lat": 55.6833745, "lon": 12.6100815 },
+    { "lat": 55.6833588, "lon": 12.6101740 }
+  ],
+  "tags": {
+    "bicycle": "yes",
+    "cycleway:both": "lane",
+    "cycleway:both:lane": "exclusive",
+    "foot": "yes",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk": "right",
+    "smoothness": "excellent",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 1111608149,
+  "bounds": {
+    "minlat": 55.6846697,
+    "minlon": 12.6128919,
+    "maxlat": 55.6847076,
+    "maxlon": 12.6130321
+  },
+  "nodes": [
+    7112820181,
+    17207426
+  ],
+  "geometry": [
+    { "lat": 55.6846697, "lon": 12.6128919 },
+    { "lat": 55.6847076, "lon": 12.6130321 }
+  ],
+  "tags": {
+    "bicycle": "yes",
+    "cycleway": "lane",
+    "foot": "yes",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "maxspeed:advisory": "40",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk": "right",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 1111608150,
+  "bounds": {
+    "minlat": 55.6847076,
+    "minlon": 12.6128816,
+    "maxlat": 55.6849865,
+    "maxlon": 12.6130321
+  },
+  "nodes": [
+    17207426,
+    7112820180,
+    10169995003
+  ],
+  "geometry": [
+    { "lat": 55.6847076, "lon": 12.6130321 },
+    { "lat": 55.6849336, "lon": 12.6129107 },
+    { "lat": 55.6849865, "lon": 12.6128816 }
+  ],
+  "tags": {
+    "bicycle": "yes",
+    "cycleway": "lane",
+    "cycleway:left:lane": "exclusive",
+    "foot": "yes",
+    "highway": "tertiary",
+    "lane_markings": "no",
+    "lit": "yes",
+    "maxspeed": "50",
+    "maxspeed:advisory": "40",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk": "no",
+    "smoothness": "excellent",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q77272940"
+  }
+},
+{
+  "type": "way",
+  "id": 1356876655,
+  "bounds": {
+    "minlat": 55.6925203,
+    "minlon": 12.6238631,
+    "maxlat": 55.6929255,
+    "maxlon": 12.6240879
+  },
+  "nodes": [
+    279567908,
+    12558501891,
+    12558501892
+  ],
+  "geometry": [
+    { "lat": 55.6925203, "lon": 12.6238631 },
+    { "lat": 55.6928121, "lon": 12.6240253 },
+    { "lat": 55.6929255, "lon": 12.6240879 }
+  ],
+  "tags": {
+    "highway": "service",
+    "lit": "no",
+    "motor_vehicle": "private",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258"
+  }
+},
+{
+  "type": "way",
+  "id": 1388171518,
+  "bounds": {
+    "minlat": 55.6916441,
+    "minlon": 12.6122267,
+    "maxlat": 55.6917891,
+    "maxlon": 12.6130220
+  },
+  "nodes": [
+    1331051331,
+    12850751139,
+    1331051278
+  ],
+  "geometry": [
+    { "lat": 55.6917891, "lon": 12.6122267 },
+    { "lat": 55.6917546, "lon": 12.6124161 },
+    { "lat": 55.6916441, "lon": 12.6130220 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "service",
+    "lane_markings": "no",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "sidewalk": "no",
+    "surface": "asphalt",
+    "width": "8"
+  }
+},
+{
+  "type": "way",
+  "id": 1388214250,
+  "bounds": {
+    "minlat": 55.6917891,
+    "minlon": 12.6122267,
+    "maxlat": 55.6919230,
+    "maxlon": 12.6123086
+  },
+  "nodes": [
+    1331051331,
+    12850751144
+  ],
+  "geometry": [
+    { "lat": 55.6917891, "lon": 12.6122267 },
+    { "lat": 55.6919230, "lon": 12.6123086 }
+  ],
+  "tags": {
+    "cycleway:both": "no",
+    "highway": "service",
+    "lit": "yes",
+    "maxspeed": "30",
+    "motor_vehicle": "permissive",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "oneway": "no",
+    "sidewalk": "no",
+    "source:maxspeed": "sign",
+    "source:width": "ARCore",
+    "surface": "asphalt",
+    "width": "6.2"
+  }
+},
+{
+  "type": "way",
+  "id": 1388214251,
+  "bounds": {
+    "minlat": 55.6919230,
+    "minlon": 12.6123086,
+    "maxlat": 55.6932012,
+    "maxlon": 12.6130904
+  },
+  "nodes": [
+    12850751144,
+    12850751147
+  ],
+  "geometry": [
+    { "lat": 55.6919230, "lon": 12.6123086 },
+    { "lat": 55.6932012, "lon": 12.6130904 }
+  ],
+  "tags": {
+    "bicycle": "use_sidepath",
+    "cycleway:both": "separate",
+    "highway": "service",
+    "lit": "yes",
+    "maxspeed": "30",
+    "motor_vehicle": "permissive",
+    "name": "Refshalevej",
+    "name:etymology:wikidata": "Q4563258",
+    "oneway": "no",
+    "sidewalk": "no",
+    "source:maxspeed": "sign",
+    "source:width": "ARCore",
+    "surface": "asphalt",
+    "width": "6.2"
+  }
+}
+
+  ]
+}

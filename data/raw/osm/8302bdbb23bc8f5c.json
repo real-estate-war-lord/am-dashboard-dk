@@ -1,0 +1,1128 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-09-22T08:45:51Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "way",
+  "id": 999570787,
+  "bounds": {
+    "minlat": 55.4679122,
+    "minlon": 9.8320584,
+    "maxlat": 55.4696603,
+    "maxlon": 9.8430236
+  },
+  "nodes": [
+    8594936927,
+    8594936925,
+    9257676163,
+    13794109832,
+    9227348299
+  ],
+  "geometry": [
+    { "lat": 55.4679122, "lon": 9.8430236 },
+    { "lat": 55.4682401, "lon": 9.8398642 },
+    { "lat": 55.4684653, "lon": 9.8382445 },
+    { "lat": 55.4688828, "lon": 9.8358426 },
+    { "lat": 55.4696603, "lon": 9.8320584 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "maxspeed": "250",
+    "name": "Ny bane over Vestfyn",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 999570788,
+  "bounds": {
+    "minlat": 55.4678404,
+    "minlon": 9.8291774,
+    "maxlat": 55.4702076,
+    "maxlon": 9.8432715
+  },
+  "nodes": [
+    9257676161,
+    14056742658,
+    8594937006,
+    9227348295,
+    9227348296,
+    9257676162,
+    8594937005,
+    8594937004
+  ],
+  "geometry": [
+    { "lat": 55.4702076, "lon": 9.8291774 },
+    { "lat": 55.4698751, "lon": 9.8308110 },
+    { "lat": 55.4695475, "lon": 9.8324267 },
+    { "lat": 55.4688305, "lon": 9.8358295 },
+    { "lat": 55.4687946, "lon": 9.8360741 },
+    { "lat": 55.4684375, "lon": 9.8380499 },
+    { "lat": 55.4681788, "lon": 9.8398269 },
+    { "lat": 55.4678404, "lon": 9.8432715 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "maxspeed": "250",
+    "name": "Ny bane over Vestfyn",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 999570790,
+  "bounds": {
+    "minlat": 55.4675898,
+    "minlon": 9.8437361,
+    "maxlat": 55.4678599,
+    "maxlon": 9.8526923
+  },
+  "nodes": [
+    9227348305,
+    8594936921,
+    9257676165,
+    13794109834,
+    13931474888
+  ],
+  "geometry": [
+    { "lat": 55.4676209, "lon": 9.8526923 },
+    { "lat": 55.4675898, "lon": 9.8493978 },
+    { "lat": 55.4676575, "lon": 9.8470535 },
+    { "lat": 55.4677637, "lon": 9.8450455 },
+    { "lat": 55.4678599, "lon": 9.8437361 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "maxspeed": "250",
+    "name": "Ny bane over Vestfyn",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 999570791,
+  "bounds": {
+    "minlat": 55.4675708,
+    "minlon": 9.8439592,
+    "maxlat": 55.4677940,
+    "maxlon": 9.8522366
+  },
+  "nodes": [
+    13931474887,
+    13794109835,
+    9257676164,
+    8594937003,
+    9227348308
+  ],
+  "geometry": [
+    { "lat": 55.4677940, "lon": 9.8439592 },
+    { "lat": 55.4677376, "lon": 9.8447959 },
+    { "lat": 55.4676338, "lon": 9.8465806 },
+    { "lat": 55.4675708, "lon": 9.8490969 },
+    { "lat": 55.4675946, "lon": 9.8522366 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "maxspeed": "250",
+    "name": "Ny bane over Vestfyn",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 999570792,
+  "bounds": {
+    "minlat": 55.4675946,
+    "minlon": 9.8522366,
+    "maxlat": 55.4676157,
+    "maxlon": 9.8530226
+  },
+  "nodes": [
+    9227348308,
+    9227348307
+  ],
+  "geometry": [
+    { "lat": 55.4675946, "lon": 9.8522366 },
+    { "lat": 55.4676157, "lon": 9.8530226 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "maxspeed": "250",
+    "name": "Ny bane over Vestfyn",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 999570793,
+  "bounds": {
+    "minlat": 55.4676209,
+    "minlon": 9.8526923,
+    "maxlat": 55.4676936,
+    "maxlon": 9.8529347
+  },
+  "nodes": [
+    9227348306,
+    9227348305
+  ],
+  "geometry": [
+    { "lat": 55.4676936, "lon": 9.8529347 },
+    { "lat": 55.4676209, "lon": 9.8526923 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "maxspeed": "250",
+    "name": "Ny bane over Vestfyn",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 999570801,
+  "bounds": {
+    "minlat": 55.4676936,
+    "minlon": 9.8529347,
+    "maxlat": 55.4688291,
+    "maxlon": 9.8643350
+  },
+  "nodes": [
+    8594936922,
+    13794109829,
+    8594936923,
+    9227348306
+  ],
+  "geometry": [
+    { "lat": 55.4688291, "lon": 9.8643350 },
+    { "lat": 55.4683107, "lon": 9.8605258 },
+    { "lat": 55.4679075, "lon": 9.8566596 },
+    { "lat": 55.4676936, "lon": 9.8529347 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "maxspeed": "250",
+    "name": "Ny bane over Vestfyn",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 999570802,
+  "bounds": {
+    "minlat": 55.4676157,
+    "minlon": 9.8530226,
+    "maxlat": 55.4687516,
+    "maxlon": 9.8643956
+  },
+  "nodes": [
+    9227348307,
+    8594937002,
+    13794109828,
+    8594937001
+  ],
+  "geometry": [
+    { "lat": 55.4676157, "lon": 9.8530226 },
+    { "lat": 55.4678130, "lon": 9.8566866 },
+    { "lat": 55.4682408, "lon": 9.8605411 },
+    { "lat": 55.4687516, "lon": 9.8643956 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "maxspeed": "250",
+    "name": "Ny bane over Vestfyn",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 999570803,
+  "bounds": {
+    "minlat": 55.4669932,
+    "minlon": 9.8643956,
+    "maxlat": 55.4694038,
+    "maxlon": 9.8997144
+  },
+  "nodes": [
+    8594937001,
+    13794109831,
+    8594937000,
+    8594936999,
+    13788816954,
+    8594936998,
+    13788816950,
+    13788816952,
+    8594936997,
+    13788816956,
+    8594936996,
+    9227581523
+  ],
+  "geometry": [
+    { "lat": 55.4687516, "lon": 9.8643956 },
+    { "lat": 55.4690113, "lon": 9.8666254 },
+    { "lat": 55.4691696, "lon": 9.8688878 },
+    { "lat": 55.4693479, "lon": 9.8727593 },
+    { "lat": 55.4694038, "lon": 9.8762557 },
+    { "lat": 55.4693428, "lon": 9.8797340 },
+    { "lat": 55.4692685, "lon": 9.8815450 },
+    { "lat": 55.4691712, "lon": 9.8833609 },
+    { "lat": 55.4688795, "lon": 9.8870363 },
+    { "lat": 55.4685296, "lon": 9.8903158 },
+    { "lat": 55.4680904, "lon": 9.8935339 },
+    { "lat": 55.4669932, "lon": 9.8997144 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "cutting": "yes",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "maxspeed": "250",
+    "name": "Ny bane over Vestfyn",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 999570804,
+  "bounds": {
+    "minlat": 55.4670849,
+    "minlon": 9.8643350,
+    "maxlat": 55.4694692,
+    "maxlon": 9.8995773
+  },
+  "nodes": [
+    9227581520,
+    8594931416,
+    13788816957,
+    8594936920,
+    13788816953,
+    13788816951,
+    8594936919,
+    13788816955,
+    8594936918,
+    8594936924,
+    13794109830,
+    8594936922
+  ],
+  "geometry": [
+    { "lat": 55.4670849, "lon": 9.8995773 },
+    { "lat": 55.4681567, "lon": 9.8934874 },
+    { "lat": 55.4685797, "lon": 9.8903212 },
+    { "lat": 55.4689515, "lon": 9.8870403 },
+    { "lat": 55.4692365, "lon": 9.8833796 },
+    { "lat": 55.4693399, "lon": 9.8815477 },
+    { "lat": 55.4694149, "lon": 9.8797067 },
+    { "lat": 55.4694692, "lon": 9.8762315 },
+    { "lat": 55.4693841, "lon": 9.8727526 },
+    { "lat": 55.4692459, "lon": 9.8688632 },
+    { "lat": 55.4690744, "lon": 9.8666316 },
+    { "lat": 55.4688291, "lon": 9.8643350 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "cutting": "yes",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "maxspeed": "250",
+    "name": "Ny bane over Vestfyn",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 999570805,
+  "bounds": {
+    "minlat": 55.4629522,
+    "minlon": 9.9010505,
+    "maxlat": 55.4668458,
+    "maxlon": 9.9167839
+  },
+  "nodes": [
+    9227581518,
+    8594931415,
+    8594936917,
+    9227581521
+  ],
+  "geometry": [
+    { "lat": 55.4629522, "lon": 9.9167839 },
+    { "lat": 55.4649263, "lon": 9.9094086 },
+    { "lat": 55.4665339, "lon": 9.9027147 },
+    { "lat": 55.4668458, "lon": 9.9010505 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "cutting": "yes",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "maxspeed": "250",
+    "name": "Ny bane over Vestfyn",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 999570806,
+  "bounds": {
+    "minlat": 55.4668458,
+    "minlon": 9.8995773,
+    "maxlat": 55.4670849,
+    "maxlon": 9.9010505
+  },
+  "nodes": [
+    9227581521,
+    9227581520
+  ],
+  "geometry": [
+    { "lat": 55.4668458, "lon": 9.9010505 },
+    { "lat": 55.4670849, "lon": 9.8995773 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "layer": "-1",
+    "maxspeed": "250",
+    "name": "Ny bane over Vestfyn",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "tunnel": "yes",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 999570807,
+  "bounds": {
+    "minlat": 55.4628977,
+    "minlon": 9.9011987,
+    "maxlat": 55.4667566,
+    "maxlon": 9.9167730
+  },
+  "nodes": [
+    9227581522,
+    8594936995,
+    8594936994,
+    9227581519
+  ],
+  "geometry": [
+    { "lat": 55.4667566, "lon": 9.9011987 },
+    { "lat": 55.4664759, "lon": 9.9026795 },
+    { "lat": 55.4648960, "lon": 9.9093733 },
+    { "lat": 55.4628977, "lon": 9.9167730 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "cutting": "yes",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "maxspeed": "250",
+    "name": "Ny bane over Vestfyn",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 999570808,
+  "bounds": {
+    "minlat": 55.4667566,
+    "minlon": 9.8997144,
+    "maxlat": 55.4669932,
+    "maxlon": 9.9011987
+  },
+  "nodes": [
+    9227581523,
+    9227581522
+  ],
+  "geometry": [
+    { "lat": 55.4669932, "lon": 9.8997144 },
+    { "lat": 55.4667566, "lon": 9.9011987 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "layer": "-1",
+    "maxspeed": "250",
+    "name": "Ny bane over Vestfyn",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "tunnel": "yes",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 999570809,
+  "bounds": {
+    "minlat": 55.4620201,
+    "minlon": 9.9167839,
+    "maxlat": 55.4629522,
+    "maxlon": 9.9201781
+  },
+  "nodes": [
+    9227581524,
+    8594931414,
+    9227581518
+  ],
+  "geometry": [
+    { "lat": 55.4620201, "lon": 9.9201781 },
+    { "lat": 55.4624199, "lon": 9.9187314 },
+    { "lat": 55.4629522, "lon": 9.9167839 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "maxspeed": "250",
+    "name": "Ny bane over Vestfyn",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 999570810,
+  "bounds": {
+    "minlat": 55.4619915,
+    "minlon": 9.9167730,
+    "maxlat": 55.4628977,
+    "maxlon": 9.9200649
+  },
+  "nodes": [
+    9227581519,
+    8594936993,
+    9227581525
+  ],
+  "geometry": [
+    { "lat": 55.4628977, "lon": 9.9167730 },
+    { "lat": 55.4622889, "lon": 9.9189483 },
+    { "lat": 55.4619915, "lon": 9.9200649 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "maxspeed": "250",
+    "name": "Ny bane over Vestfyn",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 999570811,
+  "bounds": {
+    "minlat": 55.4614315,
+    "minlon": 9.9200649,
+    "maxlat": 55.4619915,
+    "maxlon": 9.9222142
+  },
+  "nodes": [
+    9227581525,
+    9227581527
+  ],
+  "geometry": [
+    { "lat": 55.4619915, "lon": 9.9200649 },
+    { "lat": 55.4614315, "lon": 9.9222142 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "maxspeed": "250",
+    "name": "Ny bane over Vestfyn",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 999570812,
+  "bounds": {
+    "minlat": 55.4615409,
+    "minlon": 9.9201781,
+    "maxlat": 55.4620201,
+    "maxlon": 9.9220549
+  },
+  "nodes": [
+    9227581526,
+    9227581524
+  ],
+  "geometry": [
+    { "lat": 55.4615409, "lon": 9.9220549 },
+    { "lat": 55.4620201, "lon": 9.9201781 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "maxspeed": "250",
+    "name": "Ny bane over Vestfyn",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 999570815,
+  "bounds": {
+    "minlat": 55.4590269,
+    "minlon": 9.9222142,
+    "maxlat": 55.4614315,
+    "maxlon": 9.9313135
+  },
+  "nodes": [
+    9227581527,
+    9227581530
+  ],
+  "geometry": [
+    { "lat": 55.4614315, "lon": 9.9222142 },
+    { "lat": 55.4590269, "lon": 9.9313135 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "maxspeed": "250",
+    "name": "Ny bane over Vestfyn",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 999570816,
+  "bounds": {
+    "minlat": 55.4590494,
+    "minlon": 9.9220549,
+    "maxlat": 55.4615409,
+    "maxlon": 9.9313659
+  },
+  "nodes": [
+    9227581529,
+    9227581526
+  ],
+  "geometry": [
+    { "lat": 55.4590494, "lon": 9.9313659 },
+    { "lat": 55.4615409, "lon": 9.9220549 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "maxspeed": "250",
+    "name": "Ny bane over Vestfyn",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 999570817,
+  "bounds": {
+    "minlat": 55.4468957,
+    "minlon": 9.9313659,
+    "maxlat": 55.4590494,
+    "maxlon": 9.9634647
+  },
+  "nodes": [
+    9227581532,
+    8594931409,
+    13793810577,
+    8594931411,
+    13793810579,
+    8594931410,
+    8594931413,
+    8594931412,
+    9227581529
+  ],
+  "geometry": [
+    { "lat": 55.4468957, "lon": 9.9634647 },
+    { "lat": 55.4485761, "lon": 9.9609380 },
+    { "lat": 55.4500967, "lon": 9.9582484 },
+    { "lat": 55.4515564, "lon": 9.9551940 },
+    { "lat": 55.4529288, "lon": 9.9520691 },
+    { "lat": 55.4541685, "lon": 9.9487781 },
+    { "lat": 55.4565348, "lon": 9.9409396 },
+    { "lat": 55.4582662, "lon": 9.9342391 },
+    { "lat": 55.4590494, "lon": 9.9313659 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "cutting": "yes",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "maxspeed": "250",
+    "name": "Ny bane over Vestfyn",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 999570818,
+  "bounds": {
+    "minlat": 55.4468630,
+    "minlon": 9.9313135,
+    "maxlat": 55.4590269,
+    "maxlon": 9.9633727
+  },
+  "nodes": [
+    9227581530,
+    8594936992,
+    8594936991,
+    8594936990,
+    13793810580,
+    8594936989,
+    13793810578,
+    8594936988,
+    9227581531
+  ],
+  "geometry": [
+    { "lat": 55.4590269, "lon": 9.9313135 },
+    { "lat": 55.4582366, "lon": 9.9342141 },
+    { "lat": 55.4565068, "lon": 9.9409057 },
+    { "lat": 55.4541067, "lon": 9.9487833 },
+    { "lat": 55.4528940, "lon": 9.9519878 },
+    { "lat": 55.4515295, "lon": 9.9551442 },
+    { "lat": 55.4500360, "lon": 9.9581998 },
+    { "lat": 55.4485181, "lon": 9.9608693 },
+    { "lat": 55.4468630, "lon": 9.9633727 }
+  ],
+  "tags": {
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "cutting": "yes",
+    "description": "Ny bane over Vestfyn",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "maxspeed": "250",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 1528809537,
+  "bounds": {
+    "minlat": 55.4677940,
+    "minlon": 9.8432715,
+    "maxlat": 55.4678404,
+    "maxlon": 9.8439592
+  },
+  "nodes": [
+    8594937004,
+    13931474887
+  ],
+  "geometry": [
+    { "lat": 55.4678404, "lon": 9.8432715 },
+    { "lat": 55.4677940, "lon": 9.8439592 }
+  ],
+  "tags": {
+    "bridge": "yes",
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "layer": "1",
+    "maxspeed": "250",
+    "name": "Ny bane over Vestfyn",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+},
+{
+  "type": "way",
+  "id": 1528809538,
+  "bounds": {
+    "minlat": 55.4678599,
+    "minlon": 9.8430236,
+    "maxlat": 55.4679122,
+    "maxlon": 9.8437361
+  },
+  "nodes": [
+    13931474888,
+    8594936927
+  ],
+  "geometry": [
+    { "lat": 55.4678599, "lon": 9.8437361 },
+    { "lat": 55.4679122, "lon": 9.8430236 }
+  ],
+  "tags": {
+    "bridge": "yes",
+    "construction": "rail",
+    "construction:electrified": "contact_line",
+    "construction:frequency": "50",
+    "construction:railway": "rail",
+    "construction:railway:etcs": "2",
+    "construction:voltage": "25000",
+    "electrified": "no",
+    "gauge": "1435",
+    "highspeed": "yes",
+    "layer": "1",
+    "maxspeed": "250",
+    "name": "Ny bane over Vestfyn",
+    "note": "Sketch from Vejdirektoratet web-map",
+    "opening_date": "2029",
+    "operator": "Banedanmark",
+    "operator:wikidata": "Q806420",
+    "operator:wikipedia": "da:Banedanmark",
+    "railway": "construction",
+    "source": "https://www.vejdirektoratet.dk/projekt/ny-jernbane-over-vestfyn",
+    "source:workrules": "https://www.bane.dk/Jernbanevirksomhed/Sikkerhed/Trafikale-regler",
+    "usage": "main",
+    "workrules": "DK:ORF"
+  }
+}
+
+  ]
+}
