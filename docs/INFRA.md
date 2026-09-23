@@ -31,7 +31,7 @@ they show *where* a project runs, never how it will be built, and must not be me
 | `id` | slug | stable identifier, e.g. `m5-phase-1`; stations use `<line>-st-<name>` |
 | `name` | string | project name, Danish where that is the published name |
 | `label_short` | string | short map label for zoomed-out views ("M5 phase 1", "Ring 3"); from the CSV column of the same name, defaulting to the first three words of `name` |
-| `type` | enum | `metro` · `letbane` · `brt` · `rail` · `road` · `bridge_tunnel` · `urban_dev` · `hospital` · `university` |
+| `type` | enum | `metro` · `letbane` · `brt` · `rail` · `road` · `bridge_tunnel` · `urban_dev` · `hospital` · `university` · `public_building` (a state building: courthouse, ministry, parliament) |
 | `status` | enum | `study` · `decided` · `construction` · `opened` (see §5) |
 | `open_year` | int \| null | currently expected opening year |
 | `open_year_original` | int \| null | opening year first decided, when the source names one — the delay is the interesting number |
@@ -142,3 +142,37 @@ and its `source_url`.
   the main København–Odense–Fredericia–Aarhus–Aalborg corridor and the project carries `map: false`. They are fit for showing *where* a
   project is, not for any measurement.
 - `kommuner` is computed from the geometry; `kommuner_override` covers what the join cannot answer.
+
+## 8. Added 2026-09-23 (route A: public projects)
+
+Fifteen non-transport and remaining transport projects were added, each verified against an official
+publisher on 23 September 2026. Where a figure was not published, the field is empty — the research
+notes for each row sit in its `notes`.
+
+| project(s) | source used |
+|---|---|
+| Nyt Hospital Nordsjælland, Nyt Hospital Bispebjerg, Ny Psykiatri Bispebjerg | Region Hovedstaden's agenda system, `edagsorden.regionh.dk` — regionsrådsmøde 15.09.2026 (quarterly reports) and 07.04.2026. www.regionh.dk and godtsygehusbyggeri.dk's per-project pages could not be used: the first is behind a bot check, the second returns 404 |
+| Nyt OUH | Region Syddanmark, *Årsrapport og ledelsesberetning 2025*; ouh.dk project pages |
+| Nyt Aalborg Universitetshospital | Region Nordjylland, `byghospitalsbyen.rn.dk` (Indvielse, Hospitalsbyen i tal), `aalborguh.rn.dk` (flytteplan), Regnskab 2025 |
+| Aalborg Plusbus, BRT 400S, BRT 200S | Movia, *BRT-katalog: Seks BRT-projekter på tværs af Danmark* (jan. 2021); Vejdirektoratet's project pages for 400S and 200S |
+| BRT Ringvejen, Aarhus | Aarhus Kommune, *Aftale om grøn mobilitetsplan* (7 Aug 2024) |
+| BRT/letbane Frederikssundsvej | Københavns Kommune, Økonomiudvalget 22.01.2025, punkt 7 |
+| Universitetsbyen and Universitetsbyen Syd | Aarhus Universitet, *Udviklings- og byggeprojekter i Aarhus* |
+| DTU Bygning 330 | DTU, *DTU Space nye bygning* |
+| RUC Pergola, Fremtidens Folketing | Bygningsstyrelsen, bygst.dk project pages |
+
+Two finished kvalitetsfond hospitals are kept as **landmark `opened` rows** because they still explain
+today's hospital geography: Regionshospitalet Gødstrup (2022, 3.150 mio. kr.) and AUH Skejby (2019,
+6.350 mio. kr., accounts closed 2024) — sources: Region Midtjylland's Gødstrup timeline and Godt
+Sygehusbyggeri's AUH article.
+
+**Checked and deliberately left out:** Nyt Hospital Herlev (fully in use 2022) and Nyt Hospital
+Hvidovre (ultimo 2024) — finished kvalitetsfond projects with no remaining stage. Københavns Universitet Nørre Campus / Panum —
+no current large stage is published anywhere official. Odense BRT, BRT Ring 2½, BRT Hillerødmotorvejen,
+BRT Roskilde and BRT Helsingør — no such decided project exists. BRT 150S, BRT Randers, Plusbus 2 and
+BRT i Lautrup — mulighedsstudie only, with no decision, budget or year published.
+
+**Figures that could not be verified and are therefore empty:** Aalborg Plusbus's opening date (the
+official Aalborg Kommune and NT pages now 404; September 2023 appears only in press), Nyt Hospital
+Bispebjerg's opening year (a 2030–2032 window, not a year), Universitetsbyen Syd's move-in years (two
+official AU pages disagree), and every budget marked "not published" above.

@@ -1,0 +1,1569 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-09-22T08:45:51Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "way",
+  "id": 378132371,
+  "bounds": {
+    "minlat": 55.3539675,
+    "minlon": 10.4217776,
+    "maxlat": 55.3540152,
+    "maxlon": 10.4218794
+  },
+  "nodes": [
+    3818593345,
+    4927450295
+  ],
+  "geometry": [
+    { "lat": 55.3539675, "lon": 10.4217776 },
+    { "lat": 55.3540152, "lon": 10.4218794 }
+  ],
+  "tags": {
+    "bicycle": "no",
+    "foot": "no",
+    "highway": "tertiary",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Søndre Hospitalsvej",
+    "name:etymology:wikidata": "Q2496415",
+    "oneway": "yes",
+    "source:maxspeed": "sign",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 378137217,
+  "bounds": {
+    "minlat": 55.3584711,
+    "minlon": 10.4263456,
+    "maxlat": 55.3628469,
+    "maxlon": 10.4339291
+  },
+  "nodes": [
+    7942163432,
+    3815514390,
+    3815514391,
+    6531942431,
+    7479852570,
+    3815514392,
+    7479852569,
+    3815514393,
+    3815514424,
+    3815514394,
+    7479852568,
+    13784259588,
+    3815514425,
+    7479852567,
+    13097959840,
+    13784259571,
+    3815514395,
+    3815514426,
+    13097959839,
+    13097959833,
+    7479852566,
+    3815514396,
+    3815514397,
+    7479852565,
+    3815514415,
+    6531942432,
+    3815514409,
+    7479852564,
+    3815514410,
+    7479852563,
+    3815514398,
+    13784195728,
+    3815514399,
+    3815514416,
+    9757978789,
+    9037554731,
+    7479852560,
+    9757978790,
+    11478864989,
+    12397501138,
+    3815514411,
+    10939663741
+  ],
+  "geometry": [
+    { "lat": 55.3584840, "lon": 10.4288701 },
+    { "lat": 55.3584758, "lon": 10.4291923 },
+    { "lat": 55.3584711, "lon": 10.4304148 },
+    { "lat": 55.3584978, "lon": 10.4313666 },
+    { "lat": 55.3585535, "lon": 10.4319477 },
+    { "lat": 55.3586021, "lon": 10.4321693 },
+    { "lat": 55.3586989, "lon": 10.4325432 },
+    { "lat": 55.3588230, "lon": 10.4328885 },
+    { "lat": 55.3589753, "lon": 10.4332131 },
+    { "lat": 55.3592285, "lon": 10.4335622 },
+    { "lat": 55.3594277, "lon": 10.4337206 },
+    { "lat": 55.3595794, "lon": 10.4338144 },
+    { "lat": 55.3596169, "lon": 10.4338376 },
+    { "lat": 55.3598149, "lon": 10.4338896 },
+    { "lat": 55.3598326, "lon": 10.4338927 },
+    { "lat": 55.3598925, "lon": 10.4339033 },
+    { "lat": 55.3600386, "lon": 10.4339290 },
+    { "lat": 55.3602456, "lon": 10.4339291 },
+    { "lat": 55.3604572, "lon": 10.4339035 },
+    { "lat": 55.3606070, "lon": 10.4338731 },
+    { "lat": 55.3607170, "lon": 10.4338350 },
+    { "lat": 55.3608437, "lon": 10.4337867 },
+    { "lat": 55.3612501, "lon": 10.4335216 },
+    { "lat": 55.3615347, "lon": 10.4332808 },
+    { "lat": 55.3618664, "lon": 10.4328839 },
+    { "lat": 55.3621092, "lon": 10.4324651 },
+    { "lat": 55.3622961, "lon": 10.4320400 },
+    { "lat": 55.3624143, "lon": 10.4317224 },
+    { "lat": 55.3625835, "lon": 10.4311219 },
+    { "lat": 55.3626491, "lon": 10.4307970 },
+    { "lat": 55.3627058, "lon": 10.4304353 },
+    { "lat": 55.3627712, "lon": 10.4296384 },
+    { "lat": 55.3627896, "lon": 10.4294147 },
+    { "lat": 55.3628328, "lon": 10.4283645 },
+    { "lat": 55.3628426, "lon": 10.4278561 },
+    { "lat": 55.3628468, "lon": 10.4276353 },
+    { "lat": 55.3628469, "lon": 10.4275730 },
+    { "lat": 55.3628452, "lon": 10.4273376 },
+    { "lat": 55.3628450, "lon": 10.4273028 },
+    { "lat": 55.3628422, "lon": 10.4269068 },
+    { "lat": 55.3628405, "lon": 10.4266740 },
+    { "lat": 55.3628275, "lon": 10.4263456 }
+  ],
+  "tags": {
+    "access:conditional": "no @ (construction)",
+    "cycleway": "separate",
+    "highway": "tertiary",
+    "lit": "yes",
+    "name": "Hospitalsringen",
+    "name:etymology:wikidata": "Q2496415",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 380551978,
+  "bounds": {
+    "minlat": 55.3543349,
+    "minlon": 10.4225378,
+    "maxlat": 55.3576750,
+    "maxlon": 10.4262134
+  },
+  "nodes": [
+    6466737421,
+    3815514173,
+    4519793152,
+    3815514174,
+    6531957401,
+    7479852552,
+    7942163536,
+    6531957393,
+    7942163527,
+    7942163529,
+    7856432128,
+    5399581985,
+    5399581973,
+    7479852551
+  ],
+  "geometry": [
+    { "lat": 55.3543349, "lon": 10.4225378 },
+    { "lat": 55.3544370, "lon": 10.4227003 },
+    { "lat": 55.3548365, "lon": 10.4233682 },
+    { "lat": 55.3551476, "lon": 10.4238697 },
+    { "lat": 55.3556715, "lon": 10.4245330 },
+    { "lat": 55.3562668, "lon": 10.4251007 },
+    { "lat": 55.3564064, "lon": 10.4252526 },
+    { "lat": 55.3564809, "lon": 10.4253336 },
+    { "lat": 55.3565565, "lon": 10.4254052 },
+    { "lat": 55.3566843, "lon": 10.4255262 },
+    { "lat": 55.3567240, "lon": 10.4255600 },
+    { "lat": 55.3573221, "lon": 10.4260085 },
+    { "lat": 55.3575717, "lon": 10.4261647 },
+    { "lat": 55.3576750, "lon": 10.4262134 }
+  ],
+  "tags": {
+    "bicycle": "use_sidepath",
+    "foot": "use_sidepath",
+    "highway": "tertiary",
+    "lanes": "1",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Søndre Hospitalsvej",
+    "name:etymology:wikidata": "Q2496415",
+    "oneway": "yes",
+    "smoothness": "excellent",
+    "source": "http://www.odense.dk/borger/trafik%20og%20veje/aktuelle-projekter/munkebjergvejs%20forlaengelse/kort%20og%20tegninger",
+    "source:maxspeed": "DK:urban",
+    "source:name": "http://www.odense.dk/borger/bolig%20og%20byggeri/kort%20over%20odense/kortinfo",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 380556856,
+  "bounds": {
+    "minlat": 55.3564553,
+    "minlon": 10.4192486,
+    "maxlat": 55.3566714,
+    "maxlon": 10.4234046
+  },
+  "nodes": [
+    3838757571,
+    13612046192,
+    10304136428,
+    10718789421,
+    6814870266,
+    6814189549
+  ],
+  "geometry": [
+    { "lat": 55.3564553, "lon": 10.4234046 },
+    { "lat": 55.3564592, "lon": 10.4233308 },
+    { "lat": 55.3565404, "lon": 10.4218009 },
+    { "lat": 55.3566372, "lon": 10.4199751 },
+    { "lat": 55.3566473, "lon": 10.4197851 },
+    { "lat": 55.3566714, "lon": 10.4192486 }
+  ],
+  "tags": {
+    "bicycle": "use_sidepath",
+    "foot": "use_sidepath",
+    "highway": "service",
+    "lit": "yes",
+    "name": "Søndre Hospitalsvej",
+    "name:etymology:wikidata": "Q2496415",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 401595593,
+  "bounds": {
+    "minlat": 55.3544105,
+    "minlon": 10.4223803,
+    "maxlat": 55.3576936,
+    "maxlon": 10.4260862
+  },
+  "nodes": [
+    8075532631,
+    5399581986,
+    6533505871,
+    4040030250,
+    7856432132,
+    7856432133,
+    7942163528,
+    6533506090,
+    6814870290,
+    4118333657,
+    4519793153,
+    4519793154,
+    3838732786,
+    4927451926,
+    6466737420
+  ],
+  "geometry": [
+    { "lat": 55.3576936, "lon": 10.4260862 },
+    { "lat": 55.3576006, "lon": 10.4260445 },
+    { "lat": 55.3573404, "lon": 10.4258725 },
+    { "lat": 55.3567727, "lon": 10.4254213 },
+    { "lat": 55.3567118, "lon": 10.4253623 },
+    { "lat": 55.3566782, "lon": 10.4253321 },
+    { "lat": 55.3565984, "lon": 10.4252514 },
+    { "lat": 55.3564906, "lon": 10.4251423 },
+    { "lat": 55.3561791, "lon": 10.4248205 },
+    { "lat": 55.3557869, "lon": 10.4244050 },
+    { "lat": 55.3554304, "lon": 10.4239730 },
+    { "lat": 55.3550660, "lon": 10.4234607 },
+    { "lat": 55.3547610, "lon": 10.4229859 },
+    { "lat": 55.3546538, "lon": 10.4227987 },
+    { "lat": 55.3544105, "lon": 10.4223803 }
+  ],
+  "tags": {
+    "bicycle": "use_sidepath",
+    "foot": "use_sidepath",
+    "highway": "tertiary",
+    "lanes": "1",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Søndre Hospitalsvej",
+    "name:etymology:wikidata": "Q2496415",
+    "oneway": "yes",
+    "smoothness": "excellent",
+    "source": "http://www.odense.dk/borger/trafik%20og%20veje/aktuelle-projekter/munkebjergvejs%20forlaengelse/kort%20og%20tegninger",
+    "source:maxspeed": "DK:urban",
+    "source:name": "http://www.odense.dk/borger/bolig%20og%20byggeri/kort%20over%20odense/kortinfo",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 689343246,
+  "bounds": {
+    "minlat": 55.3541902,
+    "minlon": 10.4218985,
+    "maxlat": 55.3544105,
+    "maxlon": 10.4223803
+  },
+  "nodes": [
+    6466737420,
+    3838732788,
+    7164864967,
+    3838732789
+  ],
+  "geometry": [
+    { "lat": 55.3544105, "lon": 10.4223803 },
+    { "lat": 55.3543591, "lon": 10.4222770 },
+    { "lat": 55.3542565, "lon": 10.4220666 },
+    { "lat": 55.3541902, "lon": 10.4218985 }
+  ],
+  "tags": {
+    "bicycle": "no",
+    "foot": "no",
+    "highway": "tertiary",
+    "lanes": "1",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Søndre Hospitalsvej",
+    "name:etymology:wikidata": "Q2496415",
+    "oneway": "yes",
+    "source:maxspeed": "sign",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 689343252,
+  "bounds": {
+    "minlat": 55.3540773,
+    "minlon": 10.4220109,
+    "maxlat": 55.3543349,
+    "maxlon": 10.4225378
+  },
+  "nodes": [
+    3818593346,
+    10931258465,
+    6466737421
+  ],
+  "geometry": [
+    { "lat": 55.3540773, "lon": 10.4220109 },
+    { "lat": 55.3540945, "lon": 10.4221064 },
+    { "lat": 55.3543349, "lon": 10.4225378 }
+  ],
+  "tags": {
+    "bicycle": "no",
+    "foot": "no",
+    "highway": "tertiary",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Søndre Hospitalsvej",
+    "name:etymology:wikidata": "Q2496415",
+    "oneway": "yes",
+    "source": "http://www.odense.dk/borger/trafik%20og%20veje/aktuelle-projekter/munkebjergvejs%20forlaengelse/kort%20og%20tegninger",
+    "source:maxspeed": "sign",
+    "source:name": "http://www.odense.dk/borger/bolig%20og%20byggeri/kort%20over%20odense/kortinfo",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 727103179,
+  "bounds": {
+    "minlat": 55.3560887,
+    "minlon": 10.4180925,
+    "maxlat": 55.3568962,
+    "maxlon": 10.4192486
+  },
+  "nodes": [
+    6814189508,
+    6814189509,
+    6814189510,
+    6814189511,
+    6814189512,
+    6814189513,
+    6814189514,
+    6814189515,
+    6814189516,
+    6814189517,
+    6814189518,
+    6814189519,
+    6814189520,
+    6814189521,
+    6814189522,
+    6814189523,
+    6814189524,
+    6814189525,
+    6814189526,
+    6814189527,
+    6814189528,
+    6814189529,
+    6814189533,
+    6814189530,
+    114210172,
+    13612046196,
+    7942163630,
+    7942163631,
+    6814189549
+  ],
+  "geometry": [
+    { "lat": 55.3560887, "lon": 10.4191488 },
+    { "lat": 55.3564470, "lon": 10.4185011 },
+    { "lat": 55.3565748, "lon": 10.4182246 },
+    { "lat": 55.3566093, "lon": 10.4181667 },
+    { "lat": 55.3566508, "lon": 10.4181172 },
+    { "lat": 55.3566828, "lon": 10.4181004 },
+    { "lat": 55.3567288, "lon": 10.4180925 },
+    { "lat": 55.3567614, "lon": 10.4181004 },
+    { "lat": 55.3567914, "lon": 10.4181184 },
+    { "lat": 55.3568163, "lon": 10.4181453 },
+    { "lat": 55.3568483, "lon": 10.4181982 },
+    { "lat": 55.3568725, "lon": 10.4182532 },
+    { "lat": 55.3568840, "lon": 10.4182937 },
+    { "lat": 55.3568923, "lon": 10.4183420 },
+    { "lat": 55.3568962, "lon": 10.4183915 },
+    { "lat": 55.3568859, "lon": 10.4186365 },
+    { "lat": 55.3568770, "lon": 10.4186882 },
+    { "lat": 55.3568610, "lon": 10.4187387 },
+    { "lat": 55.3568431, "lon": 10.4187792 },
+    { "lat": 55.3568221, "lon": 10.4188050 },
+    { "lat": 55.3567939, "lon": 10.4188253 },
+    { "lat": 55.3567499, "lon": 10.4188440 },
+    { "lat": 55.3567113, "lon": 10.4188745 },
+    { "lat": 55.3566884, "lon": 10.4189197 },
+    { "lat": 55.3566842, "lon": 10.4190100 },
+    { "lat": 55.3566824, "lon": 10.4190478 },
+    { "lat": 55.3566807, "lon": 10.4190855 },
+    { "lat": 55.3566768, "lon": 10.4191471 },
+    { "lat": 55.3566714, "lon": 10.4192486 }
+  ],
+  "tags": {
+    "bicycle": "no",
+    "foot": "no",
+    "highway": "service",
+    "lit": "yes",
+    "name": "Søndre Hospitalsvej",
+    "name:etymology:wikidata": "Q2496415",
+    "oneway": "yes",
+    "smoothness": "excellent",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 727103182,
+  "bounds": {
+    "minlat": 55.3563040,
+    "minlon": 10.4192303,
+    "maxlat": 55.3566714,
+    "maxlon": 10.4231069
+  },
+  "nodes": [
+    6814189547,
+    13612046193,
+    10304136427,
+    10718789420,
+    6814189551,
+    6814189553,
+    6814189552,
+    6814189550,
+    13612046195,
+    6814189549
+  ],
+  "geometry": [
+    { "lat": 55.3563040, "lon": 10.4231069 },
+    { "lat": 55.3563086, "lon": 10.4230137 },
+    { "lat": 55.3563565, "lon": 10.4220485 },
+    { "lat": 55.3564650, "lon": 10.4199570 },
+    { "lat": 55.3564966, "lon": 10.4193132 },
+    { "lat": 55.3565070, "lon": 10.4192626 },
+    { "lat": 55.3565210, "lon": 10.4192387 },
+    { "lat": 55.3565408, "lon": 10.4192303 },
+    { "lat": 55.3566404, "lon": 10.4192442 },
+    { "lat": 55.3566714, "lon": 10.4192486 }
+  ],
+  "tags": {
+    "highway": "service",
+    "lit": "yes",
+    "name": "Søndre Hospitalsvej",
+    "name:etymology:wikidata": "Q2496415",
+    "service": "parking_aisle",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 727103183,
+  "bounds": {
+    "minlat": 55.3557935,
+    "minlon": 10.4199337,
+    "maxlat": 55.3562836,
+    "maxlon": 10.4228741
+  },
+  "nodes": [
+    9720065098,
+    9710859426,
+    8682767915,
+    9710859425,
+    8682767914,
+    9957016263,
+    8682767912,
+    9957016262,
+    9957016261,
+    8682767911,
+    9957016260,
+    9957016259,
+    8682767910,
+    9957016258,
+    9957016257,
+    9957016256,
+    8682767909,
+    9957016255,
+    9957016254,
+    8682767908,
+    9488044501,
+    8682767907,
+    9957010035,
+    9957010036,
+    8682767906
+  ],
+  "geometry": [
+    { "lat": 55.3561956, "lon": 10.4228741 },
+    { "lat": 55.3561886, "lon": 10.4228583 },
+    { "lat": 55.3561598, "lon": 10.4227528 },
+    { "lat": 55.3561598, "lon": 10.4226749 },
+    { "lat": 55.3561624, "lon": 10.4226179 },
+    { "lat": 55.3562804, "lon": 10.4203963 },
+    { "lat": 55.3562831, "lon": 10.4203209 },
+    { "lat": 55.3562836, "lon": 10.4202586 },
+    { "lat": 55.3562793, "lon": 10.4201902 },
+    { "lat": 55.3562695, "lon": 10.4201270 },
+    { "lat": 55.3562533, "lon": 10.4200739 },
+    { "lat": 55.3562312, "lon": 10.4200237 },
+    { "lat": 55.3562106, "lon": 10.4199970 },
+    { "lat": 55.3561735, "lon": 10.4199606 },
+    { "lat": 55.3561447, "lon": 10.4199439 },
+    { "lat": 55.3561204, "lon": 10.4199337 },
+    { "lat": 55.3560965, "lon": 10.4199339 },
+    { "lat": 55.3560710, "lon": 10.4199386 },
+    { "lat": 55.3560505, "lon": 10.4199488 },
+    { "lat": 55.3560274, "lon": 10.4199665 },
+    { "lat": 55.3560050, "lon": 10.4199908 },
+    { "lat": 55.3559354, "lon": 10.4201005 },
+    { "lat": 55.3558351, "lon": 10.4202898 },
+    { "lat": 55.3558034, "lon": 10.4203606 },
+    { "lat": 55.3557935, "lon": 10.4203967 }
+  ],
+  "tags": {
+    "access": "private",
+    "highway": "service",
+    "lit": "yes",
+    "name": "Søndre Hospitalsvej",
+    "name:etymology:wikidata": "Q2496415",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 727178047,
+  "bounds": {
+    "minlat": 55.3571056,
+    "minlon": 10.4178721,
+    "maxlat": 55.3572907,
+    "maxlon": 10.4214909
+  },
+  "nodes": [
+    6814870267,
+    10075147010,
+    13612046197,
+    6814870272,
+    13612046199,
+    13612049309
+  ],
+  "geometry": [
+    { "lat": 55.3571056, "lon": 10.4214909 },
+    { "lat": 55.3571328, "lon": 10.4209228 },
+    { "lat": 55.3571831, "lon": 10.4199253 },
+    { "lat": 55.3571860, "lon": 10.4198721 },
+    { "lat": 55.3571886, "lon": 10.4198226 },
+    { "lat": 55.3572907, "lon": 10.4178721 }
+  ],
+  "tags": {
+    "highway": "service",
+    "lit": "yes",
+    "name": "Søndre Hospitalsvej",
+    "name:etymology:wikidata": "Q2496415",
+    "service": "parking_aisle",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 727178048,
+  "bounds": {
+    "minlat": 55.3572699,
+    "minlon": 10.4179018,
+    "maxlat": 55.3574596,
+    "maxlon": 10.4215655
+  },
+  "nodes": [
+    6814870269,
+    13612046200,
+    10075147009,
+    6814870271,
+    13612049310
+  ],
+  "geometry": [
+    { "lat": 55.3572699, "lon": 10.4215655 },
+    { "lat": 55.3572729, "lon": 10.4215085 },
+    { "lat": 55.3573180, "lon": 10.4206475 },
+    { "lat": 55.3573566, "lon": 10.4199011 },
+    { "lat": 55.3574596, "lon": 10.4179018 }
+  ],
+  "tags": {
+    "highway": "service",
+    "lit": "yes",
+    "name": "Søndre Hospitalsvej",
+    "name:etymology:wikidata": "Q2496415",
+    "service": "parking_aisle",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 727178049,
+  "bounds": {
+    "minlat": 55.3566473,
+    "minlon": 10.4197851,
+    "maxlat": 55.3573566,
+    "maxlon": 10.4199011
+  },
+  "nodes": [
+    6814870271,
+    13612046198,
+    6814870272,
+    7942163576,
+    7942163577,
+    13612046194,
+    6814870266
+  ],
+  "geometry": [
+    { "lat": 55.3573566, "lon": 10.4199011 },
+    { "lat": 55.3573225, "lon": 10.4198953 },
+    { "lat": 55.3571860, "lon": 10.4198721 },
+    { "lat": 55.3569950, "lon": 10.4198419 },
+    { "lat": 55.3569598, "lon": 10.4198363 },
+    { "lat": 55.3566792, "lon": 10.4197903 },
+    { "lat": 55.3566473, "lon": 10.4197851 }
+  ],
+  "tags": {
+    "bicycle": "use_sidepath",
+    "foot": "use_sidepath",
+    "highway": "service",
+    "lit": "yes",
+    "name": "Søndre Hospitalsvej",
+    "name:etymology:wikidata": "Q2496415",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 727178050,
+  "bounds": {
+    "minlat": 55.3571056,
+    "minlon": 10.4214909,
+    "maxlat": 55.3575170,
+    "maxlon": 10.4215966
+  },
+  "nodes": [
+    6814870267,
+    6814870275,
+    6814870274,
+    6814870277,
+    6814870276,
+    6814870273,
+    6814870269,
+    259568026
+  ],
+  "geometry": [
+    { "lat": 55.3571056, "lon": 10.4214909 },
+    { "lat": 55.3571063, "lon": 10.4215130 },
+    { "lat": 55.3571086, "lon": 10.4215251 },
+    { "lat": 55.3571131, "lon": 10.4215325 },
+    { "lat": 55.3571196, "lon": 10.4215374 },
+    { "lat": 55.3571289, "lon": 10.4215396 },
+    { "lat": 55.3572699, "lon": 10.4215655 },
+    { "lat": 55.3575170, "lon": 10.4215966 }
+  ],
+  "tags": {
+    "highway": "service",
+    "lit": "yes",
+    "name": "Søndre Hospitalsvej",
+    "name:etymology:wikidata": "Q2496415",
+    "service": "driveway",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 727178051,
+  "bounds": {
+    "minlat": 55.3565707,
+    "minlon": 10.4217677,
+    "maxlat": 55.3567114,
+    "maxlon": 10.4236657
+  },
+  "nodes": [
+    6814870283,
+    6814870282,
+    13612046191,
+    10841532935,
+    6814870281,
+    6814870279,
+    6814870278
+  ],
+  "geometry": [
+    { "lat": 55.3565707, "lon": 10.4236657 },
+    { "lat": 55.3565920, "lon": 10.4236390 },
+    { "lat": 55.3565974, "lon": 10.4236287 },
+    { "lat": 55.3566062, "lon": 10.4236119 },
+    { "lat": 55.3566165, "lon": 10.4235756 },
+    { "lat": 55.3566221, "lon": 10.4235358 },
+    { "lat": 55.3567114, "lon": 10.4217677 }
+  ],
+  "tags": {
+    "highway": "service",
+    "lit": "yes",
+    "name": "Søndre Hospitalsvej",
+    "name:etymology:wikidata": "Q2496415",
+    "service": "parking_aisle",
+    "smoothness": "good",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 727178052,
+  "bounds": {
+    "minlat": 55.3561791,
+    "minlon": 10.4245612,
+    "maxlat": 55.3565674,
+    "maxlon": 10.4248583
+  },
+  "nodes": [
+    6814870284,
+    6814870285,
+    6814870286,
+    6814870287,
+    6814870288,
+    6814870289,
+    6814870290
+  ],
+  "geometry": [
+    { "lat": 55.3565674, "lon": 10.4245612 },
+    { "lat": 55.3565139, "lon": 10.4247156 },
+    { "lat": 55.3564770, "lon": 10.4247790 },
+    { "lat": 55.3564311, "lon": 10.4248251 },
+    { "lat": 55.3563787, "lon": 10.4248539 },
+    { "lat": 55.3563091, "lon": 10.4248583 },
+    { "lat": 55.3561791, "lon": 10.4248205 }
+  ],
+  "tags": {
+    "bicycle": "no",
+    "foot": "no",
+    "highway": "tertiary_link",
+    "lanes": "1",
+    "lit": "yes",
+    "name": "Søndre Hospitalsvej",
+    "name:etymology:wikidata": "Q2496415",
+    "oneway": "yes",
+    "smoothness": "excellent",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 851512557,
+  "bounds": {
+    "minlat": 55.3584840,
+    "minlon": 10.4266282,
+    "maxlat": 55.3586472,
+    "maxlon": 10.4288701
+  },
+  "nodes": [
+    7942163432,
+    7942163423,
+    9929111476,
+    7942163388,
+    7942163422,
+    7942163421,
+    7942163420,
+    7942163417
+  ],
+  "geometry": [
+    { "lat": 55.3584840, "lon": 10.4288701 },
+    { "lat": 55.3585431, "lon": 10.4281888 },
+    { "lat": 55.3585538, "lon": 10.4280060 },
+    { "lat": 55.3585894, "lon": 10.4273980 },
+    { "lat": 55.3586004, "lon": 10.4272293 },
+    { "lat": 55.3586177, "lon": 10.4269531 },
+    { "lat": 55.3586216, "lon": 10.4268911 },
+    { "lat": 55.3586472, "lon": 10.4266282 }
+  ],
+  "tags": {
+    "access:conditional": "no @ (construction)",
+    "cycleway": "separate",
+    "highway": "tertiary",
+    "lanes": "1",
+    "lit": "yes",
+    "name": "Hospitalsringen",
+    "name:etymology:wikidata": "Q2496415",
+    "oneway": "yes",
+    "smoothness": "excellent",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 851512559,
+  "bounds": {
+    "minlat": 55.3584667,
+    "minlon": 10.4244693,
+    "maxlat": 55.3588645,
+    "maxlon": 10.4288701
+  },
+  "nodes": [
+    3815514406,
+    3815514422,
+    12397501221,
+    7942163430,
+    7942163431,
+    4040030253,
+    9929111468,
+    3815514176,
+    9929111475,
+    7942163414,
+    7942163413,
+    7942163425,
+    7942163424,
+    3815514423,
+    7942163432
+  ],
+  "geometry": [
+    { "lat": 55.3588645, "lon": 10.4244693 },
+    { "lat": 55.3587404, "lon": 10.4250311 },
+    { "lat": 55.3586553, "lon": 10.4254520 },
+    { "lat": 55.3586439, "lon": 10.4255084 },
+    { "lat": 55.3585756, "lon": 10.4261406 },
+    { "lat": 55.3585613, "lon": 10.4264576 },
+    { "lat": 55.3585530, "lon": 10.4265611 },
+    { "lat": 55.3585447, "lon": 10.4266639 },
+    { "lat": 55.3585387, "lon": 10.4268149 },
+    { "lat": 55.3585373, "lon": 10.4268510 },
+    { "lat": 55.3585345, "lon": 10.4269136 },
+    { "lat": 55.3585297, "lon": 10.4270229 },
+    { "lat": 55.3585012, "lon": 10.4274653 },
+    { "lat": 55.3584667, "lon": 10.4281860 },
+    { "lat": 55.3584840, "lon": 10.4288701 }
+  ],
+  "tags": {
+    "access:conditional": "no @ (construction)",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "name": "Hospitalsringen",
+    "name:etymology:wikidata": "Q2496415",
+    "oneway": "yes",
+    "smoothness": "excellent",
+    "surface": "asphalt",
+    "turn:lanes": "none|right"
+  }
+},
+{
+  "type": "way",
+  "id": 937083068,
+  "bounds": {
+    "minlat": 55.3551711,
+    "minlon": 10.4203967,
+    "maxlat": 55.3557935,
+    "maxlon": 10.4212760
+  },
+  "nodes": [
+    8682767906,
+    8682767901,
+    8682767899
+  ],
+  "geometry": [
+    { "lat": 55.3557935, "lon": 10.4203967 },
+    { "lat": 55.3556656, "lon": 10.4206336 },
+    { "lat": 55.3551711, "lon": 10.4212760 }
+  ],
+  "tags": {
+    "access": "private",
+    "highway": "service",
+    "name": "Søndre Hospitalsvej",
+    "name:etymology:wikidata": "Q2496415",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 1051858434,
+  "bounds": {
+    "minlat": 55.3540152,
+    "minlon": 10.4218794,
+    "maxlat": 55.3540773,
+    "maxlon": 10.4220109
+  },
+  "nodes": [
+    4927450295,
+    3818593346
+  ],
+  "geometry": [
+    { "lat": 55.3540152, "lon": 10.4218794 },
+    { "lat": 55.3540773, "lon": 10.4220109 }
+  ],
+  "tags": {
+    "bicycle": "no",
+    "foot": "no",
+    "highway": "tertiary",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Søndre Hospitalsvej",
+    "name:etymology:wikidata": "Q2496415",
+    "oneway": "yes",
+    "source:maxspeed": "sign",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 1083469172,
+  "bounds": {
+    "minlat": 55.3588645,
+    "minlon": 10.4201379,
+    "maxlat": 55.3610856,
+    "maxlon": 10.4244693
+  },
+  "nodes": [
+    7479852556,
+    3815514418,
+    7479852555,
+    3815514407,
+    7479852554,
+    3815514419,
+    3815514404,
+    8683038157,
+    3815514420,
+    7479852553,
+    3815514408,
+    7479847055,
+    8708541565,
+    3815514405,
+    13301778250,
+    3815514421,
+    3815514406
+  ],
+  "geometry": [
+    { "lat": 55.3610856, "lon": 10.4201723 },
+    { "lat": 55.3609882, "lon": 10.4201443 },
+    { "lat": 55.3608501, "lon": 10.4201379 },
+    { "lat": 55.3606350, "lon": 10.4201604 },
+    { "lat": 55.3604888, "lon": 10.4202184 },
+    { "lat": 55.3602786, "lon": 10.4203583 },
+    { "lat": 55.3600600, "lon": 10.4206107 },
+    { "lat": 55.3599212, "lon": 10.4208079 },
+    { "lat": 55.3598350, "lon": 10.4209792 },
+    { "lat": 55.3596732, "lon": 10.4213449 },
+    { "lat": 55.3594184, "lon": 10.4220217 },
+    { "lat": 55.3593011, "lon": 10.4224017 },
+    { "lat": 55.3591951, "lon": 10.4227846 },
+    { "lat": 55.3591672, "lon": 10.4228854 },
+    { "lat": 55.3590001, "lon": 10.4236951 },
+    { "lat": 55.3589908, "lon": 10.4237404 },
+    { "lat": 55.3588645, "lon": 10.4244693 }
+  ],
+  "tags": {
+    "access:conditional": "no @ (construction)",
+    "cycleway": "separate",
+    "highway": "tertiary",
+    "lit": "yes",
+    "name": "Hospitalsringen",
+    "name:etymology:wikidata": "Q2496415",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 1083469173,
+  "bounds": {
+    "minlat": 55.3615154,
+    "minlon": 10.4203759,
+    "maxlat": 55.3621381,
+    "maxlon": 10.4217608
+  },
+  "nodes": [
+    3815514401,
+    9929111485,
+    3815514414,
+    9929111486,
+    9929169719,
+    3815514402,
+    9929169722,
+    9929111487,
+    3815514417,
+    9929111511
+  ],
+  "geometry": [
+    { "lat": 55.3621381, "lon": 10.4217608 },
+    { "lat": 55.3621180, "lon": 10.4215758 },
+    { "lat": 55.3620463, "lon": 10.4213058 },
+    { "lat": 55.3619327, "lon": 10.4210183 },
+    { "lat": 55.3618678, "lon": 10.4208731 },
+    { "lat": 55.3618293, "lon": 10.4207868 },
+    { "lat": 55.3617672, "lon": 10.4206897 },
+    { "lat": 55.3617269, "lon": 10.4206268 },
+    { "lat": 55.3615646, "lon": 10.4204254 },
+    { "lat": 55.3615154, "lon": 10.4203759 }
+  ],
+  "tags": {
+    "access:conditional": "no @ (construction)",
+    "highway": "tertiary",
+    "lanes": "1",
+    "lit": "yes",
+    "name": "Hospitalsringen",
+    "name:etymology:wikidata": "Q2496415",
+    "oneway": "yes",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 1083469174,
+  "bounds": {
+    "minlat": 55.3610856,
+    "minlon": 10.4201723,
+    "maxlat": 55.3621381,
+    "maxlon": 10.4217608
+  },
+  "nodes": [
+    7479852556,
+    9929111490,
+    9929111491,
+    9929111492,
+    9929111493,
+    9929169721,
+    9929111494,
+    9929111500,
+    9929111495,
+    9929111496,
+    9929111497,
+    9929111498,
+    3815514401
+  ],
+  "geometry": [
+    { "lat": 55.3610856, "lon": 10.4201723 },
+    { "lat": 55.3612646, "lon": 10.4203250 },
+    { "lat": 55.3614411, "lon": 10.4204462 },
+    { "lat": 55.3615416, "lon": 10.4205500 },
+    { "lat": 55.3617020, "lon": 10.4207351 },
+    { "lat": 55.3617370, "lon": 10.4207889 },
+    { "lat": 55.3617850, "lon": 10.4208629 },
+    { "lat": 55.3618129, "lon": 10.4209319 },
+    { "lat": 55.3618804, "lon": 10.4210987 },
+    { "lat": 55.3619889, "lon": 10.4213984 },
+    { "lat": 55.3620483, "lon": 10.4215569 },
+    { "lat": 55.3620781, "lon": 10.4216773 },
+    { "lat": 55.3621381, "lon": 10.4217608 }
+  ],
+  "tags": {
+    "access:conditional": "no @ (construction)",
+    "cycleway": "separate",
+    "highway": "tertiary",
+    "lanes": "1",
+    "lit": "yes",
+    "name": "Hospitalsringen",
+    "name:etymology:wikidata": "Q2496415",
+    "oneway": "yes",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 1083469180,
+  "bounds": {
+    "minlat": 55.3586575,
+    "minlon": 10.4244693,
+    "maxlat": 55.3588645,
+    "maxlon": 10.4265219
+  },
+  "nodes": [
+    7942163428,
+    7942163419,
+    7942163418,
+    3815514406
+  ],
+  "geometry": [
+    { "lat": 55.3586575, "lon": 10.4265219 },
+    { "lat": 55.3587491, "lon": 10.4255635 },
+    { "lat": 55.3588163, "lon": 10.4250724 },
+    { "lat": 55.3588645, "lon": 10.4244693 }
+  ],
+  "tags": {
+    "access:conditional": "no @ (construction)",
+    "cycleway": "separate",
+    "highway": "tertiary",
+    "lanes": "1",
+    "lit": "yes",
+    "name": "Hospitalsringen",
+    "name:etymology:wikidata": "Q2496415",
+    "oneway": "yes",
+    "smoothness": "excellent",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 1083469181,
+  "bounds": {
+    "minlat": 55.3586472,
+    "minlon": 10.4265219,
+    "maxlat": 55.3586575,
+    "maxlon": 10.4266282
+  },
+  "nodes": [
+    7942163417,
+    7942163428
+  ],
+  "geometry": [
+    { "lat": 55.3586472, "lon": 10.4266282 },
+    { "lat": 55.3586575, "lon": 10.4265219 }
+  ],
+  "tags": {
+    "access:conditional": "no @ (construction)",
+    "highway": "tertiary",
+    "lanes": "1",
+    "lit": "yes",
+    "name": "Hospitalsringen",
+    "name:etymology:wikidata": "Q2496415",
+    "oneway": "yes",
+    "smoothness": "excellent",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 1177564305,
+  "bounds": {
+    "minlat": 55.3621381,
+    "minlon": 10.4217608,
+    "maxlat": 55.3627827,
+    "maxlon": 10.4254870
+  },
+  "nodes": [
+    10939663736,
+    3815514412,
+    13301323450,
+    7479852561,
+    3815514400,
+    7479852559,
+    13097991429,
+    3815514413,
+    3815514401
+  ],
+  "geometry": [
+    { "lat": 55.3627827, "lon": 10.4254870 },
+    { "lat": 55.3627562, "lon": 10.4251506 },
+    { "lat": 55.3627131, "lon": 10.4247093 },
+    { "lat": 55.3626949, "lon": 10.4245234 },
+    { "lat": 55.3626284, "lon": 10.4240519 },
+    { "lat": 55.3625378, "lon": 10.4234478 },
+    { "lat": 55.3624555, "lon": 10.4230075 },
+    { "lat": 55.3624430, "lon": 10.4229358 },
+    { "lat": 55.3621381, "lon": 10.4217608 }
+  ],
+  "tags": {
+    "access:conditional": "no @ (construction)",
+    "cycleway": "separate",
+    "highway": "tertiary",
+    "lit": "yes",
+    "name": "Hospitalsringen",
+    "name:etymology:wikidata": "Q2496415",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 1177564306,
+  "bounds": {
+    "minlat": 55.3627827,
+    "minlon": 10.4254870,
+    "maxlat": 55.3627910,
+    "maxlon": 10.4256303
+  },
+  "nodes": [
+    10939663735,
+    10939663736
+  ],
+  "geometry": [
+    { "lat": 55.3627910, "lon": 10.4256303 },
+    { "lat": 55.3627827, "lon": 10.4254870 }
+  ],
+  "tags": {
+    "highway": "tertiary",
+    "lit": "yes",
+    "name": "Hospitalsringen",
+    "name:etymology:wikidata": "Q2496415",
+    "surface": "asphalt",
+    "tunnel": "building_passage"
+  }
+},
+{
+  "type": "way",
+  "id": 1177564311,
+  "bounds": {
+    "minlat": 55.3627910,
+    "minlon": 10.4256303,
+    "maxlat": 55.3628217,
+    "maxlon": 10.4262190
+  },
+  "nodes": [
+    10939663740,
+    7479852562,
+    10939663735
+  ],
+  "geometry": [
+    { "lat": 55.3628217, "lon": 10.4262190 },
+    { "lat": 55.3628061, "lon": 10.4258752 },
+    { "lat": 55.3627910, "lon": 10.4256303 }
+  ],
+  "tags": {
+    "access:conditional": "no @ (construction)",
+    "cycleway": "separate",
+    "highway": "tertiary",
+    "lit": "yes",
+    "name": "Hospitalsringen",
+    "name:etymology:wikidata": "Q2496415",
+    "smoothness": "excellent",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 1177564312,
+  "bounds": {
+    "minlat": 55.3628217,
+    "minlon": 10.4262190,
+    "maxlat": 55.3628275,
+    "maxlon": 10.4263456
+  },
+  "nodes": [
+    10939663741,
+    10939663740
+  ],
+  "geometry": [
+    { "lat": 55.3628275, "lon": 10.4263456 },
+    { "lat": 55.3628217, "lon": 10.4262190 }
+  ],
+  "tags": {
+    "highway": "tertiary",
+    "lit": "yes",
+    "name": "Hospitalsringen",
+    "name:etymology:wikidata": "Q2496415",
+    "surface": "asphalt",
+    "tunnel": "building_passage"
+  }
+},
+{
+  "type": "way",
+  "id": 1292359440,
+  "bounds": {
+    "minlat": 55.3610856,
+    "minlon": 10.4201632,
+    "maxlat": 55.3613030,
+    "maxlon": 10.4202050
+  },
+  "nodes": [
+    3815514403,
+    9929111489,
+    7479852556
+  ],
+  "geometry": [
+    { "lat": 55.3613030, "lon": 10.4202050 },
+    { "lat": 55.3611868, "lon": 10.4201632 },
+    { "lat": 55.3610856, "lon": 10.4201723 }
+  ],
+  "tags": {
+    "access:conditional": "no @ (construction)",
+    "highway": "tertiary",
+    "lanes": "1",
+    "lit": "yes",
+    "name": "Hospitalsringen",
+    "name:etymology:wikidata": "Q2496415",
+    "oneway": "yes",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 1292359441,
+  "bounds": {
+    "minlat": 55.3613030,
+    "minlon": 10.4202050,
+    "maxlat": 55.3615154,
+    "maxlon": 10.4203759
+  },
+  "nodes": [
+    9929111511,
+    9929111488,
+    9929169729,
+    3815514403
+  ],
+  "geometry": [
+    { "lat": 55.3615154, "lon": 10.4203759 },
+    { "lat": 55.3614486, "lon": 10.4203087 },
+    { "lat": 55.3613897, "lon": 10.4202667 },
+    { "lat": 55.3613030, "lon": 10.4202050 }
+  ],
+  "tags": {
+    "access:conditional": "no @ (construction)",
+    "bicycle": "use_sidepath",
+    "highway": "tertiary",
+    "lanes": "1",
+    "lit": "yes",
+    "name": "Hospitalsringen",
+    "name:etymology:wikidata": "Q2496415",
+    "oneway": "yes",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 1293624563,
+  "bounds": {
+    "minlat": 55.3561956,
+    "minlon": 10.4228741,
+    "maxlat": 55.3566039,
+    "maxlon": 10.4251423
+  },
+  "nodes": [
+    6533506090,
+    6533506089,
+    7942163558,
+    6814870284,
+    6533506088,
+    10841532936,
+    6814870280,
+    6533506087,
+    6814870283,
+    6533506086,
+    3838757571,
+    13612049317,
+    6814189547,
+    6814189546,
+    10304136425,
+    9720065098
+  ],
+  "geometry": [
+    { "lat": 55.3564906, "lon": 10.4251423 },
+    { "lat": 55.3565252, "lon": 10.4250154 },
+    { "lat": 55.3565529, "lon": 10.4248302 },
+    { "lat": 55.3565674, "lon": 10.4245612 },
+    { "lat": 55.3566039, "lon": 10.4239137 },
+    { "lat": 55.3566026, "lon": 10.4238481 },
+    { "lat": 55.3565962, "lon": 10.4237825 },
+    { "lat": 55.3565846, "lon": 10.4237218 },
+    { "lat": 55.3565707, "lon": 10.4236657 },
+    { "lat": 55.3565183, "lon": 10.4235443 },
+    { "lat": 55.3564553, "lon": 10.4234046 },
+    { "lat": 55.3563306, "lon": 10.4231593 },
+    { "lat": 55.3563040, "lon": 10.4231069 },
+    { "lat": 55.3562441, "lon": 10.4229837 },
+    { "lat": 55.3562096, "lon": 10.4229058 },
+    { "lat": 55.3561956, "lon": 10.4228741 }
+  ],
+  "tags": {
+    "highway": "service",
+    "lit": "yes",
+    "name": "Søndre Hospitalsvej",
+    "name:etymology:wikidata": "Q2496415",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 1484614978,
+  "bounds": {
+    "minlat": 55.3573172,
+    "minlon": 10.4166918,
+    "maxlat": 55.3574942,
+    "maxlon": 10.4173246
+  },
+  "nodes": [
+    6814870268,
+    13612049305,
+    13612049306
+  ],
+  "geometry": [
+    { "lat": 55.3573172, "lon": 10.4173246 },
+    { "lat": 55.3573362, "lon": 10.4169790 },
+    { "lat": 55.3574942, "lon": 10.4166918 }
+  ],
+  "tags": {
+    "highway": "service",
+    "lit": "yes",
+    "name": "Søndre Hospitalsvej",
+    "name:etymology:wikidata": "Q2496415",
+    "service": "parking_aisle",
+    "surface": "gravel"
+  }
+},
+{
+  "type": "way",
+  "id": 1484614979,
+  "bounds": {
+    "minlat": 55.3574596,
+    "minlon": 10.4173956,
+    "maxlat": 55.3574876,
+    "maxlon": 10.4179018
+  },
+  "nodes": [
+    13612049310,
+    13612049307,
+    6814870270
+  ],
+  "geometry": [
+    { "lat": 55.3574596, "lon": 10.4179018 },
+    { "lat": 55.3574667, "lon": 10.4177744 },
+    { "lat": 55.3574876, "lon": 10.4173956 }
+  ],
+  "tags": {
+    "highway": "service",
+    "lit": "yes",
+    "name": "Søndre Hospitalsvej",
+    "name:etymology:wikidata": "Q2496415",
+    "service": "parking_aisle",
+    "surface": "gravel"
+  }
+},
+{
+  "type": "way",
+  "id": 1484614980,
+  "bounds": {
+    "minlat": 55.3572907,
+    "minlon": 10.4173246,
+    "maxlat": 55.3573172,
+    "maxlon": 10.4178721
+  },
+  "nodes": [
+    13612049309,
+    13612049308,
+    6814870268
+  ],
+  "geometry": [
+    { "lat": 55.3572907, "lon": 10.4178721 },
+    { "lat": 55.3572966, "lon": 10.4177513 },
+    { "lat": 55.3573172, "lon": 10.4173246 }
+  ],
+  "tags": {
+    "highway": "service",
+    "lit": "yes",
+    "name": "Søndre Hospitalsvej",
+    "name:etymology:wikidata": "Q2496415",
+    "service": "parking_aisle",
+    "surface": "gravel"
+  }
+},
+{
+  "type": "way",
+  "id": 1557707685,
+  "bounds": {
+    "minlat": 55.3576936,
+    "minlon": 10.4260862,
+    "maxlat": 55.3586575,
+    "maxlon": 10.4265219
+  },
+  "nodes": [
+    7942163428,
+    9929111466,
+    4040030253,
+    4040030252,
+    12397501211,
+    8075532631
+  ],
+  "geometry": [
+    { "lat": 55.3586575, "lon": 10.4265219 },
+    { "lat": 55.3586095, "lon": 10.4264898 },
+    { "lat": 55.3585613, "lon": 10.4264576 },
+    { "lat": 55.3583915, "lon": 10.4263993 },
+    { "lat": 55.3577457, "lon": 10.4261096 },
+    { "lat": 55.3576936, "lon": 10.4260862 }
+  ],
+  "tags": {
+    "access:conditional": "no @ (construction)",
+    "bicycle": "use_sidepath",
+    "foot": "use_sidepath",
+    "highway": "tertiary",
+    "lanes": "1",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Søndre Hospitalsvej",
+    "name:etymology:wikidata": "Q2496415",
+    "oneway": "yes",
+    "smoothness": "excellent",
+    "source": "http://www.odense.dk/borger/trafik%20og%20veje/aktuelle-projekter/munkebjergvejs%20forlaengelse/kort%20og%20tegninger",
+    "source:maxspeed": "DK:urban",
+    "source:name": "http://www.odense.dk/borger/bolig%20og%20byggeri/kort%20over%20odense/kortinfo",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 1557707686,
+  "bounds": {
+    "minlat": 55.3576750,
+    "minlon": 10.4262134,
+    "maxlat": 55.3586472,
+    "maxlon": 10.4266639
+  },
+  "nodes": [
+    7479852551,
+    12397501210,
+    9929111471,
+    7942163412,
+    7479852571,
+    3815514176,
+    9929111481,
+    7942163417
+  ],
+  "geometry": [
+    { "lat": 55.3576750, "lon": 10.4262134 },
+    { "lat": 55.3577202, "lon": 10.4262375 },
+    { "lat": 55.3577471, "lon": 10.4262519 },
+    { "lat": 55.3584051, "lon": 10.4266041 },
+    { "lat": 55.3584898, "lon": 10.4266424 },
+    { "lat": 55.3585447, "lon": 10.4266639 },
+    { "lat": 55.3585930, "lon": 10.4266471 },
+    { "lat": 55.3586472, "lon": 10.4266282 }
+  ],
+  "tags": {
+    "access:conditional": "no @ (construction)",
+    "bicycle": "use_sidepath",
+    "foot": "use_sidepath",
+    "highway": "tertiary",
+    "lanes": "1",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Søndre Hospitalsvej",
+    "name:etymology:wikidata": "Q2496415",
+    "oneway": "yes",
+    "smoothness": "excellent",
+    "source": "http://www.odense.dk/borger/trafik%20og%20veje/aktuelle-projekter/munkebjergvejs%20forlaengelse/kort%20og%20tegninger",
+    "source:maxspeed": "DK:urban",
+    "source:name": "http://www.odense.dk/borger/bolig%20og%20byggeri/kort%20over%20odense/kortinfo",
+    "surface": "asphalt"
+  }
+}
+
+  ]
+}

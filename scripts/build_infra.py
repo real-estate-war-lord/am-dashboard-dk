@@ -50,7 +50,7 @@ OUT = ROOT / "data" / "geo" / "infra_projects.geojson"
 OVERPASS = "https://overpass-api.de/api/interpreter"
 UA = {"User-Agent": "am-dashboard-dk/2.1 (+https://github.com/real-estate-war-lord/am-dashboard-dk)"}
 SIMPLIFY_DEG = 20 / 111_320          # ~20 m at this latitude, in degrees
-TYPES = {"metro", "letbane", "brt", "rail", "road", "bridge_tunnel", "urban_dev", "hospital", "university"}
+TYPES = {"metro", "letbane", "brt", "rail", "road", "bridge_tunnel", "urban_dev", "hospital", "university", "public_building"}
 STATUSES = {"study", "decided", "construction", "opened"}
 
 
@@ -119,9 +119,13 @@ def manual(spec):
     return Point(float(lon), float(lat))
 
 
+SITE_TYPES = {"hospital", "university", "public_building"}   # a place, not a corridor
+
+
 def want_kind(row):
-    """What shape the project should end up as."""
-    if row["parent_id"]:
+    """What shape the project should end up as: stations and single sites are points, development
+    areas polygons, everything else a corridor."""
+    if row["parent_id"] or row["type"] in SITE_TYPES:
         return "point"
     return "polygon" if row["type"] == "urban_dev" else "line"
 

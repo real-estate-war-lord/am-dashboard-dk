@@ -1,0 +1,26 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-09-22T08:45:51Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 2164223422,
+  "lat": 55.6749503,
+  "lon": 12.5822340,
+  "tags": {
+    "amenity": "library",
+    "check_date": "2024-03-19",
+    "name": "Rigsarkivet",
+    "website": "https://www.sa.dk/content/dk/om_statens_arkiver/organisation/rigsarkivet",
+    "wikidata": "Q2860552",
+    "wikipedia": "da:Rigsarkivet"
+  }
+}
+
+  ]
+}
