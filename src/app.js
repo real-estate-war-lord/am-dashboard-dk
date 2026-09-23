@@ -68,7 +68,7 @@ const cphMode = () => !!(CPH && MK.muni === CPH_MUNI && MK.cphView !== "postnr")
 const S = { view: "makro" };
 const YEARS = [...new Set([...((D.meta && D.meta.years) || []), ...((D.cph && D.cph.meta && D.cph.meta.years) || [])])].sort();
 const LATEST = (D.meta && D.meta.latest_year) || (YEARS[YEARS.length - 1] || "");
-const MK = { ind: (IND[0] || {}).key, muni: null, own: false, year: LATEST, cphView: "kvarter", micro: false, mind: "rented_pct", infra: false, pub: false };
+const MK = { ind: (IND[0] || {}).key, muni: null, own: false, year: LATEST, cphView: "kvarter", micro: false, mind: "rented_pct", infra: false, pub: false, srv: false };
 /* Micro (building) layer: dist/micro/<kommune>.json, loaded on demand; D.micro = index {code: {file, n}} */
 const MICRO_IDX = (D.micro && D.micro.municipalities) || {};
 const MICRO = {};                                  /* code → {meta, b:[…]} once loaded */
@@ -154,6 +154,7 @@ function hashFor() {
   if (S.view === "makro" && MK.infra) q.push("infra=1");   /* the overlay survives every level change */
   if (S.view === "makro" && MK.pub) q.push("public=1");
   if (MK.pub || S.view === "publist") q.push(...pubHashParts());
+  if (S.view === "makro" && MK.srv) { q.push("services=1"); q.push(...srvHashParts()); }
   if (S.view === "makro" && MK.focus) q.push(`focus=${encodeURIComponent(MK.focus)}`);
   /* the test-property pin rides along with the map hash so the link opens on the same spot */
   if (S.view === "makro" && TP.lat != null) { q.push(`pin=${TP.lat.toFixed(5)},${TP.lon.toFixed(5)}`); if (TP.label && TP.label !== TP_LABEL) q.push(`pl=${encodeURIComponent(TP.label)}`); }
@@ -202,8 +203,9 @@ function parseHash() {
     CH.fq = q.fq === "q" ? "q" : "year"; CH.ov = q.ov ? q.ov.split(",").filter(Boolean) : []; CH.nat = q.nat !== "0"; }
   else { S.view = "makro"; MK.muni = parts[1] && byCode[parts[1]] ? parts[1] : null; MK.cphView = parts[2] === "postnr" ? "postnr" : "kvarter";
          MK.micro = q.micro === "1" && microAvail(MK.muni); if (q.mind && MICRO_INDS.some(i => i.key === q.mind)) MK.mind = q.mind;
-         MK.infra = q.infra === "1"; MK.pub = q.public === "1";
-         pubParseFilter(q); MK.focus = q.focus || null; if (MK.focus) MK.infra = true; tpParse(q); }
+         MK.infra = q.infra === "1"; MK.pub = q.public === "1"; MK.srv = q.services === "1";
+         pubParseFilter(q); srvParseFilter(q);
+         MK.focus = q.focus || null; if (MK.focus) MK.infra = true; tpParse(q); }
   if (!curInds().some(i => i.key === MK.ind)) MK.ind = (curInds()[0] || {}).key;
   if (!yearsFor(MK.ind).includes(MK.year)) MK.year = LATEST;
   if (S.view === "makro") {
@@ -295,6 +297,17 @@ document.addEventListener("click", e => {
     if (k === "infra") ANL.infra = !ANL.infra; else if (k === "public") ANL.pub = !ANL.pub; else ANL.micro = !ANL.micro;
     syncHash(); renderKeep(); return; }
   if (g("[data-public]")) { MK.pub = !MK.pub; syncHash(); renderKeep(); return; }
+  if (g("[data-services]")) { MK.srv = !MK.srv; LF.srvDrawn = null; if (MK.srv) srvLoadVisible(); syncHash(); renderKeep(); return; }
+  if ((el = g("[data-srvcat]"))) { const k = el.dataset.srvcat;
+    if (e.shiftKey) { srvSetFilter(new Set([k])); return; }
+    const cur = new Set(SF.cats); cur.has(k) ? cur.delete(k) : cur.add(k);
+    srvSetFilter(cur); return; }
+  if ((el = g("[data-srvmode]"))) { const k = el.dataset.srvmode;
+    const cur = new Set(SF.tmodes); cur.has(k) ? cur.delete(k) : cur.add(k);
+    /* the Transport chip follows its two sub-toggles: both off means the category is off */
+    const cats = new Set(SF.cats); cur.size ? cats.add("transport") : cats.delete("transport");
+    srvSetFilter(cats, cur); return; }
+  if (g("[data-srvall]")) { srvSetFilter(new Set(Object.keys(SRV_CAT)), new Set(["rail", "bus"])); return; }
   if ((el = g("[data-pubonly]"))) { pubSetFilter({ cats: new Set([el.dataset.pubonly]) }); return; }
   if (g("[data-puball]")) { pubSetFilter({ cats: null, kind: "both" }); return; }
   if ((el = g("[data-pubcat]"))) { const k = el.dataset.pubcat;
@@ -427,7 +440,7 @@ function legendHtml(sc, ind, key, note) {
     (lowerBetter(ind.key || "") ? `<div class="lgnote">↓ lower is better · darkest = highest</div>` : "") +
     `${note ? `<div class="lgnote">${note}</div>` : ""}`;
 }
-function setLegend(id, sc, ind, key, note) { const el = document.getElementById(id); if (el) el.innerHTML = legendHtml(sc, ind, key, note); setInfraLegend(); setPublicLegend(); }
+function setLegend(id, sc, ind, key, note) { const el = document.getElementById(id); if (el) el.innerHTML = legendHtml(sc, ind, key, note); setInfraLegend(); setPublicLegend(); setServicesLegend(); }
 function setInfraLegend() {
   const el = document.getElementById("infralegend"); if (!el) return;
   const live = !!(MK.infra && INFRA.length);
@@ -569,12 +582,12 @@ function vMakro() {
   return `
   <div class="card accent" id="mapcard">
     <div class="card-head tools-only">
-      <div class="tools">${areaSearch()}${tpBox()}${muni && microAvail(muni.code) ? `<div class="seg"><button class="sg ${!MK.micro ? "on" : ""}" data-micro="0">Areas</button><button class="sg ${MK.micro ? "on" : ""}" data-micro="1">Buildings (${nf(MICRO_IDX[String(Number(muni.code))].n, 0)})</button></div>` : ""}${muni && muni.code === CPH_MUNI && CPH && !microMode() ? `<div class="seg"><button class="sg ${MK.cphView !== "postnr" ? "on" : ""}" data-cphview="kvarter">Quarters (${CPH.areas.length})</button><button class="sg ${MK.cphView === "postnr" ? "on" : ""}" data-cphview="postnr">Postal codes</button></div>` : ""}${INFRA.length ? `<div class="seg"><button class="sg ${MK.infra ? "on" : ""}" data-infra title="Show planned and ongoing infrastructure projects on top of the map">Infra projects</button></div>` : ""}${PUB ? `<div class="seg"><button class="sg ${MK.pub ? "on" : ""}" data-public title="Public buildings from BBR: schools, daycare, health and culture${MK.muni && !pubAvail(MK.muni) ? " — no BBR pull for this municipality yet" : ""}">Public buildings</button></div>` : ""}${microMode() ? mindSelect() : indSelect() + yearSelect()}${D.portfolio ? `<button class="lk mini ${MK.own ? "primary" : ""}" data-mkown>● Own properties</button>` : ""}<button class="lk" data-fs title="Full screen (Esc to exit)">⤢ Full screen</button></div>
+      <div class="tools">${areaSearch()}${tpBox()}${muni && microAvail(muni.code) ? `<div class="seg"><button class="sg ${!MK.micro ? "on" : ""}" data-micro="0">Areas</button><button class="sg ${MK.micro ? "on" : ""}" data-micro="1">Buildings (${nf(MICRO_IDX[String(Number(muni.code))].n, 0)})</button></div>` : ""}${muni && muni.code === CPH_MUNI && CPH && !microMode() ? `<div class="seg"><button class="sg ${MK.cphView !== "postnr" ? "on" : ""}" data-cphview="kvarter">Quarters (${CPH.areas.length})</button><button class="sg ${MK.cphView === "postnr" ? "on" : ""}" data-cphview="postnr">Postal codes</button></div>` : ""}${INFRA.length ? `<div class="seg"><button class="sg ${MK.infra ? "on" : ""}" data-infra title="Show planned and ongoing infrastructure projects on top of the map">Infra projects</button></div>` : ""}${PUB ? `<div class="seg"><button class="sg ${MK.pub ? "on" : ""}" data-public title="Public buildings from BBR: schools, daycare, health and culture${MK.muni && !pubAvail(MK.muni) ? " — no BBR pull for this municipality yet" : ""}">Public buildings</button></div>` : ""}${SRV ? `<div class="seg"><button class="sg ${MK.srv ? "on" : ""}" data-services title="Shops, places to eat, pharmacies and public-transport stops — OpenStreetMap and Rejseplanen">Services</button></div>` : ""}${microMode() ? mindSelect() : indSelect() + yearSelect()}${D.portfolio ? `<button class="lk mini ${MK.own ? "primary" : ""}" data-mkown>● Own properties</button>` : ""}<button class="lk" data-fs title="Full screen (Esc to exit)">⤢ Full screen</button></div>
       ${microMode() ? "" : indQuick()}<div class="tperr" id="tperr" role="status" ${TP.msg ? "" : 'style="display:none"'}>${esc(TP.msg)}</div>${tpNote()}</div>
     ${microMode() ? microExplain() : indExplain(ind)}
     ${muni && !microMode() ? muniStrip(muni) : ""}
-    <div class="mapwrap"><div id="lfmap"></div><div class="maplegs"><div class="maplegend publiclegend" id="publiclegend"></div><div class="maplegend infralegend" id="infralegend"></div></div><div class="maplegend" id="maplegend"></div></div>
-    ${srcNote(`<p class="cap">${muni ? "Click a polygon for its figures and a link to its page." : "Click a polygon for its figures; open a municipality with the search box above or from the popup. Table view lists everything side by side."} Colour classes: quintiles of the visible areas. Boundaries: DAGI, Klimadatastyrelsen (simplified); basemap OpenStreetMap.</p>`)}
+    <div class="mapwrap"><div id="lfmap"></div><div class="maplegs"><div class="maplegend publiclegend" id="publiclegend"></div><div class="maplegend serviceslegend" id="serviceslegend"></div><div class="maplegend infralegend" id="infralegend"></div></div><div class="maplegend" id="maplegend"></div></div>
+    ${srcNote(`<p class="cap">${muni ? "Click a polygon for its figures and a link to its page." : "Click a polygon for its figures; open a municipality with the search box above or from the popup. Table view lists everything side by side."} Colour classes: quintiles of the visible areas. Boundaries: DAGI, Klimadatastyrelsen (simplified); basemap OpenStreetMap.${MK.srv ? ` <b>Services:</b> ${esc(srvAttribLine())}.` : ""}</p>`)}
   </div>`;
 }
 
@@ -1850,6 +1863,7 @@ function lfLayers() {
   LF.ctx = { areas, munis, sc, micro, ind, vk };
   lfInfraLayers();
   lfPublicLayers();
+  lfServicesLayers();
   lfLabels();
   setLegend("maplegend", sc, ind, ind.key, micro ? (cphMode() ? "quarters" + (bydelLevel(ind) ? " · ^ one figure per bydel" : "") : "postal codes") : (ind.level === "postnr" && !MK.muni ? "municipalities · zoom in for postal codes" : "municipalities" + (fine ? ` · ° ${cphMode() ? "quarters" : "postal codes"} take the municipality value` : "")));
   if (LF.ownG) { LF.map.removeLayer(LF.ownG); LF.ownG = null; }
@@ -1871,10 +1885,18 @@ function lfInit() {
   const map = L.map(el, { center: LF.center, zoom: LF.zoom, scrollWheelZoom: true, zoomSnap: 0.5, zoomDelta: 1, wheelPxPerZoomLevel: 30, wheelDebounceTime: 20 });
   LF.map = map;
   LF.canvas = L.canvas({ padding: .3 });     /* likewise: the building dots' renderer dies with its map */
+  /* Services sit in their own pane above the choropleth (overlayPane, z 400) and below the
+     labels and popups (markerPane, z 600). Without it the canvas element is created before
+     the area polygons and ends up under them, and their semi-transparent fill washes every
+     dot out — visible as grey-looking markers over a dark quintile and correct ones off it. */
+  if (!map.getPane("srvpane")) { map.createPane("srvpane"); map.getPane("srvpane").style.zIndex = 450; }
+  LF.srvCanvas = L.canvas({ pane: "srvpane", padding: .3 });
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, className: "basemap",
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · Boundaries: DAGI, Klimadatastyrelsen' }).addTo(map);
   map.on("moveend", () => { const c = map.getCenter(); LF.center = [c.lat, c.lng]; LF.zoom = map.getZoom();
-    if (MK.pub) { pubLoadVisible(); lfPublicLabels(); } });
+    if (MK.pub) { pubLoadVisible(); lfPublicLabels(); }
+    /* services draw only what is in the viewport, so a pan is a redraw, not just a load */
+    if (MK.srv) lfServicesLayers(); });
   /* Leaflet stops click propagation inside popups, so page links in popups are wired here */
   map.on("popupopen", ev => { const el = ev.popup.getElement(); if (!el) return;
     el.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => go(b.dataset.go)));
@@ -1889,6 +1911,7 @@ function lfInit() {
     /* rebuild polygons only when the display level changes — rebuilding on every pan would kill open popups */
     lfInfraLabels();
     if (MK.pub) lfPublicLayers();                /* the zoom rule changes which public rows are drawn */
+    if (MK.srv) lfServicesLayers(true);          /* likewise: each services category has its own zoom floor */
     if (microMode()) { (LF.microMarks || []).forEach(m => m.setRadius(microRadius(m._dw))); return; }
     const z = map.getZoom(), fine = !!MK.muni || z >= MICRO_ZOOM, lvl = (fine ? "micro" : z < 8 ? "national" : "macro") + (cphMode() ? "-cph" : "") + (MK.muni || "");
     if (lvl !== LF.level) lfLayers(); else if (fine) lfLabels();
@@ -2332,6 +2355,266 @@ function publicLine(level, code) {
 /* ---------- Schools (Uddannelsesstatistik.dk / STIL) ----------
    The per-area aggregates ride along in public_index (PUB.areas); the school records themselves are
    a separate file, fetched once the public layer is on or a school page is opened. */
+
+/* ---------- Services overlay (OpenStreetMap + Rejseplanen) ----------
+   Same shape as the Public buildings layer: a toolbar toggle, a legend that doubles as the
+   category filter, per-kommune files fetched on demand, popups in the same two-level style.
+   Two things differ, both because this layer is 44.181 points against public buildings' 7.517:
+     · only what is inside the viewport is drawn, not every loaded row;
+     · every category has its own zoom floor, so the dense ones cannot be asked for at all
+       until the viewport is small enough to hold them.
+   Data: scripts/build_services.py · docs/SERVICES.md */
+const SRV = D.services || null;                     /* index.json: {asof, categories, kommuner{code:{bbox,n,by_cat}}} */
+const SRV_FILES = {};                               /* code → points[] once fetched */
+/* Hues deliberately outside the choropleth's green ramp, the infra greys/teal and the four
+   public-building tones (indigo/sage/plum/ochre). Every marker also carries a white halo, so
+   it stays readable on the palest and the darkest quintile fill alike. */
+const SRV_CAT = {
+  grocery:   { label: "Groceries",    color: "#E8590C", zoom: 13 },
+  food:      { label: "Food & drink", color: "#C2255C", zoom: 14 },
+  pharmacy:  { label: "Pharmacy",     color: "#5F3DC4", zoom: 13 },
+  transport: { label: "Transport",    color: "#1864AB", zoom: 10 },
+};
+const SRV_MODE = {
+  metro:        { label: "Metro",      color: "#1864AB", group: "rail" },
+  "s-train":    { label: "S-train",    color: "#0B7285", group: "rail" },
+  rail:         { label: "Rail",       color: "#343A40", group: "rail" },
+  "light-rail": { label: "Light rail", color: "#9C36B5", group: "rail" },
+  bus:          { label: "Bus",        color: "#868E96", group: "bus" },
+};
+/* English sub-type names for the popup — the files carry the OSM/GTFS vocabulary */
+const SRV_SUB = {
+  supermarket: "Supermarket", convenience: "Convenience store",
+  restaurant: "Restaurant", cafe: "Café", bar: "Bar", fast_food: "Takeaway",
+  pharmacy: "Pharmacy",
+  metro: "Metro station", "s-train": "S-train station", rail: "Railway station",
+  "light-rail": "Light rail stop", bus: "Bus stop",
+};
+const SRV_RAIL_MODES = ["metro", "s-train", "rail", "light-rail"];
+/* Transport is split in two because the two halves are three orders of magnitude apart:
+   628 stations against 24.412 bus stops. Rail is on by default, bus is not. */
+const SRV_TGROUP = { rail: { label: "Rail & metro", zoom: 10 }, bus: { label: "Bus", zoom: 14 } };
+const SRV_DEFAULT_CATS = ["grocery", "pharmacy", "transport"];
+const SRV_DEFAULT_MODES = ["rail"];
+const SRV_MAX_MARKERS = 3000;                       /* the ceiling the zoom floors are there to keep */
+/* a fingertip is not a mouse pointer: on a touch screen the dots and stations are drawn
+   bigger, which is also their hit area — Leaflet tests the circle's own radius */
+const srvCoarse = () => { try { return matchMedia("(pointer: coarse)").matches; } catch (e) { return false; } };
+const SF = { cats: new Set(SRV_DEFAULT_CATS), tmodes: new Set(SRV_DEFAULT_MODES) };
+const SRV_SHORT = { grocery: "g", food: "f", pharmacy: "p", transport: "t" };
+const SRV_LONG = Object.fromEntries(Object.entries(SRV_SHORT).map(([k, v]) => [v, k]));
+
+/* both sources the layer draws from, for the map footer and the Sources view */
+const SRV_ATTRIB = ["© OpenStreetMap contributors, ODbL", "Rejseplanen, CC BY 4.0"];
+const srvAttribLine = () => SRV_ATTRIB.join(" · ") + (SRV && SRV.asof ? ` · services data as of ${SRV.asof}` : "");
+
+function srvParseFilter(q) {
+  const raw = (q.srv || "").trim();
+  if (!raw) { SF.cats = new Set(SRV_DEFAULT_CATS); SF.tmodes = new Set(SRV_DEFAULT_MODES); return; }
+  const parts = raw.split(",").filter(Boolean);
+  SF.cats = new Set(parts.map(c => SRV_LONG[c]).filter(Boolean));
+  SF.tmodes = new Set(parts.filter(c => c === "rail" || c === "bus"));
+  /* "transport on with neither half" cannot be drawn, so it is not a state we keep */
+  if (!SF.tmodes.size) SF.cats.delete("transport");
+}
+function srvHashParts() {
+  const cats = [...SF.cats].map(c => SRV_SHORT[c]).filter(Boolean);
+  const modes = SF.cats.has("transport") ? [...SF.tmodes] : [];
+  const v = cats.concat(modes).join(",");
+  return v ? [`srv=${v}`] : ["srv=none"];
+}
+const srvCatOn = c => SF.cats.has(c);
+const srvModeOn = m => SF.cats.has("transport") && SF.tmodes.has(SRV_MODE[m] ? SRV_MODE[m].group : "rail");
+function srvSetFilter(cats, tmodes) {
+  if (cats !== undefined) SF.cats = cats;
+  if (tmodes !== undefined) SF.tmodes = tmodes;
+  if (SF.cats.has("transport") && !SF.tmodes.size) SF.tmodes = new Set(SRV_DEFAULT_MODES);
+  LF.srvDrawn = null;                     /* the viewport did not move, but what belongs on it changed */
+  syncHash(); renderKeep();
+}
+/* the zoom a category needs before it is drawn at all */
+function srvCatZoom(cat) {
+  if (cat !== "transport") return SRV_CAT[cat].zoom;
+  const gs = [...SF.tmodes].map(g => SRV_TGROUP[g].zoom);
+  return gs.length ? Math.min(...gs) : SRV_TGROUP.rail.zoom;
+}
+const srvZoom = () => (LF.map ? LF.map.getZoom() : 7);
+
+/* ---- loading: only the kommuner whose bbox meets the viewport, cached for the session ---- */
+function srvLoad(code) {
+  const k = String(Number(code));
+  if (!SRV || !SRV.kommuner[k] || SRV_FILES[k] || SRV_FILES["_loading_" + k]) return;
+  SRV_FILES["_loading_" + k] = true;
+  fetch(`services/${k.padStart(4, "0")}.json`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(d => {
+      SRV_FILES[k] = (d.points || []).map(p => ({ cat: p[0], sub: p[1], lat: p[2], lon: p[3],
+        name: p[4] || "", extra: p.length > 5 ? p[5] : null, kom: k }));
+      delete SRV_FILES["_loading_" + k];
+      if (MK.srv && LF.map) lfServicesLayers(true);
+    })
+    .catch(() => { delete SRV_FILES["_loading_" + k]; SRV_FILES["_error_" + k] = true; });
+}
+/* The lowest zoom at which *anything* enabled would be drawn. Below it nothing is
+   fetched: the national view intersects all 99 bounding boxes, and loading 2,6 MB to
+   draw nothing is exactly what this layer must not do. */
+function srvMinZoom() {
+  const zs = [...SF.cats].map(srvCatZoom);
+  return zs.length ? Math.min(...zs) : Infinity;
+}
+const SRV_MAX_FILES = 24;                           /* a hard ceiling on one pass, whatever the viewport */
+function srvLoadVisible() {
+  if (!LF.map || !MK.srv || !SRV) return;
+  if (LF.map.getZoom() < srvMinZoom()) return;
+  const v = LF.map.getBounds(), c = v.getCenter();
+  const hits = [];
+  Object.entries(SRV.kommuner).forEach(([k, m]) => {
+    const bb = m.bbox; if (!bb) return;                       /* [S, W, N, E] */
+    if (v.getSouth() <= bb[2] && v.getNorth() >= bb[0] && v.getWest() <= bb[3] && v.getEast() >= bb[1])
+      hits.push([k, Math.abs((bb[0] + bb[2]) / 2 - c.lat) + Math.abs((bb[1] + bb[3]) / 2 - c.lng)]);
+  });
+  /* nearest first, so a viewport that somehow spans half the country still starts with
+     the municipalities the reader is actually looking at */
+  hits.sort((a, b) => a[1] - b[1]).slice(0, SRV_MAX_FILES).forEach(([k]) => srvLoad(k));
+}
+/* what to draw: loaded points, passing the filter, inside the viewport, above their zoom floor */
+function srvRows() {
+  if (!SRV || !LF.map) return [];
+  const z = srvZoom(), v = LF.map.getBounds().pad(0.15);
+  const s_ = v.getSouth(), n_ = v.getNorth(), w_ = v.getWest(), e_ = v.getEast();
+  const rows = [];
+  Object.keys(SRV_FILES).forEach(k => {
+    if (k.startsWith("_")) return;
+    SRV_FILES[k].forEach(p => {
+      if (!srvCatOn(p.cat)) return;
+      if (p.cat === "transport") { if (!srvModeOn(p.sub) || z < SRV_TGROUP[SRV_MODE[p.sub].group].zoom) return; }
+      else if (z < SRV_CAT[p.cat].zoom) return;
+      if (p.lat < s_ || p.lat > n_ || p.lon < w_ || p.lon > e_) return;
+      rows.push(p);
+    });
+  });
+  return rows;
+}
+const srvColor = p => p.cat === "transport" ? (SRV_MODE[p.sub] || SRV_MODE.bus).color : SRV_CAT[p.cat].color;
+const srvIsStation = p => p.cat === "transport" && p.sub !== "bus";
+const srvSubLabel = p => SRV_SUB[p.sub] || p.sub;
+const srvName = p => p.name || `Unnamed ${srvSubLabel(p).toLowerCase()}`;
+
+function srvPopup(p) {
+  const row = (l, v) => v == null || v === "" ? "" : `<span class="lfrow"><span>${esc(l)}</span><b>${v}</b></span>`;
+  const col = srvColor(p);
+  const transport = p.cat === "transport";
+  const plats = transport && typeof p.extra === "number" ? p.extra : null;
+  const brand = !transport && p.extra ? String(p.extra) : "";
+  /* every mode this stop is listed under, across the loaded points at the same position */
+  const modes = transport ? srvModesHere(p) : [];
+  const src = transport
+    ? `Rejseplanen, CC BY 4.0`
+    : `© OpenStreetMap contributors, ODbL`;
+  return `<div class="lfpop"><b>${esc(srvName(p))}</b>
+    <span class="infrapills"><i class="ipill" style="color:${col};border-color:${col}55">${esc(SRV_CAT[p.cat].label)}</i>
+      <i class="ipill">${esc(srvSubLabel(p))}</i>${brand ? `<i class="ipill">${esc(brand)}</i>` : ""}</span>
+    <div class="lfrows">
+      ${row("Type", esc(srvSubLabel(p)))}
+      ${brand ? row("Brand", esc(brand)) : ""}
+      ${transport && modes.length > 1 ? row("Also served by", modes.filter(m => m !== p.sub).map(m => esc(SRV_MODE[m].label)).join(" · ")) : ""}
+      ${plats ? row("Platforms merged", plats) : ""}
+      ${row("Municipality", esc((byCode[p.kom] || {}).name || ""))}
+      ${row("Position", `${p.lat.toFixed(5)}, ${p.lon.toFixed(5)}`)}</div>
+    <p class="cap dim">${src} · data as of ${esc((SRV && SRV.asof) || "–")}</p></div>`;
+}
+/* the other transport points within 40 m — a station that serves several modes is one point per mode */
+function srvModesHere(p) {
+  const out = new Set([p.sub]);
+  (SRV_FILES[p.kom] || []).forEach(q => {
+    if (q.cat !== "transport" || q === p) return;
+    if (Math.abs(q.lat - p.lat) < 0.0006 && Math.abs(q.lon - p.lon) < 0.0011) out.add(q.sub);
+  });
+  return [...out];
+}
+
+/* A redraw tears down and rebuilds every marker, so it is worth not doing on every pan.
+   The rows are gathered for a viewport padded by 15 %, which means a small pan is still
+   covered by what is already on the map; only a pan past that padding, a zoom, or a
+   filter change needs new markers. `force` is what the filter and the file loader pass. */
+function srvNeedsRedraw() {
+  if (!LF.srvDrawn || LF.srvDrawn.zoom !== LF.map.getZoom()) return true;
+  const v = LF.map.getBounds(), b = LF.srvDrawn.bounds;
+  return !(b.contains(v.getNorthEast()) && b.contains(v.getSouthWest()));
+}
+function lfServicesLayers(force) {
+  if (!LF.map) return;
+  if (MK.srv && SRV && !force && LF.srvG && !srvNeedsRedraw()) { srvLoadVisible(); return; }
+  ["srvG", "srvStG"].forEach(k => { if (LF[k] && LF.map) { LF.map.removeLayer(LF[k]); LF[k] = null; } });
+  if (!MK.srv || !SRV) { LF.srvDrawn = null; setServicesLegend(); return; }
+  srvLoadVisible();
+  LF.srvDrawn = { zoom: LF.map.getZoom(), bounds: LF.map.getBounds().pad(0.15) };
+  const rows = srvRows();
+  LF.srvN = rows.length;
+  const touch = srvCoarse(), rDot = touch ? 6.5 : 4.5, rSt = touch ? 9 : 7;
+  const dots = [], stations = [];
+  rows.forEach(p => {
+    const col = srvColor(p);
+    if (srvIsStation(p)) {
+      /* a station is a click target first: the same radius as the infra station markers */
+      const halo = L.circleMarker([p.lat, p.lon], { pane: "srvpane", radius: rSt + 2, stroke: false, fillColor: "#FFFFFF", fillOpacity: .95, interactive: false });
+      const m = L.circleMarker([p.lat, p.lon], { pane: "srvpane", radius: rSt, color: col, weight: 2.2, opacity: .95,
+        fillColor: col, fillOpacity: .9, className: "infra-shape srv-station" });
+      m.on("mouseover", () => { m.setRadius(rSt + 2); halo.setRadius(rSt + 4); }).on("mouseout", () => { m.setRadius(rSt); halo.setRadius(rSt + 2); });
+      m.on("click", e => L.popup({ maxWidth: 420, autoPanPadding: [24, 24] }).setLatLng(e.latlng || [p.lat, p.lon]).setContent(srvPopup(p)).openOn(LF.map));
+      stations.push(halo, m);
+    } else {
+      /* the dense categories go on the canvas renderer — thousands of SVG paths would stall the pan */
+      const m = L.circleMarker([p.lat, p.lon], { renderer: LF.srvCanvas || LF.canvas, radius: rDot,
+        color: "#FFFFFF", weight: 1.4, opacity: .95, fillColor: col, fillOpacity: 1 });
+      m.on("click", e => L.popup({ maxWidth: 420, autoPanPadding: [24, 24] }).setLatLng(e.latlng || [p.lat, p.lon]).setContent(srvPopup(p)).openOn(LF.map));
+      dots.push(m);
+    }
+  });
+  LF.srvG = L.layerGroup(dots).addTo(LF.map);
+  LF.srvStG = L.layerGroup(stations).addTo(LF.map);
+  setServicesLegend();
+}
+
+/* ---- legend, which is also the filter ---- */
+function srvLegendHtml() {
+  const z = srvZoom(), n = LF.srvN || 0;
+  const catRow = (k, c) => {
+    const on = srvCatOn(k), below = on && z < srvCatZoom(k);
+    return `<div class="lgrow srvcat ${on ? "" : "off"}" data-srvcat="${k}" role="button" tabindex="0"
+        title="${esc(c.label)} — click to show or hide, shift-click to isolate">
+      <i style="${on ? `background:${c.color}` : `background:transparent;box-shadow:inset 0 0 0 2px ${c.color}`};border-radius:50%"></i>${esc(c.label)}
+      ${below ? `<em class="srvzoom">zoom in</em>` : ""}</div>`;
+  };
+  const modeRow = `<div class="lgrow gk srvmodes">${Object.entries(SRV_TGROUP).map(([g, t]) => {
+    const on = SF.cats.has("transport") && SF.tmodes.has(g);
+    return `<span class="pubtog ${on ? "" : "off"}" data-srvmode="${g}" title="${esc(t.label)} stops">${esc(t.label)}</span>`;
+  }).join("")}</div>`;
+  /* Bus is a sub-toggle rather than a category, so it needs its own line: without it a
+     reader who switched Bus on at zoom 13 sees nothing and is told nothing. */
+  const hints = Object.entries(SRV_CAT).filter(([k]) => srvCatOn(k) && z < srvCatZoom(k))
+    .map(([, c]) => c.label)
+    /* …but only once: below Transport's own floor the category is already named, and
+       adding "rail & metro stops, bus stops" after it just says the same thing twice */
+    .concat(z < srvCatZoom("transport") ? [] : Object.entries(SRV_TGROUP)
+      .filter(([g, t]) => SF.cats.has("transport") && SF.tmodes.has(g) && z < t.zoom)
+      .map(([, t]) => t.label + " stops"));
+  return `<div class="lgtitle">Services<span>OSM &amp; Rejseplanen ${esc((SRV && SRV.asof) || "")}
+      ${SF.cats.size < Object.keys(SRV_CAT).length || SF.tmodes.size < 2 ? ` · <b class="only" data-srvall>All</b>` : ""}</span></div>
+    ${Object.entries(SRV_CAT).map(([k, c]) => catRow(k, c)).join("")}
+    ${modeRow}
+    ${!SF.cats.size ? `<div class="lgrow gk allhidden">All categories hidden · <b class="only" data-srvall>Show all</b></div>` : ""}
+    ${hints.length ? `<div class="lgnote srvhint">Zoom in to see ${esc(hints.join(", ").toLowerCase())}</div>` : ""}
+    <div class="lgnote">${!SF.cats.size ? "nothing drawn"
+      : `${nf(LF.srvN || 0, 0)} drawn in view${n >= SRV_MAX_MARKERS ? " · at the drawing ceiling — zoom in" : ""}`}</div>`;
+}
+function setServicesLegend() {
+  const el = document.getElementById("serviceslegend"); if (!el) return;
+  const live = !!(MK.srv && SRV && document.getElementById("lfmap"));
+  if (!live) { el.innerHTML = ""; el.style.display = "none"; return; }
+  el.style.display = "";
+  el.innerHTML = srvLegendHtml();
+}
+
 const SCH_META = (PUB && PUB.schools) || null;      /* {built, retrieved, years, n, benchmarks} */
 const SCH_BY = {};                                  /* institutionsnummer → record */
 let SCHOOLS = null, SCH_LOADING = false;
@@ -2825,7 +3108,15 @@ function vSources() {
   return `<div class="card"><div class="card-head"><h3>Data sources and freshness</h3><span class="hint">built ${esc((D.meta && D.meta.built) || "–")}</span></div>
     <table class="tbl compact"><thead><tr><th>Source</th><th>Tables / files</th><th>As of</th><th>Fetched</th><th>Licence</th></tr></thead>
     <tbody>${s.map(x => `<tr><th>${x.url ? `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.label)}</a>` : esc(x.label)}</th><td class="dim">${esc(x.tables || "")}</td><td>${esc(x.asof || "")}</td><td class="dim">${esc(x.fetched || "")}</td><td class="dim">${esc(x.licence || "")}</td></tr>`).join("") || `<tr><td colspan="5" class="empty">no sources recorded</td></tr>`}</tbody></table>
-    <p class="cap">${((D.meta && D.meta.attribution) || []).map(esc).join(" · ")}${CPH && CPH.meta && CPH.meta.attribution ? " · " + esc(CPH.meta.attribution) : ""}</p></div>
+    <p class="cap">${((D.meta && D.meta.attribution) || []).map(esc).join(" · ")}${CPH && CPH.meta && CPH.meta.attribution ? " · " + esc(CPH.meta.attribution) : ""}${SRV ? " · " + esc(SRV_ATTRIB.join(" · ")) : ""}</p></div>
+  ${SRV ? `<div class="card"><div class="card-head"><h3>Services layer</h3><span class="hint">${nf(Object.values(SRV.kommuner).reduce((a, k) => a + k.n, 0), 0)} points · as of ${esc(SRV.asof || "–")}</span></div>
+    <table class="tbl compact"><thead><tr><th>Source</th><th>Used for</th><th>As of</th><th>Licence</th></tr></thead><tbody>
+      <tr><th><a href="https://download.geofabrik.de/europe/denmark.html" target="_blank" rel="noopener">OpenStreetMap — Denmark extract (Geofabrik)</a></th>
+        <td class="dim">Groceries, food &amp; drink, pharmacies</td><td>${esc(SRV.asof || "")}</td><td class="dim">ODbL 1.0 — © OpenStreetMap contributors</td></tr>
+      <tr><th><a href="https://labs.rejseplanen.dk/" target="_blank" rel="noopener">Rejseplanen — static GTFS</a></th>
+        <td class="dim">Metro, S-train, rail, light rail and bus stops</td><td>${esc(SRV.asof || "")}</td><td class="dim">CC BY 4.0 — Rejseplanen</td></tr>
+    </tbody></table>
+    <p class="cap">Stops are clustered into stations by name and mode; method and caveats in <code>docs/SERVICES.md</code>. OpenStreetMap coverage is not uniform — a rural area with no shop mapped is not the same as an area with no shop.</p></div>` : ""}
   ${defs(IND, "Indicator definitions — municipalities and postal codes")}
   ${CPH ? defs(IND_CPH, "Indicator definitions — Copenhagen quarters") : ""}`;
 }

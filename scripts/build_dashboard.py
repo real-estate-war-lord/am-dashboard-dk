@@ -94,6 +94,7 @@ def main():
     infra = load(ROOT / "data" / "geo" / "infra_projects.geojson")
     infra_index = load(PROC / "infra_index.json")
     public_index = load(PROC / "public_index.json")
+    services_index = load(PROC / "services" / "index.json")
     built = (makro.get("meta") or {}).get("built") or dt.date.today().isoformat()
     data = {
         "meta": makro.get("meta", {"built": built, "sources": [], "attribution": []}),
@@ -115,6 +116,9 @@ def main():
         "public": {"areas": public_index["areas"], "built": public_index["built"], "kommuner": public_index["kommuner"],
                    "recent_years": public_index["recent_years"],
                    "schools": public_index.get("schools")} if public_index else None,
+        # services: the index only (as-of, vocabulary, per-kommune counts + bbox). The points
+        # themselves load on demand from dist/services/<kommune>.json for whatever is in view.
+        "services": services_index,
     }
     payload = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</script", "<\\/script")
     html = (SRC / "index.html").read_text(encoding="utf-8")
@@ -143,6 +147,13 @@ def main():
         for f in pub.glob("*.json"):
             shutil.copy(f, pd_ / f.name)
         print(f"copied {len(list(pd_.glob('*.json')))} public-building files → {pd_}")
+    srv = PROC / "services"
+    if srv.exists():
+        import shutil
+        sd = out.parent / "services"; sd.mkdir(exist_ok=True)
+        for f in srv.glob("*.json"):
+            shutil.copy(f, sd / f.name)
+        print(f"copied {len(list(sd.glob('*.json')))} services files → {sd}")
     if micro_idx:
         import shutil
         md = out.parent / "micro"; md.mkdir(exist_ok=True)
