@@ -11,9 +11,11 @@ Seven checks, in order:
   5. 20–34 baseline  — the Denmark figure fc_20_34_rel is measured against, checked against
                        FRDK's own age detail, and the two identities that define the pair
                        fc_20_34_rel / fc_20_34_abs                             [FAILS]
-  6. housing gap     — 98 kommuner with every component present and non-null   [FAILS]
+  6. housing gap     — 98 kommuner with every component present and non-null, and the two
+                       identities that define gap_per_1000_rel                 [FAILS]
   7. gap by hand     — gap_per_1000 recomputed for five kommuner straight from the raw
-                       FOLK1A / FAM55N / BYGV33 cells                          [FAILS]
+                       FOLK1A / FAM55N / BOL101 cells, household-size trend, cap and all
+                       — a second implementation of the formula                [FAILS]
 
 Checks 6 and 7 are skipped, not failed, when housing_gap.json has not been built.
 Exit status is non-zero if a check marked FAIL does not pass.
@@ -248,8 +250,11 @@ def main():
     else:
         g = json.loads(GAP.read_text())
         gmeta, gk = g["meta"], g["kommuner"]
-        parts = ("pop", "households", "persons_per_hh", "p_base", "p_mid", "demand_5y",
-                 "supply_5y", "gap", "gap_per_1000", "pipeline_permitted")
+        parts = ("pop", "households", "persons_per_hh", "persons_per_hh_mid",
+                 "pph_change_per_year", "p_base", "p_mid", "households_base",
+                 "households_mid", "demand_5y", "demand_5y_const", "stock_prev",
+                 "stock_base", "supply_5y", "supply_5y_gross", "gap", "gap_per_1000",
+                 "gap_per_1000_rel", "gap_const_gross", "pipeline_permitted")
         holes = [(c, f) for c in gk for f in parts if gk[c].get(f) is None]
         absent = sorted(set(kom) - set(gk))
         print(f"\n6. housing gap — {len(gk)} kommuner × {len(parts)} components, "
@@ -257,50 +262,87 @@ def main():
         if len(gk) != 98 or holes or absent:
             print(f"   ✗ FAIL {holes[:3]} {absent[:3]}"); fails.append("housing gap coverage")
         else:
-            print(f"   ✓ complete; completions {gmeta['tables']['BYGV33']['completions_years'][0]}"
-                  f"–{gmeta['tables']['BYGV33']['completions_years'][-1]}, households "
-                  f"{gmeta['tables']['FAM55N']['period']}, population "
-                  f"{gmeta['tables']['FOLK1A']['period']}")
-            print(f"   Denmark: demand {gmeta['national']['demand_5y']:,.0f}  "
-                  f"supply {gmeta['national']['supply_5y']:,.0f}  "
-                  f"gap {gmeta['national']['gap']:+,.0f}  "
-                  f"{gmeta['national']['gap_per_1000']:+.2f} per 1 000".replace(",", " "))
+            t = gmeta["tables"]
+            print(f"   ✓ complete; households {t['FAM55N']['trend_years'][0]}–"
+                  f"{t['FAM55N']['period']}, population {t['FOLK1A']['trend_periods'][0]}–"
+                  f"{t['FOLK1A']['period']}, dwelling stock "
+                  f"{t['BOL101']['stock_years'][0]}–{t['BOL101']['stock_years'][1]} "
+                  f"({t['BOL101']['span_years']} years)")
+            n = gmeta["national"]
+            print(f"   Denmark: demand {n['demand_5y']:,.0f} (constant size "
+                  f"{n['demand_5y_const']:,.0f})  supply {n['supply_5y']:,.0f} (gross "
+                  f"{n['supply_5y_gross']:,.0f})  gap {n['gap']:+,.0f}  "
+                  f"{n['gap_per_1000']:+.2f} per 1 000".replace(",", " "))
+
+        # gap_per_1000_rel is only meaningful if Denmark is the Σ of the same kommuner
+        n = gmeta["national"]
+        bad_rel = [c for c in gk
+                   if abs(gk[c]["gap_per_1000_rel"]
+                          - (gk[c]["gap_per_1000"] - n["gap_per_1000"])) > 0.011]
+        sums = {f: sum(gk[c][f] for c in gk) for f in ("demand_5y", "supply_5y", "p_base")}
+        bad_sum = [f for f in sums if abs(sums[f] - n[f]) > 1]
+        print(f"   {'✓' if not bad_rel else '✗'} gap_per_1000_rel = gap_per_1000 − Denmark's "
+              f"{n['gap_per_1000']:+.2f} for {len(gk) - len(bad_rel)}/{len(gk)} kommuner")
+        print(f"   {'✓' if not bad_sum else '✗'} Σ kommuner = Denmark for "
+              f"{', '.join(sorted(set(sums) - set(bad_sum)))}")
+        if bad_rel or bad_sum:
+            fails.append("housing gap coverage")
 
         print(f"\n7. gap_per_1000 recomputed from the raw cells, {len(BY_HAND)} kommuner")
-        pulls = {t: raw_path(gmeta["tables"][t]["pull"]) for t in ("FOLK1A", "FAM55N", "BYGV33")}
+        pulls = {t: raw_path(gmeta["tables"][t]["pull"]) for t in ("FOLK1A", "FAM55N", "BOL101")}
         if any(v is None for v in pulls.values()):
             gone = [t for t, v in pulls.items() if v is None]
             print(f"   ⚠ raw pulls for {', '.join(gone)} are not on disk "
                   f"(gitignored) — rerun scripts/build_housing_gap.py to restore them")
         else:
-            full = gmeta["tables"]["BYGV33"]["completions_years"]
-            hh_year = gmeta["tables"]["FAM55N"]["period"]
-            pop_period = gmeta["tables"]["FOLK1A"]["period"]
+            t = gmeta["tables"]
+            pph_years = t["FAM55N"]["trend_years"]
+            pop_periods = t["FOLK1A"]["trend_periods"]
+            y_prev, y_now = t["BOL101"]["stock_years"]
+            span = t["BOL101"]["span_years"]
+            horizon = gmeta["projection"]["horizon_years"]
             ymid = gmeta["projection"]["mid_year"]
-            raw = {t: read_csv(pulls[t]) for t in pulls}
+            raw = {k: read_csv(pulls[k]) for k in pulls}
+
+            def cells(table, code, period):
+                return sum(int(r["INDHOLD"]) for r in raw[table]
+                           if r["OMRÅDE"] == code and r["TID"] == period)
+
             for c in BY_HAND:
-                pop = sum(int(r["INDHOLD"]) for r in raw["FOLK1A"]
-                          if r["OMRÅDE"] == c and r["TID"] == pop_period)
-                hh = sum(int(r["INDHOLD"]) for r in raw["FAM55N"]
-                         if r["OMRÅDE"] == c and r["TID"] == hh_year)
-                done = sum(int(r["INDHOLD"]) for r in raw["BYGV33"]
-                           if r["OMRÅDE"] == c and r["BYGFASE"] == "3" and r["TID"][:4] in full)
-                pph = pop / hh
+                pph = [cells("FOLK1A", c, p) / cells("FAM55N", c, y)
+                       for y, p in zip(pph_years, pop_periods)]
+                base, step = pph[-1], (pph[-1] - pph[0]) / (len(pph) - 1)
+                # the cap, written out rather than imported: ±5 % of the base over the whole
+                # window, then a hard floor of 1.6 persons per household
+                mid = min(max(base + step * horizon, base * 0.95), base * 1.05)
+                mid = max(mid, 1.6)
                 p0, p1 = kom[c][years[0]]["total"], kom[c][ymid]["total"]
-                demand = (p1 - p0) / pph
-                supply = done / len(full) * len(full)
+                demand = p1 / mid - p0 / base
+                supply = (cells("BOL101", c, y_now) - cells("BOL101", c, y_prev)) / span * horizon
                 per1000 = (demand - supply) / p0 * 1000
                 stored = gk[c]["gap_per_1000"]
                 ok = abs(per1000 - stored) < 0.01
                 if not ok:
                     fails.append("gap by hand")
                 print(f"   {'✓' if ok else '✗'} {c} {NAMES.get(c, ''):<13} "
-                      f"pop {pop:>8,} ÷ hh {hh:>8,} = {pph:.4f} p/hh".replace(",", " "))
-                print(f"       demand ({p1:,} − {p0:,}) / {pph:.4f} = {demand:>9,.0f}   "
-                      f"supply {done:,} / {len(full)} × {len(full)} = {supply:>9,.0f}"
+                      f"p/hh {pph_years[0]} {base - step * (len(pph) - 1):.4f} → "
+                      f"{pph_years[-1]} {base:.4f} ({step:+.5f}/yr) → {ymid} {mid:.4f}"
+                      f"{'  capped' if abs(mid - (base + step * horizon)) > 1e-9 else ''}")
+                print(f"       demand {p1:,} / {mid:.4f} − {p0:,} / {base:.4f} = "
+                      f"{demand:>9,.0f}   supply ({cells('BOL101', c, y_now):,} − "
+                      f"{cells('BOL101', c, y_prev):,}) / {span} × {horizon} = {supply:>9,.0f}"
                       .replace(",", " "))
                 print(f"       gap {demand - supply:>+10,.0f} / {p0:,} × 1000 = "
-                      f"{per1000:+.2f}   stored {stored:+.2f}".replace(",", " "))
+                      f"{per1000:+.2f}   stored {stored:+.2f}   vs Denmark "
+                      f"{gk[c]['gap_per_1000_rel']:+.2f}".replace(",", " "))
+
+        bt = gmeta.get("backtest")
+        if bt:
+            print(f"\n   backtest {bt['window']} (scripts/build_housing_gap.py): Spearman ρ "
+                  f"against the actual gap")
+            for s_ in bt["spearman"].values():
+                print(f"     {s_['population_input']:<22} old {s_['old']:+.3f}  "
+                      f"new {s_['new']:+.3f}  → {s_['new'] - s_['old']:+.3f}")
 
     print()
     if fails:

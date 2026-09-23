@@ -210,12 +210,15 @@ Phase A added files only — `scripts/build_forecast.py`, `scripts/build_housing
 
 So Phase B's first job is to move the block and teach the pipeline about it:
 
-1. **`config/indicators.json`** — move the ten entries from `forecast.indicators` into
+1. **`config/indicators.json`** — move the eleven entries from `forecast.indicators` into
    `indicators[]`, keeping `_doc`, `first_year`, `last_year` and `mid_year` wherever they are still
    useful. Extend the top-level `_doc` to document `calc: forecast`, `calc: housing_gap`,
    `db: forecast`, `db: housing_gap`, `field`, `scale`, `center`, `hue_pos`/`hue_neg` and
    `direction: neutral`. Consider moving `chip: true` from `fc_20_34` to `fc_20_34_rel` — the
-   relative version is the one that reads as a map (§3).
+   relative version is the one that reads as a map (§3). **`fc_hh_gap_rel` is the default of the
+   two housing-gap entries** and is listed before `fc_hh_gap` for that reason; whatever mechanism
+   Phase B uses to pick a group's opening indicator must land on it, because `fc_hh_gap` renders
+   one-sided on a diverging ramp (§7).
 2. **`scripts/build_makro.py`**
    - `compute()` (~line 400): add a `calc == "forecast"` branch, next to `infra_index` /
      `public_index` / `schools`. It should read `data/processed/forecast.json` and call
@@ -225,15 +228,17 @@ So Phase B's first job is to move the block and teach the pipeline about it:
      `indicators()` returns one dict per kommune keyed by exactly the registry keys, so the branch
      is a lookup, not a dispatch on `field`.
    - a second branch for `calc == "housing_gap"`, reading `data/processed/housing_gap.json` and
-     returning `kommuner[code]["gap_per_1000"]`. Same snapshot rule: `{}` when `year` is set.
+     returning `kommuner[code][ind["field"]]` — `gap_per_1000_rel` for `fc_hh_gap_rel` and
+     `gap_per_1000` for `fc_hh_gap`, so the branch is a `field` lookup rather than one hard-coded
+     name. Same snapshot rule: `{}` when `year` is set.
    - the indicator-output block (~line 594): add `"scale"`, `"center"`, `"hue_pos"`, `"hue_neg"` and
      `"field"` to the key list copied into `makro.json`, or the app never sees them.
    - the source-list loop (~line 622): add `"forecast"` **and `"housing_gap"`** to the `db` skip set
      (`"boligstat", "lbf", "bbr", "infra", "public", "schools"`), then append a source entry for each
      from the respective `meta` (label, `asof` = `meta.updated`, `fetched`, `url`, `licence`) the
      way `infra_index` and `public_index` already do. `housing_gap.json`'s `meta.tables` carries a
-     per-table `updated` stamp, so its source entry should name FOLK1A, FAM55N and BYGV33 rather
-     than one table.
+     per-table `updated` stamp, so its source entry should name FOLK1A, FAM55N, BOL101 and BYGV33
+     rather than one table.
 3. **`src/app.js`**
    - `mkShade()` (~line 399) builds a **single-ended** ramp from the paper tint to `hue`. It needs a
      diverging variant: when `ind.scale === "diverging"`, ramp `hue_neg` → paper → `hue_pos` about
@@ -263,13 +268,14 @@ So Phase B's first job is to move the block and teach the pipeline about it:
      a municipality grows. One extra pull, no new source.
    - The Copenhagen kvarter outlook (`s30/KKFR2026`) is a separate build with its own splicing rule;
      it keys straight onto the existing `OMRKK` kvarter geometry.
-   - A **relative** housing gap — `fc_hh_gap` minus Denmark's −22.3 — would do for §7 what
-     `fc_20_34_rel` does for §3, and for exactly the same reason: every municipality sits on one
-     side of zero, so the sign carries no information and the spread carries all of it. Not added
-     here because it was not asked for, but it is the variant worth mapping.
-   - `fc_hh_gap` with **household** rather than population demand. DST publishes a household
-     projection (`FRHUS1xx`); using it would drop the constant-household-size assumption, which §7
-     shows is the single largest term the current formula omits.
+   - `fc_hh_gap` with an **official household projection** rather than a fitted household-size
+     trend. DST publishes one (`FRHUS1xx`); using it would replace the extrapolation and its ±5 %
+     cap — the largest remaining modelling choice in §7 — with a published figure, and would make
+     the demand side directly comparable with the projection's own assumptions.
+   - **Rerun the §7 backtest on the next vintage.** It currently says the new formula ranks
+     municipalities *worse* than the superseded one on the 2020→2025 window, while both of its
+     components score better in isolation (§7). One window is not a verdict; the code is already
+     written, so a second one costs a rerun.
 
 ---
 
@@ -372,12 +378,19 @@ list, in size order: the 2010s youth bulge ageing out of the age band it was cou
 
 ---
 
-## 7. The housing gap — `fc_hh_gap`
+## 7. The housing gap — `fc_hh_gap_rel` and `fc_hh_gap`
 
 **Build:** `scripts/build_housing_gap.py` · **Output:** `data/processed/housing_gap.json`
 **Check:** `scripts/validate_forecast.py` checks 6 and 7
 
 > *Are enough dwellings being built for the growth DST projects?*
+
+The first version of this indicator answered that with two shortcuts that both pushed the answer the
+same way: household size was frozen, which **understates demand**, and supply was gross completions,
+which **overstates net additions**. Every one of the 98 municipalities came out negative, so the sign
+carried no information at all. Both shortcuts are now gone, and the map indicator is the **relative**
+variant. The absolute one is kept as the second indicator, because the level is still worth reading —
+it is simply not what a diverging ramp can show.
 
 ### Formula
 
@@ -385,47 +398,78 @@ Per municipality, over the **first five years of the projection window, 2026 →
 where the projection is least uncertain:
 
 ```
-persons_per_hh = FOLK1A population 2026K1  ÷  FAM55N households 2026
-demand_5y      = (P₂₀₃₁ − P₂₀₂₆) / persons_per_hh
-supply_5y      = mean yearly BYGV33 completions 2021–2025  ×  5
-gap            = demand_5y − supply_5y                      ← positive = undersupply
-gap_per_1000   = gap / P₂₀₂₆ × 1000                         ← the indicator
+persons_per_hh(y) = FOLK1A population yK1  ÷  FAM55N households y        6 years, 2021…2026
+step              = (persons_per_hh₂₀₂₆ − persons_per_hh₂₀₂₁) / 5        mean yearly change
+pph₂₀₃₁           = persons_per_hh₂₀₂₆ + 5 × step                        capped, see below
+demand_5y         = P₂₀₃₁ / pph₂₀₃₁  −  P₂₀₂₆ / persons_per_hh₂₀₂₆       households, not people
+supply_5y         = (BOL101 stock₂₀₂₆ − stock₂₀₂₀) / 6 × 5               net additions
+gap               = demand_5y − supply_5y                     ← positive = undersupply
+gap_per_1000      = gap / P₂₀₂₆ × 1000                        ← `fc_hh_gap`
+gap_per_1000_rel  = gap_per_1000 − Denmark's own              ← `fc_hh_gap_rel`, the map
 ```
+
+**The household-size cap.** An extrapolated trend runs away if nothing stops it, and the six
+observations behind `step` include the 2020–2022 pandemic years, when Danish household size fell
+unusually fast. So the *total* five-year move is capped at **±5 %** of the base value and the result
+is floored at **1.6** persons per household — below the smallest figure any Danish municipality has
+ever recorded. In this vintage **neither bound binds for any of the 98 municipalities**: the widest
+move is Gribskov's −0.0189 per year, which is −4.31 % over five years. The cap is insurance for a
+future vintage, not a live term.
 
 `persons_per_hh` is each municipality's **own** household size, not a national average — it ranges
 from **1.71 (Læsø) to 2.55 (Vallensbæk)** against a national 2.09, and substituting the national
-figure would cut Læsø's demand by 18 % and raise Vallensbæk's by 22 %. Population and households are read at the **same 1 January**, so the ratio is a real
-snapshot rather than two dates divided.
+figure would cut Læsø's demand by 18 % and raise Vallensbæk's by 22 %. Population and households are
+read at the **same 1 January**, so the ratio is a real snapshot rather than two dates divided. It is
+falling in **85 of 98** municipalities and rising in 13, mostly the western Copenhagen suburbs
+(Glostrup +0.0149 a year, Ishøj +0.0118, Vallensbæk +0.0110).
 
 `P₂₀₂₆` and `P₂₀₃₁` are DST's `ALDER=TOT` cells from `forecast.json`, so the demand side is exactly
-the projection §2 describes. `supply_5y` is written as *mean × 5* rather than as a plain sum because
-the mean is the thing being assumed to continue; the two are arithmetically identical for five full
-years and differ the moment the window is not five years.
+the projection §2 describes. Note that `demand_5y` is now a difference of **two household counts**,
+not a population change divided by one household size — the second term is `P₂₀₂₆ / persons_per_hh₂₀₂₆`,
+which is the municipality's actual household count, so the whole of the household-formation effect
+lands in the first term.
+
+**Why the supply window is six years, not five.** `BOL101` publishes no **2021** and no **2022** —
+DST closed both years *"due to errors in data from the Building and Housing Register"* (a mandatory
+footnote on the table). The natural 2021 → 2026 window therefore has no start, so the build takes the
+newest published year at or before it (**2020**) and annualises over the span that actually separates
+the two: `(stock₂₀₂₆ − stock₂₀₂₀) / 6 × 5`. `stock_window()` derives this from whatever the table
+offers, so the window closes back to five years on its own if DST ever reopens the two years.
 
 ### Sources and periods
 
 | what | table | selection | period used |
 |---|---|---|---|
-| population | `FOLK1A` | all areas, sex/age/marital status eliminated | **2026Q1** (1 January 2026) |
-| households | `FAM55N` | all areas, household types summed, size/children eliminated | **2026** (1 January) |
-| completions | `BYGV33` | `BYGFASE=3`, all uses, all builder types | **2021–2025**, five full calendar years |
-| pipeline | `BYGV33` | `BYGFASE=1` and `2`, same selection | **2025Q3–2026Q2**, latest four quarters |
+| population | `FOLK1A` | all areas, sex/age/marital status eliminated | **2021Q1–2026Q1**, 1 January each year |
+| households | `FAM55N` | all areas, household types summed, size/children eliminated | **2021–2026**, 1 January |
+| dwelling stock | `BOL101` | all areas, `BEBO` all three, `ANVENDELSE` all seven, tenure/ownership/construction year eliminated | **2020 and 2026**, 1 January |
+| completions *(context)* | `BYGV33` | `BYGFASE=3`, all uses, all builder types | **2021–2025**, five full calendar years |
+| pipeline *(context)* | `BYGV33` | `BYGFASE=1` and `2`, same selection | **2025Q3–2026Q2**, latest four quarters |
 | projection | `FRKM126` | via `forecast.json` | **2026 and 2031** |
+| backtest projection | `FRKM120` | all areas, `ALDER=TOT` | **2020 and 2025** |
+
+`BOL101`'s `BEBO` (type of resident) **cannot be eliminated**, so "all dwellings" has to be named:
+dwellings with registered population, dwellings without, and cottages without. `ANVENDELSE` is listed
+rather than eliminated for one reason only — it makes `supply_5y_excl_cottages` available as a check
+on how much of a municipality's net additions are summer houses. Nationally that is **4 590 of
+152 985**, or 3 %; it is concentrated exactly where it would be (Odsherred, Ringkøbing-Skjern).
 
 **Raw pulls are reused before they are fetched.** If `scripts/fetch_statbank.py` has already left a
-`data/raw/dst_<TABLE>_<date>.csv` that covers the period, the build reads it and says `reused`;
+`data/raw/dst_<TABLE>_<date>.csv` that covers the periods, the build reads it and says `reused`;
 otherwise it pulls its own copy into `data/raw/forecast/housing/` (gitignored, same rule as the
 projection pulls). A cached pull is only accepted if every breakdown column it carries is the
 variable's total code — `TOTALS` in the script — because rows are summed and a pull that broke
-`ALDER` or `HUSSTØR` down would double-count. `BYGV33` never reuses: the repo's cached selection is
-`BYGFASE=3` only, and the pipeline needs phases 1 and 2.
+`ALDER` or `HUSSTØR` down would double-count. `BYGV33` and `BOL101` never reuse: the repo's cached
+`BYGV33` selection is `BYGFASE=3` only while the pipeline needs phases 1 and 2, and `BOL101`'s stock
+depends on a `BEBO` selection a cached pull could silently have made differently.
 
-The tableinfo JSON is **not** duplicated. All three tables are already in the repo's own registry,
-so `data/raw/dst_<TABLE>.meta.json` is committed; the build writes a copy under
+The tableinfo JSON is **not** duplicated. FOLK1A, FAM55N, BOL101 and BYGV33 are already in the repo's
+own registry, so `data/raw/dst_<TABLE>.meta.json` is committed and the build writes a copy under
 `data/raw/forecast/housing/` only when the live tableinfo differs from it, i.e. exactly when DST has
-revised the table since that copy was taken. `data/raw/forecast/housing/` therefore holds nothing
-but gitignored CSVs on a clean run — unlike `data/raw/forecast/dst/`, whose projection tables have
-no committed counterpart.
+revised the table since that copy was taken. The one file that *is* written there on every clean run
+is **`FRKM120.meta.json`** — the backtest's projection vintage has no committed counterpart, the same
+situation as the projection tables in `data/raw/forecast/dst/`, and it is what records that vintage's
+`updated` stamp.
 
 ### Output
 
@@ -433,140 +477,256 @@ no committed counterpart.
 {
   "meta": {
     "built": "2026-09-23", "fetched": "2026-09-23", "kommuner": 98,
-    "national": { "demand_5y": 33606.0, "supply_5y": 168072.0,
-                  "gap": -134466.0, "gap_per_1000": -22.32, … },
+    "national": { "demand_5y": 69382.8, "demand_5y_const": 32535.7,
+                  "supply_5y": 152985.0, "supply_5y_gross": 168072.0,
+                  "gap": -83602.2, "gap_per_1000": -13.87,
+                  "gap_const_gross": -135536.3, "gap_per_1000_const_gross": -22.49, … },
     "projection": { "table": "FRKM126", "vintage": 2026,
                     "base_year": "2026", "mid_year": "2031", "horizon_years": 5 },
-    "tables": { "FAM55N": {…}, "FOLK1A": {…}, "BYGV33": {…} },   // period, updated, pull, how
-    "formula": "…", "sign": "…", "pipeline_note": "…", "caveats": "…",
+    "tables": { "FAM55N": {…}, "FOLK1A": {…}, "BOL101": {…}, "BYGV33": {…} },
+    "backtest": { "window": "2020→2025", "spearman": {…}, "components": {…}, … },
+    "formula": "…", "variants": "…", "sign": "…", "pipeline_note": "…", "caveats": "…",
     "licence": "free reuse with attribution", "source": "…", "url": "…"
   },
   "kommuner": {
-    "101": { "pop": 671714, "households": 332181, "persons_per_hh": 2.0221,
-             "p_base": 671714, "p_mid": 689101,
-             "demand_5y": 8598.3, "supply_5y": 19012.0,
-             "completions_by_year": {"2021": 5530, "2022": 3531, "2023": 3869,
-                                     "2024": 3162, "2025": 2920},
-             "gap": -10413.7, "gap_per_1000": -15.5,
-             "permits_4q": 850, "starts_4q": 1409, "pipeline_permitted": -559 }
+    "665": { "pop": 18596, "households": 9151, "persons_per_hh": 2.0321,
+             "persons_per_hh_by_year": {"2021": 2.0788, "2022": 2.0643, "2023": 2.0724,
+                                        "2024": 2.0546, "2025": 2.0457, "2026": 2.0321},
+             "pph_change_per_year": -0.00933,
+             "persons_per_hh_mid": 1.9855, "pph_capped": false,
+             "p_base": 18596, "p_mid": 17688,
+             "households_base": 9151.0, "households_mid": 8908.7,
+             "demand_5y": -242.3, "demand_5y_const": -446.8,
+             "stock_prev": 13259, "stock_base": 13312,
+             "supply_5y": 44.2, "supply_5y_excl_cottages": -31.7, "supply_5y_gross": 147.0,
+             "completions_by_year": {"2021": 17, …, "2025": 29},
+             "gap": -286.5, "gap_per_1000": -15.41, "gap_per_1000_rel": -1.54,
+             "gap_const_gross": -593.8, "gap_per_1000_const_gross": -31.93,
+             "permits_4q": 7, "starts_4q": 6, "pipeline_permitted": 1 }
   }
 }
 ```
 
 Every component is stored, not just the answer, so the popup can show the working and check 7 can
-recompute it. The stored numbers are rounded for display; the chain itself is computed unrounded, so
-`demand_5y` is not `p_mid − p_base` divided by the *rounded* `persons_per_hh`.
+recompute it. **Both superseded variants are stored too** — `demand_5y_const` (household size frozen)
+and `supply_5y_gross` (gross completions), combined in `gap_const_gross` — so the effect of each fix
+stays visible in the data rather than only in this document. The stored numbers are rounded for
+display; the chain itself is computed unrounded.
 
 **`pipeline_permitted` is context and enters no figure.** It is permits **minus** starts over the
 latest four quarters — a four-quarter **flow difference**, not a stock of permitted-not-started
-dwellings, which `BYGV33` does not publish. Positive means more was permitted than begun in the
-year, so the not-yet-started backlog grew; negative means starts drew an earlier backlog down.
-`BYGV33` is explicitly *not adjusted for reporting delays*, so the most recent quarters are revised
-upward later and a slightly negative reading is not evidence of a stall. København's −559 over
-2025Q3–2026Q2 is the largest drawdown in the country; Vejle's +452 the largest build-up.
+dwellings, which `BYGV33` does not publish. Positive means more was permitted than begun in the year,
+so the not-yet-started backlog grew; negative means starts drew an earlier backlog down. `BYGV33` is
+explicitly *not adjusted for reporting delays*, so the most recent quarters are revised upward later
+and a slightly negative reading is not evidence of a stall. Vejle's +452 over 2025Q3–2026Q2 is the
+largest build-up in the country; København's −559 the largest drawdown.
 
-### 🚩 Every municipality is negative — read the spread, not the sign
+### What the two fixes did
 
-| | demand 5y | supply 5y | gap | per 1 000 |
+| Denmark 2026→2031 | demand | supply | gap | per 1 000 |
 |---|---:|---:|---:|---:|
-| **Denmark** | 33 606 | 168 072 | **−134 466** | **−22.32** |
+| old — constant household size, gross completions | 32 536 | 168 072 | −135 536 | **−22.49** |
+| **new — household-size trend, net stock change** | **69 383** | **152 985** | **−83 602** | **−13.87** |
+| effect of the fix | **+36 847** | **−15 087** | +51 934 | +8.62 |
 
-**0 of 98 municipalities have a positive gap.** Denmark's projected population growth 2026→2031 is
-70 357 people, which at 2.09 persons per household is ~33 600 dwellings; completions averaged
-**33 614 a year** over 2021–2025, so the country builds in one year what this arithmetic says it
-needs in five. The indicator still separates municipalities cleanly — the range is **−7.6 (Gladsaxe)
-to −42.2 (Fanø)**, a factor of five — but the *sign* carries no information in this vintage. A
-diverging ramp centred on 0 will therefore render one-sided, exactly as `fc_80p` does (§3), and the
-Phase B note proposes the relative variant that would fix the map.
+Projecting household size **more than doubles** national demand, because Denmark's persons per
+household fell from 2.147 in 2015 to 2.094 in 2026 and the projection carries that on. Netting
+demolitions, mergers and conversions off the supply side removes 15 087 dwellings, 9 % of gross
+completions; net additions come in below gross completions in **77 of 98** municipalities (København
+−915, Herning −668, Odense −665) and above them in 21, led by Aalborg at +840, where conversions into
+housing and BYGV33's reporting delay both push the same way.
 
-| | highest — building least for the projected growth | | | lowest — building most relative to it | |
-|---|---|---:|---|---|---:|
-| 1 | Gladsaxe | −7.6 | 1 | Fanø | −42.2 |
-| 2 | Hvidovre | −8.6 | 2 | Odsherred | −40.1 |
-| 3 | Tårnby | −8.6 | 3 | Lolland | −39.6 |
-| 4 | Ishøj | −10.9 | 4 | Læsø | −39.3 |
-| 5 | Fredensborg | −12.1 | 5 | Høje-Taastrup | −38.7 |
-| 6 | Rødovre | −12.9 | 6 | Gribskov | −38.1 |
-| 7 | Køge | −13.2 | 7 | Morsø | −38.1 |
-| 8 | Herlev | −13.5 | 8 | Struer | −36.3 |
-| 9 | Svendborg | −14.3 | 9 | Samsø | −36.1 |
-| 10 | Allerød | −14.6 | 10 | Hillerød | −35.5 |
+It is not enough to flip the sign. **0 of 98 municipalities still have a positive gap**, and the
+absolute range is **−1.1 (Tårnby) to −47.0 (Læsø)**. But the gap that remains is much closer to what
+actually happened last time: over 2020→2025 Denmark really did form 129 169 households while adding
+164 763 dwellings, an actual gap of **−6.12 per 1 000**. The new formula's −13.87 for the next five
+years sits far nearer that than the old −22.49 did.
 
-The two ends mean different things, which is the trap this indicator sets:
+The ranking moves too, and not by a little. Aarhus goes from −18.0 to −4.9 per 1 000 and from
+mid-table to third tightest, because its household size is falling fast (2.07 → 2.03 over five years,
+projected to 1.98) while its net additions are below its completions. Lemvig goes from −31.9 to
+−15.4: netting the stock leaves it +44 dwellings over five years against 147 completed, and its
+demand is −242 rather than −447. Gladsaxe, top of the old ranking, falls to 31st.
 
-- **Top**: dense, built-out Copenhagen suburbs with real projected growth and little room to build —
-  Gladsaxe adds 345 dwellings' worth of people and completes 888. Genuinely the tightest market.
-- **Bottom**: two different stories mixed together. Fanø, Odsherred, Lolland, Læsø, Morsø and Struer
-  are **shrinking**, so `demand_5y` is *negative* and every completed dwelling counts as oversupply.
-  Høje-Taastrup and Hillerød are the opposite — large projected growth (1 984 and 536 dwellings) with
-  a building programme several times larger. The indicator cannot tell them apart on its own, which
-  is why the popup must show `demand_5y` alongside the gap.
+### 🚩 `fc_hh_gap_rel` is the map; `fc_hh_gap` is the number
+
+Because every municipality is still negative, a diverging ramp centred on 0 renders one-sided —
+exactly the problem `fc_20_34_rel` solves for §3, and solved the same way. `fc_hh_gap_rel` subtracts
+**Denmark's own −13.87**, where Denmark is the Σ of the same 98 municipalities computed the same way
+(check 6 asserts both the identity and the sum). That puts **41 of 98 above the line and 57 below**,
+and the reading is *tighter or looser than the country*, not *undersupplied or oversupplied*.
+
+| | tightest against the country | vs DK | per 1 000 | | loosest against the country | vs DK | per 1 000 |
+|---|---|---:|---:|---|---|---:|---:|
+| 1 | Tårnby | +12.8 | −1.1 | 1 | Læsø | −33.1 | −47.0 |
+| 2 | Hvidovre | +10.5 | −3.4 | 2 | Samsø | −24.9 | −38.8 |
+| 3 | Aarhus | +9.0 | −4.9 | 3 | Odsherred | −21.5 | −35.3 |
+| 4 | Hedensted | +7.8 | −6.0 | 4 | Fanø | −21.0 | −34.9 |
+| 5 | Halsnæs | +7.5 | −6.4 | 5 | Høje-Taastrup | −19.0 | −32.8 |
+| 6 | Odense | +6.7 | −7.2 | 6 | Glostrup | −18.9 | −32.7 |
+| 7 | Helsingør | +6.0 | −7.9 | 7 | Ringkøbing-Skjern | −15.3 | −29.1 |
+| 8 | Vejen | +5.6 | −8.3 | 8 | Bornholm | −12.1 | −26.0 |
+| 9 | Skanderborg | +5.4 | −8.4 | 9 | Lyngby-Taarbæk | −11.5 | −25.4 |
+| 10 | Thisted | +5.4 | −8.4 | 10 | Brøndby | −10.0 | −23.9 |
+
+The two ends still mean different things, which is the trap this indicator sets and which no
+re-centring removes:
+
+- **Top**: built-out municipalities whose projected household growth is nearly matched by their net
+  additions — Tårnby needs 314 dwellings and adds 362. Genuinely the tightest markets.
+- **Bottom**: two different stories mixed together. Læsø, Samsø, Odsherred, Fanø and Ringkøbing-Skjern
+  are **shrinking**, so `demand_5y` is *negative* and every net addition counts as oversupply;
+  several are also summer-house municipalities, which is what `supply_5y_excl_cottages` is for.
+  Høje-Taastrup and Brøndby are the opposite — real projected household growth (1 812 and 1 381) with
+  a building programme twice the size. The indicator cannot tell them apart on its own, which is why
+  the popup must show `demand_5y` alongside the gap.
+
+### Backtest — and it does not say what the fix hoped
+
+`build_housing_gap.py` replays the whole formula on the last window that has fully played out. It
+stands at 1 January **2020**, uses only 2015–2020 inputs, predicts 2020→2025, and scores the result
+against what happened: **actual household growth (FAM55N 2020→2025) minus actual net dwelling-stock
+change (BOL101 2020→2025)**, per 1 000 inhabitants. The population input is `FRKM120`, the projection
+vintage actually published in 2020, so this is the indicator out of sample and not just its
+arithmetic; a second scoring substitutes the realised population, which separates the formula's error
+from the projection's.
+
+Spearman rank correlation across the 98 municipalities, predicted `gap_per_1000` against actual:
+
+| population input | old (constant size, gross completions) | **new (trend, net stock)** | trend demand only | net stock only |
+|---|---:|---:|---:|---:|
+| `FRKM120` projection | **+0.199** | −0.171 | −0.082 | +0.178 |
+| realised population | **+0.389** | +0.215 | +0.229 | +0.373 |
+
+**Stated plainly: on this backtest the new method ranks municipalities worse than the old one, by
+−0.37 with the 2020 projection and −0.17 with the realised population. The fix does not pay off on
+the measure it was tested against.** Each fix scored on its own side does better, which is what makes
+the combined result worth spelling out:
+
+| side, 2020→2025 | ρ old → new | median miss per 1 000 | Denmark old / new vs actual |
+|---|---:|---:|---:|
+| households formed | +0.919 → **+0.960** | 8.46 → **4.57** | +78 154 / **+93 793** vs +129 169 |
+| net dwellings added | +0.780 → **+0.799** | 8.73 → 10.75 | +125 708 / +111 871 vs **+164 763** |
+
+Both sides rank better under the new formula and the demand side's typical miss is roughly halved.
+The combined gap nevertheless ranks worse because **it is a small residual between two large, nearly
+equal flows**: Denmark's actual 2020→2025 gap was −6.12 per 1 000 out of a demand of +22.2 and a
+supply of +28.3, and across municipalities the actual gap spans only −42.5 to +4.1 with a median of
+−5.8. Both formulas under-predict both sides — 2020–2025 was an acceleration in household formation
+*and* in building that neither could see from 2015–2020 data — and the old formula's two errors
+happened to **cancel**: −51 015 on demand against −39 055 on supply leaves a gap error of −11 960,
+while the new formula's smaller demand error (−35 376) sits against a larger supply error (−52 892)
+and leaves +17 516. Better components, worse cancellation.
+
+What that justifies and what it does not:
+
+- It does **not** justify calling the new method more accurate. One window, one country, 98 points,
+  and the headline test says the opposite.
+- It does justify keeping it. The quantity the map is asked to show is *the balance between household
+  formation and net additions*, and the new formula estimates both of those quantities better and
+  measures the second one as the thing it claims to be. The old formula got the residual's ranking
+  slightly less wrong through an error cancellation that has no reason to repeat.
+- It does mean the **absolute** gap should not be read as a forecast of anything. That was already
+  true and the backtest quantifies it: neither method explains much of the between-municipality
+  variation in the realised gap.
+
+The ten municipalities that actually tightened most over 2020→2025 are worth keeping next to the
+ranking above, because only two of them are anywhere near the top of it:
+
+| | | actual per 1 000 | households formed | net dwellings | old predicted | new predicted |
+|---|---|---:|---:|---:|---:|---:|
+| 1 | Tårnby | +4.12 | +585 | +408 | −5.0 | −16.5 |
+| 2 | Frederiksberg | +2.94 | +1 635 | +1 328 | −14.4 | −11.7 |
+| 3 | Næstved | +1.37 | +1 479 | +1 365 | −13.1 | −5.4 |
+| 4 | København | +1.15 | +20 263 | +19 535 | −10.3 | −20.7 |
+| 5 | Dragør | +0.28 | +48 | +44 | −10.3 | −12.3 |
+| 6 | Frederikssund | +0.07 | +1 525 | +1 522 | −7.2 | −3.3 |
+| 7 | Gentofte | +0.01 | +703 | +702 | −11.4 | −5.7 |
+| 8 | Stevns | 0.00 | +504 | +504 | −8.7 | −7.2 |
+| 9 | Favrskov | −0.62 | +606 | +636 | −11.7 | −4.9 |
+| 10 | Tønder | −1.50 | −92 | −36 | −10.6 | +9.3 |
+
+Only **seven municipalities in the whole country** actually formed more households than they added
+dwellings over 2020→2025, and the largest margin was 4.12 per 1 000 — Tårnby, Frederiksberg, Næstved,
+København, Dragør, Frederikssund and Gentofte, in that order. Both formulas predicted large negative
+gaps for every one of them. Of the ten above, **only Tårnby is also in the current relative top ten**;
+Næstved is 13th, Frederikssund 12th, Favrskov 14th and Tønder 16th, while Stevns is 72nd and Dragør
+64th. That overlap is the visible form of the ρ ≈ +0.2 to +0.4 in the table: a weak signal, not none.
+
+`--no-backtest` skips the whole block; the results are stored in `meta.backtest` either way, so
+`validate_forecast.py` can print them without rerunning anything.
 
 ### Assumptions
 
-1. **Household size is constant** at its 1 January 2026 value for the whole five years.
-2. **The building pace is flat** at the 2021–2025 mean, with no trend, no cycle and no response to
-   prices, rates or the projection itself.
+1. **Household size follows its own recent linear trend**, capped at ±5 % over five years and floored
+   at 1.6 persons. No cohort structure, no ageing effect, no price or tenure response.
+2. **The building pace is the flat net-additions pace** of the 2020–2026 stock change, with no trend,
+   no cycle and no response to prices, rates or the projection itself.
 3. **The projection is exogenous.** DST's municipal projection carries no housing programme (§1), so
    a municipality that builds 5 000 dwellings does not thereby gain the population to fill them in
    this arithmetic. Demand and supply are measured independently and then compared.
-4. **Every dwelling completed is a net addition to the stock** available to the projected population.
+4. **A dwelling in the BOL101 stock is available to the projected population** — it is not vacant,
+   not a second home, not a student hall counted against households that do not exist.
 
 ### Caveats — what is deliberately not modelled
 
-- **The constant-household-size assumption is the largest omitted term, and it understates demand.**
-  Danish household size has fallen steadily — 2.150 persons per household in 2016, 2.118 in 2021,
-  2.094 in 2026. Over 2021→2026 Denmark actually gained **120 983 households**; the same population
-  growth at a *constant* 2021 household size implies only **87 604**. The formula would therefore
-  have missed about **28 %** of the last five years' real household formation.
-- **Demolitions and conversions.** `BYGV33` counts completions, not net stock change. Dwellings
-  demolished, merged or converted to other uses are not subtracted, so `supply_5y` overstates the
-  net addition.
-- **Vacancy and second homes.** A completed dwelling in Odsherred or on Fanø may be a summer house
-  and never house a projected resident. Neither vacancy nor holiday-home status is modelled, which
-  biases exactly the municipalities at the bottom of the ranking.
-- **Student housing and institutions.** `ANVEND` is summed over all uses, so halls of residence
+- **The household-size trend is a straight line through six years, two of which are pandemic years.**
+  It is the largest remaining modelling choice and the cap exists to bound it. The backtest shows the
+  trend under-predicted the actual 2020–2025 fall nationally (Denmark's persons per household went
+  2.134 → 2.097, against a trend extrapolation of 2.122), so if anything this still understates
+  household formation.
+- **DST publishes a household projection** (`FRHUS1xx`) which would replace the whole demand side
+  with an official figure. Using it is the obvious next step and is listed in §5.
+- **`BOL101` has no 2021 or 2022.** The supply window spans six years and is annualised; if the true
+  pace within the closed years differed sharply from the rest of the window, that is invisible here.
+- **Vacancy and second homes.** A dwelling in the stock may be empty or a summer house.
+  `supply_5y_excl_cottages` is carried for the cottage part of this — 3 % nationally — but vacancy is
+  not modelled at all, and `BOL101`'s `UDLFORH=IB` (unoccupied) is summed into the total rather than
+  removed.
+- **Student housing and institutions.** All `ANVENDELSE` codes are summed, so halls of residence
   count as dwellings while their residents may not form FAM55N households.
-- **Reporting delay.** `BYGV33` is the unadjusted table; recent quarters are revised upward, so the
-  2025 completion figure — and hence `supply_5y` — is a slight undercount that will grow.
-- **In shrinking municipalities `demand_5y` is negative**, so any positive supply reads as
-  oversupply and the value is driven by the completion count alone. 45 of 98 municipalities are in
-  this position.
+- **In shrinking municipalities `demand_5y` is negative**, so any positive supply reads as oversupply
+  and the value is driven by the stock change alone. 31 of 98 municipalities are in this position —
+  down from 45 under the constant-household-size formula, because falling household size keeps demand
+  positive in 14 municipalities whose population shrinks.
 - **The projection is not housing-driven**, so this compares two series that do not talk to each
   other. It is a consistency check on a municipality's building programme against its official
-  demographic outlook, not a market forecast.
-
-Even against *actual* household formation the picture holds: Denmark completed 168 072 dwellings
-over 2021–2025 against 120 983 new households, ~39 % more. The negative national gap is not purely
-an artefact of assumption 1.
+  demographic outlook, not a market forecast — and the backtest above is the evidence for how weak a
+  forecast it would be.
 
 ### Validation
 
-`scripts/validate_forecast.py` check 6 asserts 98 municipalities with all ten components present and
-non-null. Check 7 recomputes `gap_per_1000` for **København, Aarhus, Brøndby, Lemvig and
-Frederiksberg** from the raw CSV cells — a second implementation reading the pulls directly, not the
-build's own numbers — and prints every step:
+`scripts/validate_forecast.py` check 6 asserts 98 municipalities with all twenty components present
+and non-null, plus the two identities `fc_hh_gap_rel` depends on: `gap_per_1000_rel = gap_per_1000 −
+Denmark's`, for all 98, and `Σ kommuner = Denmark` for `demand_5y`, `supply_5y` and `p_base`. Check 7
+recomputes `gap_per_1000` for **København, Aarhus, Brøndby, Lemvig and Frederiksberg** from the raw
+CSV cells — a second implementation reading the pulls directly, with its own copy of the trend, the
+cap and the annualised stock window, not the build's numbers — and prints every step:
 
 ```
-✓ 101 København     pop  671 714 ÷ hh  332 181 = 2.0221 p/hh
-    demand (689 101 − 671 714) / 2.0221 =     8 598   supply 19 012 / 5 × 5 =    19 012
-    gap    -10 414 / 671 714 × 1000 = -15.50   stored -15.50
-✓ 665 Lemvig        pop   18 596 ÷ hh    9 151 = 2.0321 p/hh
-    demand (17 688 − 18 596) / 2.0321 =      -447   supply 147 / 5 × 5 =       147
-    gap       -594 / 18 596 × 1000 = -31.93   stored -31.93
+✓ 751 Aarhus        p/hh 2021 2.0723 → 2026 2.0256 (-0.00934/yr) → 2031 1.9789
+    demand 399 885 / 1.9789 − 378 361 / 2.0256 =    15 283   supply (197 117 − 176 562) / 6 × 5 =    17 129
+    gap     -1 846 / 378 361 × 1000 = -4.88   stored -4.88   vs Denmark +8.99
+✓ 665 Lemvig        p/hh 2021 2.0788 → 2026 2.0321 (-0.00933/yr) → 2031 1.9855
+    demand 17 688 / 1.9855 − 18 596 / 2.0321 =      -242   supply (13 312 − 13 259) / 6 × 5 =        44
+    gap       -286 / 18 596 × 1000 = -15.41   stored -15.41   vs Denmark -1.54
 ```
 
-Lemvig is the shrinking case: −908 people over five years is −447 dwellings of demand, and 147
-completions push the gap further negative. Frederiksberg is the same shape at city scale. Brøndby is
-the one municipality that gains 20–34-year-olds outright (§3) and still comes out at −23.5, because
-3 818 more people at 2.29 per household is 1 669 dwellings against 2 633 completed.
+Lemvig is the shrinking case: 908 fewer people over five years is 242 fewer households once falling
+household size is allowed for — not the 447 the constant-size formula gave — and 44 net dwellings
+push the gap negative. Frederiksberg is the same shape at city scale: −82 households of demand
+against 1 178 net additions. Brøndby is the one municipality that gains 20–34-year-olds outright
+(§3), and it is the one case here where household size **rises** (2.29 → 2.32), so its demand falls
+from 1 669 to 1 381 while its net additions, 2 359, are 274 below its completions.
 
 ### Popup text — Phase B
 
-> *Forecast needs ~N dwellings, recent pace ~M → gap K*
+> *Projection implies ~N more households, recent pace adds ~M dwellings → gap K*
 
 with `N` = `demand_5y`, `M` = `supply_5y`, `K` = `gap`, and — because of everything above — the
-sentence must survive **N being negative**. "Forecast needs ~−447 dwellings" is wrong; the shrinking
-case wants its own wording ("projection implies 447 fewer households; 147 completed"). The popup
-should also carry `persons_per_hh`, the completion years and `pipeline_permitted`, and `note_short`
-should reach the map so the constant-household-size caveat travels with the number.
+sentence must survive **N being negative**. "Implies ~−242 more households" is wrong; the shrinking
+case wants its own wording ("projection implies 242 fewer households; 44 dwellings added"). The popup
+should also carry `persons_per_hh` → `persons_per_hh_mid` (the working behind the demand side),
+`stock_prev` → `stock_base`, and `pipeline_permitted`; `note_short` should reach the map so the
+"measured against Denmark, not against zero" caveat travels with the number, exactly as it does for
+`fc_20_34_rel`.
