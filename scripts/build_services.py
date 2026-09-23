@@ -373,8 +373,13 @@ def write_files(points, meta, asof, raw_meta):
         total_bytes += path.stat().st_size
         counts = collections.Counter(p["cat"] for p in pts)
         subs = collections.Counter(f"{p['cat']}:{p['sub']}" for p in pts)
+        # the municipality's own bounds, so the page can decide from index.json alone
+        # whether a file is worth fetching for the current viewport — [S, W, N, E]
+        bb = [min(p["lat"] for p in pts), min(p["lon"] for p in pts),
+              max(p["lat"] for p in pts), max(p["lon"] for p in pts)]
         index["kommuner"][str(int(code4))] = {
             "file": f"{code4}.json", "n": len(pts),
+            "bbox": [round(v, 4) for v in bb],
             "by_cat": dict(sorted(counts.items())), "by_sub": dict(sorted(subs.items())),
         }
 

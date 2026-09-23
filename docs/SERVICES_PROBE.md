@@ -153,10 +153,10 @@ for their *live* APIs, not for this static file.
 
 **Licence:** the feed carries its own `attributions.txt` — `is_producer=1`,
 `organization_name=Rejseplanen`, `attribution_url=https://www.rejseplanen.dk`. Third-party
-catalogues describe the feed as CC BY 4.0; **we could not confirm that wording on a
-first-party page** (the Labs article returns 403 to a plain fetch), so treat
-"attribution to Rejseplanen" as the confirmed requirement and check the licence text
-before shipping.
+catalogues describe the feed as CC BY 4.0, which we could not confirm from a first-party
+page at probe time (the Labs article returns 403 to a plain fetch). **Since resolved:**
+Rejseplanen Labs' "Retningslinjer for Labs" states CC BY 4.0 — see
+[`SERVICES.md`](SERVICES.md) §6.
 
 | | |
 |---|---|
@@ -348,8 +348,8 @@ split into their own per-kommune file.
 
 ## 8. Open questions before building
 
-1. **GTFS licence wording** — confirm CC BY 4.0 (or whatever it is) on a first-party
-   Rejseplanen page before shipping. `attributions.txt` only gives the producer.
+1. ~~**GTFS licence wording**~~ — **resolved: CC BY 4.0**, per Rejseplanen Labs'
+   "Retningslinjer for Labs". See [`SERVICES.md`](SERVICES.md) §6.
 2. **Station clustering rule** — GTFS gives no `parent_station`. Cluster by
    `stop_name` + a radius? By `stop_code` prefix? This needs a measurement of its own.
 3. **Refresh cadence** — the extract is daily, GTFS roughly fortnightly. Monthly with the

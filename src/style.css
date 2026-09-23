@@ -1469,6 +1469,35 @@ th .thn{display:inline}
 /* every category stays listed, so an off one needs a way back: greyed, struck through, hollow swatch */
 .maplegend .lgrow.gk.allhidden{color:var(--ink);margin-top:5px;white-space:normal;line-height:1.35}
 .maplegend .lgrow.gk.allhidden .only{margin-left:0;padding-left:0;color:var(--ink);text-decoration:underline}
+/* ---- Services overlay (docs/SERVICES.md) ---- */
+.maplegend.serviceslegend{min-width:180px;pointer-events:auto}
+/* the category rows are the filter, same interaction as the public-buildings legend */
+.maplegend .lgrow.srvcat{cursor:pointer;border-radius:4px;padding:1px 3px;margin:0 -3px}
+.maplegend .lgrow.srvcat:hover{background:rgba(20,28,24,.06)}
+.maplegend .lgrow.srvcat.off{opacity:.38;text-decoration:line-through}
+.maplegend .lgrow.srvcat i{width:11px;height:11px;flex-basis:11px;border:1px solid rgba(0,0,0,.08)}
+/* "zoom in" sits where the ONLY link sits on the public legend — a state, not an action */
+.maplegend .srvzoom{font-style:normal;font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted);margin-left:auto;padding-left:6px}
+.maplegend .lgrow.srvmodes{flex-wrap:wrap;gap:4px;margin-top:3px;padding-left:23px}
+.maplegend .lgnote.srvhint{color:var(--ink2);font-style:italic}
+/* the transport dots are drawn on the canvas renderer; the station circles stay SVG so they keep
+   their hover growth and cursor */
+#lfmap path.srv-station{cursor:pointer}
+@media (max-width:900px){
+  /* the legend doubles as the filter, so on a phone it must stay tappable rather than tiny:
+     the column goes full width under the map controls and the chips wrap */
+  .maplegs{left:12px;right:12px;align-items:stretch;max-height:46%}
+  .maplegs .maplegend{width:100%;max-width:none}
+  .maplegend .lgrow.srvcat,.maplegend .pubtog{padding:5px 4px;margin:0 -4px}
+  .maplegend .lgrow.srvmodes{padding-left:0}
+  /* as pills, "on" has to be readable without the strike-through carrying all the weight */
+  .maplegend .lgrow.srvmodes .pubtog{padding:5px 10px;border:1px solid var(--ink);border-radius:999px;
+    background:var(--ink);color:#fff;opacity:1}
+  .maplegend .lgrow.srvmodes .pubtog.off{background:transparent;color:var(--muted);
+    border-color:var(--line);opacity:1;text-decoration:line-through}
+  .maplegend .lgnote{max-width:none}
+}
 .maplegend .lgsub{font-family:var(--body);font-weight:600;font-size:11px;margin:6px 0 3px;padding-top:6px;border-top:1px solid var(--line);line-height:1.2}
 .maplegend .lgsub span{display:block;font-family:var(--mono);font-weight:400;font-size:9.5px;color:var(--muted);margin-top:1px}
 

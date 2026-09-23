@@ -138,5 +138,5 @@ Mostly Rejseplanen's Swedish stops (Skånetrafiken crosses the Øresund) plus a 
 - ✓ København (101) groceries 513 — probe said 513, ±5 % = 487–539
 - ✓ metro stations in Denmark 44 — expected 40–50
 - ✓ every kommune has at least one grocery
-- ✓ processed size **2.55 MB** (target < 15 MB)
+- ✓ processed size **2.56 MB** (target < 15 MB)
 

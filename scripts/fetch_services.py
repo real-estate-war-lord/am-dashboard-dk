@@ -41,7 +41,7 @@ SOURCES = {
         "url": "https://www.rejseplanen.info/labs/GTFS.zip",
         "file": "rejseplanen_gtfs.zip",
         "name": "Rejseplanen — static GTFS",
-        "licence": "Attribution: Rejseplanen (see docs/SERVICES.md — licence text unconfirmed)",
+        "licence": "CC BY 4.0 — Rejseplanen (labs.rejseplanen.dk, Retningslinjer for Labs)",
     },
 }
 
