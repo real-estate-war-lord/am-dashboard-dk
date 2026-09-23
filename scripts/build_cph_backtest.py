@@ -45,7 +45,8 @@ Output
     {"meta": {...},
      "horizons": {"<h>": {"forecast": {...}, "baseline": {...}, "n": …}},
      "areas":   {"<code>": {"bt_mape", "bt_bias", "bt_medape", "bt_mae",
-                            "bt_baseline_mape", "bt_n", "bt_mape_by_horizon"}},
+                            "bt_baseline_mape", "bt_n", "bt_mape_by_horizon",
+                            "bt_mape_5y", "bt_over_5y", "bt_n_5y", "bt_line_eligible"}},
      "pairs":   [{"vintage", "horizon", "year", "code", "forecast", "actual", "baseline"}]}
 
 Usage
@@ -71,6 +72,15 @@ from build_cph_forecast import (API, CITY, DB, RAW, TOL_BYDEL, TOL_CITY, UA,  # 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 OUT = ROOT / "data" / "processed" / "cph_backtest.json"
 HORIZONS = (1, 3, 5)     # years ahead to score; 0 is added as the base-year check
+
+# ---- the one backtest figure that reaches the UI -----------------------------------
+# docs/FORECAST.md §9.7: Copenhagen kvarter and bydel AREA PAGES carry a single factual
+# line built from bt_mape_5y, bt_over_5y and bt_n_5y. Never on the map, never coloured.
+# An area with fewer than BT_LINE_MIN vintages at h=5 shows nothing at all rather than a
+# figure resting on one or two replays — a count, not a confidence interval, because the
+# rule has to be checkable from the data.
+BT_LINE_H = 5
+BT_LINE_MIN = 3
 
 
 def get(url: str):
@@ -275,10 +285,17 @@ def main():
         if not ps:
             continue
         f_ = score(ps, "forecast")
+        # the UI line: h=5 only, with the over-forecast count beside the error, so the
+        # sentence can say "y of z vintages over-forecast" from stored figures alone
+        at5 = [p for p in ps if p["horizon"] == BT_LINE_H]
         per_area[k] = {"bt_mape": f_["mape"], "bt_bias": f_["bias"],
                        "bt_medape": f_["medape"], "bt_mae": f_["mae"],
                        "bt_baseline_mape": score(ps, "baseline")["mape"],
                        "bt_n": len(ps),
+                       "bt_mape_5y": score(at5, "forecast")["mape"] if at5 else None,
+                       "bt_over_5y": sum(1 for p in at5 if p["forecast"] > p["actual"]),
+                       "bt_n_5y": len(at5),
+                       "bt_line_eligible": len(at5) >= BT_LINE_MIN,
                        "bt_mape_by_horizon": {
                            str(h): score([p for p in ps if p["horizon"] == h],
                                          "forecast")["mape"]
@@ -306,6 +323,20 @@ def main():
                    "(1 − mape_forecast / mape_baseline) × 100, positive = the district "
                    "split beats the pro-rata city baseline.",
         "tolerances": {"city": TOL_CITY, "bydel": TOL_BYDEL},
+        "ui_line": {
+            "horizon": BT_LINE_H, "min_vintages": BT_LINE_MIN,
+            "keys": ["bt_mape_5y", "bt_over_5y", "bt_n_5y", "bt_line_eligible"],
+            "where": "Copenhagen kvarter and bydel area pages only — never the map, never "
+                     "coloured, never a ranking.",
+            "text": "Past accuracy: KK's 5-year forecasts for this area were off by "
+                    "{bt_mape_5y} % on average ({bt_over_5y} of {bt_n_5y} vintages "
+                    "over-forecast).",
+            "rule": f"Render only where bt_line_eligible is true, i.e. bt_n_5y >= "
+                    f"{BT_LINE_MIN}. Below that, show nothing — not a hedged figure.",
+            "note": "This is the ONLY backtest figure that reaches the UI. bt_mape, "
+                    "bt_bias, bt_medape, bt_mae and bt_baseline_mape stay in this file "
+                    "and in docs/FORECAST.md §9 as research.",
+        },
         "additivity_warnings": warnings,
         "licence": "free reuse with attribution",
         "source": f"Københavns Kommune KKFR{min(old)}–KKFR{cur} and KKBEF1, "

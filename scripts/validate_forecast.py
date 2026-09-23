@@ -112,41 +112,81 @@ FROM_NET_DWELLINGS = {"hist_net_dwell"}
 # indicators stay out of the registry and reach the UI through a Phase B note under the
 # `cph` key instead (docs/FORECAST.md §8, §9). The hard-data rule applies to them all the
 # same, so they are audited here and check 0 also asserts that none has crept into the
-# registry. (value, file) — the file the key must actually appear in.
+# registry.
+#
+# (source, arithmetic, assumption, file, ui) — `ui` is whether the key is allowed to reach
+# the UI at all. Most of these are research: fc_netmig and its flag are computed, checked
+# and documented, but nothing renders them (§9.4 — the five reconciliation failures make a
+# kvarter choropleth of it actively misleading, and a research figure is not worth that).
+# The only Copenhagen-only figures that reach the UI are the four behind §9.7's one-line
+# past-accuracy sentence on area pages. `--ui` prints the full UI inventory.
 #
 # y0 = the vintage year; win5 / win = the movement years each window sums (§9).
 AUDIT_CPH = {
  "fc_netmig_5y":           ("KKFRBEDI", "Σ `06 Nettotilflytning` over movement years "
-                                        "y0…y0+4", None, "cph"),
- "fc_netmig_5y_per1000":   ("KKFRBEDI + KKFR<V>", "fc_netmig_5y / P_y0 × 1000", None, "cph"),
+                                        "y0…y0+4", None, "cph", False),
+ "fc_netmig_5y_per1000":   ("KKFRBEDI + KKFR<V>", "fc_netmig_5y / P_y0 × 1000", None, "cph", False),
  "fc_netmig":              ("KKFRBEDI", "Σ `06 Nettotilflytning` over movement years "
-                                        "y0…y_last−1", None, "cph"),
- "fc_netmig_per1000":      ("KKFRBEDI + KKFR<V>", "fc_netmig / P_y0 × 1000", None, "cph"),
+                                        "y0…y_last−1", None, "cph", False),
+ "fc_netmig_per1000":      ("KKFRBEDI + KKFR<V>", "fc_netmig / P_y0 × 1000", None, "cph", False),
  "fc_netmig_gap":          ("KKFRBEDI + KKFR<V>",
                             "(P_(y_last) − P_y0) − Σ(`03 Fødselsoverskud` + "
-                            "`06 Nettotilflytning`) over the window", None, "cph"),
- "fc_netmig_gap_per1000":  ("KKFRBEDI + KKFR<V>", "fc_netmig_gap / P_y0 × 1000", None, "cph"),
+                            "`06 Nettotilflytning`) over the window", None, "cph", False),
+ "fc_netmig_gap_per1000":  ("KKFRBEDI + KKFR<V>", "fc_netmig_gap / P_y0 × 1000", None, "cph", False),
  "fc_netmig_reconciles":   ("KKFRBEDI + KKFR<V>",
                             "|fc_netmig_gap| ≤ max(5 × window years, 1 % of P_y0) — a QA "
                             "threshold on published cells, not a parameter of any "
                             "displayed value; see §9 for why it is not delicate",
-                            None, "cph"),
+                            None, "cph", False),
  "bt_mape":                ("KKFR<V> + KKBEF1",
                             "mean over (vintage, horizon ≥ 1) of |F − A| / A × 100",
-                            None, "backtest"),
+                            None, "backtest", False),
  "bt_bias":                ("KKFR<V> + KKBEF1",
                             "mean over (vintage, horizon ≥ 1) of (F − A) / A × 100",
-                            None, "backtest"),
+                            None, "backtest", False),
  "bt_medape":              ("KKFR<V> + KKBEF1",
                             "median over (vintage, horizon ≥ 1) of |F − A| / A × 100 — "
                             "MAPE's companion, since a few small kvarterer dominate the "
-                            "mean", None, "backtest"),
+                            "mean", None, "backtest", False),
  "bt_mae":                 ("KKFR<V> + KKBEF1",
                             "mean over (vintage, horizon ≥ 1) of |F − A|, in persons",
-                            None, "backtest"),
+                            None, "backtest", False),
  "bt_baseline_mape":       ("KKFR<V> + KKBEF1",
                             "bt_mape with F = KKFR<V>(k, V) × KKFR<V>(city, V+h) / "
-                            "KKFR<V>(city, V)", None, "backtest"),
+                            "KKFR<V>(city, V)", None, "backtest", False),
+ # ---- the only Copenhagen-only keys that reach the UI (§9.7) ----
+ "bt_mape_5y":             ("KKFR<V> + KKBEF1",
+                            "mean over the vintages scoreable at horizon 5 of "
+                            "|F − A| / A × 100", None, "backtest", True),
+ "bt_over_5y":             ("KKFR<V> + KKBEF1",
+                            "count of those vintages with F > A", None, "backtest", True),
+ "bt_n_5y":                ("KKFR<V> + KKBEF1",
+                            "count of those vintages", None, "backtest", True),
+ "bt_line_eligible":       ("KKFR<V> + KKBEF1",
+                            "bt_n_5y ≥ 3 — below that the area shows no line at all",
+                            None, "backtest", True),
+}
+
+# The ten fc_* keys of AUDIT are produced for Copenhagen too, by the same indicators(),
+# from KKFR<V> instead of FRKM1xx and at kvarter and bydel level. Same arithmetic, so no
+# second audit row — but they are part of the UI inventory, so --ui lists them.
+CPH_REUSES = ["fc_growth", "fc_growth_5y", "fc_pop_rate_5y", "fc_abs",
+              "fc_0_5", "fc_6_16", "fc_20_34", "fc_20_34_rel", "fc_20_34_abs", "fc_80p"]
+
+# fc_20_34_rel is the one reused key whose meaning changes with the geography: it is
+# measured against the KK city total, not Denmark (§8), so it needs its own label and
+# arithmetic in the UI inventory rather than the registry's.
+CPH_OVERRIDES = {
+ "fc_20_34_rel": ("Young adults 20–34 vs København 2026→2040",
+                  "fc_20_34 − the same expression on the KK city total (OMRKK 1000)"),
+}
+
+# labels for the four keys behind §9.7's past-accuracy line, which have no registry entry
+BT_LABELS = {
+ "bt_mape_5y": "Past accuracy: mean 5-year forecast error",
+ "bt_over_5y": "…of which vintages that over-forecast",
+ "bt_n_5y": "…vintages scoreable at 5 years",
+ "bt_line_eligible": "…whether the line is shown at all",
 }
 
 # check 9's rounding tolerances live with the Copenhagen geography that defines them
@@ -509,6 +549,28 @@ def backtest(top: int) -> list[str]:
     if missing:
         print(f"    ✗ {len(missing)} areas have no bt_mape: {missing[:4]}")
         fails.append("backtest")
+
+    # ---- the past-accuracy line (§9.7) — the only backtest figures the UI may show ----
+    line = m["ui_line"]
+    ok_line = [k for k in areas if areas[k]["bt_line_eligible"]]
+    bad = [k for k in areas
+           if areas[k]["bt_line_eligible"] != (areas[k]["bt_n_5y"] >= line["min_vintages"])
+           or (areas[k]["bt_line_eligible"]
+               and (areas[k]["bt_mape_5y"] is None
+                    or not 0 <= areas[k]["bt_over_5y"] <= areas[k]["bt_n_5y"]))]
+    print(f"    {'✓' if not bad else '✗'} past-accuracy line: {len(ok_line)}/{len(areas)} areas "
+          f"eligible (rule: bt_n_5y ≥ {line['min_vintages']}, horizon {line['horizon']}), "
+          f"{len(bad)} inconsistent")
+    if bad:
+        print(f"      {[(k, areas[k]['bt_n_5y'], areas[k]['bt_over_5y']) for k in bad[:4]]}")
+        fails.append("backtest line")
+    shown = sorted(((areas[k]["bt_mape_5y"], k) for k in ok_line), reverse=True)
+    if shown:
+        worst_v, worst_k = shown[0]
+        a = areas[worst_k]
+        print(f"      worst line in the city — {worst_k} {b['names'].get(worst_k, '')}: "
+              f"\"off by {a['bt_mape_5y']:.1f} % on average "
+              f"({a['bt_over_5y']} of {a['bt_n_5y']} vintages over-forecast)\"")
     if m["additivity_warnings"]:
         print(f"    ⚠ {len(m['additivity_warnings'])} additivity warnings in the source "
               f"vintages, e.g. {m['additivity_warnings'][0]}")
@@ -597,6 +659,47 @@ def net_dwellings(kom: dict, base_year: str) -> list[str]:
     return fails
 
 
+def ui_inventory() -> None:
+    """Every indicator this branch puts in front of a user, and nothing else.
+
+    Assembled from the same two audit tables check 0 enforces, so it cannot drift from
+    what is actually allowed. Research figures — the housing gap, fc_netmig and the
+    backtest's other statistics — are absent by construction, not by editing.
+    """
+    reg = json.loads(CFG.read_text(encoding="utf-8")).get("forecast", {}).get("indicators", [])
+    by_key = {i["key"]: i for i in reg}
+    rows = []
+    for k in (i["key"] for i in reg):
+        table, arith, assumption = AUDIT[k]
+        ind = by_key[k]
+        rows.append((k, ind["label"], "kommune", table, arith, assumption))
+    for k in CPH_REUSES:
+        table, arith, assumption = AUDIT[k]
+        label, arith = CPH_OVERRIDES.get(k, (by_key[k]["label"], arith))
+        rows.append((k, label, "bydel + kvarter", "KKFR<V> (s30)", arith, assumption))
+    for k, (table, arith, assumption, _tag, ui) in AUDIT_CPH.items():
+        if ui:
+            rows.append((k, BT_LABELS.get(k, k), "bydel + kvarter", table, arith, assumption))
+    w = [max(len(str(r[i])) for r in rows) for i in range(5)]
+    print(f"Indicators this branch puts in the UI — {len(rows)} entries\n")
+    head = ("key", "label", "level", "source table(s)", "exact arithmetic")
+    print("  " + "  ".join(h.ljust(w[i]) for i, h in enumerate(head)) + "  kind")
+    print("  " + "  ".join("-" * w[i] for i in range(5)) + "  " + "-" * 30)
+    for k, label, level, table, arith, assumption in rows:
+        kind = ("⚠ ASSUMPTION" if assumption else
+                "official figure" if arith.startswith("published") else
+                "arithmetic on official figures")
+        print("  " + "  ".join(str(v).ljust(w[i]) for i, v in enumerate(
+            (k, label, level, table, arith))) + f"  {kind}")
+    bad = [r[0] for r in rows if r[5]]
+    print(f"\n  {len(rows)} entries · {len(rows) - len(bad)} are published figures or plain "
+          f"arithmetic on them · {len(bad)} assumptions")
+    excluded = [k for k, r in AUDIT_CPH.items() if not r[4]]
+    print(f"\n  Deliberately NOT in the UI: fc_hh_gap, fc_hh_gap_rel (housing gap, "
+          f"docs/FORECAST.md §7)\n  and {len(excluded)} Copenhagen research keys: "
+          f"{', '.join(excluded)} (§9)")
+
+
 def audit_cph(registry_keys: list[str]) -> list[str]:
     """Check 0b — the Copenhagen-only keys, which are audited but stay out of the registry.
 
@@ -609,17 +712,20 @@ def audit_cph(registry_keys: list[str]) -> list[str]:
                              ("backtest", CBT, lambda d: next(iter(d["areas"].values()), {}))):
         produced[tag] = set(where(json.loads(path.read_text(encoding="utf-8")))) \
             if path.exists() else None
+    n_ui = sum(1 for r in AUDIT_CPH.values() if r[4])
     print(f"\n   Copenhagen-only keys — audited here, deliberately not in the registry "
-          f"(Phase A rule, §8/§9)")
+          f"(Phase A rule, §8/§9)\n   {n_ui} reach the UI, "
+          f"{len(AUDIT_CPH) - n_ui} are research only · UI = shown, · = research")
     w = max((len(k) for k in AUDIT_CPH), default=14)
-    for k, (table, arith, assumption, tag) in AUDIT_CPH.items():
+    for k, (table, arith, assumption, tag, ui) in AUDIT_CPH.items():
         have = produced[tag]
         if have is None:
             print(f"   · {k:<{w}}  {table:<19}  {arith.splitlines()[0][:52]}   "
                   f"(file not built, skipped)")
             continue
         ok = k in have and not assumption and k not in registry_keys
-        print(f"   {'✓' if ok else '✗'} {k:<{w}}  {table:<19}  {arith}")
+        mark = "✓" if ok else "✗"
+        print(f"   {mark} {'UI' if ui else '  '} {k:<{w}}  {table:<19}  {arith}")
         if assumption:
             print(f"     {'':<{w}}  ⚠ ASSUMPTION: {assumption}")
             fails.append("registry audit")
@@ -649,7 +755,12 @@ def main():
     ap.add_argument("--tolerance", type=float, default=0.1, help="max Σ-vs-national deviation, %%")
     ap.add_argument("--top", type=int, default=10, help="rows at each end of the 20–34 rankings")
     ap.add_argument("--audit", action="store_true", help="run check 0 on its own and stop")
+    ap.add_argument("--ui", action="store_true",
+                    help="print every indicator this branch puts in the UI, and stop")
     args = ap.parse_args()
+    if args.ui:
+        ui_inventory()
+        return
     if not SRC.exists():
         sys.exit(f"{SRC.relative_to(ROOT)} not found — run scripts/build_forecast.py first")
     d = json.loads(SRC.read_text())

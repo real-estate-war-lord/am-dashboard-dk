@@ -202,26 +202,38 @@ counts dwellings that exist, not dwellings that are available.
 
 These live in `cph_forecast.json` and `cph_backtest.json` and are **deliberately not in
 `config/indicators.json`**: Phase A's rule is that Copenhagen-only indicators stay out of the
-registry and reach the UI through a Phase B note under the `cph` key instead (§8, §9). The hard-data
-rule applies to them exactly the same, so `validate_forecast.py` check 0 audits them here — and also
-asserts that none of them has leaked into the registry.
+registry and are added under the `cph` key by Phase B (§8, §9). The hard-data rule applies to them
+exactly the same, so `validate_forecast.py` check 0 audits them here — and also asserts that none of
+them has leaked into the registry.
 
-*y₀* = the vintage year (2026); the movement windows are defined in §9.
+Most of them are **research: computed, checked, documented and never rendered.** Passing §0 is a
+floor, not a warrant; §9.7 gives the reason for each. The `ui` column is enforced, not descriptive —
+`validate_forecast.py --ui` builds the UI inventory from it.
 
-| key | source table(s) | exact arithmetic | assumption |
-|---|---|---|---|
-| `fc_netmig_5y` | `KKFRBEDI` | Σ `06 Nettotilflytning` over movement years y₀…y₀+4 | none |
-| `fc_netmig_5y_per1000` | `KKFRBEDI` + `KKFR<V>` | `fc_netmig_5y` / P_y₀ × 1000 | none |
-| `fc_netmig` | `KKFRBEDI` | Σ `06 Nettotilflytning` over movement years y₀…y_last−1 | none |
-| `fc_netmig_per1000` | `KKFRBEDI` + `KKFR<V>` | `fc_netmig` / P_y₀ × 1000 | none |
-| `fc_netmig_gap` | `KKFRBEDI` + `KKFR<V>` | (P_y_last − P_y₀) − Σ(`03 Fødselsoverskud` + `06 Nettotilflytning`) over the window | none |
-| `fc_netmig_gap_per1000` | `KKFRBEDI` + `KKFR<V>` | `fc_netmig_gap` / P_y₀ × 1000 | none |
-| `fc_netmig_reconciles` | `KKFRBEDI` + `KKFR<V>` | \|`fc_netmig_gap`\| ≤ max(5 × window years, 1 % of P_y₀) | none — a threshold, see below |
-| `bt_mape` | `KKFR<V>` + `KKBEF1` | mean over (vintage, horizon ≥ 1) of \|F − A\| / A × 100 | none |
-| `bt_bias` | `KKFR<V>` + `KKBEF1` | mean over (vintage, horizon ≥ 1) of (F − A) / A × 100 | none |
-| `bt_medape` | `KKFR<V>` + `KKBEF1` | median over (vintage, horizon ≥ 1) of \|F − A\| / A × 100 | none |
-| `bt_mae` | `KKFR<V>` + `KKBEF1` | mean over (vintage, horizon ≥ 1) of \|F − A\|, in persons | none |
-| `bt_baseline_mape` | `KKFR<V>` + `KKBEF1` | `bt_mape` with F = `KKFR<V>`(k, V) × `KKFR<V>`(city, V+h) / `KKFR<V>`(city, V) | none |
+*y₀* = the vintage year (2026); the movement windows are defined in §9.4.
+
+| key | ui | source table(s) | exact arithmetic | assumption |
+|---|---|---|---|---|
+| `fc_netmig_5y` | 🚫 | `KKFRBEDI` | Σ `06 Nettotilflytning` over movement years y₀…y₀+4 | none |
+| `fc_netmig_5y_per1000` | 🚫 | `KKFRBEDI` + `KKFR<V>` | `fc_netmig_5y` / P_y₀ × 1000 | none |
+| `fc_netmig` | 🚫 | `KKFRBEDI` | Σ `06 Nettotilflytning` over movement years y₀…y_last−1 | none |
+| `fc_netmig_per1000` | 🚫 | `KKFRBEDI` + `KKFR<V>` | `fc_netmig` / P_y₀ × 1000 | none |
+| `fc_netmig_gap` | 🚫 | `KKFRBEDI` + `KKFR<V>` | (P_y_last − P_y₀) − Σ(`03 Fødselsoverskud` + `06 Nettotilflytning`) over the window | none |
+| `fc_netmig_gap_per1000` | 🚫 | `KKFRBEDI` + `KKFR<V>` | `fc_netmig_gap` / P_y₀ × 1000 | none |
+| `fc_netmig_reconciles` | 🚫 | `KKFRBEDI` + `KKFR<V>` | \|`fc_netmig_gap`\| ≤ max(5 × window years, 1 % of P_y₀) | none — a threshold, see below |
+| `bt_mape` | 🚫 | `KKFR<V>` + `KKBEF1` | mean over (vintage, horizon ≥ 1) of \|F − A\| / A × 100 | none |
+| `bt_bias` | 🚫 | `KKFR<V>` + `KKBEF1` | mean over (vintage, horizon ≥ 1) of (F − A) / A × 100 | none |
+| `bt_medape` | 🚫 | `KKFR<V>` + `KKBEF1` | median over (vintage, horizon ≥ 1) of \|F − A\| / A × 100 | none |
+| `bt_mae` | 🚫 | `KKFR<V>` + `KKBEF1` | mean over (vintage, horizon ≥ 1) of \|F − A\|, in persons | none |
+| `bt_baseline_mape` | 🚫 | `KKFR<V>` + `KKBEF1` | `bt_mape` with F = `KKFR<V>`(k, V) × `KKFR<V>`(city, V+h) / `KKFR<V>`(city, V) | none |
+| `bt_mape_5y` | **✅** | `KKFR<V>` + `KKBEF1` | mean over the vintages scoreable at horizon 5 of \|F − A\| / A × 100 | none |
+| `bt_over_5y` | **✅** | `KKFR<V>` + `KKBEF1` | count of those vintages with F > A | none |
+| `bt_n_5y` | **✅** | `KKFR<V>` + `KKBEF1` | count of those vintages | none |
+| `bt_line_eligible` | **✅** | `KKFR<V>` + `KKBEF1` | `bt_n_5y` ≥ 3 — below that the area shows no line at all | none — a threshold |
+
+The four ✅ keys are the whole of §9.7's past-accuracy line, on Copenhagen kvarter and bydel **area
+pages only**. Nothing else from `cph_backtest.json` is rendered, and **`fc_netmig` is not rendered at
+all** — §9.7 note 2 explains why a signal that passes §0 can still be wrong to show.
 
 **`fc_netmig_reconciles` is a threshold, not an assumption, and the distinction is worth stating.**
 An assumption changes a displayed value; this changes nothing — it is a QA flag over two published
@@ -232,8 +244,21 @@ that band, the flag has become load-bearing and the rule needs revisiting rather
 
 **The ten `fc_*` keys of §3 are produced for Copenhagen too**, by the same `indicators()`. They need
 no second audit row: the arithmetic is identical and only the source table (`KKFR<V>` instead of
-`FRKM1xx`) and `fc_20_34_rel`'s baseline (the city, not Denmark — §8) differ. `hist_net_dwell` has
-no Copenhagen counterpart, because BOL101 does not publish a dwelling stock below the municipality.
+`FRKM1xx`) and `fc_20_34_rel`'s baseline (the city, not Denmark — §8) differ. They do appear twice in
+the UI inventory, once per level. `hist_net_dwell` has no Copenhagen counterpart, because BOL101 does
+not publish a dwelling stock below the municipality.
+
+### The UI inventory
+
+```bash
+python3 scripts/validate_forecast.py --ui
+```
+
+prints **every indicator this branch puts in front of a user and nothing else** — 25 entries: the 11
+registry indicators at kommune level, the same ten `fc_*` again at bydel and kvarter level from
+`KKFR<V>`, and the four keys behind the past-accuracy line. It is assembled from the two audit tables
+above, so it cannot drift from what check 0 allows, and it ends by naming what is deliberately
+excluded: the housing gap (§7) and the twelve Copenhagen research keys (§9).
 
 ### The pair that must not be combined
 
@@ -455,6 +480,7 @@ python3 scripts/build_net_dwellings.py            # BOL101 + FOLK1A → net_dwel
 python3 scripts/build_net_dwellings.py --no-fetch # rebuild from cached CSVs only
 python3 scripts/validate_forecast.py              # the checks below; non-zero exit on failure
 python3 scripts/validate_forecast.py --audit      # check 0 on its own — the hard-data audit
+python3 scripts/validate_forecast.py --ui         # every indicator that reaches the UI, and nothing else
 python3 scripts/build_forecast.py --indicators fc_20_34_rel --top 10
 python3 scripts/build_forecast.py --indicators fc_pop_rate_5y --top 10
 
@@ -515,9 +541,11 @@ python3 scripts/build_housing_gap.py              # needs forecast.json; writes 
    (**fails**), then the five kvarterer where `fc_netmig` does not reconcile with the stock table
    (information — **§9.5**).
 10. **KK forecast backtest** — every served vintage replayed against `KKBEF1`: MAPE, bias and skill
-    against a pro-rata city baseline at horizons 1, 3 and 5, plus the worst kvarterer. All
-    **information** — it measures Københavns Kommune's record, not this build; only an internally
-    inconsistent summary fails. **§9** has the numbers.
+    against a pro-rata city baseline at horizons 1, 3 and 5, plus the worst kvarterer. Mostly
+    **information** — it measures Københavns Kommune's record, not this build. Two things do fail:
+    an internally inconsistent summary, and a broken **past-accuracy line** (§9.7), whose four keys
+    are the only backtest figures the UI may show. The line's own rule — `bt_n_5y ≥ 3` or show
+    nothing — is asserted here against every area. **§9** has the numbers.
 
 Checks 6, 7/8, 9 and 10 are **skipped, not failed**, when their file has not been built, and 6 and 8
 report politely if the raw pulls they name have been cleaned away (they are gitignored). 7 and 8 still
@@ -1193,9 +1221,8 @@ same city, and it is the clearest possible argument for never plotting them on o
 6. **Read §9 before rendering any of this.** It backtests these forecasts against eight superseded
    vintages — the district split beats a no-detail baseline by 20–36 %, but it runs about +2 % hot at
    five years, and the two kvarterer §8 leads with (Vesterbro Syd, Nordhavn) are the two least
-   reliable in the city. It also adds `fc_netmig`, the net in-migration driving the split, and
-   flags five kvarterer where that signal disagrees with the stock table badly enough to reverse
-   its sign.
+   reliable in the city. §9 adds exactly **one** thing to the UI: the per-area past-accuracy line
+   (§9.7). Its other output, `fc_netmig`, is research and is not rendered anywhere.
 
 ---
 
@@ -1209,6 +1236,10 @@ same city, and it is the clearest possible argument for never plotting them on o
 showing Nordhavn at +176 % without saying so overstates what the number is. This section replaces
 the warning with two measurements — **how well those forecasts have actually done**, and **what is
 driving them**.
+
+Of the two, only the first reaches the UI, as a single line on Copenhagen area pages (§9.7). The
+second, `fc_netmig`, is research: §9.5 shows it reversing sign on the city's two biggest development
+sites, which is disqualifying for a map however clean its provenance.
 
 ---
 
@@ -1323,13 +1354,15 @@ scheduled to triple is genuinely hard.
 
 **Three kvarterer where the split is *worse* than pro rata** — Utterslev (9.02 % vs 4.26 %),
 Vigerslev (8.06 % vs 5.65 %) and Holmen og Refshaleøen (6.97 % vs 1.54 %). Those are the cases where
-KK's housing programme said something would happen and it did not. A reliability figure per kvarter
-(`bt_mape` beside `bt_baseline_mape`) is exactly what a reader needs to tell them apart, which is why
-§3 part b audits them for UI use.
+KK's housing programme said something would happen and it did not.
+
+The skill comparison is the most useful thing in this table and it is **not** shown in the UI: it
+cannot be read without the baseline being explained, and a number that needs a paragraph does not
+belong on an area page. What is shown is the plain error at five years — §9.7.
 
 ---
 
-### 9.4 The build-out signal — `fc_netmig`
+### 9.4 The build-out signal — `fc_netmig` 🚫 *research only, not shown in the UI (§9.7)*
 
 `KKFRBEDI` carries the **movement** side of the same run as `KKFR2026`: who is born, who dies, who
 moves in and who moves out of each district, per year. Its Danish metadata, quoted in full:
@@ -1398,9 +1431,9 @@ not yearly rates** — divide by 5 or 14 for a rate.
 **Copenhagen grows on births, not migration.** The city's net migration is **−40 626 over
 2026–2039** while its population rises +55 469. Every bydel but two is negative over the full window.
 This is not a quirk of the projection: `KKFRBEV` has net inter-municipal migration at about
-−6 100 a year throughout, partly offset by positive net immigration. A panel that shows `fc_netmig`
-without this context will read as a city in decline, which is not what the same run says about its
-population.
+−6 100 a year throughout, partly offset by positive net immigration. On its own the figure reads as a
+city in decline, which is not what the same run says about its population — one of several reasons
+`fc_netmig` stays in this document and out of the UI (§9.7).
 
 #### Kvarter rankings — `fc_netmig_per1000`, 2026–2039
 
@@ -1449,8 +1482,10 @@ largest gain in the city, while its net migration reads **−1 053**. A panel th
 area, and the inflow would appear next door in Amagerbro Øst, whose population barely moves.
 
 `fc_netmig_reconciles` is stored **per code** for exactly this reason, alongside `fc_netmig_gap` and
-`fc_netmig_gap_per1000`. Anything that renders `fc_netmig` must respect the flag — suppress the
-value, or show it with the gap. Check 9f prints the five every run.
+`fc_netmig_gap_per1000`. **This is also why `fc_netmig` is not shown anywhere** (§9.7): a signal that
+reverses sign on the two biggest development sites in the city cannot be put on a choropleth, and
+neither of the fixes — hide the five, or flag them — survives contact with a map legend. Check 9f
+prints the five every run so the situation stays visible in the data even though the UI ignores it.
 
 The threshold is `|gap| ≤ max(5 × window years, 1 % of P₂₀₂₆)` and it is **not delicate**: every gap
 it passes is ≤ 26 persons and every gap it catches is ≥ 412. See §3 part b for why that makes it a
@@ -1473,26 +1508,57 @@ says it should be. **Use `01 − 02`.** `KKFRBEDI`'s own `03 Fødselsoverskud` i
 
 ---
 
-### 9.7 Phase B notes
+### 9.7 Phase B notes — one line, and nothing else
+
+Of everything in this section, **exactly one figure reaches the UI**. The rest is research: computed,
+checked, documented, and never rendered. `validate_forecast.py --ui` prints the full inventory from
+the same audit tables check 0 enforces, so the list cannot drift from what is allowed.
 
 1. **Nothing here goes into `config/indicators.json`.** Same rule as §8: Copenhagen-only keys stay
    out of the registry in Phase A and are added under the `cph` key by Phase B. Check 0 part b
    asserts they have not leaked in, so this is enforced rather than hoped for.
-2. **`fc_netmig` needs its flag.** Respect `fc_netmig_reconciles` per area (§9.5). The simplest
-   honest rendering is to grey the five out on the choropleth and show `fc_netmig_gap` in their
-   popup with one line of explanation.
-3. **Show both windows.** `fc_netmig_5y_per1000` beside `fc_netmig_per1000`, because the ordering
-   changes substantially between them and the difference *is* the construction schedule (§9.4).
-   Do not compute anything between `fc_netmig` and `fc_abs` beyond what is already stored — the
-   residual is natural increase, which the movement table publishes directly as `03`.
-4. **A reliability figure belongs next to every kvarter forecast.** `bt_mape`, `bt_baseline_mape` and
-   `bt_bias` are audited for UI use (§3 part b). The single most useful sentence a panel can carry
-   is: *over 2019–2025 this kvarter's five-year forecasts were off by X % on average, against Y % for
-   a no-detail baseline.* For Vesterbro Syd that is 15.12 % against 28.78 % — which is simultaneously
-   a warning and a defence, and the reader deserves both.
-5. **State the upward bias once, globally.** +2.23 % at five years for kvarterer, +1.36 % for the
-   city (§9.3). This is a property of the source, not of a particular area, so it belongs in the
-   layer's `warn`, not in 67 popups.
-6. **Do not require the backtest to exist.** `cph_backtest.json` depends on KK continuing to serve
-   unlisted tables (§9.1). Checks 9f and 10 skip rather than fail when a file is missing; the UI
-   should degrade the same way.
+
+2. ### 🚫 `fc_netmig` is research only — it is not shown anywhere
+   Not on the map, not in a popup, not on an area page. `fc_netmig`, `fc_netmig_5y`, their per-1 000
+   variants, `fc_netmig_gap`, `fc_netmig_gap_per1000` and `fc_netmig_reconciles` stay in
+   `cph_forecast.json` and in this document, and nothing renders them.
+
+   **Why, given it is hard data.** §0 permits it — every value is a published `KKFRBEDI` cell — but
+   passing §0 is a floor, not a warrant. §9.5 is the reason: for five kvarterer the signal disagrees
+   with the stock table badly enough to **reverse its sign**, and two of those are the city's biggest
+   development sites. A figure that says Nordøstamager is losing people while its population grows by
+   10 414 is worse than no figure, and the alternatives are both bad — suppress the five and the map
+   has holes exactly where the story is, or show them flagged and the flag has to carry more weight
+   than a map legend can. Keeping it in the file costs nothing and loses nothing, because §9.4 is
+   where its value actually is: it explains *why* `fc_growth` looks the way it does, which is a
+   sentence in this document, not a layer.
+
+3. ### ✅ The past-accuracy line — the one thing that is shown
+   **Where:** Copenhagen **kvarter and bydel area pages only**. Never on the map, never coloured,
+   never a ranking, never a chip.
+
+   **Text:**
+   > Past accuracy: KK's 5-year forecasts for this area were off by **{`bt_mape_5y`} %** on average
+   > (**{`bt_over_5y`}** of **{`bt_n_5y`}** vintages over-forecast).
+
+   **Rule:** render only where `bt_line_eligible` is true, i.e. `bt_n_5y` ≥ 3. Below that show
+   **nothing** — not a hedged figure, not "insufficient data". Today every area has exactly 3
+   vintages at h=5 (2019, 2020, 2021), so all 78 qualify; that is a property of how far `KKBEF1`
+   reaches and will change. Round `bt_mape_5y` to one decimal at render time; it is stored at two.
+
+   **Everything else the backtest computes stays here.** `bt_mape`, `bt_bias`, `bt_medape`, `bt_mae`
+   and `bt_baseline_mape` are research. In particular the skill-against-baseline comparison — the
+   most interesting result in §9.3 — is *not* shown: it needs the baseline explained to mean
+   anything, and a number that needs a paragraph does not belong on an area page.
+
+   The line is worth its space because it is specific and it cuts both ways. Vesterbro Syd's is
+   **33.53 %**, against the city's **1.36 %** — the reader sees that the +203 % headline sits on the
+   least reliable forecast in Copenhagen, from the same source that produced the headline.
+
+4. **Do not state the upward bias as a separate UI figure.** It is real (§9.3) but it is a second
+   backtest number, and decision 3 allows one. The per-area line already carries it in the
+   `{`bt_over_5y`} of {`bt_n_5y`}` clause, which is the same fact in a form that needs no footnote.
+
+5. **Do not require the backtest to exist.** `cph_backtest.json` depends on KK continuing to serve
+   unlisted tables (§9.1). Checks 9f and 10 skip rather than fail when a file is missing, and the UI
+   must degrade the same way: no file, no line, no error.
