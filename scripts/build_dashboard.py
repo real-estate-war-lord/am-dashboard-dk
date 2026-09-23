@@ -77,6 +77,28 @@ def kommuner_lookup(out_dir: pathlib.Path):
           + (f" · simplified {simplify}" if simplify else " · not simplified"))
 
 
+def check_js(paths):
+    """Refuse to inline JavaScript that does not parse.
+
+    Without this `make build` happily writes a dist/index.html whose app.js has a syntax
+    error — the page then renders nothing and the build still says it succeeded. node is
+    optional: if it is not installed the check is skipped rather than failing the build.
+    """
+    import shutil
+    import subprocess
+    node = shutil.which("node")
+    if not node:
+        print("  · node not found — skipping the JavaScript syntax check")
+        return
+    for p in paths:
+        if not p.exists():
+            continue
+        r = subprocess.run([node, "--check", str(p)], capture_output=True, text=True)
+        if r.returncode:
+            raise SystemExit(f"✗ {p.name} does not parse:\n{(r.stderr or r.stdout).strip()}")
+    print(f"  · JavaScript parses ({', '.join(p.name for p in paths if p.exists())})")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--data", default=str(PROC / "makro.json"))
@@ -86,6 +108,7 @@ def main():
     ap.add_argument("--out", default=str(ROOT / "dist" / "index.html"))
     args = ap.parse_args()
 
+    check_js([SRC / "app.js", SRC / "testprop.js"])
     makro = load(pathlib.Path(args.data)) or {}
     market = load(pathlib.Path(args.market)) or {}
     portfolio = load(pathlib.Path(args.portfolio))

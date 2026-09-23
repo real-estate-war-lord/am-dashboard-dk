@@ -15,6 +15,43 @@ checked data files and a registry entry; Phase B renders them.
 
 ---
 
+## 0a. Final state — what is in the UI, and what is not (v2.5, 2026-09-23)
+
+Phase B is done. This is the whole of what a reader can see, and the whole of what is deliberately
+withheld. `python3 scripts/validate_forecast.py --ui` prints the same inventory from the audit
+tables, so this list cannot drift from what is enforced.
+
+### ✅ Shown
+
+| where | what |
+|---|---|
+| **Map** (municipalities) | the ten `fc_*` as a group **Outlook**, diverging ramp centred on 0, `fc_growth` and `fc_20_34_rel` as quick chips. `hist_net_dwell` in **Housing stock** |
+| **Map** (Copenhagen quarters) | the same ten from `KKFR2026`, labelled *Københavns Kommune*, `fc_20_34_rel` labelled **vs København** |
+| **Year selector** | replaced by *"Projection 2026→2040 · DST 2026"* — one vintage, no history to select |
+| **Municipality card** | *Outlook 2040* under population. For København, **both** DST and KK with the gap stated (§4) |
+| **Area popups** | the same line, plus `meta.caveat` on any quarter figure |
+| **Area page** | a **Population outlook** card: observed population solid (`FOLK1A` / `KKBEF1`), projection dashed to 2040, a *today* marker, the age split in persons |
+| **Copenhagen quarter pages** | the one past-accuracy line of §9.7, and nothing else from the backtest |
+| **Infra datasheet** | *Outlook around this project* — the kommune's and, for Copenhagen, the quarters' `fc_growth` and `fc_20_34`, listed per publisher, never merged |
+| **Analysis sheet** | an **Outlook** section for the pin's own area, with the same chart. Its profile rows are neutral: the percentile bar reads as a position, not a score |
+| **Charts** | Outlook indicators selectable; each series names its publisher, and a chart carrying both runs says so |
+| **Sources** | table ids, windows, vintages, fetch dates, and the sentence that projections are scenarios |
+
+### 🚫 Not shown, and why
+
+| what | passes §0? | why it is still out |
+|---|---|---|
+| **The housing gap** (`fc_hh_gap*`, `housing_gap.json`) | **no** | It needs a fitted, capped household-size trend — an assumption of ours. §0 rules it out on its inputs, before any question of whether it scores well. §7 is the record. `scripts/build_housing_gap.py` stays in the repo as research and is in no build target. |
+| **`fc_netmig*`** (7 keys) | yes | Every value is a published `KKFRBEDI` cell, but for five kvarterer it disagrees with the stock table badly enough to **reverse its sign**, and two of those are the city's biggest development sites (§9.5). Passing §0 is a floor, not a warrant. |
+| **`bt_mape`, `bt_bias`, `bt_medape`, `bt_mae`, `bt_baseline_mape`** | yes | The skill-against-baseline result is the most interesting thing in §9.3 and needs a paragraph to mean anything. §9.7 allows the area page **one** backtest number; it spends it on the per-area 5-year error. |
+| **The upward bias as its own figure** | yes | Real (§9.3), but it is a second backtest number. The `{bt_over_5y} of {bt_n_5y}` clause in the line already carries it. |
+
+Nothing in the left column is registered in `config/indicators.json`, built into `makro.json` or
+`cph.json`, or referenced in `src/`. `validate_forecast.py` check 0 asserts the first; the release
+sweep greps for the rest.
+
+---
+
 ## 0. 🚫 The hard-data rule
 
 > **Every indicator the map shows must be either an official published figure or plain arithmetic

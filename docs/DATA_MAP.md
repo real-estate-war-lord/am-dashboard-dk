@@ -445,6 +445,48 @@ Sydhavn / Ny Ellebjerg stations are not in it, so "nearest station" here means t
 `make test` (12 Python + 15 JS), `make validate` (0 ✗) and `make build` (0 ⚠) all pass on the same
 commit. Method and the rest of the feature: [`ANALYSIS.md`](ANALYSIS.md).
 
+### 7e. Outlook layer — full independent verification (2026-09-23)
+
+Not a sample. `scripts/verify_forecast_full.py` re-pulls the source tables from the API with its
+own request, its own CSV parsing and its own arithmetic — it imports nothing from
+`build_forecast.py` — and diffs the result cell by cell against what the pipeline shipped, so a bug
+in the build cannot hide in the check.
+
+| # | check | result |
+|---|---|---|
+| 1 | `FRKM126` → `forecast.json`, every cell re-pulled and diffed: **98 kommuner × 15 years × 8 fields** | ✅ **11 760 cells, 0 mismatches** |
+| 2 | Σ 98 kommuner vs `FRDK126`'s published national total, all 15 years | ✅ largest gap **129 persons on 6.0 M (0.0022 %)** |
+| 3 | `KKFR2026` → `cph_forecast.json`, every cell re-pulled and diffed: **93 OMRKK areas × 15 years × 8 fields** | ✅ **11 160 cells, 0 mismatches** |
+| 4 | Σ kvarterer = Σ bydele = city, all 15 years | ✅ worst Δ **5 / 2 persons** (tolerance ±10) |
+| 5 | Every `fc_*` for every area, recomputed here from the raw cells | ✅ **980 municipal + 930 Copenhagen values, 0 mismatches** |
+| 6 | `hist_net_dwell` recomputed from `BOL101` + `FOLK1A` | ✅ **98 municipalities, 0 mismatches** |
+
+**22 920 re-pulled cells and 2 008 recomputed indicator values, 0 mismatches.**
+
+The two non-zero numbers are rounding, not error, and both are expected:
+
+- **129 persons** between Σ of the 98 municipalities and `FRDK126`. They are two separately
+  published tables of one projection run, each rounded per cell. §3 predicts this and check 5 of
+  `validate_forecast.py` reconciles the 20–34 share of it to **0.0004 pp**.
+- **5 persons** between Σ kvarterer and the city in `KKFR2026`, against a ±10 tolerance. Same cause.
+
+The recomputed baselines match the documented ones exactly: Denmark's own 20–34 change is
+**−7.1092 %** (§3 quotes −7.1092 against `FRDK126`'s −7.1096) and København's is **−3.15 %** (§8).
+
+Three source quirks the verification had to get right, each a way a lazier check would have
+silently passed:
+
+- **`FRDK126` has no age-total code**, and its `HERKOMST` elimination value is *"persons of Danish
+  origin"* — 5.0 M, not 6.0 M. Asking for `Tid` alone returns that subset without complaining. All
+  five origin groups have to be requested and summed.
+- **`KKFR2026` spells the sex variable `KON`**; `FRKM126` spells it `KØN`.
+- **`total` is the publisher's own `ALDER=TOT` cell, not the sum of the age groups.** Summing ages
+  instead produces a ±1–5 person difference on every area and every year — 1 120 false mismatches
+  on the first run of this script, which is exactly the artefact §2 documents.
+
+Reproduce with `python3 scripts/verify_forecast_full.py --report` (`--cached` reuses its own pulls;
+they land in `data/raw/verify/`, gitignored).
+
 ## 8. Infrastructure overlay (v2.1)
 
 The curated layer of major transport and public projects — 51 projects with geometry, their status,

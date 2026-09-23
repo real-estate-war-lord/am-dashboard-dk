@@ -1,6 +1,6 @@
 # Services layer — groceries, food, pharmacies, transport stops
 
-**Status:** **frozen on `v2.x-services`, ready to integrate** · pipeline **and** map overlay · national coverage
+**Status:** **released in v2.5** · pipeline **and** map overlay · national coverage
 **Scope:** points only. There are deliberately **no area-level service indicators** (§10).
 **Scripts:** `scripts/fetch_services.py` → `scripts/build_services.py`
 **Output:** `data/processed/services/<kommune>.json` (committed) + `index.json`

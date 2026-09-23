@@ -343,6 +343,7 @@ document.addEventListener("click", e => {
   if ((el = g("[data-argroup]"))) { AR.group = el.dataset.argroup; syncHash(); renderKeep(); return; }
   if ((el = g("[data-artab]"))) { AR.tab = el.dataset.artab; syncHash(); renderKeep(); return; }
   if ((el = g("[data-arsub]"))) { AR.sub = el.dataset.arsub; syncHash(); renderKeep(); return; }
+  if ((el = g("[data-view]"))) { const h = viewHash(el.dataset.view); if (h) go(h); return; }
   if ((el = g("[data-indq]"))) { MK.ind = el.dataset.indq; if (!yearsFor(MK.ind).includes(MK.year)) MK.year = LATEST; syncHash(); renderKeep(); return; }
   if (g("[data-mftoggle]")) { UI.mfOpen = !UI.mfOpen; const p = document.getElementById("mfpanel"), b = g("[data-mftoggle]"); if (p) p.style.display = UI.mfOpen ? "" : "none"; if (b) b.classList.toggle("on", UI.mfOpen); return; }
   if ((el = g("[data-arind]"))) { MK.ind = el.dataset.arind; if (!yearsFor(MK.ind).includes(MK.year)) MK.year = LATEST; syncHash(); renderKeep(); return; }
@@ -489,6 +490,8 @@ function legendHtml(sc, ind, key, note) {
     (lowerBetter(ind.key || "") ? `<div class="lgnote">↓ lower is better · darkest = highest</div>` : "") +
     /* an Outlook legend says what it is and whose projection it is, in place of a good/bad note */
     (neutralDir(ind.key || "") && ind.proj ? `<div class="lgnote">${esc(projLegendNote(ind))}</div>` : "") +
+    /* one click from any Outlook legend into the saved view that frames the story */
+    (ind.proj && SAVED_VIEWS.length ? `<div class="lgnote"><button class="lk mini" data-view="${esc(SAVED_VIEWS[0].id)}" title="${esc(SAVED_VIEWS[0].hint)}">★ ${esc(SAVED_VIEWS[0].label)}</button></div>` : "") +
     (sc.diverging && sc.clamped ? `<div class="lgnote dim">top and bottom classes are open-ended</div>` : "") +
     `${note ? `<div class="lgnote">${note}</div>` : ""}`;
 }
@@ -511,10 +514,30 @@ function indSelect() {
   return `<select id="indsel" class="indsel" aria-label="Indicator">${groups.map(gname => `<optgroup label="${esc(gname)}">${L.filter(i => (i.group || "Other") === gname).map(i =>
     `<option value="${i.key}" ${MK.ind === i.key ? "selected" : ""}>${esc(optLabel(i))}</option>`).join("")}</optgroup>`).join("")}</select>`;
 }
+/* ---------- Saved views ----------
+   A preset is nothing but a hash: opening the link restores the view exactly, because every piece of
+   it already round-trips through parseHash (indicator, level, overlays, filters). Defined once here
+   so the chip and the legend link cannot drift apart. */
+const SAVED_VIEWS = [
+  { id: "growth-story", label: "Growth story",
+    hint: "Copenhagen by quarter, young adults 20–34 against the city, with infrastructure and public buildings on top",
+    hash: "map/101?ind=fc_20_34_rel&infra=1&public=1" },
+];
+const viewHash = id => (SAVED_VIEWS.find(v => v.id === id) || {}).hash || "";
+/* is the current view already this preset? compares the pieces that define it, not the string */
+function viewActive(v) {
+  const q = Object.fromEntries(new URLSearchParams(v.hash.split("?")[1] || ""));
+  return S.view === "makro" && String(MK.muni) === "101" && MK.ind === q.ind && cphMode()
+    && (!q.infra || MK.infra) && (!q.public || MK.pub);
+}
+function viewChips() {
+  if (!SAVED_VIEWS.length) return "";
+  return `<div class="savedviews">${SAVED_VIEWS.map(v => `<button class="iqb view ${viewActive(v) ? "on" : ""}" data-view="${esc(v.id)}" title="${esc(v.hint)}">★ ${esc(v.label)}</button>`).join("")}</div>`;
+}
 function indQuick() {
   /* the six figures people ask for first, one click each */
   const L = curInds(); const ks = QUICK_KEYS.map(k => L.find(i => i.key === k)).filter(Boolean);
-  return ks.length > 1 ? `<div class="iq">${ks.map(i => `<button class="iqb ${MK.ind === i.key ? "on" : ""}" data-indq="${i.key}" title="${esc(i.label)}">${esc(i.short || i.label)}</button>`).join("")}</div>` : "";
+  return ks.length > 1 ? `<div class="iq">${ks.map(i => `<button class="iqb ${MK.ind === i.key ? "on" : ""}" data-indq="${i.key}" title="${esc(i.label)}">${esc(i.short || i.label)}</button>`).join("")}${viewChips()}</div>` : viewChips();
 }
 /* searchable area box: municipalities open on the map, postal codes and quarters open their page */
 const AREA_OPTS = [{ t: "Denmark — whole country", h: "map", k: ["denmark", "danmark", "dk"] }];
@@ -670,6 +693,27 @@ function pastAccuracyLine(a) {
   const bt = a && a.bt;
   if (!bt || bt.bt_mape_5y == null || !bt.bt_n_5y) return "";
   return `<p class="cap">Past accuracy: KK's 5-year forecasts for this area were off by <b>${nf(bt.bt_mape_5y, 1)} %</b> on average (<b>${bt.bt_over_5y}</b> of <b>${bt.bt_n_5y}</b> vintages over-forecast).</p>`;
+}
+
+/* The outlook of the areas something sits in — used by the infra datasheet and the Analysis sheet.
+   DST and KK are listed as separate blocks, never averaged or merged into one figure (§4). */
+function outlookFor(koms, kvas) {
+  const gK = IND.find(i => i.key === "fc_growth"), yK = IND.find(i => i.key === "fc_20_34");
+  const gQ = IND_CPH.find(i => i.key === "fc_growth"), yQ = IND_CPH.find(i => i.key === "fc_20_34");
+  const blocks = [];
+  const rows = (list, gi, yi) => list.filter(o => o && o[gi.key] != null).map(o =>
+    `<tr><th>${esc(o.name || o.nr || o.code)}</th><td class="num">${fmtOf(gi)(o[gi.key])}</td><td class="num">${o[yi.key] != null ? fmtOf(yi)(o[yi.key]) : "–"}</td></tr>`).join("");
+  const table = (title, pr, body, caveat) => `<div class="olblock">
+    <p class="cap"><b>${esc(title)}</b> · <span class="tag proj">Projection ${esc(pr.from)}→${esc(pr.to)}</span> ${esc(pr.publisher)} ${esc(pr.vintage)}${pr.table ? ` · ${esc(pr.table)}` : ""}</p>
+    <table class="tbl compact"><thead><tr><th>Area</th><th class="num">Population ${esc(pr.to)}</th><th class="num">20–34</th></tr></thead><tbody>${body}</tbody></table>
+    ${caveat ? `<p class="cap warnline">⚠ ${esc(caveat)}</p>` : ""}</div>`;
+  const kr = gK && yK ? rows(koms || [], gK, yK) : "";
+  if (kr) blocks.push(table("Municipality", gK.proj || {}, kr, ""));
+  const qr = gQ && yQ ? rows(kvas || [], gQ, yQ) : "";
+  if (qr) blocks.push(table("Copenhagen quarter", gQ.proj || {}, qr, (gQ.proj || {}).caveat || ""));
+  if (!blocks.length) return "";
+  return `<div class="olfor">${blocks.join("")}
+    ${blocks.length > 1 ? `<p class="cap dim">Two different projections, listed separately: DST's municipal run and Københavns Kommune's district run are never combined or averaged — they are 2.2 % apart for this city by 2040 (docs/FORECAST.md §4).</p>` : ""}</div>`;
 }
 
 /* "Upcoming: M5 phase 1 (2036) · Nordhavnstunnel (2028) · +3 more" — projects that have not opened */
@@ -1503,6 +1547,31 @@ function featDistM(f, lat, lon) {
 }
 const anDist = m => m == null ? "–" : m < 1000 ? `${nf(Math.round(m / 10) * 10, 0)} m` : `${nf(m / 1000, 1)} km`;
 function anLoc() { const m = (AN.a || "").match(/^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/); return m ? { lat: Number(m[1]), lon: Number(m[2]) } : null; }
+/* --- Outlook for the pin's own area (docs/FORECAST.md §5.7) ---
+   The finest area that has a projection: a Copenhagen quarter uses KK throughout, anything else uses
+   DST's municipal run. The two are never shown as one figure. */
+function anOutlookCard(e, r) {
+  if (!e) return "";
+  const isQ = e.type === "kvarter" && e.o && e.o.fc_growth != null;
+  const src = isQ ? e.o : (r.kommune ? byCode[r.kommune.code] : null);
+  if (!src || src.fc_growth == null) return "";
+  const list = isQ ? IND_CPH : IND;
+  const pr = ((list.find(i => i.key === "fc_growth") || {}).proj) || {};
+  const keys = ["fc_growth", "fc_growth_5y", "fc_20_34", "fc_80p"];
+  const tiles = keys.map(k => list.find(i => i.key === k)).filter(i => i && src[i.key] != null);
+  const where = isQ ? `${e.name} (quarter)` : `${(r.kommune || {}).name || ""} (municipality)`;
+  return `<div class="card outlook anoutlook">
+    <div class="card-head"><h3>Outlook</h3>
+      <span class="hint"><span class="tag proj">Projection</span> ${esc(pr.from || "")}→${esc(pr.to || "")} · ${esc(pr.publisher || "")} ${esc(pr.vintage || "")} · ${esc(where)}</span></div>
+    ${tiles.length ? `<div class="hl">${tiles.map(i => `<button class="hlc ${MK.ind === i.key ? "on" : ""}" data-arind="${esc(i.key)}" title="${esc(i.desc || i.label)}">
+      <span>${esc(i.short || i.label)}</span><b>${fmtOf(i)(src[i.key])}</b><em class="dim">${esc(i.unit || "")}</em></button>`).join("")}</div>` : ""}
+    ${popOutlookChart(src, { actualSource: isQ ? "KKBEF1" : "FOLK1A", projSource: pr.table || pr.publisher })}
+    ${isQ ? pastAccuracyLine(src) : ""}
+    ${isQ ? cphFcCaveat("kvarter") : `<p class="cap">${esc(((list.find(i => i.key === "fc_growth")) || {}).warn || "")}</p>`}
+    <p class="cap dim">The projection is for the whole ${isQ ? "quarter" : "municipality"}, not for this address — it carries no housing programme, so a development on this plot is not in it. Observed population from ${esc(isQ ? "KKBEF1" : "FOLK1A")}; the dashed line is ${esc(pr.table || "")}, a scenario rather than a measurement.</p>
+  </div>`;
+}
+
 /* the nav item opens the pin that is on the map, if there is one — otherwise the empty state */
 const anNavLink = () => TP.lat != null ? analysisLink(TP.lat, TP.lon, TP.label) : "analysis";
 /* every municipality whose bounding box touches the circle of radius m around the pin, the pin's own first */
@@ -1519,22 +1588,27 @@ function anPct(v, key, pool) {
   if (v == null) return null;
   const vals = pool.map(o => V(o, key)).filter(x => x != null);
   if (vals.length < 5) return null;
-  const lb = lowerBetter(key);
+  /* neutral: no favourable end, so the bar is simply "how high among the peers" */
+  const lb = !neutralDir(key) && lowerBetter(key);
   const beaten = vals.filter(x => lb ? x > v : x < v).length, tied = vals.filter(x => x === v).length;
-  return { p: (beaten + tied / 2) / vals.length * 100, n: vals.length };
+  return { p: (beaten + tied / 2) / vals.length * 100, n: vals.length, neutral: neutralDir(key) };
 }
 function anRow(e, i, r) {
   const cur = eVal(e, i.key); if (cur.v == null) return "";
   /* an inherited figure is the municipality's, so it is ranked against municipalities, not against
      the postal codes or quarters that all copy the same number */
   const pool = cur.own ? e.peers : MUNI;
-  const pc = anPct(cur.v, i.key, pool), lb = lowerBetter(i.key);
+  const pc = anPct(cur.v, i.key, pool), lb = lowerBetter(i.key), nu = neutralDir(i.key);
   const peers = pool === MUNI ? "municipalities" : e.peerLabel;
   const kom = r.kommune ? V(byCode[r.kommune.code], i.key) : null;
-  return `<tr><th><span class="thn">${esc(i.label)} <span class="dim">${esc(i.unit || "")}</span></span><button class="tch" data-go="${chartLink(i.key, e.type, e.code)}" title="Open in Charts">↗</button></th>
+  /* A neutral indicator gets the same bar, read as a position rather than a score: "higher than
+     n % of the peers", no better/worse wording and no favourable-end fill (docs/FORECAST.md §3). */
+  const barTitle = nu ? `higher than ${nf(pc ? pc.p : 0, 0)} % of the ${pc ? pc.n : 0} ${peers} — neither end is better`
+    : `better than ${nf(pc ? pc.p : 0, 0)} % of the ${pc ? pc.n : 0} ${peers}${lb ? " — lower is better here" : ""}`;
+  return `<tr${nu ? ' class="anneutral"' : ""}><th><span class="thn">${esc(i.label)} <span class="dim">${esc(i.unit || "")}</span></span>${i.proj ? `<span class="tag proj mini">${esc(i.proj.publisher)} ${esc(i.proj.vintage)}</span>` : ""}<button class="tch" data-go="${chartLink(i.key, e.type, e.code)}" title="Open in Charts">↗</button></th>
     ${fmtCell(i, cur.v, !cur.own, e.type === "kvarter" ? bydelMark(i) : "")}
     <td class="anbc" data-v="${pc ? pc.p.toFixed(1) : ""}">${pc
-      ? `<span class="anbw" title="better than ${nf(pc.p, 0)} % of the ${pc.n} ${peers}${lb ? " — lower is better here" : ""}"><span class="anbar"><i style="width:${pc.p.toFixed(1)}%"></i></span><em>${nf(pc.p, 0)}</em></span>`
+      ? `<span class="anbw" title="${esc(barTitle)}"><span class="anbar"><i style="width:${pc.p.toFixed(1)}%"></i></span><em>${nf(pc.p, 0)}</em></span>`
       : `<span class="dim">–</span>`}</td>
     ${fmtCell(i, kom, false)}${fmtCell(i, NAT ? V(NAT, i.key) : null, false)}</tr>`;
 }
@@ -1856,7 +1930,7 @@ function vAnalysis() {
   const koms = anKomsNear(pt, r.kommune && r.kommune.code, AN_RING_M).filter(pubAvail);
   setTimeout(anMapInit, 0);
   setTimeout(anFill, 0);
-  const hint = `° = municipality value where no finer statistic exists${e && e.type === "kvarter" ? " · ^ = figure published for the whole bydel" : ""} · the percentile bar fills toward "better", so a low value fills it where lower is better · ↗ opens the indicator in Charts.`;
+  const hint = `° = municipality value where no finer statistic exists${e && e.type === "kvarter" ? " · ^ = figure published for the whole bydel" : ""} · the percentile bar fills toward "better", so a low value fills it where lower is better${profile.some(i => neutralDir(i.key)) ? "; Outlook rows are neutral and the bar simply reads as a position among peers" : ""} · ↗ opens the indicator in Charts.`;
   return `
   ${anHead(pt, r, e)}
   <div class="card"><div class="card-head"><h3>Where it is</h3>
@@ -1870,7 +1944,8 @@ function vAnalysis() {
     ${anIndTable(e, r, profile)}</div>
   <div class="card"><div class="card-head"><h3>Safety</h3><span class="hint">${esc(SAFETY.length ? (SAFETY[0].unit || "") : "")} · municipality level${e.type === "kvarter" ? " plus the city's own bydel survey" : ""}</span></div>
     ${safety.length ? anIndTable(e, r, safety) : `<p class="empty">no safety figure for this area</p>`}
-    <p class="cap">Reported crime comes from Danmarks Statistik per municipality over a rolling four quarters; a postal code or quarter shows its municipality's figure (°).${e.type === "kvarter" ? ` Københavns Kommune's own safety survey publishes per bydel (^), so every quarter of ${esc(e.bydel || "the district")} carries the same number — a different source, period and geography from the national one.` : ""}</p></div>`
+    <p class="cap">Reported crime comes from Danmarks Statistik per municipality over a rolling four quarters; a postal code or quarter shows its municipality's figure (°).${e.type === "kvarter" ? ` Københavns Kommune's own safety survey publishes per bydel (^), so every quarter of ${esc(e.bydel || "the district")} carries the same number — a different source, period and geography from the national one.` : ""}</p></div>
+  ${anOutlookCard(e, r)}`
     : `<div class="card"><p class="empty">No area statistics cover this point.</p></div>`}
   ${anInfraCard(pt)}
   <div id="anpub">${anPubCard(pt, r)}</div>
@@ -2130,9 +2205,9 @@ document.addEventListener("fullscreenchange", () => {
 const CH_COLORS = ["#1C6B5C", "#B07A1E", "#40547F", "#B0331B", "#82346C", "#5C5F52", "#6E8C5E", "#C08A24"];
 function chEntity(id) {
   const [t, c] = id.split(":");
-  if (t === "kommune" && byCode[c]) return { id, type: t, o: byCode[c], name: byCode[c].name, inds: IND, peers: MUNI, peerLabel: "municipalities" };
+  if (t === "kommune" && byCode[c]) return { id, type: t, o: byCode[c], name: byCode[c].name, inds: IND, peers: MUNI, peerLabel: "municipalities", publisher: "DST" };
   if (t === "postnr" && byNr[c]) return { id, type: t, o: byNr[c], name: `${c} ${byNr[c].name}`, inds: IND, peers: AREAS, peerLabel: "postal codes", muni: byCode[byNr[c].muni] };
-  if (t === "kvarter" && byQ[c]) return { id, type: t, o: byQ[c], name: byQ[c].name + " (CPH)", inds: IND_Q, peers: CPH.areas, peerLabel: "quarters", muni: byCode[CPH_MUNI] };
+  if (t === "kvarter" && byQ[c]) return { id, type: t, o: byQ[c], name: byQ[c].name + " (CPH)", inds: IND_Q, peers: CPH.areas, peerLabel: "quarters", muni: byCode[CPH_MUNI], publisher: "Københavns Kommune" };
   return null;
 }
 function chartAdd(id, text) {
@@ -2187,7 +2262,10 @@ function chartSeries() {
       /* postal codes, and quarters on indicators the quarter layer lacks, take the municipality's series (°) */
       const inh = !!e.muni && (e.type === "postnr" || !cphOwn(i.key));
       const val = y => { const v = chVal(e.o, i, y); return v != null ? v : inh ? chVal(e.muni, i, y) : null; };
-      series.push({ name: multi ? `${e.name} · ${i.short || i.label}` : e.name, color: CH_COLORS[k++ % CH_COLORS.length], pts: ys.map(y => ({ y, v: own ? val(y) : null })),
+      /* on a projection chart the series name carries its publisher, so two runs on one chart can
+         never be mistaken for one series (docs/FORECAST.md §4) */
+      const pubTag = i.proj && e.publisher ? ` · ${e.publisher}` : "";
+      series.push({ name: (multi ? `${e.name} · ${i.short || i.label}` : e.name) + pubTag, color: CH_COLORS[k++ % CH_COLORS.length], pts: ys.map(y => ({ y, v: own ? val(y) : null })),
                     inherited: own && inh && V(e.o, i.key) == null && V(e.muni, i.key) != null });
     });
     if (CH.nat && NAT) series.push({ name: multi ? `Denmark · ${i.short || i.label}` : "Denmark", color: ents.length ? CH_COLORS[first % CH_COLORS.length] : "#16170F", dash: true, pts: ys.map(y => ({ y, v: chVal(NAT, i, y) })) });
@@ -2291,6 +2369,10 @@ function vCharts() {
                  ["Big four", ["101", "751", "461", "851"].filter(c => byCode[c]).map(c => "kommune:" + c)]];
   const { series } = chartSeries(); const q = isQ(ys[0] || "");
   const hasNat = !!NAT && (NAT[ind.key] != null || !!(NAT.hist && NAT.hist[ind.key]));
+  /* §4: a Copenhagen quarter carries KK's projection and a municipality carries DST's. They may be
+     read side by side — they must not be read as one series, and the gap has to be stated. */
+  const pubs = ind.proj ? [...new Set(ents.map(e => e.type === "kvarter" ? "Københavns Kommune" : "DST"))] : [];
+  const mixed = pubs.length > 1;
   const cands = overlayCands(ind);
   return `
   <div class="card accent">
@@ -2304,6 +2386,7 @@ function vCharts() {
       <div class="seg">${[["auto", "Auto"], ["line", "Line"], ["bar", "Bars"], ["dist", "Distribution"]].map(([m, l]) => `<button class="sg ${CH.mode === m ? "on" : ""}" data-chmode="${m}">${l}</button>`).join("")}</div>
       ${chartMode() === "dist" ? `<select id="chdist" class="indsel">${Object.entries(DIST_DEFS).map(([k, v]) => `<option value="${k}" ${CH.dist === k ? "selected" : ""}>${v[0]}</option>`).join("")}</select>` : ""}</div></div>
     ${ents.length && CH.mode === "auto" && chartMode() === "bar" && chartYears().length < 2 ? `<p class="hint" style="margin:0 0 8px">This indicator is a single snapshot (no history) — shown as bars of the latest value. BBR distributions are under <b>Distribution</b>.</p>` : ""}
+    ${ind.proj && ents.length ? `<p class="hint projnote" style="margin:0 0 8px"><span class="tag proj">Projection</span> ${esc(ind.proj.from)}→${esc(ind.proj.to)} · neither end is "better", so nothing here is coloured good or bad.${mixed ? ` <b>Two different runs are on this chart:</b> ${esc(pubs.join(" and "))}. They are not combined and must not be read as one series — for this city they are 2.2 % apart by 2040 (docs/FORECAST.md §4).` : ` Source: ${esc(pubs[0] === "Københavns Kommune" ? "Københavns Kommune" : "DST")} ${esc(ind.proj.vintage)}.`}</p>` : ""}
     <div class="tfilters">
       <span class="asrch"><input id="chq" list="arealist" class="indsel" placeholder="Add municipality, postal code or quarter… (Enter)" autocomplete="off"><datalist id="arealist">${AREA_OPTS.map(o => `<option value="${esc(o.t)}"></option>`).join("")}</datalist></span>
       ${quick.map(([l, ids]) => `<button class="lk mini" data-chadd="${ids.join("|")}">+ ${l}</button>`).join("")}
@@ -3081,6 +3164,7 @@ function vProject() {
       ${kom.length ? `<p class="cap">Municipalities</p><div class="tfilters">${chips(kom, o => "map/" + o.code)}</div>` : ""}
       ${pnr.length ? `<p class="cap">Postal codes (${pnr.length})</p><div class="tfilters">${chips(pnr.slice(0, 14), o => pageOf(o))}${pnr.length > 14 ? `<span class="hint">+${pnr.length - 14} more</span>` : ""}</div>` : ""}
       ${kva.length ? `<p class="cap">Copenhagen quarters (${kva.length})</p><div class="tfilters">${chips(kva.slice(0, 10), o => pageOf(o))}${kva.length > 10 ? `<span class="hint">+${kva.length - 10} more</span>` : ""}</div>` : ""}
+      ${(() => { const ol = outlookFor(kom, kva.slice(0, 8)); return ol ? `<div class="olsec"><p class="cap"><b>Outlook around this project</b> — how the areas it serves are projected to change. A projection carries no housing programme, so this project is not in these numbers.</p>${ol}</div>` : ""; })()}
       <p class="cap">${esc(p.notes || "")}</p>
       <p class="cap dim">${esc(p.source_doc || "")}${p.source_doc ? " · " : ""}geometry: ${esc(p.geometry_source || "–")} · updated ${esc(p.updated || "")}</p>
     </div>
