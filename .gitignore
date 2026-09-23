@@ -31,3 +31,7 @@ dist/geo
 data/raw/probe/
 data/raw/services/
 dist/services/
+
+# forecast raw pulls (re-downloadable per docs/FORECAST_SOURCES.md; tableinfo JSON is committed)
+data/raw/forecast/**/*.csv
+data/raw/forecast/**/*.pdf
