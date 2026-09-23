@@ -54,8 +54,11 @@ def main():
         "infra": {"features": (infra or {}).get("features", []), "meta": (infra or {}).get("meta")} if infra else None,
         "infra_index": (infra_index or {}).get("areas") if infra_index else None,
         # public buildings: counts per area inline, the buildings themselves loaded on demand (dist/public/<kommune>.json)
+        # public buildings: counts per area inline; the school aggregates ride along in the same areas
+        # dict (scripts/build_schools.py), while the school records load on demand from schools.json
         "public": {"areas": public_index["areas"], "built": public_index["built"], "kommuner": public_index["kommuner"],
-                   "recent_years": public_index["recent_years"]} if public_index else None,
+                   "recent_years": public_index["recent_years"],
+                   "schools": public_index.get("schools")} if public_index else None,
     }
     payload = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</script", "<\\/script")
     html = (SRC / "index.html").read_text(encoding="utf-8")
@@ -69,7 +72,8 @@ def main():
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html, encoding="utf-8")
     # the infrastructure layer is inlined in the page, and also served as files so it can be reused
-    for src in (ROOT / "data" / "geo" / "infra_projects.geojson", PROC / "infra_index.json", PROC / "public_index.json"):
+    for src in (ROOT / "data" / "geo" / "infra_projects.geojson", PROC / "infra_index.json", PROC / "public_index.json",
+                PROC / "schools.json"):
         if src.exists():
             import shutil
             shutil.copy(src, out.parent / src.name)

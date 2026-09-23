@@ -1970,6 +1970,136 @@
    ],
    "calc": "public_index",
    "source": "BBR via Datafordeler (bygningens anvendelse 410–449), addresses and missing coordinates from DAR — see docs/PUBLIC_BUILDINGS.md"
+  },
+  {
+   "key": "school_grade_avg",
+   "label": "FP9 grade average",
+   "short": "FP9 grade",
+   "unit": "grade 0–12",
+   "fmt": "idx",
+   "desc": "Weighted average of the bundne prøver at Folkeskolens Afgangseksamen (9th grade), latest school year, pupil-weighted over the schools of the area.",
+   "warn": "A grade average is not a quality ranking — it mostly tracks intake. Read it next to the socioeconomic reference difference, which is what the source publishes it for.",
+   "note": "Pupil-weighted over folkeskoler and frie grundskoler that have a value; specialskoler are excluded because their intake makes an average meaningless. A school whose cell the source suppressed (under 3 observations, under 5 pupils for trivsel and the socioøkonomisk reference) is absent from the mean, not counted as zero — so an area's figure covers only the schools that publish. Copenhagen metro set only (19 municipalities).",
+   "note_short": "FP9 bundne prøver, pupil-weighted; specialskoler excluded",
+   "level": "postnr",
+   "hue": [
+    64,
+    96,
+    152
+   ],
+   "group": "Schools",
+   "direction": "higher_better",
+   "sources": [
+    {
+     "db": "schools",
+     "table": "schools",
+     "geo": "kommune"
+    },
+    {
+     "db": "schools",
+     "table": "schools",
+     "geo": "postnr"
+    }
+   ],
+   "calc": "schools",
+   "source": "Uddannelsesstatistik.dk (STIL) — GS cubes KARA/KARAGNS (grades), OVER/OVERSKO (socioøkonomisk reference, klassekvotient), TRIV/TRIVIND (trivsel), ELEV/ELEVEX (elevtal); STIL institutionsregister for location and type. Kilde: Uddannelsesstatistik.dk — see docs/SCHOOLS.md"
+  },
+  {
+   "key": "school_socref_diff",
+   "label": "Grade vs socioeconomic reference",
+   "short": "Soc. ref. diff",
+   "unit": "grade points",
+   "fmt": "signdec1",
+   "desc": "Difference between the schools' actual FP9 grade average and the socioeconomic reference — the grade the ministry's model expects given the pupils' background. Positive means the schools do better than their intake predicts.",
+   "warn": "The difference is a model residual, not a causal claim about teaching. STIL marks per school whether it is statistically significant; most schools sit within the uncertainty band.",
+   "note": "Pupil-weighted over folkeskoler and frie grundskoler that have a value; specialskoler are excluded because their intake makes an average meaningless. A school whose cell the source suppressed (under 3 observations, under 5 pupils for trivsel and the socioøkonomisk reference) is absent from the mean, not counted as zero — so an area's figure covers only the schools that publish. Copenhagen metro set only (19 municipalities). Published one year behind the grades, so the latest school year usually has grades but no reference yet.",
+   "note_short": "actual minus expected FP9 grade, pupil-weighted",
+   "level": "postnr",
+   "hue": [
+    64,
+    96,
+    152
+   ],
+   "group": "Schools",
+   "direction": "higher_better",
+   "sources": [
+    {
+     "db": "schools",
+     "table": "schools",
+     "geo": "kommune"
+    },
+    {
+     "db": "schools",
+     "table": "schools",
+     "geo": "postnr"
+    }
+   ],
+   "calc": "schools",
+   "source": "Uddannelsesstatistik.dk (STIL) — GS cubes KARA/KARAGNS (grades), OVER/OVERSKO (socioøkonomisk reference, klassekvotient), TRIV/TRIVIND (trivsel), ELEV/ELEVEX (elevtal); STIL institutionsregister for location and type. Kilde: Uddannelsesstatistik.dk — see docs/SCHOOLS.md"
+  },
+  {
+   "key": "school_trivsel",
+   "label": "Pupil well-being",
+   "short": "Well-being",
+   "unit": "1–5",
+   "fmt": "idx",
+   "desc": "Generel trivsel, the overall indicator of the national pupil well-being survey (elevtrivselsmålingen), on a 1–5 scale. Pupil-weighted over the schools of the area.",
+   "warn": "A self-reported survey with real non-response; the 1–5 scale compresses, so differences between areas are small by construction.",
+   "note": "Pupil-weighted over folkeskoler and frie grundskoler that have a value; specialskoler are excluded because their intake makes an average meaningless. A school whose cell the source suppressed (under 3 observations, under 5 pupils for trivsel and the socioøkonomisk reference) is absent from the mean, not counted as zero — so an area's figure covers only the schools that publish. Copenhagen metro set only (19 municipalities).",
+   "note_short": "Generel trivsel, 1–5, survey-weighted",
+   "level": "postnr",
+   "hue": [
+    64,
+    96,
+    152
+   ],
+   "group": "Schools",
+   "direction": "higher_better",
+   "sources": [
+    {
+     "db": "schools",
+     "table": "schools",
+     "geo": "kommune"
+    },
+    {
+     "db": "schools",
+     "table": "schools",
+     "geo": "postnr"
+    }
+   ],
+   "calc": "schools",
+   "source": "Uddannelsesstatistik.dk (STIL) — GS cubes KARA/KARAGNS (grades), OVER/OVERSKO (socioøkonomisk reference, klassekvotient), TRIV/TRIVIND (trivsel), ELEV/ELEVEX (elevtal); STIL institutionsregister for location and type. Kilde: Uddannelsesstatistik.dk — see docs/SCHOOLS.md"
+  },
+  {
+   "key": "pupils_per_school",
+   "label": "Pupils per school",
+   "short": "Pupils/school",
+   "unit": "pupils",
+   "fmt": "int",
+   "desc": "Average number of pupils per school (folkeskoler and frie grundskoler) in the area, latest school year.",
+   "note": "Counts whole institutions, not departments: a school with several afdelinger is one school here. Copenhagen metro set only.",
+   "level": "postnr",
+   "hue": [
+    64,
+    96,
+    152
+   ],
+   "group": "Schools",
+   "direction": "higher_better",
+   "sources": [
+    {
+     "db": "schools",
+     "table": "schools",
+     "geo": "kommune"
+    },
+    {
+     "db": "schools",
+     "table": "schools",
+     "geo": "postnr"
+    }
+   ],
+   "calc": "schools",
+   "source": "Uddannelsesstatistik.dk (STIL) — GS cubes KARA/KARAGNS (grades), OVER/OVERSKO (socioøkonomisk reference, klassekvotient), TRIV/TRIVIND (trivsel), ELEV/ELEVEX (elevtal); STIL institutionsregister for location and type. Kilde: Uddannelsesstatistik.dk — see docs/SCHOOLS.md"
   }
  ],
  "macro": [

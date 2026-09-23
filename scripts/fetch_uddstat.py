@@ -28,6 +28,7 @@ Usage:
   python3 scripts/fetch_uddstat.py --query q.json            # run a saved query body, cache the rows
 """
 import argparse
+import collections
 import datetime as dt
 import hashlib
 import json
@@ -131,14 +132,15 @@ def fetch(område, emne, underemne, nøgletal, detaljering, filtre=None, tomme_r
 
 
 def cached(område, emne, underemne, nøgletal, detaljering, filtre=None,
-           tomme_rækker=True, refresh=False):
-    """fetch(), cached to data/raw/uddstat/<emne>_<underemne>.jsonl.
+           tomme_rækker=True, refresh=False, tag=None):
+    """fetch(), cached to data/raw/uddstat/<emne>_<underemne>[_<tag>].jsonl.
 
     The sidecar .meta.json records the query that produced the file, so changing the measures or
-    the detaljering refetches instead of quietly reusing rows with different columns.
+    the detaljering refetches instead of quietly reusing rows with different columns. `tag`
+    separates two cuts of the same cube (ELEVEX total vs by herkomst, KARAGNS school vs kommune).
     """
     RAW.mkdir(parents=True, exist_ok=True)
-    stem = f"{emne}_{underemne}"
+    stem = f"{emne}_{underemne}" + (f"_{tag}" if tag else "")
     jsonl, meta_p = RAW / f"{stem}.jsonl", RAW / f"{stem}.meta.json"
     query = {"område": område, "emne": emne, "underemne": underemne, "nøgletal": list(nøgletal),
              "detaljering": list(detaljering), "filtre": filtre, "tomme_rækker": tomme_rækker}
@@ -236,12 +238,172 @@ def cmd_map():
         cmd_skema(f"{omr}/{emne}/{ue}", None)
 
 
+# --- the Schools layer pull (docs/SCHOOLS.md) --------------------------------
+
+SCHOOL_YEARS = ["2023/2024", "2024/2025", "2025/2026"]
+INST = "[Institution].[Institutionsnummer]"
+AFD = "[Institution].[Afdelingsnummer]"
+KOM = "[Institution].[Beliggenhedskommune]"
+AAR = "[Skoleår].[Skoleår]"
+TRIV_IND = "[Trivselsindikator].[Trivselsindikator]"
+HERKOMST = "[Herkomst].[Herkomst]"
+
+# One entry per cube pull. `key` is the cache tag and the name printed in the coverage report;
+# `unit` says which column carries the school identity, so the coverage count knows what to count.
+SCHOOL_PULLS = [
+    {"key": "grades", "emne": "KARA", "underemne": "KARAGNS", "unit": INST,
+     "nøgletal": ["Gennemsnit i bundne prøver", "Antal elever med alle bundne prøver"],
+     "detaljering": [INST, AAR], "what": "FP9 grade average, bundne prøver"},
+    {"key": "grades_dm", "emne": "KARA", "underemne": "KARADM", "unit": INST,
+     "nøgletal": ["Gennemsnit - Dansk bundne prøver", "Gennemsnit - Matematik bundne prøver"],
+     "detaljering": [INST, AAR], "what": "FP9 dansk and matematik"},
+    {"key": "overblik", "emne": "OVER", "underemne": "OVERSKO", "unit": AFD,
+     "nøgletal": ["SocRef Karaktergennemsnit", "SocRef Socioøkonomisk reference", "SocRef Forskel",
+                  "SocRef Signifikant forskel", "Klassekvotient", "Elevtal", "Karaktergennemsnit",
+                  "Andel med højest trivsel"],
+     "detaljering": [AFD, AAR], "what": "socioøkonomisk reference + klassekvotient (afdeling level)"},
+    {"key": "trivsel", "emne": "TRIV", "underemne": "TRIVIND", "unit": INST,
+     "nøgletal": ["Indikatorsvar", "Totale antal elever - indikatorsvar"],
+     "detaljering": [INST, TRIV_IND, AAR], "what": "elevtrivsel, 5 indicators"},
+    {"key": "pupils", "emne": "ELEV", "underemne": "ELEVEX", "unit": INST,
+     "nøgletal": ["Antal elever"], "detaljering": [INST, AAR], "what": "elevtal, total"},
+    {"key": "pupils_herkomst", "emne": "ELEV", "underemne": "ELEVEX", "unit": INST,
+     "nøgletal": ["Antal elever"], "detaljering": [INST, HERKOMST, AAR], "what": "elevtal by herkomst"},
+]
+# Benchmarks: the same grade measure one and two levels up. No kommune filter — every municipality,
+# so a school can be compared with its own kommune and with Denmark.
+BENCH_PULLS = [
+    {"key": "bench_kommune", "emne": "KARA", "underemne": "KARAGNS", "unit": KOM,
+     "nøgletal": ["Gennemsnit i bundne prøver"], "detaljering": [KOM, AAR], "national": True,
+     "what": "benchmark: grade average per kommune"},
+    {"key": "bench_land", "emne": "KARA", "underemne": "KARAGNS", "unit": None,
+     "nøgletal": ["Gennemsnit i bundne prøver"], "detaljering": [AAR], "national": True,
+     "what": "benchmark: grade average, Denmark"},
+]
+
+
+def col(row, dim):
+    """The value of a detaljering column. The API echoes '[A].[B]' back as '[A].[B].[B]'."""
+    return row.get(f"{dim}.[{dim.rsplit('.', 1)[1].strip('[]')}]")
+
+
+# The register's own names for the grundskole types we keep. Efterskoler, specialskoler for voksne,
+# ungdomsskoler, FGU and gymnasier are deliberately out — see docs/SCHOOLS.md §4.
+GRUNDSKOLE_TYPES = {"Folkeskoler": "folkeskole", "Friskoler og private grundskoler": "fri grundskole",
+                    "Specialskoler for børn": "specialskole", "Kommunale internationale skoler": "fri grundskole"}
+REGISTER = ROOT / "data" / "external" / "institutionsregister.csv"
+# The register writes "<name> Kommune"; for København alone it uses the genitive, "Københavns
+# Kommune", while the cubes and data/geo/kommuner.geojson both say "København". Stripping a
+# trailing "s" is NOT a safe general rule — Assens, Horsens, Randers, Aarhus and five others
+# really do end in one — so the one exception is spelled out here.
+KOMMUNE_ALIAS = {"Københavns": "København"}
+_KOM_CODE = None
+
+
+def kommune_code(name):
+    """Canonical kommune name → 4-digit kommunekode, from the vendored DAGI boundaries."""
+    global _KOM_CODE
+    if _KOM_CODE is None:
+        p = ROOT / "data" / "geo" / "kommuner.geojson"
+        _KOM_CODE = {f["properties"]["navn"]: f["properties"]["kode"]
+                     for f in json.loads(p.read_text(encoding="utf-8"))["features"]} if p.exists() else {}
+    return _KOM_CODE.get(name)
+
+
+def register_kommune(raw):
+    """The register's Beliggenhedskommune cell → the canonical kommune name."""
+    n = raw.replace(" Kommune", "").strip()
+    return KOMMUNE_ALIAS.get(n, n)
+
+
+def register_schools(kommune_names=None):
+    """Grundskole rows of the institution register, keyed by institutionsnummer.
+
+    Semicolon-separated and UTF-8 *with BOM*, so the encoding has to be utf-8-sig. Returns
+    {institutionsnummer: {...}}; `kommune_names` filters on Beliggenhedskommune ("København").
+    """
+    import csv
+    want = set(kommune_names) if kommune_names else None
+    out = {}
+    with open(REGISTER, encoding="utf-8-sig", newline="") as f:
+        for r in csv.DictReader(f, delimiter=";"):
+            kind = GRUNDSKOLE_TYPES.get(r["Institutionstype, navn"])
+            if not kind:
+                continue
+            kom = register_kommune(r["Beliggenhedskommune"])
+            if want and kom not in want:
+                continue
+            try:
+                lat, lon = float(r["Geokode: Breddegrad"]), float(r["Geokode: Længdegrad"])
+            except ValueError:
+                lat = lon = None
+            out[r["Institutionsnummer"]] = {
+                "nr": r["Institutionsnummer"], "name": r["Institutionsnavn"].strip(), "type": kind,
+                "type_raw": r["Institutionstype, navn"], "kommune": kom, "kom": kommune_code(kom),
+                "enhedsart": r["Enhedsart"],
+                "hoved": r["Hovedinstitution"].strip() or None, "postnr": r["Postnummer"].strip() or None,
+                "address": r["Adresse"].strip() or None,
+                "lat": round(lat, 6) if lat else None, "lon": round(lon, 6) if lon else None,
+            }
+    return out
+
+
+def cmd_schools(refresh=False):
+    """Pull every cube the Schools layer needs, for the 19 metro kommuner and the latest 3 years."""
+    reg = register_schools(METRO_NAMES)
+    # afdelingsnummer → institutionsnummer, so the afdeling-level cube can be counted against schools
+    to_inst = {nr: (r["hoved"] if r["hoved"] and r["hoved"] in reg else nr) for nr, r in reg.items()}
+    print(f"metro kommuner: {len(METRO_NAMES)} · school years: {', '.join(SCHOOL_YEARS)}")
+    print(f"register: {len(reg)} grundskoler in the 19 metro kommuner\n")
+    for p in SCHOOL_PULLS + BENCH_PULLS:
+        filtre = {AAR: SCHOOL_YEARS}
+        if not p.get("national"):
+            filtre[KOM] = METRO_NAMES
+        rows = cached("GS", p["emne"], p["underemne"], p["nøgletal"], p["detaljering"],
+                      filtre=filtre, tomme_rækker=False, refresh=refresh, tag=p["key"])
+        measures = [m for m in p["nøgletal"]]
+        # a row "covers" a school only if at least one measure actually carries a value —
+        # suppressed cells come back as an empty string, not as an absent column
+        units, with_val = set(), set()
+        per_year = collections.defaultdict(set)
+        for r in rows:
+            u = col(r, p["unit"]) if p["unit"] else "DK"
+            if u is None:
+                continue
+            units.add(u)
+            if any(dknum(r.get(m)) is not None or (r.get(m) or "").strip() for m in measures):
+                with_val.add(u)
+                per_year[col(r, AAR)].add(u)
+        print(f"{p['key']:<16} {p['emne']}/{p['underemne']:<8} {len(rows):>6} rows · "
+              f"{len(with_val):>4} {'schools' if p['unit'] else 'rows'} with a value")
+        print(f"{'':<16} {p['what']}")
+        if p.get("national") or not p["unit"]:
+            continue
+        # coverage is measured against the register, not against the response: a suppressed school
+        # is simply absent from the response, so "missing" can only be counted from the outside
+        seen = {to_inst.get(u, u) for u in with_val}
+        covered = seen & set(reg)
+        missing = set(reg) - seen
+        print(f"{'':<16} register coverage: {len(covered)}/{len(reg)} schools · {len(missing)} missing "
+              f"(suppressed, no 9th grade, or not in this cube)")
+        if missing:
+            by_type = collections.Counter(reg[n]["type"] for n in missing)
+            print(f"{'':<16} missing by type: " + " · ".join(f"{t} {n}" for t, n in by_type.most_common()))
+        if per_year:
+            print(f"{'':<16} by year: " + " · ".join(f"{y} {len(v)}" for y, v in sorted(per_year.items())))
+    print("\ncached → data/raw/uddstat/  (one .jsonl + .meta.json per pull)")
+    print("note: GS/SOCR/SOCREFEX and GS/SOCR/SOCREF3ÅR return 0 rows through the API at every\n"
+          "      detaljering tried — the socioøkonomisk reference comes from OVER/OVERSKO instead.\n"
+          "      See docs/SCHOOLS.md §2.")
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--example", action="store_true", help="run the documented ELEV/ELEVEX call for København")
     ap.add_argument("--skema", nargs="?", const="", metavar="OMRÅDE[/EMNE[/UNDEREMNE]]", help="catalogue lookup")
     ap.add_argument("--detalje", metavar="DIM", help="with --skema OMR/EMNE/UE: list that dimension's members")
     ap.add_argument("--map", action="store_true", help="dimensions + measures of the GS cubes this project wants")
+    ap.add_argument("--schools", action="store_true", help="pull every cube the Schools layer needs (19 metro kommuner, latest 3 years)")
     ap.add_argument("--query", metavar="FILE", help="run a JSON query body and cache the rows")
     ap.add_argument("--refresh", action="store_true", help="ignore the cache")
     a = ap.parse_args()
@@ -252,6 +414,8 @@ def main():
         cmd_skema(a.skema, a.detalje)
     elif a.map:
         cmd_map()
+    elif a.schools:
+        cmd_schools(refresh=a.refresh)
     elif a.query:
         q = json.loads(pathlib.Path(a.query).read_text(encoding="utf-8"))
         rows = cached(q["område"], q["emne"], q["underemne"], q["nøgletal"], q["detaljering"],

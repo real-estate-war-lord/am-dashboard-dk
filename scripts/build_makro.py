@@ -381,6 +381,23 @@ def calc_infra_index(ind, year=None):
     return out
 
 
+def calc_schools(ind, year=None):
+    """School-quality aggregates, written into public_index.json by scripts/build_schools.py.
+
+    A snapshot of the latest published school year, so no history. The values are pupil-weighted
+    over folkeskoler and frie grundskoler that have a value; specialskoler are excluded and a
+    suppressed school simply does not enter the mean (docs/SCHOOLS.md §3)."""
+    ix = public_index()
+    if year or not ix or not ix.get("schools"):
+        return {}
+    per = f"school year {ix['schools']['years'][-1]}"
+    out = {}
+    for geo in ("kommune", "postnr"):
+        vals = {k.split(":", 1)[1]: v.get(ind["key"]) for k, v in ix["areas"].items() if k.startswith(geo + ":")}
+        out[geo] = ({a: v for a, v in vals.items() if v is not None}, per)
+    return out
+
+
 def compute(ind, year=None):
     """Returns {geo: ({area: value}, period)} for one indicator, optionally for a
     reference year (rows after that year are dropped; see rows_for_year)."""
@@ -398,6 +415,8 @@ def compute(ind, year=None):
         return calc_public_index(ind, year)
     if calc == "infra_index":
         return calc_infra_index(ind, year)
+    if calc == "schools":
+        return calc_schools(ind, year)
     if calc.startswith("rolling4q"):
         vals, p = calc_rolling4q(ind, year)
         return {srcs[0]["geo"]: (vals, p)} if p else {}
@@ -600,7 +619,7 @@ def main():
     for ind in c["indicators"]:
         for s in ind["sources"]:
             key = (s.get("db", ""), s.get("table", ""))
-            if key in seen or s.get("db") in ("boligstat", "lbf", "bbr", "infra", "public"):
+            if key in seen or s.get("db") in ("boligstat", "lbf", "bbr", "infra", "public", "schools"):
                 continue
             seen.add(key)
             m = meta(*key)
@@ -623,12 +642,20 @@ def main():
                         "tables": "data/geo/infra_projects.geojson · Fingerplan 2019, Anlægsstatus, regions and agencies, OpenStreetMap",
                         "asof": ix["built"], "fetched": ix["built"], "url": "https://github.com/real-estate-war-lord/am-dashboard-dk/blob/main/docs/INFRA.md",
                         "licence": "see docs/INFRA.md"})
+    sx = (px or {}).get("schools")
+    if sx:
+        sources.append({"key": "schools", "label": f"School quality — Uddannelsesstatistik.dk (STIL), {sx['n']} schools in the Copenhagen metro set",
+                        "tables": "GS cubes KARA/KARAGNS, KARA/KARADM, OVER/OVERSKO, TRIV/TRIVIND, ELEV/ELEVEX · STIL institutionsregister",
+                        "asof": sx["years"][-1], "fetched": sx["retrieved"],
+                        "url": "https://github.com/real-estate-war-lord/am-dashboard-dk/blob/main/docs/SCHOOLS.md",
+                        "licence": "free reuse incl. commercial — attribution \"Kilde: Uddannelsesstatistik.dk\""})
     if (EXT / "rent_private.csv").exists():
         sources.append({"key": "boligstat", "label": "Social- og Boligstyrelsen, boligstat.dk — private rental rent DKK/m²", "url": "https://boligstat.dk", "licence": "public"})
     if (EXT / "rent_social.csv").exists():
         sources.append({"key": "lbf", "label": "Landsbyggefonden, Huslejestatistik — social housing rent DKK/m²", "url": "https://lbf.dk/viden/statistikker/huslejestatistik/", "licence": "public"})
     attribution = ["Danmarks Statistik", "Finans Danmark, Boligmarkedsstatistikken", "Social- og Boligstyrelsen", "Landsbyggefonden",
-                   "Indeholder data fra Klimadatastyrelsen (DAGI, BBR)", "Danmarks Nationalbank"]
+                   "Indeholder data fra Klimadatastyrelsen (DAGI, BBR)", "Danmarks Nationalbank",
+                   "Kilde: Uddannelsesstatistik.dk"]
     out = {
         "meta": {"built": dt.date.today().isoformat(), "sources": sources, "attribution": attribution, "years": [str(y) for y in sorted(all_years)], "latest_year": str(latest_year),
                  "note": "Postal codes take their dominant municipality. Cells with too few observations are suppressed by the source and shown as –.",

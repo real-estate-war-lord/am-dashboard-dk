@@ -33,7 +33,9 @@ const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&am
 const FMT = {
   pct0: v => nf(v, 0) + " %", pct1: v => nf(v, 1) + " %", signpct1: v => sign(v, x => nf(x, 1) + " %"),
   kdkk: v => nf(v / 1000, 0) + " kDKK", dkk0: v => nf(v, 0) + " DKK", dkk1: v => nf(v, 1) + " DKK",
-  int: v => nf(v, 0), days: v => nf(v, 0) + " d", m2: v => nf(v, 0) + " m²", per1000: v => per1000(v) + " / 1,000", idx: v => nf(v, 1)
+  int: v => nf(v, 0), days: v => nf(v, 0) + " d", m2: v => nf(v, 0) + " m²", per1000: v => per1000(v) + " / 1,000", idx: v => nf(v, 1),
+  /* grade points: signed, one decimal, no unit — the socioeconomic reference difference */
+  signdec1: v => sign(v, x => nf(x, 1))
 };
 /* rates per 1,000 (crime, homes for sale): no % sign — the unit is in the label, the legend title and the column head.
    Whole numbers once the rate is large enough for a decimal to be noise. */
@@ -90,6 +92,8 @@ const CH = { ind: (IND[0] || {}).key, areas: [], y0: "", y1: "", median: true, t
 const PR = { id: null };                                                          /* project datasheet */
 const PB = { kom: null, id: null };                                               /* public-building sheet */
 const PL = { key: "" };                                                           /* public list panel: "<level>:<code>:<cat>:<kind>" */
+const SC = { nr: null };                                                          /* school datasheet */
+const SL = { key: "" };                                                           /* school list panel: "<level>:<code>" */
 /* public-buildings filter, shared by the map, the legend and the area card. cats = null means all. */
 const PF = { cats: null, kind: "both" };
 const PF_SHORT = { education: "edu", institutions: "inst", health: "health", culture: "culture" };
@@ -142,6 +146,8 @@ function hashFor() {
   else if (S.view === "project") { p = `project/${PR.id}`; }
   else if (S.view === "public") { p = `public/${PB.kom}/${PB.id}`; }
   else if (S.view === "publist") { p = `publist/${PL.key}`; }
+  else if (S.view === "school") { p = `school/${SC.nr}`; }
+  else if (S.view === "schoollist") { p = `schoollist/${SL.key}`; }
   else if (S.view === "pipeline") { p = "pipeline"; if (PIPE.type) q.push(`ptype=${PIPE.type}`); if (PIPE.status) q.push(`pstatus=${PIPE.status}`); }
   else if (S.view === "makro") p = "map" + (MK.muni ? "/" + MK.muni + (MK.muni === CPH_MUNI && MK.cphView === "postnr" ? "/postnr" : "") : "");
   else p = S.view;
@@ -162,6 +168,8 @@ function parseHash() {
   else if (v === "project" && parts[1]) { S.view = "project"; PR.id = decodeURIComponent(parts[1]); }
   else if (v === "public" && parts[2]) { S.view = "public"; PB.kom = parts[1]; PB.id = decodeURIComponent(parts[2]); }
   else if (v === "publist" && parts[1]) { S.view = "publist"; PL.key = decodeURIComponent(parts.slice(1).join(":")); pubParseFilter(q); }
+  else if (v === "school" && parts[1]) { S.view = "school"; SC.nr = decodeURIComponent(parts[1]); schoolsLoad(); }
+  else if (v === "schoollist" && parts[1]) { S.view = "schoollist"; SL.key = decodeURIComponent(parts.slice(1).join(":")); schoolsLoad(); }
   else if (v === "pipeline") { S.view = "pipeline"; PIPE.type = q.ptype || ""; PIPE.status = q.pstatus || ""; }
   else if (v === "charts") { S.view = "charts"; CH.ind = q.ind || CH.ind; CH.areas = q.a ? q.a.split(",").filter(Boolean) : CH.areas; CH.y0 = q.y0 || CH.y0; CH.y1 = q.y1 || CH.y1; CH.median = q.med !== "0"; CH.mode = q.mode || "auto"; CH.dist = q.dist || "size";
     CH.fq = q.fq === "q" ? "q" : "year"; CH.ov = q.ov ? q.ov.split(",").filter(Boolean) : []; CH.nat = q.nat !== "0"; }
@@ -194,7 +202,7 @@ const NAV_GROUPS = [["Market intelligence", ["makro", "table", "charts", "market
 const viewOf = id => VIEWS.find(v => v[0] === id) || VIEWS[0];
 
 function renderNav() {
-  const on = S.view === "area" ? "makro" : S.view === "project" ? "pipeline" : ["public", "publist"].includes(S.view) ? "makro" : S.view;
+  const on = S.view === "area" ? "makro" : S.view === "project" ? "pipeline" : ["public", "publist", "school", "schoollist"].includes(S.view) ? "makro" : S.view;
   document.getElementById("nav").innerHTML = NAV_GROUPS.map(([lab, ids]) => `<div class="nav-glab">${lab}</div>` +
     ids.map(id => { const v = viewOf(id); return `<button class="nav-item ${on === id ? "on" : ""}" data-go="${v[3]}" title="${esc(v[2])}"><b>${v[1]}</b></button>`; }).join("")).join("");
 }
@@ -208,6 +216,8 @@ function crumbs() {
     if (m) { if (microMode()) { c.push([m.name, `map/${m.code}` + q]); tail = "Buildings"; kind = "BBR register"; } else { tail = m.name; kind = cphMode() ? "quarters" : "postal codes"; } }
     else { tail = "Map"; kind = "municipalities and postal codes"; } }
   else if (S.view === "project") { const f = projectEntity(); c.push(["Pipeline", "pipeline"]); tail = f ? f.properties.name : "Project"; kind = f ? (INFRA_TYPE[f.properties.type] || f.properties.type) : ""; }
+  else if (S.view === "school") { const s = SCH_BY[SC.nr]; if (s && byCode[s.kom]) c.push([s.kommune, `area/kommune/${s.kom}` + q]); tail = s ? s.name : "School"; kind = s ? (SCH_TYPE[s.type] || s.type) : "Uddannelsesstatistik.dk"; }
+  else if (S.view === "schoollist") { tail = "Schools"; kind = "sorted by FP9 grade"; }
   else { tail = viewOf(S.view)[1]; kind = { table: "every area side by side", charts: "PNG and CSV export", market: "national series and sources", pipeline: `${INFRA_ALL.length} projects · budget, status, opening year` }[S.view] || ""; }
   return { c, tail, kind };
 }
@@ -216,7 +226,7 @@ function renderTop() {
   document.getElementById("hd").innerHTML = `<nav class="crumbs">${c.map(([l, h]) => `<button data-go="${esc(h)}">${esc(l)}</button><i>›</i>`).join("")}<b>${esc(tail)}</b>${kind ? `<span class="dim">${esc(kind)}</span>` : ""}</nav>`;
 }
 const RENDER = { makro: vMakro, table: vTable, area: vArea, charts: vCharts, market: vMarket, pipeline: vPipeline, project: vProject,
-                 public: vPublic, publist: vPubList };
+                 public: vPublic, publist: vPubList, school: vSchool, schoollist: vSchoolList };
 function render() {
   renderNav(); renderTop();
   const body = document.getElementById("body");
@@ -264,6 +274,8 @@ document.addEventListener("click", e => {
     const f = el.dataset.pubfilter;      /* the card segments set the same filter the legend uses */
     if (f) { const [c, k] = f.split(":"); PF.cats = c ? new Set([c]) : null; PF.kind = k === "case" ? "open" : k === "existing" ? "existing" : "both"; }
     go(`publist/${el.dataset.publist}`); return; }
+  if ((el = g("[data-school]"))) { go(`school/${encodeURIComponent(el.dataset.school)}`); return; }
+  if ((el = g("[data-schoollist]"))) { go(`schoollist/${el.dataset.schoollist}`); return; }
   if ((el = g("[data-pubsheet]"))) { const row = el.closest("[data-pubkom]"); go(`public/${(row && row.dataset.pubkom) || (MK.muni || CPH_MUNI)}/${el.dataset.pubsheet}`); return; }
   if (g("[data-mcsv]")) { exportMicroCsv(); return; }
   if ((el = g("[data-argroup]"))) { AR.group = el.dataset.argroup; syncHash(); renderKeep(); return; }
@@ -376,7 +388,7 @@ function setInfraLegend() {
   el.style.display = MK.infra && INFRA.length ? "" : "none";
   if (MK.infra && INFRA.length) el.innerHTML = infraLegendHtml();
 }
-const GROUP_ORDER = ["Demographics", "Income & jobs", "Housing stock", "Housing stock (BBR)", "Rents", "Prices & market", "Construction", "Safety", "Growth signals"];
+const GROUP_ORDER = ["Demographics", "Income & jobs", "Housing stock", "Housing stock (BBR)", "Rents", "Prices & market", "Construction", "Safety", "Schools", "Growth signals"];
 /* "label · unit" for selects, leaving out unit parts the label already says ("Reported crime · per 1,000 inh." + "rolling 4Q") */
 function optLabel(i) {
   const parts = (i.unit || "").split(" · ").filter(u => u && !i.label.includes(u) && !i.label.endsWith("· " + u.split(" ")[0]));
@@ -1493,7 +1505,8 @@ function vCharts() {
     <tbody>${ys.map((yy, i) => `<tr><th>${fmtP(yy)}</th>${series.map(s_ => fmtCell(ind, s_.pts[i].v, false)).join("")}</tr>`).join("")}</tbody></table></div></div>` : ""}
   ${chartMode() === "dist" && ents.some(e => e.o.bbr) ? `<div class="card"><div class="card-head"><h3>Data</h3><span class="hint">share of dwellings · count</span></div>
     <div class="scrollx"><table class="tbl compact" data-sortable><thead><tr><th>Area</th><th class="num">Dwellings</th>${(DIST_DEFS[CH.dist] || DIST_DEFS.size)[1].map(l => `<th class="num">${esc(l)}</th>`).join("")}</tr></thead>
-    <tbody>${ents.filter(e => e.o.bbr && e.o.bbr.dist).map(e => { const d = e.o.bbr.dist[CH.dist]; const t = d.reduce((a, b) => a + b, 0) || 1; return `<tr><th>${esc(e.name)}</th><td class="num">${nf(e.o.bbr.n, 0)}</td>${d.map(v => `<td class="num" data-v="${v / t * 100}">${nf(v / t * 100, 0)} % <span class="dim">${nf(v, 0)}</span></td>`).join("")}</tr>`; }).join("")}</tbody></table></div></div>` : ""}`;
+    <tbody>${ents.filter(e => e.o.bbr && e.o.bbr.dist).map(e => { const d = e.o.bbr.dist[CH.dist]; const t = d.reduce((a, b) => a + b, 0) || 1; return `<tr><th>${esc(e.name)}</th><td class="num">${nf(e.o.bbr.n, 0)}</td>${d.map(v => `<td class="num" data-v="${v / t * 100}">${nf(v / t * 100, 0)} % <span class="dim">${nf(v, 0)}</span></td>`).join("")}</tr>`; }).join("")}</tbody></table></div></div>` : ""}
+  ${schoolsChartCard()}`;
 }
 function chartAddMany(ids) { ids.forEach(id => { if (!CH.areas.includes(id) && CH.areas.length < 8) CH.areas.push(id); }); syncHash(); renderKeep(); }
 function chartPng() {
@@ -1529,6 +1542,7 @@ const PUB_CAT = {
 const pubCat = b => PUB_CAT[b.cat] || PUB_CAT.culture;
 const pubName = b => b.name || b.address || b.label;
 function pubLoad(code) {
+  schoolsLoad();
   const k = String(Number(code));
   if (!PUB || !pubAvail(k) || PUB_FILES[k] || PUB_FILES["_loading_" + k]) return;
   PUB_FILES["_loading_" + k] = true;
@@ -1591,6 +1605,7 @@ function pubPopup(b) {
       ${b.kind === "case" ? row("Permit", b.permit || "–") + row("Started", b.started || "") + row("Case age", b.age_yrs != null ? nf(b.age_yrs, 1) + " yr" : "") +
         row("Expected completion", b.expected || "not stated") + row("Owner", b.owner || "") + row("Case no.", b.case_no || "") : ""}
       ${row("Municipality", esc((byCode[b.kom] || {}).name || ""))}${row("Postal code", esc(b.postnr || ""))}</div>
+    ${schoolPopupBlock(b)}
     ${b.kind === "case" ? `<p class="cap">⚠ Owner-reported BBR case — not a confirmed construction schedule.</p>` : ""}
     <span class="lfact"><button class="lk mini primary" data-pubsheet="${esc(b.id)}">Open sheet ›</button>
       ${area.length ? `<button class="lk mini" data-go="${withQ(pageOf(area[0]))}">${esc(area[0].name)} ›</button>` : ""}</span>
@@ -1601,11 +1616,21 @@ function lfPublicLayers() {
   if (!LF.map || !MK.pub || !PUB) return;
   pubLoadVisible();
   const rows = pubRows(), marks = [], hits = [];
+  /* grade mode: Education on its own → the markers carry the school's FP9 grade instead of the category */
+  const gm = gradeMode(), gsc = gm ? gradeScale() : null;
   rows.forEach(b => {
     const c = pubCat(b), existing = b.kind === "existing";
+    let stroke = c.color, fill = existing ? c.color : "#FFFFFF", fop = existing ? .85 : 1, wt = 2;
+    if (gm && b.cat === "education") {
+      const gc = gradeColor(b, gsc);
+      /* no grade (0.–6. klasse, suppressed, special, or not a school at all) keeps the base hue,
+         drawn hollow with a thin outline so it reads as "not on this scale", never as a low grade */
+      if (gc) { fill = gc; fop = .95; stroke = "#2F3B55"; wt = 1.4; }
+      else { fill = c.color; fop = .18; stroke = c.color; wt = 1; }
+    }
     const halo = L.circleMarker([b.lat, b.lon], { radius: 8, stroke: false, fillColor: "#FFFFFF", fillOpacity: .9, interactive: false });
-    const m = L.circleMarker([b.lat, b.lon], { radius: 6, color: c.color, weight: 2, opacity: .95, className: "infra-shape",
-      fillColor: existing ? c.color : "#FFFFFF", fillOpacity: existing ? .85 : 1, dashArray: existing ? null : "3 3" });
+    const m = L.circleMarker([b.lat, b.lon], { radius: 6, color: stroke, weight: wt, opacity: .95, className: "infra-shape",
+      fillColor: fill, fillOpacity: fop, dashArray: existing ? null : "3 3" });
     m.on("mouseover", () => { m.setRadius(8); halo.setRadius(10); }).on("mouseout", () => { m.setRadius(6); halo.setRadius(8); });
     m.on("click", e => L.popup({ maxWidth: 420, autoPanPadding: [24, 24] }).setLatLng(e.latlng || [b.lat, b.lon]).setContent(pubPopup(b)).openOn(LF.map));
     m._pub = b;
@@ -1643,6 +1668,17 @@ function setPublicLegend() {
   const kindRow = `<div class="lgrow gk">
       <span class="pubtog ${pubKindOn("existing") ? "" : "off"}" data-pubkind="existing"><i class="pk-exist"></i>existing</span>
       <span class="pubtog ${pubKindOn("case") ? "" : "off"}" data-pubkind="open"><i class="pk-case"></i>open case</span></div>`;
+  if (gradeMode()) {
+    const sc = gradeScale(), ind = gradeInd(), n = sc.classes || 0, b = sc.breaks || [];
+    const lab = i2 => n === 1 ? nf(sc.lo, 1) : i2 === 0 ? `≤ ${nf(b[0], 1)}` : i2 === n - 1 ? `> ${nf(b[i2 - 1], 1)}` : `${nf(b[i2 - 1], 1)} – ${nf(b[i2], 1)}`;
+    const bins = []; for (let i2 = n - 1; i2 >= 0; i2--) bins.push(`<div class="lgrow"><i style="background:${mkShade(n > 1 ? i2 / (n - 1) : .5, GRADE_KEY)}"></i>${lab(i2)}</div>`);
+    el.innerHTML = `<div class="lgtitle">FP9 grade avg<span>bundne prøver · ${esc(SCH_LATEST)}</span></div>
+      ${n ? bins.join("") : `<div class="lgrow dim">no grades loaded</div>`}
+      <div class="lgrow"><i style="background:${PUB_CAT.education.color};opacity:.18;border:1px solid ${PUB_CAT.education.color}"></i>no grade published</div>
+      <div class="lgrow gk"><b class="only" data-puball>All categories</b></div>
+      <div class="lgnote">${sc.n || 0} schools classed over the loaded municipalities. A school with no grade teaches no 9th grade, or the source suppressed it — never read it as a low grade. Kilde: Uddannelsesstatistik.dk</div>`;
+    return;
+  }
   el.innerHTML = `<div class="lgtitle">Public buildings<span>BBR ${esc(PUB.built)} · ${PUB.kommuner.length} municipalities${filtered ? ` · <b class="only" data-puball>All</b>` : ""}</span></div>
     ${Object.entries(PUB_CAT).map(([k, c]) => catRow(k, c)).join("")}
     ${kindRow}
@@ -1653,11 +1689,239 @@ function setPublicLegend() {
 /* the PUBLIC line on an area card */
 function publicLine(level, code) {
   const e = pubOf(level, code); if (!e) return "";
+  const sch = schoolLine(level, code);
   const seg = Object.entries(PUB_CAT).map(([k, c]) => { const v = (e.counts || {})[k] || {};
     return v.existing ? `<button class="lk mini" data-publist="${level}:${code}:${k}:existing" data-pubfilter="${k}:existing" style="border-color:${c.color}66">${nf(v.existing, 0)} ${esc(k === "institutions" ? "daycare/inst." : c.label.toLowerCase())}</button>` : ""; }).join("");
   const cases = Object.values(e.counts || {}).reduce((s, v) => s + (v.case || 0), 0);
-  if (!seg && !cases) return "";
-  return `<span class="upcoming"><em>Public</em>${seg}${cases ? `<button class="lk mini" data-publist="${level}:${code}::case" data-pubfilter=":case">${cases} open case${cases > 1 ? "s" : ""}</button>` : ""}</span>`;
+  if (!seg && !cases && !sch) return "";
+  return `<span class="upcoming"><em>Public</em>${seg}${cases ? `<button class="lk mini" data-publist="${level}:${code}::case" data-pubfilter=":case">${cases} open case${cases > 1 ? "s" : ""}</button>` : ""}${schoolLine(level, code)}</span>`;
+}
+
+/* ---------- Schools (Uddannelsesstatistik.dk / STIL) ----------
+   The per-area aggregates ride along in public_index (PUB.areas); the school records themselves are
+   a separate file, fetched once the public layer is on or a school page is opened. */
+const SCH_META = (PUB && PUB.schools) || null;      /* {built, retrieved, years, n, benchmarks} */
+const SCH_BY = {};                                  /* institutionsnummer → record */
+let SCHOOLS = null, SCH_LOADING = false;
+function schoolsLoad() {
+  if (SCHOOLS || SCH_LOADING || !SCH_META) return;
+  SCH_LOADING = true;
+  fetch("schools.json").then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(d => { SCHOOLS = d; (d.schools || []).forEach(s => SCH_BY[s.nr] = s); SCH_LOADING = false;
+      if (LF.map && MK.pub) lfPublicLayers();
+      if (["school", "schoollist", "area", "charts"].includes(S.view)) renderKeep(); })
+    .catch(() => { SCH_LOADING = false; SCHOOLS = { schools: [] }; });
+}
+const schoolOf = b => (b && b.school && SCH_BY[b.school]) || null;
+const SCH_YEARS = (SCH_META && SCH_META.years) || [];
+const SCH_LATEST = SCH_YEARS[SCH_YEARS.length - 1] || "";
+const SCH_TYPE = { "folkeskole": "Folkeskole", "fri grundskole": "Private / free school", "specialskole": "Special school" };
+/* The source's own verdict on whether actual minus expected is more than noise. OVER/OVERSKO spells
+   these "Over niveau" / "Under niveau" / "På niveau" — NOT the "Bedre/Dårligere end forventet" the
+   SOCREFEX dimension uses. Only the first two are significant; "På niveau" means within the band. */
+const SCH_SIG = { "Over niveau": "above expected", "Under niveau": "below expected" };
+const schSig = v => SCH_SIG[v] || null;
+const schBench = (kom, year) => ((SCH_META && SCH_META.benchmarks && SCH_META.benchmarks.kommune[kom]) || {})[year || SCH_LATEST];
+const schBenchDK = year => ((SCH_META && SCH_META.benchmarks && SCH_META.benchmarks.denmark) || {})[year || SCH_LATEST];
+/* a suppressed cell is absent, never zero — every reader of a school value goes through this */
+const schV = (s, k) => (s && s.latest && s.latest[k] != null) ? s.latest[k] : null;
+const schY = (s, k) => (s && s.latest_year && s.latest_year[k]) || "";
+const SUPPRESSED = "suppressed by the source (under 3 observations; under 5 pupils for well-being and the socioeconomic reference) — not zero";
+const schCell = (v, fmt) => v == null ? `<span class="dim" title="${SUPPRESSED}">–</span>` : fmt(v);
+const schGrade = v => nf(v, 1);
+const schDiff = v => sign(v, x => nf(x, 1));
+function schoolsInView() {
+  /* every school of the municipalities whose buildings are loaded — the pool the grade ramp classes */
+  if (!SCHOOLS) return [];
+  const loaded = new Set(Object.keys(PUB_FILES).filter(k => !k.startsWith("_")));
+  const keys = MK.muni && pubAvail(MK.muni) ? new Set([String(Number(MK.muni))]) : loaded;
+  return (SCHOOLS.schools || []).filter(s => keys.has(s.kom));
+}
+/* --- grade colouring: only when the public filter is showing Education and nothing else --- */
+const GRADE_KEY = "school_grade_avg";
+const gradeInd = () => IND.find(i => i.key === GRADE_KEY) || { key: GRADE_KEY, short: "FP9 grade", label: "FP9 grade average", unit: "grade 0–12", fmt: "idx" };
+function gradeMode() {
+  return !!(MK.pub && SCH_META && PF.cats && PF.cats.size === 1 && PF.cats.has("education") && SCHOOLS);
+}
+function gradeScale() {
+  return scaleOf(schoolsInView(), s => schV(s, "grade_avg"));
+}
+function gradeColor(b, sc) {
+  const s = schoolOf(b); const v = schV(s, "grade_avg");
+  if (v == null) return null;                       /* no grade → keep the base Education hue */
+  const t = sc.t(v);
+  return t == null ? null : mkShade(t, GRADE_KEY);
+}
+/* --- the school block inside a public-building popup --- */
+function schoolPopupBlock(b) {
+  const s = schoolOf(b); if (!s) return "";
+  const row = (l, v, t) => `<span class="lfrow"><span${t ? ` title="${esc(t)}"` : ""}>${esc(l)}</span><b>${v}</b></span>`;
+  const g = schV(s, "grade_avg"), kb = schBench(s.kommune, schY(s, "grade_avg")), dk = schBenchDK(schY(s, "grade_avg"));
+  const d = schV(s, "soc_ref_diff"), sig = schSig(schV(s, "soc_ref_significant"));
+  const socTxt = d == null ? `<span class="dim" title="${SUPPRESSED}">–</span>`
+    : `${schDiff(d)}${sig ? ` <em class="schsig">✓ ${esc(sig)}</em>` : ` <em class="dim">≈ as expected</em>`}`;
+  const bench = g == null ? "" : `<em class="dim">${kb != null ? `kommune ${schGrade(kb)}` : ""}${kb != null && dk != null ? " · " : ""}${dk != null ? `DK ${schGrade(dk)}` : ""}</em>`;
+  return `<div class="schpop">
+    <span class="schhead"><b>${esc(s.name)}</b><i class="ipill">${esc(SCH_TYPE[s.type] || s.type)}</i></span>
+    <div class="lfrows">
+      ${row("FP9 grade", `${schCell(g, schGrade)} ${bench}`, "weighted average of the bundne prøver, 9th grade")}
+      ${row("Socioeconomic reference", socTxt, "actual grade minus the grade the ministry's model expects from the pupils' background")}
+      ${row("Well-being", schCell(schV(s, "trivsel_general"), v => nf(v, 1) + " / 5"), "Generel trivsel, national pupil survey")}
+      ${row("Pupils", schCell(schV(s, "pupils_total"), v => nf(v, 0)))}
+      ${row("Class size", schCell(schV(s, "klassekvotient"), v => nf(v, 1)))}
+      ${row("School year", esc(schY(s, "grade_avg") || schY(s, "pupils_total") || SCH_LATEST))}
+    </div>
+    ${s.bbr_ids.length > 1 ? `<p class="cap dim">One of ${s.bbr_ids.length} buildings on this school's site — the figures belong to the school, not to this building.</p>` : ""}
+    <span class="lfact"><button class="lk mini primary" data-school="${esc(s.nr)}">Open school sheet ›</button></span></div>`;
+}
+/* --- school datasheet (#school/<institutionsnummer>) --- */
+function vSchool() {
+  if (!SCHOOLS) { schoolsLoad(); return `<div class="card"><p class="empty">Loading the schools…</p></div>`; }
+  const s = SCH_BY[SC.nr];
+  if (!s) return `<div class="card"><p class="empty">No school with institutionsnummer ${esc(SC.nr)} in the layer.</p>
+    <div class="tools"><button class="lk" data-back>‹ Back</button></div></div>`;
+  const m = byCode[s.kom], area = [byNr[s.postnr], byQ[s.kvarter]].filter(Boolean);
+  const gy = schY(s, "grade_avg"), kb = schBench(s.kommune, gy), dk = schBenchDK(gy);
+  const g = schV(s, "grade_avg"), d = schV(s, "soc_ref_diff"), sig = schSig(schV(s, "soc_ref_significant"));
+  const tile = (l, v, sub) => `<span class="hlc"><span>${esc(l)}</span><b>${v}</b><em>${esc(sub || "")}</em></span>`;
+  const bld = (s.bbr_ids || []).map(id => (PUB_FILES[s.kom] || { buildings: [] }).buildings.find(b => b.id === id)).filter(Boolean);
+  if (!bld.length && s.bbr_ids.length) { pubLoad(s.kom); setTimeout(() => renderKeep(), 700); }
+  const yrow = (label, key, fmt) => `<tr><th>${esc(label)}</th>${SCH_YEARS.map(y => {
+    const v = (s.years[y] || {})[key];
+    return `<td class="num">${v == null ? `<span class="dim" title="${SUPPRESSED}">–</span>` : fmt(v)}</td>`; }).join("")}</tr>`;
+  return `
+  <div class="card accent arhead">
+    <div class="arid"><h2>${esc(s.name)}</h2>
+      <div class="artags"><span class="tag" style="color:${PUB_CAT.education.color};border-color:${PUB_CAT.education.color}55">${esc(SCH_TYPE[s.type] || s.type)}</span>
+        <span class="tag">${esc(s.kommune)}</span><span class="tag">inst. no. ${esc(s.nr)}</span>
+        ${s.address ? `<span class="tag">${esc(s.address)}</span>` : ""}
+        ${s.enhedsart === "Afdeling (underordnet enhed)" ? `<span class="tag" title="a department of a larger school — the source may publish its figures under the parent">department</span>` : ""}</div>
+    </div>
+    <div class="tools"><button class="lk" data-back>‹ Back</button>
+      <button class="lk primary" data-go="map/${esc(s.kom)}?ind=${encodeURIComponent(MK.ind)}&public=1&pub=edu">Show on map</button>
+      ${m ? `<button class="lk" data-go="${withQ("area/kommune/" + s.kom)}">${esc(m.name)} ›</button>` : ""}
+      ${area.length ? `<button class="lk" data-go="${withQ(pageOf(area[0]))}">${esc(area[0].name)} ›</button>` : ""}</div>
+    <div class="hl">
+      ${tile("FP9 grade", schCell(g, schGrade), gy ? "bundne prøver · " + gy : "bundne prøver")}
+      ${tile("Expected", schCell(schV(s, "soc_ref_expected"), schGrade), "socioeconomic reference")}
+      ${tile("Difference", d == null ? `<span class="dim" title="${SUPPRESSED}">–</span>` : schDiff(d), sig ? "✓ " + sig : d == null ? "" : "not significant")}
+      ${tile("Well-being", schCell(schV(s, "trivsel_general"), v => nf(v, 1)), "generel trivsel · 1–5")}
+      ${tile("Pupils", schCell(schV(s, "pupils_total"), v => nf(v, 0)), schV(s, "pupils_indv_efterk") != null ? nf(schV(s, "pupils_indv_efterk"), 0) + " immigrant / descendant" : "")}
+      ${tile("Class size", schCell(schV(s, "klassekvotient"), v => nf(v, 1)), "klassekvotient")}
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card"><div class="card-head"><h3>Three school years</h3><span class="hint">${esc(SCH_YEARS.join(" · "))}</span></div>
+      <div class="scrollx"><table class="tbl compact"><thead><tr><th>Measure</th>${SCH_YEARS.map(y => `<th class="num">${esc(y)}</th>`).join("")}</tr></thead><tbody>
+        ${yrow("FP9 grade, bundne prøver", "grade_avg", schGrade)}
+        ${yrow("— dansk", "grade_dansk", schGrade)}
+        ${yrow("— matematik", "grade_matematik", schGrade)}
+        ${yrow("Socioeconomic reference", "soc_ref_expected", schGrade)}
+        ${yrow("Difference", "soc_ref_diff", schDiff)}
+        ${yrow("Well-being (generel trivsel)", "trivsel_general", v => nf(v, 1))}
+        ${yrow("Pupils", "pupils_total", v => nf(v, 0))}
+        ${yrow("Class size", "klassekvotient", v => nf(v, 1))}
+      </tbody></table></div>
+      <p class="cap">A dash is a cell the source suppressed, not a zero. The socioeconomic reference is published a year behind the grades, so the newest year usually has a grade and no reference.</p></div>
+    <div class="card"><div class="card-head"><h3>Benchmarks</h3><span class="hint">FP9 grade, ${esc(gy || SCH_LATEST)}</span></div>
+      <table class="tbl compact"><tbody>
+        <tr><th>This school</th><td class="num"><b>${schCell(g, schGrade)}</b></td><td class="dim">${schV(s, "grade_n") != null ? nf(schV(s, "grade_n"), 0) + " pupils sat the exams" : ""}</td></tr>
+        <tr><th>${esc(s.kommune)}</th><td class="num">${schCell(kb, schGrade)}</td><td class="dim">${g != null && kb != null ? schDiff(g - kb) + " vs kommune" : ""}</td></tr>
+        <tr><th>Denmark</th><td class="num">${schCell(dk, schGrade)}</td><td class="dim">${g != null && dk != null ? schDiff(g - dk) + " vs Denmark" : ""}</td></tr>
+      </tbody></table>
+      <div class="card-head" style="margin-top:14px"><h3>Well-being, four sub-indicators</h3><span class="hint">1–5</span></div>
+      <table class="tbl compact"><tbody>
+        ${[["Faglig trivsel — academic", "trivsel_faglig"], ["Social trivsel — social", "trivsel_social"],
+           ["Støtte og inspiration — support", "trivsel_stoette"], ["Ro og orden — calm and order", "trivsel_ro"]]
+          .map(([l, k]) => `<tr><th>${esc(l)}</th><td class="num">${schCell(schV(s, k), v => nf(v, 1))}</td></tr>`).join("")}
+        <tr><th class="dim">Responses</th><td class="num dim">${schCell(schV(s, "trivsel_n"), v => nf(v, 0))}</td></tr>
+      </tbody></table></div>
+  </div>
+  <div class="card"><div class="card-head"><h3>Buildings on this site</h3>
+      <span class="hint">${s.bbr_ids.length} BBR building${s.bbr_ids.length === 1 ? "" : "s"} · ${s.bbr_match === "421" ? "anvendelse 421 Grundskole" : s.bbr_match === "fallback_42x" ? "no 421 within 150 m — matched on 420/429" : "no education building within 150 m"}</span></div>
+    ${bld.length ? `<div class="scrollx"><table class="tbl compact" data-sortable><thead><tr><th>Building</th><th>BBR use</th><th class="num">Floor area<br><span class="dim">m²</span></th><th class="num">Built</th><th class="num">Floors</th></tr></thead>
+      <tbody>${bld.map(b => `<tr class="clickrow" data-pubsheet="${esc(b.id)}" data-pubkom="${esc(b.kom)}"><th><span class="thn">${esc(pubName(b))} <span class="go">›</span></span></th>
+        <td class="dim">${esc(b.code)} ${esc(b.label)}</td><td class="num" data-v="${b.m2 || 0}">${b.m2 ? nf(b.m2, 0) : "–"}</td>
+        <td class="num" data-v="${b.year || ""}">${b.year || "–"}</td><td class="num">${b.floors || "–"}</td></tr>`).join("")}</tbody></table></div>`
+      : `<p class="empty">${s.bbr_ids.length ? "loading the municipality's buildings…" : "No BBR education building within 150 m of the register point — the school is listed without a footprint."}</p>`}
+    <p class="cap">Campus rule: every BBR building within 150 m of the school's register point is attached to it, so the figures above describe the school and are repeated on each of its buildings.</p></div>
+  <div class="card"><p class="cap"><b>Source:</b> Uddannelsesstatistik.dk, retrieved ${esc((SCH_META || {}).retrieved || "")} — <i>Kilde: Uddannelsesstatistik.dk</i>. Location, type and institution number from the STIL institutionsregister. Buildings from BBR via Datafordeler.
+    A grade average mostly tracks intake; the socioeconomic reference is what the source publishes it against. Method and discretion rules: <code>docs/SCHOOLS.md</code>.</p></div>`;
+}
+/* --- the schools segment on an area card's PUBLIC line --- */
+function schoolLine(level, code) {
+  const e = pubOf(level, code); if (!e || e.school_grade_avg == null) return "";
+  return `<button class="lk mini" data-schoollist="${level}:${code}" style="border-color:${PUB_CAT.education.color}66"
+    title="pupil-weighted FP9 grade average of the ${e.schools_n} folkeskoler and frie grundskoler here that publish one">schools ${nf(e.school_grade_avg, 1)} avg</button>`;
+}
+/* --- list panel: the schools of one area, sorted by grade --- */
+function vSchoolList() {
+  if (!SCHOOLS) { schoolsLoad(); return `<div class="card"><p class="empty">Loading the schools…</p></div>`; }
+  const [level, code] = (SL.key || "").split(":");
+  const e = pubOf(level, code) || {};
+  const areaName = level === "kommune" ? (byCode[code] || {}).name : level === "postnr" ? (byNr[code] || {}).name : (byQ[code] || {}).name;
+  const rows = (SCHOOLS.schools || []).filter(s => level === "kommune" ? s.kom === String(Number(code)) : level === "postnr" ? s.postnr === code : s.kvarter === code);
+  const sorted = rows.slice().sort((a, b) => (schV(b, "grade_avg") ?? -1) - (schV(a, "grade_avg") ?? -1));
+  return `
+  <div class="card accent">
+    <div class="card-head"><h3>Schools — ${esc(areaName || code)}</h3>
+      <span class="hint">${rows.length} school${rows.length === 1 ? "" : "s"} · ${esc(SCH_LATEST)} · Uddannelsesstatistik.dk</span></div>
+    <div class="tfilters"><button class="lk mini" data-back>‹ Back</button>
+      ${e.school_grade_avg != null ? `<span class="hint">area average ${nf(e.school_grade_avg, 1)} · ${e.schools_n} folkeskoler and frie grundskoler · ${nf(e.school_pupils || 0, 0)} pupils</span>` : ""}</div>
+    <div class="scrollx"><table class="tbl compact" data-sortable><thead><tr><th>School</th><th>Type</th><th class="num">FP9 grade</th><th class="num">vs expected</th><th class="num">Well-being</th><th class="num">Pupils</th><th class="num">Class size</th></tr></thead>
+      <tbody>${sorted.map(s => { const d = schV(s, "soc_ref_diff"), sig = schSig(schV(s, "soc_ref_significant")); return `<tr class="clickrow" data-school="${esc(s.nr)}">
+        <th><span class="thn">${esc(s.name)} <span class="go">›</span></span></th>
+        <td class="dim">${esc(SCH_TYPE[s.type] || s.type)}</td>
+        <td class="num" data-v="${schV(s, "grade_avg") ?? ""}">${schCell(schV(s, "grade_avg"), schGrade)}</td>
+        <td class="num" data-v="${d ?? ""}">${d == null ? `<span class="dim" title="${SUPPRESSED}">–</span>` : schDiff(d) + (sig ? ` <em class="schsig">✓</em>` : "")}</td>
+        <td class="num" data-v="${schV(s, "trivsel_general") ?? ""}">${schCell(schV(s, "trivsel_general"), v => nf(v, 1))}</td>
+        <td class="num" data-v="${schV(s, "pupils_total") ?? ""}">${schCell(schV(s, "pupils_total"), v => nf(v, 0))}</td>
+        <td class="num" data-v="${schV(s, "klassekvotient") ?? ""}">${schCell(schV(s, "klassekvotient"), v => nf(v, 1))}</td></tr>`; }).join("")
+        || `<tr><td colspan="7" class="empty">no schools in this area</td></tr>`}</tbody></table></div>
+    <p class="cap">Sorted by FP9 grade. A dash is suppressed by the source, not a zero — ${sorted.filter(s => schV(s, "grade_avg") == null).length} of these schools publish no grade (no 9th grade, or too few pupils). Specialskoler are listed but never enter the area average. ✓ marks a difference the source calls statistically significant. Kilde: Uddannelsesstatistik.dk, retrieved ${esc((SCH_META || {}).retrieved || "")}.</p>
+  </div>`;
+}
+/* --- a small grade trend for one municipality, used in the Charts view --- */
+function schoolTrend(komName, komCode) {
+  if (!SCHOOLS) return null;
+  const rows = (SCHOOLS.schools || []).filter(s => s.kom === String(Number(komCode)) && ["folkeskole", "fri grundskole"].includes(s.type));
+  const pts = SCH_YEARS.map(y => {
+    let a = 0, w = 0;
+    rows.forEach(s => { const o = s.years[y] || {}; if (o.grade_avg != null) { const k = o.grade_n || 1; a += o.grade_avg * k; w += k; } });
+    return w ? a / w : null;
+  });
+  return pts.some(v => v != null) ? { name: komName, pts, dk: SCH_YEARS.map(y => schBenchDK(y) ?? null) } : null;
+}
+function schoolTrendSvg(t) {
+  const W = 640, H = 200, P = { l: 40, r: 150, t: 14, b: 28 };
+  const all = t.pts.concat(t.dk).filter(v => v != null);
+  const lo = Math.floor(Math.min(...all) * 2) / 2 - .25, hi = Math.ceil(Math.max(...all) * 2) / 2 + .25;
+  const x = i => P.l + (W - P.l - P.r) * (SCH_YEARS.length < 2 ? .5 : i / (SCH_YEARS.length - 1));
+  const y = v => P.t + (H - P.t - P.b) * (1 - (v - lo) / (hi - lo || 1));
+  const path = a => a.map((v, i) => v == null ? null : `${i && a[i - 1] != null ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).filter(Boolean).join(" ");
+  const grid = [lo, (lo + hi) / 2, hi].map(v => `<line x1="${P.l}" x2="${W - P.r}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}" stroke="#E2E7E1"/><text x="${P.l - 6}" y="${(y(v) + 4).toFixed(1)}" text-anchor="end" class="cax">${nf(v, 1)}</text>`).join("");
+  const last = (a) => { for (let i = a.length - 1; i >= 0; i--) if (a[i] != null) return i; return -1; };
+  const li = last(t.pts), di = last(t.dk);
+  return `<svg class="chart schchart" viewBox="0 0 ${W} ${H}" role="img" aria-label="FP9 grade average by school year">
+    ${grid}
+    ${SCH_YEARS.map((yy, i) => `<text x="${x(i).toFixed(1)}" y="${H - 8}" text-anchor="middle" class="cax">${esc(yy.replace("/", "/").slice(2))}</text>`).join("")}
+    <path d="${path(t.dk)}" fill="none" stroke="#8A9488" stroke-width="1.6" stroke-dasharray="4 3"/>
+    <path d="${path(t.pts)}" fill="none" stroke="${PUB_CAT.education.color}" stroke-width="2.4"/>
+    ${t.pts.map((v, i) => v == null ? "" : `<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="3.2" fill="${PUB_CAT.education.color}"/>`).join("")}
+    ${li >= 0 ? `<text x="${W - P.r + 8}" y="${(y(t.pts[li]) + 4).toFixed(1)}" class="cax" fill="${PUB_CAT.education.color}">${esc(t.name)} ${nf(t.pts[li], 1)}</text>` : ""}
+    ${di >= 0 ? `<text x="${W - P.r + 8}" y="${(y(t.dk[di]) + 4).toFixed(1)}" class="cax" fill="#6B7469">Denmark ${nf(t.dk[di], 1)}</text>` : ""}
+  </svg>`;
+}
+function schoolsChartCard() {
+  if (!SCH_META) return "";
+  if (!SCHOOLS) { schoolsLoad(); return ""; }
+  const koms = CH.areas.filter(a => a.startsWith("kommune:")).map(a => a.split(":")[1]).filter(c => byCode[c]);
+  const trends = koms.map(c => schoolTrend((byCode[c] || {}).name, c)).filter(Boolean);
+  if (!trends.length) return "";
+  return `<div class="card"><div class="card-head"><h3>Schools</h3>
+      <span class="hint">FP9 grade average, bundne prøver · ${esc(SCH_YEARS[0])} → ${esc(SCH_LATEST)}</span></div>
+    ${trends.map(t => `<div class="chartbox">${schoolTrendSvg(t)}</div>`).join("")}
+    <p class="cap">Pupil-weighted over the folkeskoler and frie grundskoler of the municipality that publish a grade, weighted by the pupils who sat the exams; specialskoler excluded. Dashed = Denmark. This is a three-year snapshot, not the long series the chart above draws. Kilde: Uddannelsesstatistik.dk, retrieved ${esc((SCH_META || {}).retrieved || "")}.</p></div>`;
 }
 
 /* ---------- Project datasheet (#project/<id>) and Pipeline table (#pipeline) ---------- */
