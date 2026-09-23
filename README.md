@@ -15,6 +15,7 @@ An open-data market map for residential asset management in Denmark: 36 indicato
 - **Buildings (Micro)** — inside a municipality, every residential building with 2+ dwellings as a dot: address, BFE property number, tenure, size, year built, rooms; find by address, filter and export. Loaded per municipality on demand.
 - **Charts** — chart generator: indicator × areas × years, median line and Denmark reference line, PNG and CSV export, shareable URL; each indicator's axis starts at its first year (crime: 2007), rolling-quarter series can be shown quarterly, related indicators can be overlaid, and series breaks are marked.
 - **Export data** (sidebar) — one long-format CSV of every level, indicator and year plus the macro series, ready for analysis in Claude, Python or Excel.
+- **Test property** — paste a Google Maps link or a `lat, lon` pair and get a one-property Analysis sheet (`#analysis`): where it is (kommune · postal code · Copenhagen quarter), the area profile with a direction-aware percentile bar against every area of the same level, safety, every infrastructure project within 3 km with its computed distance, the public buildings and schools within 1 000 m, and the sources with their as-of stamps. The mini map carries the same layer pills as the Macro map — Infra projects · Public buildings · Buildings — with the same legends, filters and popups; its choropleth follows whichever headline tile is selected. Shareable URL (`&lay=`, `&ind=`, `&pub=`); the pin travels between the map and the sheet.
 - **Market** — KPI tiles and series for the national picture.
 - **Sources** — folded under Market: every table with its "updated" stamp, plus indicator definitions.
 
@@ -41,6 +42,12 @@ A second overlay draws the public building stock from BBR: schools, daycare, ins
 Every Education building that sits on a school's site carries that school's figures from **Uddannelsesstatistik.dk**: the FP9 grade average shown against its own municipality and against Denmark, the **socioeconomic reference** — the grade the ministry's model expects from the pupils' background — and whether the gap is statistically significant, pupil well-being, pupils and class size, over the three latest school years. A school datasheet gives the three-year table, the benchmarks, the four well-being sub-indicators and the buildings on its site. Filter the public layer down to **Education alone** and the markers switch to a five-step grade ramp with a matching legend; a school that publishes no grade — no 9th grade, or a cell the source suppressed — keeps the plain Education hue with a thin outline rather than the bottom bin, because those are not low-scoring schools. 364 schools in the Copenhagen metro set, 96 % of them placed on a BBR building. A grade average mostly tracks intake, which is exactly why the socioeconomic reference sits next to it everywhere it appears. Method, cube codes and the discretion rules: [`docs/SCHOOLS.md`](docs/SCHOOLS.md).
 
 ![School quality — Frederiksberg with the public layer filtered to Education, markers coloured by FP9 grade average](docs/screenshot-schools.jpg)
+
+### Test property and the Analysis sheet
+
+Paste a Google Maps link — or a plain `55.67610, 12.56830` — into the box on the map toolbar and the dashboard pins that point, drills to its municipality at postal-code level and draws 500 / 1 000 / 1 200 m rings around it; *Analyse ›* opens the **Analysis sheet** (`#analysis?a=<lat>,<lon>`), one address read against every layer at once: where it is (kommune · postal code · Copenhagen quarter, from the kommune's own boundary rings rather than from its postal code, so a Frederiksberg address is not labelled København), the full area profile with a direction-aware percentile bar against every area of the same level, safety, every infrastructure project within 3 km with its distance **computed from the geometry** — a station point, the nearest point of a line, 0 m inside a development area — the public buildings and schools within 1 000 m including the ones across a municipality border, and a sources card built from what that pin actually read. The mini map carries the same three layer pills as the Macro map with the same legends, filters and popups, and its choropleth follows whichever headline tile you click. The link is the state: `&lay=`, `&ind=`, `&pub=` and the pin itself travel in it, so *Copy link* reproduces the view and Back returns to the map with the pin intact. It all runs in the browser — the link is parsed, never followed, which is also why short `maps.app.goo.gl` links are refused by name instead of guessed at, and why the box says the location is stored only in the page URL. **Coverage: national, except public buildings and schools (Copenhagen metro set).** Method, formats, distances and caveats: [`docs/ANALYSIS.md`](docs/ANALYSIS.md).
+
+![Analysis sheet — a test property in 2450 København SV with the infra and public-building overlays on the mini map](docs/screenshot-analysis.jpg)
 
 ## Data sources (all free, no key unless noted)
 
@@ -73,6 +80,7 @@ make validate   # check every table/value code against the live API
 make fetch      # ~36 pulls to data/raw (no key)
 make build      # raw → data/processed → dist/index.html
 make serve      # http://localhost:8080
+make test       # unit tests (python + node --test)
 ```
 
 `make geo` re-vendors boundaries (DAWA closed 2026-10-01 — see `docs/GEO.md` for the Datafordeler route). Rents are updated yearly with `scripts/import_lbf.py` and `scripts/import_boligstat.py` (see `data/external/SOURCES.md`).
@@ -90,6 +98,7 @@ Every push to `main` rebuilds and deploys to GitHub Pages; on the 3rd of each mo
 | [`docs/DATA_MAP.md`](docs/DATA_MAP.md) | source catalogue, Finnish → Danish indicator mapping, verification log |
 | [`docs/BUILD_PLAN.md`](docs/BUILD_PLAN.md) | phases done and the roadmap |
 | [`docs/SCHOOLS.md`](docs/SCHOOLS.md) | school quality — cube codes, the BBR join, discretion rules, cadence |
+| [`docs/ANALYSIS.md`](docs/ANALYSIS.md) | the test-property pin and the Analysis sheet — link formats, kommune resolution, distances, coverage, privacy |
 | [`docs/GEO.md`](docs/GEO.md) | boundary pipeline |
 | [`CHANGELOG.md`](CHANGELOG.md) | what changed in which version |
 
@@ -108,6 +117,7 @@ The UI is a port of a Finnish asset-management dashboard's market section: same 
 - Copenhagen quarters (kvarterer) use Københavns Kommune's own statbank (`s30`); unemployment there exists only per district (bydel) and is repeated on each quarter of the district.
 - Copenhagen quarter crime and safety figures come from the city's own annual survey (police figures for the previous calendar year), so they are not comparable with the national crime indicators.
 - The public-buildings layer covers the Copenhagen metro set only, and BBR is owner-reported: floor area, use and status are as reported, not as surveyed. An open building case is not a construction schedule.
+- The Analysis sheet's distances are to mapped geometry, not walking routes, and its infra list is the curated layer — an existing station that is not a project in it will not appear. Short `maps.app.goo.gl` links cannot be resolved in a browser; paste the long URL.
 - The infrastructure layer is a curated list, not a register: it holds the projects named in `docs/INFRA.md` and nothing else, and ten of its geometries are schematic corridors drawn by hand.
 - Crime figures are reported offences by place of offence, per municipality only; they exclude the traffic law, break in 2007 and on 1 July 2013 (sexual offences), and DST writes suppressed cells as 0, so a zero on a small island may be suppressed.
 

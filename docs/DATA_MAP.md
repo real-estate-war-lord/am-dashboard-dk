@@ -387,6 +387,64 @@ Dashboard values as built on 2026-09-22 (window 2025K3→2026K2; clearance 2025)
 | Randers | 730 | 3 671 | 100 921 | 36,4 | 5,0 | 4,1 | −11,6 % | 1 282 / 4 176 → 30,7 % | ⟨statistikbanken⟩ | pending |
 | Denmark | 000 | 300 999 | 6 031 699 | 49,9 | 5,0 | 5,3 | −5,0 % | 84 741 / 327 755 → 25,9 % | ⟨statistikbanken⟩ | pending |
 
+### 7d. Analysis sheet / test-property pin (2026-09-23)
+
+Checked in the browser against the built `dist/` on `localhost:8080`, v2.4. Three pins, chosen for the
+three coverage cases: a Copenhagen quarter, a second quarter with a dense public layer, and a point
+well outside the metro set.
+
+| # | check | pin | result |
+|---|---|---|---|
+| 1 | Sheet renders, pin resolved to kommune · postnr · quarter | 55.64820, 12.53740 | ✅ **København · 2450 København SV · Gl. Sydhavn**, no `approx.` — the kommune came from the rings |
+| 2 | All seven sections populated | 55.64820, 12.53740 | ✅ area profile 19 indicators · Safety 8 · Infrastructure 7 projects within 3 km · Public buildings 56 in the ring (2 municipality files: **København + Tårnby**) · Schools 5 · Sources & as of |
+| 3 | Sheet renders in a second quarter | 55.69200, 12.55000 | ✅ **København · 2200 København N · Blågårdskvarteret/Assistens/Rantzausgade**; Infrastructure 9 · Public buildings 2 files · Schools 11 · no empty section |
+| 4 | Outside the metro set: the two uncovered sections say so | 55.46700, 8.45200 | ✅ **Esbjerg · 6700 Esbjerg**; Public buildings *"Not covered yet: public buildings are available for the Copenhagen metro area."*, Schools the same sentence; Infrastructure *"no project in the layer within 3 km"* (a different, correct sentence); area profile and Safety fully populated |
+| 5 | Public buildings pill disabled outside coverage | 55.46700, 8.45200 | ✅ `disabled`, tooltip *"Not covered yet: Copenhagen metro area only"*; Infra projects on, Buildings enabled (*"BBR buildings with ≥ 2 dwellings in Esbjerg"*) |
+| 6 | Cold load straight on an `#analysis` link, no visit to the map first | 55.64820, 12.53740 | ✅ sheet renders; network shows `geo/kommuner_lookup.json`, `schools.json`, `public/0101.json`, `public/0185.json` all 200, no console errors |
+
+#### Nearest station in the infra list, for a ruler check
+
+Pin **55.64820, 12.53740** (2450 København SV). `featDistM` over the whole layer, everything within 6 km,
+nearest first — the station rows are the `Point` geometries:
+
+| distance | geometry | project | station coordinates |
+|---|---|---|---|
+| 1 583 m | MultiLineString | Østlig Ringvej (harbour tunnel) — road, study | — |
+| 1 612 m | LineString | Signalprogrammet — rail, under construction | — |
+| 2 129 m | MultiLineString | Den nye bane København–Ringsted — rail, opened | — |
+| 2 321 m | LineString | Metro M5 phase 1 (København H – Prags Boulevard) — metro, decided | — |
+| **2 325 m** | **Point** | **M5: v/Bryggebroen** — metro, decided, 2036 | **55.66189, 12.56542** |
+| 2 471 m | LineString | Udvidelse af Amagermotorvejen — road, under construction | — |
+| 2 848 m | Point | M5: København H — metro, decided | 55.66775, 12.56673 |
+
+**The nearest station of any mode in the layer is `M5: v/Bryggebroen` at 2 325 m** (the sheet rounds it
+to *2,3 km*), from 55.64820, 12.53740 to 55.66189, 12.56542 — measure that pair with the Google Maps
+ruler. Recomputed by hand as a check: Δlat 0.01369° × 110 540 = 1 513 m, Δlon 0.02802° × 111 320 ·
+cos 55.65° = 1 759 m, hypotenuse **2 320 m** — the 5 m difference is the great-circle formula against
+the flat-earth approximation, as expected at this distance. No station is inside the 1 200 m chip ring,
+so the sheet shows no headline chip here.
+
+Note that the infra layer is a **curated project list**, not a station register: the existing
+Sydhavn / Ny Ellebjerg stations are not in it, so "nearest station" here means the nearest station
+*in the layer*.
+
+#### Pin flow and legend (same session)
+
+| check | result |
+|---|---|
+| Long Google Maps place URL (`…/place/…/@55.6482,12.5374,17z/data=…!3d55.64820!4d12.53740`) → pin | ✅ drilled to `#map/101/postnr?ind=growth&pin=55.64820,12.53740`, popup *København · 2450 København SV · Gl. Sydhavn* |
+| *Analyse ›* in the popup → sheet | ✅ `#analysis?a=55.64820,12.53740&la=Test%20property` |
+| Browser **Back** → map with the pin intact | ✅ hash keeps `pin=`, one `.tp-pin` marker on the map, `TP` state restored |
+| `https://maps.app.goo.gl/…` | ✅ inline error *"Short share links can't be read in the browser…"*; the existing pin is untouched |
+| A point in Øresund, 55.70000, 12.75000 | ✅ inline error *"…is in water or outside Denmark — no municipality or postal code covers it."*; no pin dropped, URL unchanged |
+| Public buildings legend — one category off | ✅ greyed, and the counts follow: 180 existing → 98 with Education off |
+| …all four off | ✅ legend stays, reads **All categories hidden · Show all**, counts line reads *nothing drawn* |
+| …*Show all* | ✅ all four back on, counts return to 180 existing · 6 open cases |
+| Layer pill off | ✅ the legend box is `display:none`, 0 × 0 px — no empty white bar; no `.maplegend` anywhere is visible-but-empty |
+
+`make test` (12 Python + 15 JS), `make validate` (0 ✗) and `make build` (0 ⚠) all pass on the same
+commit. Method and the rest of the feature: [`ANALYSIS.md`](ANALYSIS.md).
+
 ## 8. Infrastructure overlay (v2.1)
 
 The curated layer of major transport and public projects — 51 projects with geometry, their status,
@@ -496,3 +554,13 @@ the §9 Education buildings. Method, cube codes, the measured join and the discr
 
 
 Sources: Danmarks Statistik API docs (https://www.dst.dk/en/Statistik/brug-statistikken/muligheder-i-statistikbanken/api) · Finans Danmark Boligmarkedsstatistikken (https://finansdanmark.dk/tal-og-data/boligstatistik/boligmarkedsstatistikken/) · Klimadatastyrelsen, DAWA lukker 1. oktober 2026 (https://www.klimadatastyrelsen.dk/om-klimadatastyrelsen/nyheder/nyhedsarkiv/2026/jul/dawa-lukker-d-1-oktober-2026) · Datafordeler transition plan (https://datafordeler.dk/vejledning/transitionsnetvaerk/) · BBR GraphQL (https://datafordeler.dk/dataoversigt/bygnings-og-boligregistret-bbr/bbr-graphql/) · boligstat.dk om husleje (https://boligstat.dk/boligstat/dokumenter/omhusleje.html) · Landsbyggefonden Huslejestatistik 2026 (https://lbf.dk/viden/statistikker/huslejestatistik/huslejestatistik-2026) · DST STRAF11 documentation (https://www.dst.dk/documentationofstatistics/c1ac7749-1e15-4d3a-8ed0-fb2d26a9fe93) · Plandata WFS (https://geoserver.plandata.dk/geoserver/wfs?request=GetCapabilities&service=WFS) · Eurostat API (https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nama_10r_3gdp?geo=DK011&unit=EUR_HAB&time=2023) · Frie geografiske data, vilkår (https://dataforsyningen.dk/asset/PDF/rettigheder_vilkaar/Vilk%C3%A5r%20for%20brug%20af%20frie%20geografiske%20data.pdf)
+
+## 11. Test property pin and the Analysis sheet (v2.4)
+
+One coordinate read against every layer above. It adds **no new source** — the only new *file* is
+`dist/geo/kommuner_lookup.json`, the DAGI kommune rings (99 kommuner, simplified 0.0005°, 911 kB)
+built by `scripts/build_dashboard.py` and fetched lazily, so a pin can be placed in the right
+municipality rather than in the municipality of its postal code. Holes are kept: Frederiksberg is a
+hole in København. Accepted link formats, the short-link limitation, the distance method, the layer
+pills and hash parameters, coverage and the privacy wording:
+[`docs/ANALYSIS.md`](ANALYSIS.md). Verification: §7d.

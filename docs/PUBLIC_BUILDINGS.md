@@ -136,6 +136,24 @@ Copenhagen alone holds 2 542 existing public buildings, so the map thins them by
 The legend says which rule is in force. Per-municipality files load for whatever is in the viewport and
 stay cached for the session.
 
+### The legend is the filter
+
+The legend always lists **all four categories**, whatever the filter, plus the existing / open-case key.
+A category that is switched off is greyed, struck through and drawn with a hollow swatch — it is still a
+click away from coming back. *ONLY* (or shift-click) isolates one; *All* resets. With every category off
+the legend stays and reads **All categories hidden · Show all**, and the counts line says *nothing drawn*.
+The counts always describe what is actually on the map, after the filter and the zoom rule.
+
+Isolating Education turns on grade mode (see `SCHOOLS.md`): the FP9 ramp is appended **under** the
+category rows, never in place of them.
+
+The filter rides in the hash as `&pub=edu,inst,health,culture` and `&pubkind=existing|open`. All four off
+is `&pub=none` — a real state that reopens hidden. An empty or unreadable `pub=` means *all*, so a
+hand-typed link cannot blank the map.
+
+A legend box with nothing to say is hidden, never left as an empty white bar over the map
+(`.maplegend:empty`). The public and infra legends stack in one scrolling column at the top right.
+
 ## 5. Refresh
 
 ```bash

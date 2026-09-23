@@ -17,7 +17,11 @@ geo-cph:    ## vendor Copenhagen quarter/district polygons (Københavns Kommune 
 	$(PY) scripts/fetch_geo_cph.py
 serve:      ## open the dashboard locally
 	cd dist && $(PY) -m http.server 8080
+test-js:    ## parser unit tests (node --test)
+	node --test tests/*.test.js
+test:       ## every unit test (python + js)
+	$(PY) -m unittest discover -s tests -p 'test_*.py' && $(MAKE) test-js
 fixture:    ## synthetic render check (never ship)
 	$(PY) tests/make_fixture.py && $(PY) scripts/build_dashboard.py --data tests/fixture_makro.json --market tests/fixture_market.json --cph tests/fixture_cph.json --out dist/fixture.html
 refresh: fetch build
-.PHONY: validate geo geo-cph bbr fetch build serve fixture refresh schools
+.PHONY: validate geo geo-cph bbr fetch build serve fixture refresh schools test test-js
