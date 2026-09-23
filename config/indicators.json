@@ -3253,5 +3253,295 @@
     "direction": "higher_better"
    }
   ]
+ },
+ "forecast": {
+  "_doc": "Outlook group — DST's municipal population projection, built by scripts/build_forecast.py into data/processed/forecast.json and checked by scripts/validate_forecast.py. Held under its own top-level key rather than in `indicators[]` because `calc: forecast` and `db: forecast` are not yet implemented: build_makro.py would fall through to a StatBank raw-file lookup and raise FileNotFoundError. Phase B moves these entries into `indicators[]` once build_makro.py, and app.js's colour model, understand them (see docs/FORECAST.md, Phase B notes). `field` names the metric build_forecast.py derives; `scale: diverging` with `center: 0` asks for a two-ended ramp from `hue_neg` through the paper tint to `hue_pos`, with class breaks symmetric about the centre — the existing renderer only does the single-ended `hue` ramp with quintile breaks, which is why `hue` is kept as the positive end. `direction: neutral` means neither end is 'better': shrinking is not failure and growth is not success, so these must not be ranked or coloured good/bad.",
+  "first_year": "2026",
+  "last_year": "2040",
+  "mid_year": "2031",
+  "indicators": [
+   {
+    "key": "fc_growth",
+    "label": "Projected population growth 2026→2040",
+    "short": "Outlook 2040",
+    "unit": "%",
+    "level": "kommune",
+    "hue": [
+     10,
+     88,
+     70
+    ],
+    "hue_pos": [
+     10,
+     88,
+     70
+    ],
+    "hue_neg": [
+     166,
+     42,
+     22
+    ],
+    "scale": "diverging",
+    "center": 0,
+    "group": "Outlook",
+    "direction": "neutral",
+    "sources": [
+     {
+      "db": "forecast",
+      "table": "forecast",
+      "geo": "kommune"
+     }
+    ],
+    "calc": "forecast",
+    "field": "growth",
+    "fmt": "signpct1",
+    "desc": "Projected change in total population from 2026 to 2040, %. DST's 2026 municipal projection.",
+    "source": "Danmarks Statistik FRKM126 (municipal population projection, 2026 vintage), national control total FRDK126 — see docs/FORECAST.md",
+    "warn": "A projection, not a measurement. DST's municipal projection assumes each municipality's recent fertility, mortality and migration behaviour continues; it carries no housing programme, so a large planned development does not appear in it.",
+    "note": "Computed in scripts/build_forecast.py from data/processed/forecast.json: the 2026 vintage of DST's municipal projection, ages folded into 0–5, 6–16, 17–19, 20–34, 35–64, 65–79 and 80+. Christiansø (411) is not a municipality and has no value. Never read together with Københavns Kommune's own forecast, which is a different run — see docs/FORECAST.md.",
+    "chip": true
+   },
+   {
+    "key": "fc_growth_5y",
+    "label": "Projected population growth 2026→2031",
+    "short": "Outlook 2031",
+    "unit": "%",
+    "level": "kommune",
+    "hue": [
+     10,
+     88,
+     70
+    ],
+    "hue_pos": [
+     10,
+     88,
+     70
+    ],
+    "hue_neg": [
+     166,
+     42,
+     22
+    ],
+    "scale": "diverging",
+    "center": 0,
+    "group": "Outlook",
+    "direction": "neutral",
+    "sources": [
+     {
+      "db": "forecast",
+      "table": "forecast",
+      "geo": "kommune"
+     }
+    ],
+    "calc": "forecast",
+    "field": "growth_5y",
+    "fmt": "signpct1",
+    "desc": "Projected change in total population over the first five years, 2026 to 2031, %. The near end of the same projection, where it is least uncertain.",
+    "source": "Danmarks Statistik FRKM126 (municipal population projection, 2026 vintage), national control total FRDK126 — see docs/FORECAST.md",
+    "warn": "A projection, not a measurement. DST's municipal projection assumes each municipality's recent fertility, mortality and migration behaviour continues; it carries no housing programme, so a large planned development does not appear in it.",
+    "note": "Computed in scripts/build_forecast.py from data/processed/forecast.json: the 2026 vintage of DST's municipal projection, ages folded into 0–5, 6–16, 17–19, 20–34, 35–64, 65–79 and 80+. Christiansø (411) is not a municipality and has no value. Never read together with Københavns Kommune's own forecast, which is a different run — see docs/FORECAST.md."
+   },
+   {
+    "key": "fc_abs",
+    "label": "Projected population change 2026→2040",
+    "short": "Outlook ±",
+    "unit": "persons",
+    "level": "kommune",
+    "hue": [
+     10,
+     88,
+     70
+    ],
+    "hue_pos": [
+     10,
+     88,
+     70
+    ],
+    "hue_neg": [
+     166,
+     42,
+     22
+    ],
+    "scale": "diverging",
+    "center": 0,
+    "group": "Outlook",
+    "direction": "neutral",
+    "sources": [
+     {
+      "db": "forecast",
+      "table": "forecast",
+      "geo": "kommune"
+     }
+    ],
+    "calc": "forecast",
+    "field": "abs",
+    "fmt": "int",
+    "desc": "Projected change in total population from 2026 to 2040, in persons. Size rather than rate: a percentage makes a small municipality look dramatic, this does not.",
+    "source": "Danmarks Statistik FRKM126 (municipal population projection, 2026 vintage), national control total FRDK126 — see docs/FORECAST.md",
+    "warn": "A projection, not a measurement. DST's municipal projection assumes each municipality's recent fertility, mortality and migration behaviour continues; it carries no housing programme, so a large planned development does not appear in it.",
+    "note": "Computed in scripts/build_forecast.py from data/processed/forecast.json: the 2026 vintage of DST's municipal projection, ages folded into 0–5, 6–16, 17–19, 20–34, 35–64, 65–79 and 80+. Christiansø (411) is not a municipality and has no value. Never read together with Københavns Kommune's own forecast, which is a different run — see docs/FORECAST.md."
+   },
+   {
+    "key": "fc_0_5",
+    "label": "Projected change, children 0–5",
+    "short": "0–5 outlook",
+    "unit": "%",
+    "level": "kommune",
+    "hue": [
+     40,
+     84,
+     128
+    ],
+    "hue_pos": [
+     40,
+     84,
+     128
+    ],
+    "hue_neg": [
+     166,
+     42,
+     22
+    ],
+    "scale": "diverging",
+    "center": 0,
+    "group": "Outlook",
+    "direction": "neutral",
+    "sources": [
+     {
+      "db": "forecast",
+      "table": "forecast",
+      "geo": "kommune"
+     }
+    ],
+    "calc": "forecast",
+    "field": "a0_5",
+    "fmt": "signpct1",
+    "desc": "Projected change in the 0–5 population from 2026 to 2040, % — the daycare cohort.",
+    "source": "Danmarks Statistik FRKM126 (municipal population projection, 2026 vintage), national control total FRDK126 — see docs/FORECAST.md",
+    "warn": "A projection, not a measurement. DST's municipal projection assumes each municipality's recent fertility, mortality and migration behaviour continues; it carries no housing programme, so a large planned development does not appear in it.",
+    "note": "Computed in scripts/build_forecast.py from data/processed/forecast.json: the 2026 vintage of DST's municipal projection, ages folded into 0–5, 6–16, 17–19, 20–34, 35–64, 65–79 and 80+. Christiansø (411) is not a municipality and has no value. Never read together with Københavns Kommune's own forecast, which is a different run — see docs/FORECAST.md."
+   },
+   {
+    "key": "fc_6_16",
+    "label": "Projected change, children 6–16",
+    "short": "6–16 outlook",
+    "unit": "%",
+    "level": "kommune",
+    "hue": [
+     40,
+     84,
+     128
+    ],
+    "hue_pos": [
+     40,
+     84,
+     128
+    ],
+    "hue_neg": [
+     166,
+     42,
+     22
+    ],
+    "scale": "diverging",
+    "center": 0,
+    "group": "Outlook",
+    "direction": "neutral",
+    "sources": [
+     {
+      "db": "forecast",
+      "table": "forecast",
+      "geo": "kommune"
+     }
+    ],
+    "calc": "forecast",
+    "field": "a6_16",
+    "fmt": "signpct1",
+    "desc": "Projected change in the 6–16 population from 2026 to 2040, % — the school cohort.",
+    "source": "Danmarks Statistik FRKM126 (municipal population projection, 2026 vintage), national control total FRDK126 — see docs/FORECAST.md",
+    "warn": "A projection, not a measurement. DST's municipal projection assumes each municipality's recent fertility, mortality and migration behaviour continues; it carries no housing programme, so a large planned development does not appear in it.",
+    "note": "Computed in scripts/build_forecast.py from data/processed/forecast.json: the 2026 vintage of DST's municipal projection, ages folded into 0–5, 6–16, 17–19, 20–34, 35–64, 65–79 and 80+. Christiansø (411) is not a municipality and has no value. Never read together with Københavns Kommune's own forecast, which is a different run — see docs/FORECAST.md."
+   },
+   {
+    "key": "fc_20_34",
+    "label": "Projected change, young adults 20–34",
+    "short": "20–34 outlook",
+    "unit": "%",
+    "level": "kommune",
+    "hue": [
+     90,
+     60,
+     150
+    ],
+    "hue_pos": [
+     90,
+     60,
+     150
+    ],
+    "hue_neg": [
+     166,
+     42,
+     22
+    ],
+    "scale": "diverging",
+    "center": 0,
+    "group": "Outlook",
+    "direction": "neutral",
+    "sources": [
+     {
+      "db": "forecast",
+      "table": "forecast",
+      "geo": "kommune"
+     }
+    ],
+    "calc": "forecast",
+    "field": "a20_34",
+    "fmt": "signpct1",
+    "desc": "Projected change in the 20–34 population from 2026 to 2040, % — the group that forms new households and drives rental demand.",
+    "source": "Danmarks Statistik FRKM126 (municipal population projection, 2026 vintage), national control total FRDK126 — see docs/FORECAST.md",
+    "warn": "A projection, not a measurement. DST's municipal projection assumes each municipality's recent fertility, mortality and migration behaviour continues; it carries no housing programme, so a large planned development does not appear in it.",
+    "note": "Computed in scripts/build_forecast.py from data/processed/forecast.json: the 2026 vintage of DST's municipal projection, ages folded into 0–5, 6–16, 17–19, 20–34, 35–64, 65–79 and 80+. Christiansø (411) is not a municipality and has no value. Never read together with Københavns Kommune's own forecast, which is a different run — see docs/FORECAST.md.",
+    "chip": true
+   },
+   {
+    "key": "fc_80p",
+    "label": "Projected change, 80 and over",
+    "short": "80+ outlook",
+    "unit": "%",
+    "level": "kommune",
+    "hue": [
+     90,
+     60,
+     150
+    ],
+    "hue_pos": [
+     90,
+     60,
+     150
+    ],
+    "hue_neg": [
+     166,
+     42,
+     22
+    ],
+    "scale": "diverging",
+    "center": 0,
+    "group": "Outlook",
+    "direction": "neutral",
+    "sources": [
+     {
+      "db": "forecast",
+      "table": "forecast",
+      "geo": "kommune"
+     }
+    ],
+    "calc": "forecast",
+    "field": "a80p",
+    "fmt": "signpct1",
+    "desc": "Projected change in the 80+ population from 2026 to 2040, %. Rises everywhere in this vintage — read the spread between municipalities, not the sign.",
+    "source": "Danmarks Statistik FRKM126 (municipal population projection, 2026 vintage), national control total FRDK126 — see docs/FORECAST.md",
+    "warn": "A projection, not a measurement. DST's municipal projection assumes each municipality's recent fertility, mortality and migration behaviour continues; it carries no housing programme, so a large planned development does not appear in it.",
+    "note": "Computed in scripts/build_forecast.py from data/processed/forecast.json: the 2026 vintage of DST's municipal projection, ages folded into 0–5, 6–16, 17–19, 20–34, 35–64, 65–79 and 80+. Christiansø (411) is not a municipality and has no value. Never read together with Københavns Kommune's own forecast, which is a different run — see docs/FORECAST.md."
+   }
+  ]
  }
 }
