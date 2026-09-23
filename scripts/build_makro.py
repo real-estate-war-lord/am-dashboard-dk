@@ -378,6 +378,46 @@ def net_dwellings():
     return _NET_DWELL or None
 
 
+# The value forecast.json stores for fc_pop_rate_5y is persons per 1 000 inhabitants per year —
+# the arithmetic docs/FORECAST.md §3 audits. The UI speaks in percent per year, which is the same
+# number divided by 10, so the division happens here, once, on the way into makro.json. The audited
+# file keeps the audited unit; nothing downstream has to remember a factor.
+DISPLAY_DIV = {"fc_pop_rate_5y": 10}
+
+
+# Where a non-StatBank indicator's figures actually come from. These have no per-area API query,
+# so "Verify at source" sends the reader to the publisher's own page instead of nowhere.
+SRC_PAGE = {
+    "bbr": ("BBR via Datafordeler", "https://datafordeler.dk/dataoversigt/bygnings-og-boligregistret-bbr/bbr-graphql/"),
+    "public": ("BBR via Datafordeler", "https://datafordeler.dk/dataoversigt/bygnings-og-boligregistret-bbr/bbr-graphql/"),
+    "public_index": ("BBR via Datafordeler", "https://datafordeler.dk/dataoversigt/bygnings-og-boligregistret-bbr/bbr-graphql/"),
+    "schools": ("Uddannelsesstatistik.dk (STIL)", "https://uddannelsesstatistik.dk/"),
+    "infra_index": ("the curated infrastructure layer", "https://github.com/real-estate-war-lord/am-dashboard-dk/blob/main/docs/INFRA.md"),
+    "boligstat": ("Social- og Boligstyrelsen, boligstat.dk", "https://boligstat.dk/"),
+    "lbf": ("Landsbyggefonden", "https://lbf.dk/viden/statistikker/huslejestatistik/huslejestatistik-2026"),
+}
+
+
+def area_var(db, table):
+    """The area variable's id for a table, read from its own cached tableinfo.
+
+    Never hard-coded per vintage: KKFR2026 becomes KKFR2027 next March and the variable id
+    (OMRKK) does not change, but the table id does — so the id is resolved from the file the
+    fetch already wrote.
+    """
+    for cand in (RAW / f"{db + '_' if db else 'dst_'}{table}.meta.json",
+                 ROOT / "data" / "raw" / "forecast" / "dst" / f"tableinfo_{table}.json",
+                 ROOT / "data" / "raw" / "forecast" / "cph" / f"tableinfo_{table}.json",
+                 ROOT / "data" / "raw" / "forecast" / "dst" / f"{table}.meta.json",
+                 ROOT / "data" / "raw" / "forecast" / "cph" / f"{table}.meta.json"):
+        if cand.exists():
+            info = json.loads(cand.read_text(encoding="utf-8"))
+            for v in info.get("variables", []):
+                if v["id"] in ("KOMMUNEDK", "OMRKK", "OMRÅDE", "OMRADE", "PNR20", "BOPOMR", "OMR20"):
+                    return v["id"]
+    return None
+
+
 def proj_mid(meta, offset=5):
     """The 5-year mark of a projection window. forecast.json records first_year and
     last_year; the mid year is first_year + the same offset indicators() uses."""
@@ -479,7 +519,8 @@ def compute(ind, year=None):
             return {}   # one vintage, not a per-year history — same rule as `bbr`
         vals = forecast_values()
         per = proj_period(doc, ind["key"])
-        return {"kommune": ({k: v.get(ind["key"]) for k, v in vals.items()
+        div = DISPLAY_DIV.get(ind["key"], 1)
+        return {"kommune": ({k: round(v[ind["key"]] / div, 2) for k, v in vals.items()
                              if v.get(ind["key"]) is not None}, per)}
     if calc == "net_dwellings":
         nd = net_dwellings()
@@ -695,13 +736,66 @@ def main():
                                "hist_asof": hist_asof,
                                "tables": list(dict.fromkeys(f"{s.get('db') or 'dst'}/{s['table']}" for s in ind["sources"] if s.get("db", "") in ("", "s20", "s30")))} |
                               {k: ind[k] for k in ("history_from", "map_from", "breaks") if k in ind})
+        # "Verify at source" for every StatBank-backed indicator: the area variable is resolved from
+        # each table's own cached tableinfo, so a table whose id carries a vintage still links right.
+        # Tables with no area variable (national-only macro series) get no link rather than a wrong one.
+        vsrc = []
+        for t in indicators_out[-1].get("tables", []):
+            db, _, tb = t.partition("/")
+            db = "" if db == "dst" else db
+            av = area_var(db, tb)
+            if not av:
+                continue
+            # The indicator's own variable selection goes into the link, so the query returns the
+            # exact cells the figure is computed from rather than a different slice of the table.
+            # It is also required: several tables (INDKP101's ENHED, IFOR22's DECILGR, BOL101's
+            # BEBO) refuse a query that does not pick a value for them.
+            sel = next((x.get("vars") or {} for x in ind["sources"]
+                        if x.get("table") == tb and (x.get("db") or "") == db), {})
+            extra = {k: v for k, v in sel.items()
+                     if k not in (av, "Tid") and v and v != ["*"] and v != ["SUM"]}
+            vsrc.append({"db": db, "table": tb, "area_var": av, "years": ["*"],
+                         "vars": {k: ",".join(v) for k, v in extra.items()},
+                         "publisher_label": "Finans Danmark via Statistikbanken" if db == "s20"
+                         else "Københavns Kommune via Statistikbanken" if db == "s30"
+                         else "Danmarks Statistik"})
+        if vsrc:
+            indicators_out[-1]["src_verify"] = vsrc
+        else:
+            # BBR, the curated infra layer, the school cubes, boligstat and LBF are not StatBank
+            # tables, so there is no per-area query to build. They link to the page the Sources
+            # view already lists for them — a real destination rather than a dead affordance.
+            page = SRC_PAGE.get(ind["sources"][0].get("db") or ind["calc"]) or SRC_PAGE.get(ind["calc"])
+            if page:
+                indicators_out[-1]["src_page"] = page
         # the Outlook layer is one vintage, so the year selector shows its window instead of a year list
         if ind["calc"] == "forecast" and forecast_doc():
             fm = forecast_doc()["meta"]
+            av = area_var("", fm["table"])
             indicators_out[-1]["proj"] = {"from": fm["first_year"], "to": proj_end(fm, ind["key"]),
-                                          "vintage": str(fm["vintage"]), "publisher": "DST", "table": fm["table"]}
+                                          "vintage": str(fm["vintage"]), "publisher": "DST", "table": fm["table"],
+                                          # everything "Verify at source" needs to rebuild the query
+                                          "src": {"db": "", "table": fm["table"], "area_var": av,
+                                                  "years": [fm["first_year"], proj_mid(fm), fm["last_year"]],
+                                                  "publisher_label": "Danmarks Statistik"} if av else None,
+                                          "actuals": {"db": "", "table": "FOLK1A", "area_var": area_var("", "FOLK1A"),
+                                                      "years": ["*"], "publisher_label": "Danmarks Statistik"}}
         if ind["calc"] == "net_dwellings" and net_dwellings():
-            indicators_out[-1]["window"] = net_dwellings()["meta"].get("label_years", "")
+            nm_ = net_dwellings()["meta"]
+            indicators_out[-1]["window"] = nm_.get("label_years", "")
+            # its db is `net_dwellings`, so the generic loop above sees no tables — BOL101 is
+            # still a published StatBank table and the figure is verifiable against it
+            av = area_var("", "BOL101")
+            if av:
+                w_ = nm_.get("window") or []
+                indicators_out[-1]["src_verify"] = [
+                    {"db": "", "table": "BOL101", "area_var": av,
+                     "years": [str(w_[0]), str(w_[-1])] if w_ else ["*"],
+                     # BOL101 cannot eliminate BEBO, and the stock this indicator measures is
+                     # "all resident types", so all three codes are selected — the same slice
+                     # scripts/build_net_dwellings.py counts.
+                     "vars": {"BEBO": "1000,2000,5000"},
+                     "publisher_label": "Danmarks Statistik"}]
         # quarterly rolling series (municipalities + Denmark), from `map_from` Q1; one array per indicator aligned to q_periods
         if ind["calc"].startswith("rolling4q"):
             ser = rolling4q_series(ind, f"{ind.get('map_from', years[0])}K1")

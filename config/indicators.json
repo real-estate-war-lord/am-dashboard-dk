@@ -2225,9 +2225,9 @@
     },
     {
       "key": "fc_pop_rate_5y",
-      "label": "Projected population change 2026→2031, per 1,000 inhabitants per year",
-      "short": "Outlook / 1,000 / yr",
-      "unit": "persons / 1,000 inh. / yr",
+      "label": "Projected population change 2026→2031, % per year",
+      "short": "Projected change per year",
+      "unit": "% / yr",
       "level": "kommune",
       "hue": [
         10,
@@ -2258,11 +2258,11 @@
       "calc": "forecast",
       "field": "total",
       "fmt": "signdec1",
-      "desc": "(P2031 − P2026) ÷ 5 ÷ P2026 × 1 000 — the projected population change over the first five years, expressed as persons per 1 000 inhabitants per year. The same two cells as fc_growth_5y, in the unit that can be read beside a per-1,000 housing figure such as hist_net_dwell.",
+      "desc": "The projected change in total population over the first five years, as a percentage of today's population per year — the near end of the projection, where it is least uncertain. The same two published cells as the 2031 total, expressed per year.",
       "source": "Danmarks Statistik FRKM126 (municipal population projection, 2026 vintage), national control total FRDK126 — see docs/FORECAST.md",
       "warn": "A projection, not a measurement. DST's municipal projection assumes each municipality's recent fertility, mortality and migration behaviour continues; it carries no housing programme, so a large planned development does not appear in it.",
-      "note": "Computed in scripts/build_forecast.py from data/processed/forecast.json: the 2026 vintage of DST's municipal projection, ages folded into 0–5, 6–16, 17–19, 20–34, 35–64, 65–79 and 80+. Christiansø (411) is not a municipality and has no value. Never read together with Københavns Kommune's own forecast, which is a different run — see docs/FORECAST.md. Its unit is persons; hist_net_dwell's unit is dwellings. The two are shown side by side and are deliberately never differenced — turning persons into dwellings needs a household-size assumption, which this layer does not make (docs/FORECAST.md §0).",
-      "note_short": "Persons per 1,000 inhabitants per year, over the first five years of the projection — the near end, where it is least uncertain."
+      "note": "Computed in scripts/build_forecast.py from data/processed/forecast.json: the 2026 vintage of DST's municipal projection, ages folded into 0–5, 6–16, 17–19, 20–34, 35–64, 65–79 and 80+. Christiansø (411) is not a municipality and has no value. Never read together with Københavns Kommune's own forecast, which is a different run — see docs/FORECAST.md. Stored in forecast.json as persons per 1 000 inhabitants per year — the audited arithmetic of docs/FORECAST.md §3 — and divided by 10 at build time so the value the UI carries is a percentage per year. Same two cells, one further division. It is shown beside hist_net_dwell (dwellings) and the two are deliberately never differenced: turning persons into dwellings needs a household-size assumption, which this layer does not make (docs/FORECAST.md §0).",
+      "note_short": "A percentage of today's population per year, over the first five years of the projection — the near end, where it is least uncertain."
     },
     {
       "key": "fc_abs",
@@ -3781,9 +3781,9 @@
       },
       {
         "key": "fc_pop_rate_5y",
-        "label": "Projected population change 2026→2031, per 1,000 inhabitants per year",
-        "short": "Outlook / 1,000 / yr",
-        "unit": "persons / 1,000 inh. / yr",
+        "label": "Projected population change 2026→2031, % per year",
+        "short": "Projected change per year",
+        "unit": "% / yr",
         "level": "kvarter",
         "hue": [
           10,
@@ -3814,11 +3814,12 @@
         "calc": "cph_forecast",
         "field": "total",
         "fmt": "signdec1",
-        "desc": "(P2031 − P2026) ÷ 5 ÷ P2026 × 1 000 — the projected population change over the first five years, expressed as persons per 1 000 inhabitants per year. The same two cells as fc_growth_5y, in the unit that can be read beside a per-1,000 housing figure such as hist_net_dwell.",
+        "desc": "The projected change in total population over the first five years, as a percentage of today's population per year — the near end of the projection, where it is least uncertain. The same two published cells as the 2031 total, expressed per year.",
         "source": "Københavns Kommune KKFR2026 (Befolkningsfremskrivning 2026) via api.statbank.dk/v1/s30 — see docs/FORECAST.md §8",
         "warn": "A projection, not a measurement, and a different run from DST's — the two are never mixed (docs/FORECAST.md §4). See the uncertainty note on the quarter split.",
         "note": "Computed in scripts/build_cph_forecast.py from data/processed/cph_forecast.json by the same indicators() function as the municipal layer, so a quarter figure and a municipal figure cannot drift apart in how they are derived. Source is Københavns Kommune's own projection, never DST's — the two are different runs and are never spliced (docs/FORECAST.md §4).",
-        "geo_level": "kvarter"
+        "geo_level": "kvarter",
+        "note_short": "A percentage of today's population per year, over the first five years of the projection — the near end, where it is least uncertain."
       },
       {
         "key": "fc_abs",

@@ -1,8 +1,10 @@
 # AM Dashboard — Denmark Edition · one command per pipeline step
 PY ?= python3
 
-validate:   ## check every table/value code in config against the live API
-	$(PY) scripts/validate_config.py
+validate:   ## check every table/value code in config against the live API, and every source link
+	$(PY) scripts/validate_config.py && $(PY) scripts/check_source_links.py --quick
+validate-links: ## the full sweep: every Outlook area's link fetched and its value recomputed
+	$(PY) scripts/check_source_links.py
 geo:        ## vendor DAGI boundaries (DAWA — before 2026-10-01!)
 	$(PY) scripts/fetch_geo_dawa.py --simplify 0.0005
 fetch:      ## pull all StatBank / Finans Danmark tables to data/raw
@@ -28,7 +30,7 @@ validate-forecast: ## the Outlook layer's own checks (hard-data audit, reconcili
 fixture:    ## synthetic render check (never ship)
 	$(PY) tests/make_fixture.py && $(PY) scripts/build_dashboard.py --data tests/fixture_makro.json --market tests/fixture_market.json --cph tests/fixture_cph.json --out dist/fixture.html
 refresh: fetch build
-.PHONY: validate validate-forecast geo geo-cph bbr fetch build serve fixture refresh schools forecast test test-js
+.PHONY: validate validate-links validate-forecast geo geo-cph bbr fetch build serve fixture refresh schools forecast test test-js
 
 # scripts/build_housing_gap.py is deliberately NOT a target: it needs a fitted household-size
 # trend, which the hard-data rule forbids in the UI (docs/FORECAST.md §0, §7). It stays in the

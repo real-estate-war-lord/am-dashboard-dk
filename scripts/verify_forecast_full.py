@@ -280,6 +280,12 @@ def verify_indicators(doc_path, container, raw, y0, y1, ref_code=None, tag=""):
     return {"checked": checked, "n_mismatch": len(miss), "mismatches": miss[:20], "ref20": ref20, "tag": tag}
 
 
+# forecast.json stores fc_pop_rate_5y as persons per 1 000 inhabitants per year — the arithmetic
+# docs/FORECAST.md §3 audits. build_makro.py divides it by 10 on the way into makro.json so the UI
+# can speak in percent per year. This check reads makro.json, so it applies the same division.
+MAKRO_DISPLAY_DIV = {"fc_pop_rate_5y": 10}
+
+
 def verify_makro_fc(raw, y0, y1):
     """The municipal fc_* as they reach the app, recomputed from the raw pull."""
     mk = json.loads((PROC / "makro.json").read_text(encoding="utf-8"))
@@ -296,6 +302,7 @@ def verify_makro_fc(raw, y0, y1):
         for k, v in mine.items():
             if v is None or m.get(k) is None:
                 continue
+            v = round(v / MAKRO_DISPLAY_DIV[k], 2) if k in MAKRO_DISPLAY_DIV else v
             checked += 1
             if abs(m[k] - v) > 0.011:
                 miss.append((m["code"], k, m[k], v))

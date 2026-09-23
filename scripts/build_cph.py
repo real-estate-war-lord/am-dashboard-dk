@@ -28,6 +28,12 @@ _CPH_FC = None
 _CPH_BT = None
 
 
+# The caveat as a reader sees it. cph_forecast.json's meta carries the full version, with the
+# reasoning and the source reference, for the documentation.
+CAVEAT_UI = ("District figures follow K\u00f8benhavns Kommune's own housing plans, which KK describes "
+             "as subject to relatively large uncertainty (\u201cbeh\u00e6ftet med relativ stor usikkerhed\u201d).")
+
+
 def cph_forecast():
     """data/processed/cph_forecast.json from scripts/build_cph_forecast.py, or None."""
     global _CPH_FC
@@ -63,7 +69,8 @@ def compute(ind, year=None):
             end = m["last_year"]
         per = f"Projection {m['first_year']}\u2192{end} \u00b7 K\u00f8benhavns Kommune {m['vintage']}"
         # natively kvarter-level: no spreading, unlike the bydel-level tables
-        return {c: v.get(ind["key"]) for c, v in doc["indicators"].items()
+        div = bm.DISPLAY_DIV.get(ind["key"], 1)
+        return {c: round(v[ind["key"]] / div, 2) for c, v in doc["indicators"].items()
                 if v.get(ind["key"]) is not None}, per
     if calc == "bbr":
         b = bm.load_bbr()
@@ -216,10 +223,19 @@ def main():
         if ind["calc"] == "cph_forecast" and cph_forecast():
             fm = cph_forecast()["meta"]
             mid = fm.get("mid_year") or str(int(fm["first_year"]) + 5)
+            av = bm.area_var("s30", fm["table"])
             inds[-1]["proj"] = {"from": fm["first_year"],
                                 "to": mid if ind["key"] in ("fc_growth_5y", "fc_pop_rate_5y") else fm["last_year"],
                                 "vintage": str(fm["vintage"]), "publisher": "K\u00f8benhavns Kommune",
-                                "table": fm["table"], "caveat": fm.get("caveat", ""),
+                                "table": fm["table"],
+                                # what the reader sees: one sentence, no repo paths. The long form
+                                # stays in cph_forecast.json's meta for docs/FORECAST.md §8.
+                                "caveat": CAVEAT_UI,
+                                "src": {"db": "s30", "table": fm["table"], "area_var": av,
+                                        "years": [fm["first_year"], mid, fm["last_year"]],
+                                        "publisher_label": "K\u00f8benhavns Kommune via Statistikbanken"} if av else None,
+                                "actuals": {"db": "s30", "table": "KKBEF1", "area_var": bm.area_var("s30", "KKBEF1"),
+                                            "years": ["*"], "publisher_label": "K\u00f8benhavns Kommune via Statistikbanken"},
                                 # which baseline fc_20_34_rel was measured against — the label is
                                 # rendered from this, never from the indicator key (docs/FORECAST.md §8)
                                 "relative_baseline": fm.get("relative_baseline", ""),

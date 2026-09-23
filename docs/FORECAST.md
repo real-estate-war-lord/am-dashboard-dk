@@ -26,6 +26,7 @@ tables, so this list cannot drift from what is enforced.
 | where | what |
 |---|---|
 | **Map** (municipalities) | the ten `fc_*` as a group **Outlook**, diverging ramp centred on 0, `fc_growth` and `fc_20_34_rel` as quick chips. `hist_net_dwell` in **Housing stock** |
+| **The rate indicator** | `fc_pop_rate_5y` reads as **"Projected change 2026→2031: −492 residents (−1.3 %/yr)"** — the absolute change in people first, because a rate alone does not say how many. `forecast.json` stores the audited persons-per-1 000-per-year value; `build_makro.py` and `build_cph.py` divide it by 10 on the way into the page, so nothing user-facing says "per 1,000 inhabitants per year" |
 | **Map** (Copenhagen quarters) | the same ten from `KKFR2026`, labelled *Københavns Kommune*, `fc_20_34_rel` labelled **vs København** |
 | **Year selector** | replaced by *"Projection 2026→2040 · DST 2026"* — one vintage, no history to select |
 | **Municipality card** | *Outlook 2040* under population. For København, **both** DST and KK with the gap stated (§4) |
@@ -36,6 +37,7 @@ tables, so this list cannot drift from what is enforced.
 | **Analysis sheet** | an **Outlook** section for the pin's own area, with the same chart. Its profile rows are neutral: the percentile bar reads as a position, not a score |
 | **Charts** | Outlook indicators selectable; each series names its publisher, and a chart carrying both runs says so |
 | **Sources** | table ids, windows, vintages, fetch dates, and the sentence that projections are scenarios |
+| **Every figure** | a **Verify at source ↗** link that rebuilds the publisher's own CSV query for that one area — the table id, the area variable and the indicator's own variable selection, so the response is the cells the figure is computed from. 38 indicators link to a per-area StatBank query, 17 to the publisher's page where no per-area API exists, 0 have no link. `scripts/check_source_links.py` fetches all 165 Outlook links and recomputes the displayed value from each response |
 
 ### 🚫 Not shown, and why
 

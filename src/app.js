@@ -71,6 +71,62 @@ const lowerBetter = key => { const i = indOf(key); return !!i && i.direction ===
 const neutralDir = key => { const i = indOf(key); return !!i && i.direction === "neutral"; };
 /* an Outlook indicator is one vintage of a projection, not a per-year series */
 const projOf = key => { const i = indOf(key); return (i && i.proj) || null; };
+/* ---------- Verify at source ----------
+   Rebuilds the publisher's own CSV query from the pieces the build recorded: the sub-database,
+   the table id (which carries the vintage), the area variable's id and the years. Nothing here is
+   hard-coded per vintage — when KKFR2026 becomes KKFR2027 the link follows the data.
+     https://api.statbank.dk/v1/s30/data/KKFR2026/CSV?lang=en&OMRKK=20104&Tid=2026,2031,2040 */
+const STATBANK = "https://api.statbank.dk/v1";
+function srcUrl(src, code) {
+  if (!src || !src.table || !src.area_var || code == null) return "";
+  const db = src.db ? `${src.db}/` : "";
+  const years = (src.years || ["*"]).join(",");
+  const extra = Object.entries(src.vars || {}).map(([k, v]) => `&${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join("");
+  return `${STATBANK}/${db}data/${encodeURIComponent(src.table)}/CSV?lang=en`
+    + `&${encodeURIComponent(src.area_var)}=${encodeURIComponent(code)}${extra}&Tid=${encodeURIComponent(years)}`;
+}
+/* the link itself — always a new tab, always naming who publishes it */
+function srcLink(src, code, label) {
+  const u = srcUrl(src, code);
+  if (!u) return "";
+  const who = src.publisher_label || "the publisher";
+  return `<a class="srclink" href="${esc(u)}" target="_blank" rel="noopener"
+    title="Open the published figures for this area straight from ${esc(who)} — the same cells this value is computed from">${esc(label || "Verify at source")} ↗ <span class="dim">(${esc(who)})</span></a>`;
+}
+/* the code an area is known by in its own source table */
+const srcCode = (o, level) => level === "kvarter" ? (o.code || "") : (o.code || o.muni || "");
+/* any indicator, any area: the per-area query where the source is a StatBank table, otherwise the
+   publisher's own page. Every indicator has one or the other — none is left without a destination. */
+/* which published table a code belongs to — an indicator may list one per level, and sending a
+   postal code to a municipal table is a 400 rather than a wrong answer */
+const AREA_VAR_LEVEL = { KOMMUNEDK: "kommune", "OMRÅDE": "kommune", OMRADE: "kommune",
+                         BOPOMR: "kommune", OMR20: "kommune", PNR20: "postnr", OMRKK: "kvarter" };
+function pickSrc(i, level) {
+  const list = i.src_verify || [];
+  return list.find(q => AREA_VAR_LEVEL[q.area_var] === level) || list[0] || null;
+}
+function indSrcLink(i, code, label, level) {
+  if (!i) return "";
+  const q = pickSrc(i, level || "kommune") || ((i.proj || {}).src);
+  if (q && code != null && code !== "") return srcLink(q, code, label);
+  if (i.src_page) return `<a class="srclink" href="${esc(i.src_page[1])}" target="_blank" rel="noopener"
+    title="This figure does not come from a per-area StatBank query — open the publisher's own page">${esc(label || "Verify at source")} ↗ <span class="dim">(${esc(i.src_page[0])})</span></a>`;
+  return "";
+}
+/* "Projected change 2026→2031: −492 residents (−1.3 %/yr)" — the absolute change in people first,
+   because a rate on its own does not tell a reader how many. Both come from the same two published
+   cells: the projected population in the first year and in the fifth. */
+function projChangeLine(o, level) {
+  const list = level === "kvarter" ? IND_CPH : IND;
+  const ri = list.find(i => i.key === "fc_pop_rate_5y");
+  if (!ri || !o || !o.fc_pop) return "";
+  const from = (ri.proj && ri.proj.from) || "2026", to = (ri.proj && ri.proj.to) || "2031";
+  const a = o.fc_pop[from], b = o.fc_pop[to];
+  if (a == null || b == null) return "";
+  const abs = b - a, rate = o.fc_pop_rate_5y;
+  return `Projected change ${esc(from)}→${esc(to)}: <b>${sign(abs, x => nf(x, 0))} residents</b>`
+    + (rate != null ? ` (${sign(rate, x => nf(x, 1))} %/yr)` : "");
+}
 /* "Projection, DST 2026" at kommune level, "Projection, Københavns Kommune 2026" at kvarter/bydel —
    the publisher is read from the data, never inferred from the view (docs/FORECAST.md §4, §8). */
 const projLegendNote = ind => `Projection, ${(ind.proj && ind.proj.publisher) || "DST"} ${(ind.proj && ind.proj.vintage) || ""}`.trim();
@@ -574,6 +630,9 @@ function indExplain(i) {
     ${i.proj && i.proj.caveat ? `<p class="warnline">⚠ ${esc(i.proj.caveat)}</p>` : ""}
     ${i.note ? `<p class="dim"><em>Note</em> ${esc(i.note)}</p>` : ""}
     <p class="dim"><em>Source</em> ${esc(i.source || "–")}${asof ? ` · <em>As of</em> ${asof}` : ""} · <em>Coverage</em> ${cov}${ys.length > 1 ? ` · <em>History</em> ${ys[0]}–${LATEST}` : ""}</p>
+    ${(() => { const e_ = S.view === "area" ? areaEntity() : null;
+       const c_ = e_ ? (e_.type === "postnr" ? e_.o.nr : srcCode(e_.o, e_.type)) : (MK.muni || "");
+       const l_ = indSrcLink(i, c_, null, e_ ? e_.type : "kommune"); return l_ ? `<p class="dim">${l_}</p>` : ""; })()}
     ${src ? `<p class="dim">${esc(src)}</p>` : ""}
     ${i.warn ? `<p class="warnline">⚠ ${esc(i.warn)}</p>` : ""}</div>
   </details>`;
@@ -663,7 +722,11 @@ function outlookLine(o, level) {
   const to = (g.proj && g.proj.to) || "2040";
   const who = (g.proj && g.proj.publisher) || "DST";
   const rel = rv != null && r ? ` <span class="dim">(20–34: ${fmtOf(r)(rv)} ${esc(relLabel(r))})</span>` : "";
-  return `<div class="olline"><span>Outlook ${esc(to)}</span><b>${fmtOf(g)(gv)}</b>${rel}<em class="dim">${esc(who)}</em></div>`;
+  const chg = projChangeLine(o, level);
+  const link = srcLink((g.proj || {}).src, srcCode(o, level));
+  return `<div class="olline"><span>Outlook ${esc(to)}</span><b>${fmtOf(g)(gv)}</b>${rel}<em class="dim">${esc(who)}</em></div>`
+    + (chg ? `<div class="olchg">${chg}</div>` : "")
+    + (link ? `<div class="olsrc">${link}</div>` : "");
 }
 /* §4: a DST figure and a KK figure may sit side by side only if the gap between them is stated.
    København is the one place both exist, so it is the one place this renders. */
@@ -674,9 +737,13 @@ function outlookBothHtml(m) {
   if (dst == null || !kk || kk.fc_growth == null) return outlookLine(m, "kommune");
   const gap = Math.round((kk.fc_growth - dst) * 100) / 100;
   const g = IND.find(i => i.key === "fc_growth");
+  const gq = IND_CPH.find(i => i.key === "fc_growth");
   return `<div class="olboth">
-    <div class="olrow"><span>Outlook 2040 · <b class="olsrc">DST</b></span><b>${fmtOf(g)(dst)}</b></div>
-    <div class="olrow"><span>Outlook 2040 · <b class="olsrc">Københavns Kommune</b></span><b>${fmtOf(g)(kk.fc_growth)}</b></div>
+    <div class="olrow"><span>Outlook 2040 · <b class="olpub">DST</b></span><b>${fmtOf(g)(dst)}</b>
+      ${srcLink((g.proj || {}).src, m.code, "Verify")}</div>
+    <div class="olrow"><span>Outlook 2040 · <b class="olpub">Københavns Kommune</b></span><b>${fmtOf(g)(kk.fc_growth)}</b>
+      ${srcLink((gq && gq.proj || {}).src, "1000", "Verify")}</div>
+    ${projChangeLine(m, "kommune") ? `<div class="olchg">${projChangeLine(m, "kommune")} <span class="dim">· DST</span></div>` : ""}
     <p class="cap">Two different projections of the same city, ${nf(Math.abs(gap), 2)} pp apart — ${kk.fc_growth > dst ? "KK is the higher" : "DST is the higher"}. They are never combined: different runs, different assumptions (docs/FORECAST.md §4).</p>
   </div>`;
 }
@@ -701,15 +768,16 @@ function outlookFor(koms, kvas) {
   const gK = IND.find(i => i.key === "fc_growth"), yK = IND.find(i => i.key === "fc_20_34");
   const gQ = IND_CPH.find(i => i.key === "fc_growth"), yQ = IND_CPH.find(i => i.key === "fc_20_34");
   const blocks = [];
-  const rows = (list, gi, yi) => list.filter(o => o && o[gi.key] != null).map(o =>
-    `<tr><th>${esc(o.name || o.nr || o.code)}</th><td class="num">${fmtOf(gi)(o[gi.key])}</td><td class="num">${o[yi.key] != null ? fmtOf(yi)(o[yi.key]) : "–"}</td></tr>`).join("");
+  const rows = (list, gi, yi, lvl) => list.filter(o => o && o[gi.key] != null).map(o =>
+    `<tr><th>${esc(o.name || o.nr || o.code)}</th><td class="num">${fmtOf(gi)(o[gi.key])}</td><td class="num">${o[yi.key] != null ? fmtOf(yi)(o[yi.key]) : "–"}</td>
+      <td class="num">${srcLink((gi.proj || {}).src, srcCode(o, lvl), "Verify")}</td></tr>`).join("");
   const table = (title, pr, body, caveat) => `<div class="olblock">
     <p class="cap"><b>${esc(title)}</b> · <span class="tag proj">Projection ${esc(pr.from)}→${esc(pr.to)}</span> ${esc(pr.publisher)} ${esc(pr.vintage)}${pr.table ? ` · ${esc(pr.table)}` : ""}</p>
-    <table class="tbl compact"><thead><tr><th>Area</th><th class="num">Population ${esc(pr.to)}</th><th class="num">20–34</th></tr></thead><tbody>${body}</tbody></table>
+    <table class="tbl compact"><thead><tr><th>Area</th><th class="num">Population ${esc(pr.to)}</th><th class="num">20–34</th><th class="num">Source</th></tr></thead><tbody>${body}</tbody></table>
     ${caveat ? `<p class="cap warnline">⚠ ${esc(caveat)}</p>` : ""}</div>`;
-  const kr = gK && yK ? rows(koms || [], gK, yK) : "";
+  const kr = gK && yK ? rows(koms || [], gK, yK, "kommune") : "";
   if (kr) blocks.push(table("Municipality", gK.proj || {}, kr, ""));
-  const qr = gQ && yQ ? rows(kvas || [], gQ, yQ) : "";
+  const qr = gQ && yQ ? rows(kvas || [], gQ, yQ, "kvarter") : "";
   if (qr) blocks.push(table("Copenhagen quarter", gQ.proj || {}, qr, (gQ.proj || {}).caveat || ""));
   if (!blocks.length) return "";
   return `<div class="olfor">${blocks.join("")}
@@ -1005,7 +1073,10 @@ function outlookCard(e) {
   return `<div class="card outlook">
     <div class="card-head"><h3>Population outlook</h3>
       <span class="hint"><span class="tag proj">Projection</span> ${esc(pr.from || "")}→${esc(pr.to || "")} · ${esc(who)} ${esc(pr.vintage || "")}${pr.table ? ` · ${esc(pr.table)}` : ""}</span></div>
+    ${projChangeLine(o, isQ ? "kvarter" : "kommune") ? `<p class="olchg big">${projChangeLine(o, isQ ? "kvarter" : "kommune")}</p>` : ""}
     ${popOutlookChart(o, { actualSource: actualSrc, projSource: pr.table || who })}
+    <p class="cap srcrow">${srcLink(pr.src, srcCode(o, isQ ? "kvarter" : "kommune"), "Verify the projection at source")}
+      ${srcLink(pr.actuals, srcCode(o, isQ ? "kvarter" : "kommune"), "Verify the observed population")}</p>
     ${tiles.length ? `<div class="hl wrap">${tiles.map(i => `<button class="hlc ${MK.ind === i.key ? "on" : ""}" data-arind="${esc(i.key)}" title="${esc(i.desc || i.label)}">
       <span>${esc(i.short || i.label)}</span><b>${fmtOf(i)(o[i.key])}</b><em class="dim">${i.key === "fc_20_34_rel" ? esc(relLabel(i)) : esc(i.unit || "")}</em></button>`).join("")}</div>` : ""}
     ${ageRows ? `<div class="olages"><span class="lfsec">Age groups ${esc(pr.from || "")}→${esc(pr.to || "")} · persons</span><div class="mstrip-k">${ageRows}</div></div>` : ""}
@@ -1565,7 +1636,10 @@ function anOutlookCard(e, r) {
       <span class="hint"><span class="tag proj">Projection</span> ${esc(pr.from || "")}→${esc(pr.to || "")} · ${esc(pr.publisher || "")} ${esc(pr.vintage || "")} · ${esc(where)}</span></div>
     ${tiles.length ? `<div class="hl">${tiles.map(i => `<button class="hlc ${MK.ind === i.key ? "on" : ""}" data-arind="${esc(i.key)}" title="${esc(i.desc || i.label)}">
       <span>${esc(i.short || i.label)}</span><b>${fmtOf(i)(src[i.key])}</b><em class="dim">${esc(i.unit || "")}</em></button>`).join("")}</div>` : ""}
+    ${projChangeLine(src, isQ ? "kvarter" : "kommune") ? `<p class="olchg big">${projChangeLine(src, isQ ? "kvarter" : "kommune")}</p>` : ""}
     ${popOutlookChart(src, { actualSource: isQ ? "KKBEF1" : "FOLK1A", projSource: pr.table || pr.publisher })}
+    <p class="cap srcrow">${srcLink(pr.src, srcCode(src, isQ ? "kvarter" : "kommune"), "Verify the projection at source")}
+      ${srcLink(pr.actuals, srcCode(src, isQ ? "kvarter" : "kommune"), "Verify the observed population")}</p>
     ${isQ ? pastAccuracyLine(src) : ""}
     ${isQ ? cphFcCaveat("kvarter") : `<p class="cap">${esc(((list.find(i => i.key === "fc_growth")) || {}).warn || "")}</p>`}
     <p class="cap dim">The projection is for the whole ${isQ ? "quarter" : "municipality"}, not for this address — it carries no housing programme, so a development on this plot is not in it. Observed population from ${esc(isQ ? "KKBEF1" : "FOLK1A")}; the dashed line is ${esc(pr.table || "")}, a scenario rather than a measurement.</p>
@@ -1607,6 +1681,8 @@ function anRow(e, i, r) {
     : `better than ${nf(pc ? pc.p : 0, 0)} % of the ${pc ? pc.n : 0} ${peers}${lb ? " — lower is better here" : ""}`;
   return `<tr${nu ? ' class="anneutral"' : ""}><th><span class="thn">${esc(i.label)} <span class="dim">${esc(i.unit || "")}</span></span>${i.proj ? `<span class="tag proj mini">${esc(i.proj.publisher)} ${esc(i.proj.vintage)}</span>` : ""}<button class="tch" data-go="${chartLink(i.key, e.type, e.code)}" title="Open in Charts">↗</button></th>
     ${fmtCell(i, cur.v, !cur.own, e.type === "kvarter" ? bydelMark(i) : "")}
+    <td class="ansrc">${cur.own ? indSrcLink(i, e.type === "postnr" ? e.o.nr : srcCode(e.o, e.type), "Verify", e.type)
+                                : indSrcLink(i, (r.kommune || {}).code, "Verify", "kommune")}</td>
     <td class="anbc" data-v="${pc ? pc.p.toFixed(1) : ""}">${pc
       ? `<span class="anbw" title="${esc(barTitle)}"><span class="anbar"><i style="width:${pc.p.toFixed(1)}%"></i></span><em>${nf(pc.p, 0)}</em></span>`
       : `<span class="dim">–</span>`}</td>
@@ -1618,11 +1694,12 @@ function anIndTable(e, r, inds) {
     .concat(inds.some(i => !GROUP_ORDER.includes(i.group || "Other")) ? ["Other"] : []);
   const body = groups.map(g => {
     const rows = inds.filter(i => (i.group || "Other") === g).map(i => anRow(e, i, r)).join("");
-    return rows ? `<tr class="angrp"><th colspan="5">${esc(g)}</th></tr>${rows}` : "";
+    return rows ? `<tr class="angrp"><th colspan="6">${esc(g)}</th></tr>${rows}` : "";
   }).join("");
   if (!body) return `<p class="empty">no indicator has a value for this area</p>`;
   return `<div class="scrollx"><table class="tbl compact antbl"><thead><tr><th>Indicator</th>
     <th class="num">${esc(e.type === "kommune" ? e.name : e.type === "kvarter" ? "Quarter" : "Postal code")}</th>
+    <th class="ansrc">Source</th>
     <th class="anbc">Percentile<br><span class="dim">vs all ${esc(e.peerLabel)}</span></th>
     <th class="num">${esc(r.kommune ? r.kommune.name : "Municipality")}</th><th class="num">Denmark</th></tr></thead>
     <tbody>${body}</tbody></table></div>`;

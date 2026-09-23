@@ -1469,6 +1469,26 @@ th .thn{display:inline}
 /* every category stays listed, so an off one needs a way back: greyed, struck through, hollow swatch */
 .maplegend .lgrow.gk.allhidden{color:var(--ink);margin-top:5px;white-space:normal;line-height:1.35}
 .maplegend .lgrow.gk.allhidden .only{margin-left:0;padding-left:0;color:var(--ink);text-decoration:underline}
+/* "Verify at source ↗" — quiet until wanted, never a button-looking thing */
+.srclink{font-family:var(--mono);font-size:9.5px;color:var(--ink2);text-decoration:none;
+  border-bottom:1px dotted var(--line);white-space:nowrap}
+.srclink:hover{color:var(--ink);border-bottom-color:var(--ink2)}
+.lfpop .srclink,.tbl .srclink{font-size:9px}
+.olchg{font-family:var(--mono);font-size:11px;color:var(--ink);margin-top:3px}
+.olchg.big{font-size:12.5px;margin:6px 0 2px}
+.olsrc{margin-top:2px}
+.srcrow{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px}
+.antbl td.ansrc,.antbl th.ansrc{white-space:nowrap;width:1%}
+.olboth .olrow .srclink{margin-left:8px}
+/* On a phone a nowrap "Verify at source" line is wider than the column and drags the whole content
+   grid out with it — let it wrap, and let its row wrap around it. */
+@media (max-width:900px){
+  .srclink{white-space:normal}
+  .olboth .olrow{flex-wrap:wrap;row-gap:2px}
+  .olboth .olrow .srclink{margin-left:0;flex-basis:100%}
+  .srcrow{gap:8px}
+  .antbl td.ansrc,.antbl th.ansrc{white-space:normal}
+}
 /* ---- Population outlook (docs/FORECAST.md) ---- */
 /* a projection is labelled as one everywhere it appears */
 .tag.proj{border-color:#5A3C96;color:#5A3C96}
