@@ -156,6 +156,20 @@ Placement: point-in-polygon (shapely) into `data/geo/postnumre.geojson` and `cph
 
 Not in BBR: rents, migration, population — those stay with DST/boligstat. Unoccupied share is owner-reported and lags; DST BOL101 BEBO=2000 (municipality) is the reference vacancy figure.
 
+### 3.4b Public buildings — BBR anvendelse 410–449 (v2.2, pilot)
+
+The same register as §3.4, sliced by building use instead of dwellings: schools, daycare, health and
+culture buildings (`byg021BygningensAnvendelse` 410–449) as **existing stock** (status 6) and as
+**open building cases** (status 2/3 joined through `BBR_Sagsniveau` to `BBR_BBRSag`). Coordinates come
+from `byg404Koordinat`, and from DAR (`husnummer` → `DAR_Adressepunkt`) for the 83 % of open-case
+buildings BBR has not placed; names from OpenStreetMap within 60 m.
+
+Measured 2026-09-23 on the pilot (København + Frederiksberg, 290 open cases): **1 of 290** carried an
+expected completion date, 91 % a permit date, median permit age 4.1 years in København. That is why the
+layer speaks of *open building cases* rather than planned or ongoing construction, draws only cases with
+a permit ≤ 3 years old, and ships no forward-looking "planned buildings" indicator. Full method,
+code lists and caveats: [`docs/PUBLIC_BUILDINGS.md`](PUBLIC_BUILDINGS.md).
+
 ### 3.5 Copenhagen detail — sub-database `s30`
 
 `https://api.statbank.dk/v1/s30/tables` → 48 tables. **Implemented in v1.2 as a third map level: 67 quarters (kvarterer).** The area variable is `OMRKK`: `1000` = city total, `1001–1010` = 10 districts (bydele), `2001–2012` = local committees (lokaludvalg), `20101–21211` = kvarterer (code `2LLxx` → lokaludvalg `20LL` → bydel, mapping in `scripts/build_cph.py`). Polygons: `wfs-kbhkort.kk.dk/k101` layers `kvarter` and `bydel` (CC BY 4.0, `scripts/fetch_geo_cph.py`); the WFS `kvarternr` equals the statbank code one-to-one.

@@ -66,7 +66,7 @@ const cphMode = () => !!(CPH && MK.muni === CPH_MUNI && MK.cphView !== "postnr")
 const S = { view: "makro" };
 const YEARS = [...new Set([...((D.meta && D.meta.years) || []), ...((D.cph && D.cph.meta && D.cph.meta.years) || [])])].sort();
 const LATEST = (D.meta && D.meta.latest_year) || (YEARS[YEARS.length - 1] || "");
-const MK = { ind: (IND[0] || {}).key, muni: null, own: false, year: LATEST, cphView: "kvarter", micro: false, mind: "rented_pct", infra: false };
+const MK = { ind: (IND[0] || {}).key, muni: null, own: false, year: LATEST, cphView: "kvarter", micro: false, mind: "rented_pct", infra: false, pub: false };
 /* Micro (building) layer: dist/micro/<kommune>.json, loaded on demand; D.micro = index {code: {file, n}} */
 const MICRO_IDX = (D.micro && D.micro.municipalities) || {};
 const MICRO = {};                                  /* code → {meta, b:[…]} once loaded */
@@ -88,6 +88,8 @@ const UI = { indxOpen: false, mfOpen: false };                                  
 const MKT = { src: false };                                                        /* market: sources panel open */
 const CH = { ind: (IND[0] || {}).key, areas: [], y0: "", y1: "", median: true, title: "", mode: "auto", dist: "size", fq: "year", ov: [], nat: true };   /* chart generator; fq = year | q, ov = overlay indicators, nat = Denmark line */
 const PR = { id: null };                                                          /* project datasheet */
+const PB = { kom: null, id: null };                                               /* public-building sheet */
+const PL = { key: "" };                                                           /* public list panel: "<level>:<code>:<cat>:<kind>" */
 const PIPE = { type: "", status: "" };                                            /* pipeline filters */
 const T = { q: "", level: "kommune", region: "", minPop: 0 };                     /* table view filters */
 const REGIONS = ["Hovedstaden", "Sjælland", "Syddanmark", "Midtjylland", "Nordjylland"];
@@ -121,6 +123,7 @@ function hashFor() {
   const q = [`ind=${encodeURIComponent(MK.ind || "")}`]; if (MK.year && MK.year !== LATEST) q.push(`y=${MK.year}`);
   if (S.view === "makro" && MK.micro) { q.push("micro=1"); q.push(`mind=${MK.mind}`); }
   if (S.view === "makro" && MK.infra) q.push("infra=1");   /* the overlay survives every level change */
+  if (S.view === "makro" && MK.pub) q.push("public=1");
   if (S.view === "makro" && MK.focus) q.push(`focus=${encodeURIComponent(MK.focus)}`);
   let p;
   if (S.view === "area") { p = `area/${AR.type}/${AR.code}`; if (AR.group) q.push(`g=${encodeURIComponent(AR.group)}`); if (AR.sub !== "kvarter") q.push(`sub=${AR.sub}`); if (AR.tab !== "ind") q.push(`t=${AR.tab}`); }
@@ -129,6 +132,8 @@ function hashFor() {
     if (CH.fq === "q") q.push("fq=q"); if (CH.ov.length) q.push(`ov=${CH.ov.join(",")}`); if (!CH.nat) q.push("nat=0"); }
   else if (S.view === "market") { p = "market"; if (MKT.src) q.push("src=1"); }
   else if (S.view === "project") { p = `project/${PR.id}`; }
+  else if (S.view === "public") { p = `public/${PB.kom}/${PB.id}`; }
+  else if (S.view === "publist") { p = `publist/${PL.key}`; }
   else if (S.view === "pipeline") { p = "pipeline"; if (PIPE.type) q.push(`ptype=${PIPE.type}`); if (PIPE.status) q.push(`pstatus=${PIPE.status}`); }
   else if (S.view === "makro") p = "map" + (MK.muni ? "/" + MK.muni + (MK.muni === CPH_MUNI && MK.cphView === "postnr" ? "/postnr" : "") : "");
   else p = S.view;
@@ -147,12 +152,14 @@ function parseHash() {
   else if (v === "sources") { S.view = "market"; MKT.src = true; }
   else if (v === "market") { S.view = "market"; MKT.src = q.src === "1"; }
   else if (v === "project" && parts[1]) { S.view = "project"; PR.id = decodeURIComponent(parts[1]); }
+  else if (v === "public" && parts[2]) { S.view = "public"; PB.kom = parts[1]; PB.id = decodeURIComponent(parts[2]); }
+  else if (v === "publist" && parts[1]) { S.view = "publist"; PL.key = decodeURIComponent(parts.slice(1).join(":")); }
   else if (v === "pipeline") { S.view = "pipeline"; PIPE.type = q.ptype || ""; PIPE.status = q.pstatus || ""; }
   else if (v === "charts") { S.view = "charts"; CH.ind = q.ind || CH.ind; CH.areas = q.a ? q.a.split(",").filter(Boolean) : CH.areas; CH.y0 = q.y0 || CH.y0; CH.y1 = q.y1 || CH.y1; CH.median = q.med !== "0"; CH.mode = q.mode || "auto"; CH.dist = q.dist || "size";
     CH.fq = q.fq === "q" ? "q" : "year"; CH.ov = q.ov ? q.ov.split(",").filter(Boolean) : []; CH.nat = q.nat !== "0"; }
   else { S.view = "makro"; MK.muni = parts[1] && byCode[parts[1]] ? parts[1] : null; MK.cphView = parts[2] === "postnr" ? "postnr" : "kvarter";
          MK.micro = q.micro === "1" && microAvail(MK.muni); if (q.mind && MICRO_INDS.some(i => i.key === q.mind)) MK.mind = q.mind;
-         MK.infra = q.infra === "1"; MK.focus = q.focus || null; if (MK.focus) MK.infra = true; }
+         MK.infra = q.infra === "1"; MK.pub = q.public === "1"; MK.focus = q.focus || null; if (MK.focus) MK.infra = true; }
   if (!curInds().some(i => i.key === MK.ind)) MK.ind = (curInds()[0] || {}).key;
   if (!yearsFor(MK.ind).includes(MK.year)) MK.year = LATEST;
   if (S.view === "makro") {
@@ -178,7 +185,7 @@ const NAV_GROUPS = [["Market intelligence", ["makro", "table", "charts", "market
 const viewOf = id => VIEWS.find(v => v[0] === id) || VIEWS[0];
 
 function renderNav() {
-  const on = S.view === "area" ? "makro" : S.view === "project" ? "pipeline" : S.view;
+  const on = S.view === "area" ? "makro" : S.view === "project" ? "pipeline" : ["public", "publist"].includes(S.view) ? "makro" : S.view;
   document.getElementById("nav").innerHTML = NAV_GROUPS.map(([lab, ids]) => `<div class="nav-glab">${lab}</div>` +
     ids.map(id => { const v = viewOf(id); return `<button class="nav-item ${on === id ? "on" : ""}" data-go="${v[3]}" title="${esc(v[2])}"><b>${v[1]}</b></button>`; }).join("")).join("");
 }
@@ -199,7 +206,8 @@ function renderTop() {
   const { c, tail, kind } = crumbs();
   document.getElementById("hd").innerHTML = `<nav class="crumbs">${c.map(([l, h]) => `<button data-go="${esc(h)}">${esc(l)}</button><i>›</i>`).join("")}<b>${esc(tail)}</b>${kind ? `<span class="dim">${esc(kind)}</span>` : ""}</nav>`;
 }
-const RENDER = { makro: vMakro, table: vTable, area: vArea, charts: vCharts, market: vMarket, pipeline: vPipeline, project: vProject };
+const RENDER = { makro: vMakro, table: vTable, area: vArea, charts: vCharts, market: vMarket, pipeline: vPipeline, project: vProject,
+                 public: vPublic, publist: vPubList };
 function render() {
   renderNav(); renderTop();
   const body = document.getElementById("body");
@@ -233,6 +241,9 @@ document.addEventListener("click", e => {
   if (g("[data-chclear]")) { CH.areas = []; syncHash(); renderKeep(); return; }
   if ((el = g("[data-micro]"))) { MK.micro = el.dataset.micro === "1"; syncHash(); renderKeep(); return; }
   if (g("[data-infra]")) { MK.infra = !MK.infra; syncHash(); renderKeep(); return; }
+  if (g("[data-public]")) { MK.pub = !MK.pub; syncHash(); renderKeep(); return; }
+  if ((el = g("[data-publist]"))) { go(`publist/${el.dataset.publist}`); return; }
+  if ((el = g("[data-pubsheet]"))) { const row = el.closest("[data-pubkom]"); go(`public/${(row && row.dataset.pubkom) || (MK.muni || CPH_MUNI)}/${el.dataset.pubsheet}`); return; }
   if (g("[data-mcsv]")) { exportMicroCsv(); return; }
   if ((el = g("[data-argroup]"))) { AR.group = el.dataset.argroup; syncHash(); renderKeep(); return; }
   if ((el = g("[data-artab]"))) { AR.tab = el.dataset.artab; syncHash(); renderKeep(); return; }
@@ -459,7 +470,7 @@ function muniStrip(m) {
     .concat(STRIP_EXTRA.map(k => IND.find(i => i.key === k)).filter(has));
   const cell = i => { const rk = rankOf(m, i.key, MUNI); return `<div><span>${esc(i.short || i.label)}</span><b>${fmtOf(i)(V(m, i.key))}</b><em>${rk ? `#${rk.r} of ${rk.n}` : ""}</em></div>`; };
   return `<div class="mstrip">
-    <div class="mstrip-id"><b>${esc(m.name)}</b><span class="dim">${esc(m.region || "")} · ${m.pop != null ? nf(m.pop, 0) + " inhabitants" : ""} · ${muniAreas(m.code).length} ${cphMode() ? "quarters" : "postal codes"}</span>${upcomingLine("kommune", m.code)}</div>
+    <div class="mstrip-id"><b>${esc(m.name)}</b><span class="dim">${esc(m.region || "")} · ${m.pop != null ? nf(m.pop, 0) + " inhabitants" : ""} · ${muniAreas(m.code).length} ${cphMode() ? "quarters" : "postal codes"}</span>${upcomingLine("kommune", m.code)}${publicLine("kommune", m.code)}</div>
     <div class="mstrip-k">${key.map(cell).join("")}</div>
     <div class="mstrip-act"><button class="lk primary" data-go="${withQ(pageOf(m))}">Open ${esc(m.name)} page ›</button><button class="lk" data-go="${chartLink(MK.ind, "kommune", m.code)}" title="Open the chart generator with this municipality">↗ Chart</button></div>
   </div>`;
@@ -479,11 +490,11 @@ function vMakro() {
   return `
   <div class="card accent" id="mapcard">
     <div class="card-head tools-only">
-      <div class="tools">${areaSearch()}${muni && microAvail(muni.code) ? `<div class="seg"><button class="sg ${!MK.micro ? "on" : ""}" data-micro="0">Areas</button><button class="sg ${MK.micro ? "on" : ""}" data-micro="1">Buildings (${nf(MICRO_IDX[String(Number(muni.code))].n, 0)})</button></div>` : ""}${muni && muni.code === CPH_MUNI && CPH && !microMode() ? `<div class="seg"><button class="sg ${MK.cphView !== "postnr" ? "on" : ""}" data-cphview="kvarter">Quarters (${CPH.areas.length})</button><button class="sg ${MK.cphView === "postnr" ? "on" : ""}" data-cphview="postnr">Postal codes</button></div>` : ""}${INFRA.length ? `<div class="seg"><button class="sg ${MK.infra ? "on" : ""}" data-infra title="Show planned and ongoing infrastructure projects on top of the map">Infra projects</button></div>` : ""}${microMode() ? mindSelect() : indSelect() + yearSelect()}${D.portfolio ? `<button class="lk mini ${MK.own ? "primary" : ""}" data-mkown>● Own properties</button>` : ""}<button class="lk" data-fs title="Full screen (Esc to exit)">⤢ Full screen</button></div>
+      <div class="tools">${areaSearch()}${muni && microAvail(muni.code) ? `<div class="seg"><button class="sg ${!MK.micro ? "on" : ""}" data-micro="0">Areas</button><button class="sg ${MK.micro ? "on" : ""}" data-micro="1">Buildings (${nf(MICRO_IDX[String(Number(muni.code))].n, 0)})</button></div>` : ""}${muni && muni.code === CPH_MUNI && CPH && !microMode() ? `<div class="seg"><button class="sg ${MK.cphView !== "postnr" ? "on" : ""}" data-cphview="kvarter">Quarters (${CPH.areas.length})</button><button class="sg ${MK.cphView === "postnr" ? "on" : ""}" data-cphview="postnr">Postal codes</button></div>` : ""}${INFRA.length ? `<div class="seg"><button class="sg ${MK.infra ? "on" : ""}" data-infra title="Show planned and ongoing infrastructure projects on top of the map">Infra projects</button></div>` : ""}${PUB ? `<div class="seg"><button class="sg ${MK.pub ? "on" : ""}" data-public title="Public buildings from BBR: schools, daycare, health and culture${MK.muni && !pubAvail(MK.muni) ? " — no BBR pull for this municipality yet" : ""}">Public buildings</button></div>` : ""}${microMode() ? mindSelect() : indSelect() + yearSelect()}${D.portfolio ? `<button class="lk mini ${MK.own ? "primary" : ""}" data-mkown>● Own properties</button>` : ""}<button class="lk" data-fs title="Full screen (Esc to exit)">⤢ Full screen</button></div>
       ${microMode() ? "" : indQuick()}</div>
     ${microMode() ? microExplain() : indExplain(ind)}
     ${muni && !microMode() ? muniStrip(muni) : ""}
-    <div class="mapwrap"><div id="lfmap"></div><div class="maplegend infralegend" id="infralegend"></div><div class="maplegend" id="maplegend"></div></div>
+    <div class="mapwrap"><div id="lfmap"></div><div class="maplegend publiclegend" id="publiclegend"></div><div class="maplegend infralegend" id="infralegend"></div><div class="maplegend" id="maplegend"></div></div>
     ${srcNote(`<p class="cap">${muni ? "Click a polygon for its figures and a link to its page." : "Click a polygon for its figures; open a municipality with the search box above or from the popup. Table view lists everything side by side."} Colour classes: quintiles of the visible areas. Boundaries: DAGI, Klimadatastyrelsen (simplified); basemap OpenStreetMap.</p>`)}
   </div>`;
 }
@@ -1177,6 +1188,7 @@ function lfMicroLayers() {
   LF.microG = L.layerGroup(marks).addTo(LF.map); LF.microMarks = marks;
   setLegend("maplegend", sc, ind, "micro:" + ind.key, "buildings with ≥ 2 dwellings · dot size = dwellings");
   lfInfraLayers();
+  lfPublicLayers();
   if (cnt) cnt.textContent = `${nf(rows.length, 0)} of ${nf(d.meta.n, 0)} buildings · ${nf(rows.reduce((s_, r) => s_ + r[2], 0), 0)} dwellings`;
 }
 function lfLayers() {
@@ -1209,6 +1221,7 @@ function lfLayers() {
   LF.areaG = L.layerGroup(polys).addTo(LF.map);
   LF.ctx = { areas, munis, sc, micro, ind, vk };
   lfInfraLayers();
+  lfPublicLayers();
   lfLabels();
   setLegend("maplegend", sc, ind, ind.key, micro ? (cphMode() ? "quarters" + (bydelLevel(ind) ? " · ^ one figure per bydel" : "") : "postal codes") : (ind.level === "postnr" && !MK.muni ? "municipalities · zoom in for postal codes" : "municipalities" + (fine ? ` · ° ${cphMode() ? "quarters" : "postal codes"} take the municipality value` : "")));
   if (LF.ownG) { LF.map.removeLayer(LF.ownG); LF.ownG = null; }
@@ -1238,7 +1251,8 @@ function lfInit() {
     el.querySelectorAll("details").forEach(d => d.addEventListener("toggle", () => { const pp = ev.popup; if (pp._updateLayout) { pp._updateLayout(); pp._updatePosition(); pp._adjustPan(); } })); });
   map.on("zoomend", () => {
     /* rebuild polygons only when the display level changes — rebuilding on every pan would kill open popups */
-    lfInfraLabels();
+    lfInfraLabels(); lfPublicLabels(); setPublicLegend();
+    if (LF.pubG && !MK.muni) lfPublicLayers();   /* national ↔ zoomed-in changes which public rows are drawn */
     if (microMode()) { (LF.microMarks || []).forEach(m => m.setRadius(microRadius(m._dw))); return; }
     const z = map.getZoom(), fine = !!MK.muni || z >= MICRO_ZOOM, lvl = (fine ? "micro" : z < 8 ? "national" : "macro") + (cphMode() ? "-cph" : "") + (MK.muni || "");
     if (lvl !== LF.level) lfLayers(); else if (fine) lfLabels();
@@ -1477,6 +1491,111 @@ function chartCsv() {
 }
 
 
+
+/* ---------- Public buildings overlay (BBR anvendelse 410–449, see docs/PUBLIC_BUILDINGS.md) ---------- */
+const PUB = D.public || null;                       /* { areas, built, kommuner, recent_years } */
+const PUB_FILES = {};                               /* kommune code → { buildings: [...] } once loaded */
+const pubAvail = code => !!(PUB && code && PUB.kommuner.includes(String(Number(code))));
+const pubOf = (level, code) => (PUB && PUB.areas[`${level}:${code}`]) || null;
+/* four tones that do not collide with the infra status colours (grey-green/ochre/teal/brick) */
+const PUB_CAT = {
+  education:    { label: "Education", color: "#40547F" },
+  institutions: { label: "Daycare / institutions", color: "#6E8C5E" },
+  health:       { label: "Health", color: "#82346C" },
+  culture:      { label: "Culture", color: "#B07A1E" },
+};
+const pubCat = b => PUB_CAT[b.cat] || PUB_CAT.culture;
+const pubName = b => b.name || b.address || b.label;
+function pubLoad(code) {
+  const k = String(Number(code));
+  if (!PUB || !pubAvail(k) || PUB_FILES[k] || PUB_FILES["_loading_" + k]) return;
+  PUB_FILES["_loading_" + k] = true;
+  fetch(`public/${String(k).padStart(4, "0")}.json`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(d => { PUB_FILES[k] = d; delete PUB_FILES["_loading_" + k]; if (MK.pub && LF.map) lfPublicLayers(); })
+    .catch(() => { delete PUB_FILES["_loading_" + k]; PUB_FILES["_error_" + k] = true; });
+}
+/* what to draw: the municipality in view, else every loaded file — and at national zoom only the open cases */
+function pubRows() {
+  const loaded = Object.keys(PUB_FILES).filter(k => !k.startsWith("_"));
+  const keys = MK.muni && pubAvail(MK.muni) ? [String(Number(MK.muni))] : loaded;
+  const rows = keys.flatMap(k => (PUB_FILES[k] || {}).buildings || []);
+  const wide = !MK.muni && (!LF.map || LF.map.getZoom() < 11);
+  return wide ? rows.filter(b => b.kind === "case" && b.recent) : rows.filter(b => b.kind === "existing" || b.recent);
+}
+function pubPopup(b) {
+  const c = pubCat(b), row = (l, v) => v == null || v === "" ? "" : `<span class="lfrow"><span>${esc(l)}</span><b>${v}</b></span>`;
+  const area = [byNr[b.postnr], byQ[b.kvarter]].filter(Boolean);
+  return `<div class="lfpop"><b>${esc(pubName(b))}</b>
+    <span class="infrapills"><i class="ipill" style="color:${c.color};border-color:${c.color}55">${esc(c.label)}</i>
+      <i class="ipill">${esc(b.label)} · ${esc(b.code)}</i>
+      <i class="ipill ${b.kind === "case" ? "st-decided" : ""}">${b.kind === "existing" ? "Existing" : "Open building case"}</i></span>
+    <div class="lfrows">
+      ${row("Address", esc(b.address || ""))}${row("Floor area", b.m2 ? nf(b.m2, 0) + " m²" : "")}
+      ${b.kind === "existing" ? row("Built", b.year || "") + row("Floors", b.floors || "") : ""}
+      ${b.kind === "case" ? row("Permit", b.permit || "–") + row("Started", b.started || "") + row("Case age", b.age_yrs != null ? nf(b.age_yrs, 1) + " yr" : "") +
+        row("Expected completion", b.expected || "not stated") + row("Owner", b.owner || "") + row("Case no.", b.case_no || "") : ""}
+      ${row("Municipality", esc((byCode[b.kom] || {}).name || ""))}${row("Postal code", esc(b.postnr || ""))}</div>
+    ${b.kind === "case" ? `<p class="cap">⚠ Owner-reported BBR case — not a confirmed construction schedule.</p>` : ""}
+    <span class="lfact"><button class="lk mini primary" data-pubsheet="${esc(b.id)}">Open sheet ›</button>
+      ${area.length ? `<button class="lk mini" data-go="${withQ(pageOf(area[0]))}">${esc(area[0].name)} ›</button>` : ""}</span>
+    <p class="cap dim">BBR ${esc(b.code)} · id ${esc(b.id.slice(0, 8))}… · BBR via Datafordeler, ${esc((PUB || {}).built || "")}</p></div>`;
+}
+function lfPublicLayers() {
+  ["pubG", "pubHitG", "pubLabG"].forEach(k => { if (LF[k]) { LF.map.removeLayer(LF[k]); LF[k] = null; } });
+  if (!LF.map || !MK.pub || !PUB) return;
+  if (MK.muni && pubAvail(MK.muni)) pubLoad(MK.muni);
+  else PUB.kommuner.forEach(pubLoad);
+  const rows = pubRows(), marks = [], hits = [];
+  rows.forEach(b => {
+    const c = pubCat(b), existing = b.kind === "existing";
+    const halo = L.circleMarker([b.lat, b.lon], { radius: 8, stroke: false, fillColor: "#FFFFFF", fillOpacity: .9, interactive: false });
+    const m = L.circleMarker([b.lat, b.lon], { radius: 6, color: c.color, weight: 2, opacity: .95, className: "infra-shape",
+      fillColor: existing ? c.color : "#FFFFFF", fillOpacity: existing ? .85 : 1, dashArray: existing ? null : "3 3" });
+    m.on("mouseover", () => { m.setRadius(8); halo.setRadius(10); }).on("mouseout", () => { m.setRadius(6); halo.setRadius(8); });
+    m.on("click", e => L.popup({ maxWidth: 420, autoPanPadding: [24, 24] }).setLatLng(e.latlng || [b.lat, b.lon]).setContent(pubPopup(b)).openOn(LF.map));
+    m._pub = b;
+    marks.push(halo, m);
+  });
+  LF.pubG = L.layerGroup(marks).addTo(LF.map);
+  LF.pubHitG = L.layerGroup(hits).addTo(LF.map);
+  lfPublicLabels();
+  setPublicLegend();
+}
+function lfPublicLabels() {
+  if (LF.pubLabG) { LF.map.removeLayer(LF.pubLabG); LF.pubLabG = null; }
+  if (!LF.map || !MK.pub || !PUB || LF.map.getZoom() < 14) return;
+  const placed = [], labs = [];
+  pubRows().filter(b => b.name).forEach(b => {
+    const pt = LF.map.latLngToContainerPoint([b.lat, b.lon]);
+    if (placed.some(q => Math.abs(q.x - pt.x) < 80 && Math.abs(q.y - pt.y) < 18)) return;
+    placed.push(pt);
+    const m = L.marker([b.lat, b.lon], { interactive: true, keyboard: false,
+      icon: L.divIcon({ className: "lflab infralab publab", iconSize: null, html: `<b>${esc(b.name)}</b>` }) });
+    m.on("click", () => L.popup({ maxWidth: 420 }).setLatLng([b.lat, b.lon]).setContent(pubPopup(b)).openOn(LF.map));
+    labs.push(m);
+  });
+  LF.pubLabG = L.layerGroup(labs).addTo(LF.map);
+}
+function setPublicLegend() {
+  const el = document.getElementById("publiclegend"); if (!el) return;
+  el.style.display = MK.pub && PUB ? "" : "none";
+  if (!(MK.pub && PUB)) return;
+  const rows = pubRows(), n = rows.length, cases = rows.filter(b => b.kind === "case").length;
+  el.innerHTML = `<div class="lgtitle">Public buildings<span>BBR ${esc(PUB.built)} · pilot: ${PUB.kommuner.map(k => esc((byCode[k] || {}).name || k)).join(", ")}</span></div>
+    ${Object.entries(PUB_CAT).map(([k, c]) => `<div class="lgrow"><i style="background:${c.color};border-radius:50%"></i>${c.label}</div>`).join("")}
+    <div class="lgrow gk"><i class="pk-exist"></i>existing<i class="pk-case"></i>open case</div>
+    <div class="lgnote">${nf(n - cases, 0)} existing · ${nf(cases, 0)} open cases (permit ≤ ${PUB.recent_years} yr) drawn${MK.muni ? "" : " · zoom in for the existing stock"}</div>`;
+}
+/* the PUBLIC line on an area card */
+function publicLine(level, code) {
+  const e = pubOf(level, code); if (!e) return "";
+  const seg = Object.entries(PUB_CAT).map(([k, c]) => { const v = (e.counts || {})[k] || {};
+    return v.existing ? `<button class="lk mini" data-publist="${level}:${code}:${k}:existing" style="border-color:${c.color}66">${nf(v.existing, 0)} ${esc(k === "institutions" ? "daycare/inst." : c.label.toLowerCase())}</button>` : ""; }).join("");
+  const cases = Object.values(e.counts || {}).reduce((s, v) => s + (v.case || 0), 0);
+  if (!seg && !cases) return "";
+  return `<span class="upcoming"><em>Public</em>${seg}${cases ? `<button class="lk mini" data-publist="${level}:${code}::case">${cases} open case${cases > 1 ? "s" : ""}</button>` : ""}</span>`;
+}
+
 /* ---------- Project datasheet (#project/<id>) and Pipeline table (#pipeline) ---------- */
 function projectEntity() { return INFRA_BY[PR.id] || null; }
 /* the postal codes and quarters a project serves, from the spatial index */
@@ -1586,6 +1705,104 @@ function exportPipelineCsv() {
   const head = ["id", "name", "type", "status", "open_year", "open_window", "open_year_original", "budget_mdkk", "agency", "kommuner", "schematic", "source_url", "source_doc", "updated", "notes"];
   const lines = [head.join(";")].concat(pipeRows().map(f => head.map(k => cl(k === "kommuner" ? (f.properties.kommuner || []).join(" ") : f.properties[k])).join(";")));
   downloadCsv(lines, `infra_pipeline_${(D.meta && D.meta.built) || "data"}.csv`);
+}
+
+
+/* ---------- Public building sheet (#public/<kommune>/<id>) and list panel (#publist/…) ---------- */
+function pubFind(kom, id) {
+  const f = PUB_FILES[String(Number(kom))];
+  return f ? (f.buildings || []).find(b => b.id === id) || null : null;
+}
+function vPublic() {
+  const b = pubFind(PB.kom, PB.id);
+  if (!b) { pubLoad(PB.kom); setTimeout(() => { if (pubFind(PB.kom, PB.id)) renderKeep(); }, 700);
+    return `<div class="card"><p class="empty">Loading the building…</p></div>`; }
+  const c = pubCat(b), area = [byNr[b.postnr], byQ[b.kvarter]].filter(Boolean), m = byCode[b.kom];
+  setTimeout(() => pbMapInit(b), 0);
+  const tile = (l, v, sub) => v == null || v === "" ? "" : `<span class="hlc"><span>${esc(l)}</span><b>${v}</b><em>${esc(sub || "")}</em></span>`;
+  return `
+  <div class="card accent arhead">
+    <div class="arid"><h2>${esc(pubName(b))}</h2>
+      <div class="artags"><span class="tag" style="color:${c.color};border-color:${c.color}55">${esc(c.label)}</span>
+        <span class="tag">${esc(b.label)} · BBR ${esc(b.code)}</span>
+        <span class="tag">${b.kind === "existing" ? "Existing" : "Open building case"}</span>${b.address ? `<span class="tag">${esc(b.address)}</span>` : ""}</div>
+    </div>
+    <div class="tools"><button class="lk" data-back>‹ Back</button>
+      <button class="lk primary" data-go="map/${esc(b.kom)}?ind=${encodeURIComponent(MK.ind)}&public=1">Show on map</button>
+      ${area.length ? `<button class="lk" data-go="${withQ(pageOf(area[0]))}">${esc(area[0].name)} ›</button>` : ""}</div>
+    <div class="hl">
+      ${tile("Floor area", b.m2 ? nf(b.m2, 0) + " m²" : "–", b.floors ? b.floors + " floors" : "")}
+      ${b.kind === "existing" ? tile("Built", b.year || "–", "BBR opførelsesår")
+        : tile("Permit", b.permit || "–", b.age_yrs != null ? nf(b.age_yrs, 1) + " years ago" : "")}
+      ${b.kind === "case" ? tile("Started", b.started || "not stated", "sag005") + tile("Expected completion", b.expected || "not stated", "sag009") : ""}
+      ${tile("Municipality", esc((m || {}).name || b.kom), b.postnr ? "postal code " + esc(b.postnr) : "")}
+    </div>
+  </div>
+  ${b.kind === "case" ? `<div class="card"><p class="cap">⚠ Owner-reported BBR case — not a confirmed construction schedule. In the pilot only 1 of 290 open cases carried an expected completion date and the median permit in København was 4.1 years old, so this says a case is open, not that the building opens soon.</p></div>` : ""}
+  <div class="grid-2">
+    <div class="card"><div class="card-head"><h3>Where it is</h3><span class="hint">over ${esc(curInd().short || curInd().label)}</span></div>
+      <div class="mapwrap"><div id="prmap"></div><div class="maplegend small" id="prlegend"></div></div></div>
+    <div class="card"><div class="card-head"><h3>Details</h3><span class="hint">BBR via Datafordeler</span></div>
+      <table class="tbl compact"><tbody>
+        <tr><th>BBR use code</th><td>${esc(b.code)} — ${esc(b.label)}</td></tr>
+        <tr><th>Category</th><td>${esc(c.label)}</td></tr>
+        <tr><th>Status</th><td>${b.kind === "existing" ? "6 Opført (existing)" : `${esc(b.bbr_status || "")} — open building case`}</td></tr>
+        ${b.kind === "case" ? `<tr><th>Case number</th><td>${esc(b.case_no || "–")}</td></tr><tr><th>Owner type</th><td>${esc(b.owner || "not stated")}</td></tr>
+        <tr><th>Case floor area</th><td>${b.case_m2 ? nf(b.case_m2, 0) + " m²" : "–"}</td></tr>` : ""}
+        <tr><th>Postal code / quarter</th><td>${esc(area.map(a => a.name).join(" · ") || "–")}</td></tr>
+        <tr><th>BBR id</th><td class="dim">${esc(b.id)}</td></tr>
+        <tr><th>Name from</th><td class="dim">${b.name ? "OpenStreetMap, within 60 m (© OpenStreetMap contributors)" : "no OSM name within 60 m — address shown"}</td></tr>
+      </tbody></table>
+      <p class="cap">Source: BBR via Datafordeler, fetched ${esc((PUB || {}).built || "")}. Owner-reported register; the four phased-out use codes (410/420/430/440) are still in use alongside the finer ones. Method: <code>docs/PUBLIC_BUILDINGS.md</code>.</p></div>
+  </div>`;
+}
+function pbMapInit(b) {
+  const el = document.getElementById("prmap"); if (!el || typeof L === "undefined") return;
+  if (LF.pmap) { try { LF.pmap.remove(); } catch (e) {} LF.pmap = null; }
+  const map = L.map(el, { center: [b.lat, b.lon], zoom: 15, scrollWheelZoom: true, zoomSnap: .5, attributionControl: false });
+  LF.pmap = map;
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, className: "basemap" }).addTo(map);
+  const ind = curInd(), sc = scaleOf(MUNI, m => V(m, ind.key));
+  (byCode[b.kom] ? muniAreas(b.kom) : []).forEach(a => {
+    const t = sc.t(V(byCode[b.kom], ind.key));
+    L.polygon(a.rings, { color: "#FFFFFF", weight: .6, fillColor: t == null ? "#C4CBC4" : mkShade(t, ind.key), fillOpacity: .45, interactive: false }).addTo(map);
+  });
+  const c = pubCat(b);
+  L.circleMarker([b.lat, b.lon], { radius: 9, color: c.color, weight: 3, fillColor: b.kind === "existing" ? c.color : "#FFFFFF",
+    fillOpacity: b.kind === "existing" ? .85 : 1, dashArray: b.kind === "existing" ? null : "3 3" }).addTo(map);
+  setLegend("prlegend", sc, ind, ind.key, "municipalities");
+}
+/* list panel: the public buildings of one area, filtered by category and kind */
+function vPubList() {
+  const [level, code, cat, kind] = (PL.key || "").split(":");
+  const e = pubOf(level, code);
+  const areaName = level === "kommune" ? (byCode[code] || {}).name : level === "postnr" ? (byNr[code] || {}).name : (byQ[code] || {}).name;
+  const kom = level === "kommune" ? code : level === "postnr" ? (byNr[code] || {}).muni : CPH_MUNI;
+  const file = PUB_FILES[String(Number(kom))];
+  if (!file) { pubLoad(kom); setTimeout(() => { if (PUB_FILES[String(Number(kom))]) renderKeep(); }, 700); }
+  const rows = ((file || {}).buildings || []).filter(b =>
+    (level === "kommune" ? b.kom === String(Number(code)) : level === "postnr" ? b.postnr === code : b.kvarter === code)
+    && (!cat || b.cat === cat) && (kind === "case" ? b.kind === "case" && b.recent : kind === "existing" ? b.kind === "existing" : true));
+  const stale = (e || {}).stale_cases || 0;
+  const sorted = rows.slice().sort((a, b) => (b.m2 || 0) - (a.m2 || 0));
+  const btn = (label, c2, k2, on) => `<button class="lk mini ${on ? "primary" : ""}" data-publist="${esc(level)}:${esc(code)}:${c2}:${k2}">${esc(label)}</button>`;
+  return `
+  <div class="card accent">
+    <div class="card-head"><h3>Public buildings — ${esc(areaName || code)}</h3>
+      <span class="hint">${rows.length} shown · BBR ${esc((PUB || {}).built || "")}</span></div>
+    <div class="tfilters"><button class="lk mini" data-back>‹ Back</button>
+      ${btn("All categories", "", kind || "", !cat)}${Object.entries(PUB_CAT).map(([k, c]) => btn(c.label, k, kind || "", cat === k)).join("")}
+      ${btn("Existing", cat || "", "existing", kind === "existing")}${btn("Open cases", cat || "", "case", kind === "case")}${btn("Both", cat || "", "", !kind)}</div>
+    <div class="scrollx"><table class="tbl compact" data-sortable><thead><tr><th>Building</th><th>Category</th><th>BBR use</th><th class="num">Floor area<br><span class="dim">m²</span></th><th class="num">Built</th><th>Status</th><th>Permit</th></tr></thead>
+      <tbody>${sorted.map(b => `<tr class="clickrow" data-pubsheet="${esc(b.id)}" data-pubkom="${esc(b.kom)}"><th><span class="thn">${esc(pubName(b))} <span class="go">›</span></span></th>
+        <td class="dim">${esc(pubCat(b).label)}</td><td class="dim">${esc(b.code)} ${esc(b.label)}</td>
+        <td class="num" data-v="${b.m2 || 0}">${b.m2 ? nf(b.m2, 0) : "–"}</td><td class="num" data-v="${b.year || ""}">${b.year || "–"}</td>
+        <td>${b.kind === "existing" ? "Existing" : "Open case"}</td><td class="dim">${esc(b.permit || "")}${b.age_yrs != null ? ` (${nf(b.age_yrs, 1)} yr)` : ""}</td></tr>`).join("")
+        || `<tr><td colspan="7" class="empty">${file ? "nothing matches this filter" : "loading the municipality's buildings…"}</td></tr>`}</tbody></table></div>
+    ${stale ? `<details class="dinfo"><summary>Stale open cases (permit > ${(PUB || {}).recent_years} yrs): ${stale}</summary>
+      <div class="note">BBR cases that were never closed. They are counted here but never drawn on the map: an old open case says nothing about current construction — see <code>docs/PUBLIC_BUILDINGS.md</code>.</div></details>` : ""}
+    <p class="cap">BBR via Datafordeler, ${esc((PUB || {}).built || "")}; names from OpenStreetMap where one lies within 60 m. An open case is owner-reported and is not a construction schedule.</p>
+  </div>`;
 }
 
 /* ---------- Market view (Denmark-only panel) ---------- */

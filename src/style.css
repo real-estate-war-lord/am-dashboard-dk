@@ -1444,3 +1444,9 @@ th .thn{display:inline}
 .tbl .ipill.st-construction{color:#1C6B5C;border-color:#BBD8CF}
 .tag.st-construction{color:#1C6B5C;border-color:#BBD8CF}
 #prmap{height:360px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}
+/* public buildings overlay */
+.maplegend.publiclegend{bottom:auto;top:12px;right:12px;min-width:180px}
+.maplegend.publiclegend ~ .infralegend{top:196px}
+.maplegend .lgrow.gk i.pk-exist{width:10px;flex-basis:10px;height:10px;border-radius:50%;background:var(--muted);border:0}
+.maplegend .lgrow.gk i.pk-case{width:10px;flex-basis:10px;height:10px;border-radius:50%;background:#fff;border:2px dashed var(--muted)}
+.publab b{font-size:10px}

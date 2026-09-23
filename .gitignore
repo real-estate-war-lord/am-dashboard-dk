@@ -21,3 +21,4 @@ data/raw/dar_schema.graphql
 data/external/*.pdf
 dist/infra_projects.geojson
 dist/infra_index.json
+data/raw/public/
