@@ -2,15 +2,16 @@
 
 **Status:** v2.4 Phase A · 2026-09-23 · data pipeline only, nothing wired into the app yet
 **Source research:** [`docs/FORECAST_SOURCES.md`](FORECAST_SOURCES.md)
-**Build:** `scripts/build_forecast.py`, `scripts/build_net_dwellings.py`, `scripts/build_cph_forecast.py` · **Check:** `scripts/validate_forecast.py`
-**Output:** `data/processed/forecast.json`, `data/processed/net_dwellings.json`, `data/processed/cph_forecast.json` (§8)
+**Build:** `scripts/build_forecast.py`, `scripts/build_net_dwellings.py`, `scripts/build_cph_forecast.py`, `scripts/build_cph_backtest.py` · **Check:** `scripts/validate_forecast.py`
+**Output:** `data/processed/forecast.json`, `data/processed/net_dwellings.json`, `data/processed/cph_forecast.json` (§8), `data/processed/cph_backtest.json` (§9)
 **Research only, not in the UI:** `scripts/build_housing_gap.py` → `data/processed/housing_gap.json` (§7)
 **Registry:** `config/indicators.json` → top-level `forecast` key (see §5 for why not `indicators[]`)
 
 The Outlook layer projects each Danish municipality forward from Statistics Denmark's official
 municipal population projection, and each Copenhagen kvarter forward from Københavns Kommune's own
-(§8 — a different run, never spliced with DST's, see §4). Phase A ends with checked data files and a
-registry entry; Phase B renders them.
+(§8 — a different run, never spliced with DST's, see §4). §9 backtests that Copenhagen forecast
+against eight superseded vintages and adds the net-migration signal behind it. Phase A ends with
+checked data files and a registry entry; Phase B renders them.
 
 ---
 
@@ -196,6 +197,43 @@ What is *not* in the table — the things the source itself assumes — belongs 
 and is stated at the source, not hidden: DST's projection carries each municipality's recent
 fertility, mortality and migration behaviour forward and contains **no housing programme**; BOL101
 counts dwellings that exist, not dwellings that are available.
+
+### The audit, part b — the Copenhagen-only keys
+
+These live in `cph_forecast.json` and `cph_backtest.json` and are **deliberately not in
+`config/indicators.json`**: Phase A's rule is that Copenhagen-only indicators stay out of the
+registry and reach the UI through a Phase B note under the `cph` key instead (§8, §9). The hard-data
+rule applies to them exactly the same, so `validate_forecast.py` check 0 audits them here — and also
+asserts that none of them has leaked into the registry.
+
+*y₀* = the vintage year (2026); the movement windows are defined in §9.
+
+| key | source table(s) | exact arithmetic | assumption |
+|---|---|---|---|
+| `fc_netmig_5y` | `KKFRBEDI` | Σ `06 Nettotilflytning` over movement years y₀…y₀+4 | none |
+| `fc_netmig_5y_per1000` | `KKFRBEDI` + `KKFR<V>` | `fc_netmig_5y` / P_y₀ × 1000 | none |
+| `fc_netmig` | `KKFRBEDI` | Σ `06 Nettotilflytning` over movement years y₀…y_last−1 | none |
+| `fc_netmig_per1000` | `KKFRBEDI` + `KKFR<V>` | `fc_netmig` / P_y₀ × 1000 | none |
+| `fc_netmig_gap` | `KKFRBEDI` + `KKFR<V>` | (P_y_last − P_y₀) − Σ(`03 Fødselsoverskud` + `06 Nettotilflytning`) over the window | none |
+| `fc_netmig_gap_per1000` | `KKFRBEDI` + `KKFR<V>` | `fc_netmig_gap` / P_y₀ × 1000 | none |
+| `fc_netmig_reconciles` | `KKFRBEDI` + `KKFR<V>` | \|`fc_netmig_gap`\| ≤ max(5 × window years, 1 % of P_y₀) | none — a threshold, see below |
+| `bt_mape` | `KKFR<V>` + `KKBEF1` | mean over (vintage, horizon ≥ 1) of \|F − A\| / A × 100 | none |
+| `bt_bias` | `KKFR<V>` + `KKBEF1` | mean over (vintage, horizon ≥ 1) of (F − A) / A × 100 | none |
+| `bt_medape` | `KKFR<V>` + `KKBEF1` | median over (vintage, horizon ≥ 1) of \|F − A\| / A × 100 | none |
+| `bt_mae` | `KKFR<V>` + `KKBEF1` | mean over (vintage, horizon ≥ 1) of \|F − A\|, in persons | none |
+| `bt_baseline_mape` | `KKFR<V>` + `KKBEF1` | `bt_mape` with F = `KKFR<V>`(k, V) × `KKFR<V>`(city, V+h) / `KKFR<V>`(city, V) | none |
+
+**`fc_netmig_reconciles` is a threshold, not an assumption, and the distinction is worth stating.**
+An assumption changes a displayed value; this changes nothing — it is a QA flag over two published
+series, in the same family as check 9's `TOL_CITY`. It is also not doing any real work: on the 2026
+vintage every gap it passes is ≤ 26 persons and every gap it catches is ≥ 412, a 16× separation, so
+any threshold in a wide band gives the same five kvarterer (§9). If a future vintage puts a value in
+that band, the flag has become load-bearing and the rule needs revisiting rather than retuning.
+
+**The ten `fc_*` keys of §3 are produced for Copenhagen too**, by the same `indicators()`. They need
+no second audit row: the arithmetic is identical and only the source table (`KKFR<V>` instead of
+`FRKM1xx`) and `fc_20_34_rel`'s baseline (the city, not Denmark — §8) differ. `hist_net_dwell` has
+no Copenhagen counterpart, because BOL101 does not publish a dwelling stock below the municipality.
 
 ### The pair that must not be combined
 
@@ -420,9 +458,13 @@ python3 scripts/validate_forecast.py --audit      # check 0 on its own — the h
 python3 scripts/build_forecast.py --indicators fc_20_34_rel --top 10
 python3 scripts/build_forecast.py --indicators fc_pop_rate_5y --top 10
 
-python3 scripts/build_cph_forecast.py             # s30/KKFRxxxx → cph_forecast.json (§8)
+python3 scripts/build_cph_forecast.py             # s30/KKFRxxxx + KKFRBEDI → cph_forecast.json (§8, §9)
 python3 scripts/build_cph_forecast.py --no-fetch  # rebuild from the newest cached CSV
 python3 scripts/build_cph_forecast.py --rank 0    # build without the kvarter rankings
+
+python3 scripts/build_cph_backtest.py             # replay every served vintage → cph_backtest.json (§9)
+python3 scripts/build_cph_backtest.py --no-fetch  # rebuild from cached CSVs
+python3 scripts/build_cph_backtest.py --back 10   # how many vintage ids to probe
 
 # research only, not part of the build and not in the UI (§0, §7)
 python3 scripts/build_housing_gap.py              # needs forecast.json; writes housing_gap.json
@@ -468,9 +510,16 @@ python3 scripts/build_housing_gap.py              # needs forecast.json; writes 
 9. **Copenhagen** — the KK kvarter forecast: coverage (67 kvarterer × 15 years), the three
    additivity identities, `KKFR` 2026 vs the newest observed `KKBEF1` per kvarter, and the KK-vs-DST
    city total per year. Parts 1–3 **fail**; parts 4–5 are information, because a difference between
-   two published runs is not a bug. **§8** has the numbers.
+   two published runs is not a bug. **§8** has the numbers. Part **9f** adds the build-out signal:
+   `fc_netmig` present for all 68 kvarterer, 11 bydele and the city, and additive at every level
+   (**fails**), then the five kvarterer where `fc_netmig` does not reconcile with the stock table
+   (information — **§9.5**).
+10. **KK forecast backtest** — every served vintage replayed against `KKBEF1`: MAPE, bias and skill
+    against a pro-rata city baseline at horizons 1, 3 and 5, plus the worst kvarterer. All
+    **information** — it measures Københavns Kommune's record, not this build; only an internally
+    inconsistent summary fails. **§9** has the numbers.
 
-Checks 6, 7/8 and 9 are **skipped, not failed**, when their file has not been built, and 6 and 8
+Checks 6, 7/8, 9 and 10 are **skipped, not failed**, when their file has not been built, and 6 and 8
 report politely if the raw pulls they name have been cleaned away (they are gitignored). 7 and 8 still
 run against `housing_gap.json` even though nothing renders it — a research file that has quietly gone
 wrong is still worth knowing about.
@@ -1141,3 +1190,309 @@ same city, and it is the clearest possible argument for never plotting them on o
 5. **`hist_net_dwell` has a Copenhagen counterpart** if it is wanted: KK's `KKBOL3` publishes
    dwellings per kvarter, which would make the same four operations possible at this level. Separate
    build, same rule, not in this pass.
+6. **Read §9 before rendering any of this.** It backtests these forecasts against eight superseded
+   vintages — the district split beats a no-detail baseline by 20–36 %, but it runs about +2 % hot at
+   five years, and the two kvarterer §8 leads with (Vesterbro Syd, Nordhavn) are the two least
+   reliable in the city. It also adds `fc_netmig`, the net in-migration driving the split, and
+   flags five kvarterer where that signal disagrees with the stock table badly enough to reverse
+   its sign.
+
+---
+
+## 9. Does the kvarter forecast work? — the backtest and the build-out signal
+
+**Build:** `scripts/build_cph_backtest.py`, `scripts/build_cph_forecast.py`
+**Output:** `data/processed/cph_backtest.json`, `fc_netmig*` in `data/processed/cph_forecast.json`
+**Check:** `scripts/validate_forecast.py` checks 9f and 10 · **Audit:** §3 part b
+
+§8 ends on a warning: a kvarter number is the city's unpublished housing programme in disguise, and
+showing Nordhavn at +176 % without saying so overstates what the number is. This section replaces
+the warning with two measurements — **how well those forecasts have actually done**, and **what is
+driving them**.
+
+---
+
+### 9.1 🔎 The superseded vintages are unlisted, but they are still served
+
+`GET /v1/s30/tables` returns `KKFR2026` and nothing else. That is what
+`docs/FORECAST_SOURCES.md` §2.1 recorded — *"last year's `KKFR2025` is gone from the catalogue"* —
+and it is true of **the listing**. It is not true of the API:
+
+```
+GET /v1/s30/tableinfo/KKFR2021   →  200, "Befolkningsfremskrivning 2021", updated 2021-03-26
+GET /v1/s30/tables               →  KKFR2026 only
+```
+
+`scripts/build_cph_backtest.py` therefore **probes the ids directly** over a window of years instead
+of reading the catalogue, and records in `meta.vintages_served` which ones answered. Today that is
+**eight vintages, 2019 through 2026**; `KKFR2018` and earlier return `400`.
+
+All eight share one schema and one **93-code `OMRKK` list, identical to `KKBEF1`'s**, so a kvarter
+can be followed across vintages by its code with no crosswalk — the same property §8 relies on.
+
+> **Operational note.** This is a windfall and it may not last: KK is under no obligation to keep
+> serving an unlisted table, and the catalogue says they are not supporting it. If a future run finds
+> fewer vintages, `meta.vintages_served` will say so and the backtest will simply narrow. Do not
+> build anything that *requires* a five-year horizon to be scoreable.
+
+### 9.2 Method
+
+| | |
+|---|---|
+| forecast | `KKFR<V>`(k, V+h) — the vintage-V projection for horizon h |
+| actual | `KKBEF1`(k, (V+h)K1) — the observed population at the same 1 January |
+| baseline | `KKFR<V>`(k, V) × `KKFR<V>`(city, V+h) / `KKFR<V>`(city, V) |
+
+**The baseline is the whole point.** It is the *same* city-level projection — the demographic part KK
+would produce anyway, with housing plans explicitly excluded (`FORECAST_SOURCES.md` §2.6) — applied
+**pro rata to every kvarter with no district detail at all**. Beating it is what the
+boligprognose-driven split has to do to be worth anything. It uses only information available at
+1 January V, and it starts from the vintage's own base year rather than from `KKBEF1`, so the
+comparison isolates **the split** and not the base.
+
+**Horizon 0 measures the base separately.** Each vintage's own base year is not exactly `KKBEF1`'s
+observed population at that date — KK projects from a cleaned CPR extract, and `KKBEF1` has since
+been revised. Scoring h=0 puts a number on that gap so it is not silently charged to the forecast:
+**kvarter MAPE 0.15 %, 10 persons on average**. Small, and worth knowing rather than assuming.
+
+Metrics, all on published cells: `MAPE` = mean |F−A|/A × 100, `bias` = mean (F−A)/A × 100,
+`medAPE` = median |F−A|/A × 100, `MAE` = mean |F−A| in persons, and
+`skill` = (1 − MAPE_forecast / MAPE_baseline) × 100, positive when the split beats pro rata.
+Every vintage's own cells are re-checked against §8's ±10 / ±5 additivity tolerances before use —
+all eight pass.
+
+**Which (vintage, horizon) pairs are scoreable** is set by `KKBEF1` reaching 2026K1:
+
+| vintage | 2019 | 2020 | 2021 | 2022 | 2023 | 2024 | 2025 |
+|---|---|---|---|---|---|---|---|
+| horizons scored | 0,1,3,5 | 0,1,3,5 | 0,1,3,5 | 0,1,3 | 0,1,3 | 0,1 | 0,1 |
+
+That gives **2 046 forecast–actual pairs**: 469 kvarter-observations at h=1, 335 at h=3, 201 at h=5.
+
+### 9.3 Results — the split earns its keep, and it over-forecasts
+
+| level | h | n | MAPE | bias | medAPE | MAE | baseline MAPE | baseline bias | **skill** |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 67 kvarterer | 0 | 469 | 0.15 % | −0.09 % | 0.00 % | 10 | 0.15 % | −0.09 % | — |
+| 67 kvarterer | 1 | 469 | 1.96 % | +0.29 % | 1.36 % | 167 | 2.44 % | +0.03 % | **+19.7 %** |
+| 67 kvarterer | 3 | 335 | 4.07 % | +1.01 % | 3.03 % | 361 | 6.14 % | +0.52 % | **+33.7 %** |
+| 67 kvarterer | 5 | 201 | 6.22 % | +2.23 % | 4.41 % | 518 | 9.65 % | +1.53 % | **+35.5 %** |
+| 10 bydele | 1 | 70 | 0.63 % | +0.29 % | 0.52 % | 413 | 1.22 % | +0.34 % | **+48.4 %** |
+| 10 bydele | 3 | 50 | 1.40 % | +0.69 % | 1.10 % | 926 | 3.36 % | +1.07 % | **+58.3 %** |
+| 10 bydele | 5 | 30 | 1.82 % | +1.41 % | 1.31 % | 1 286 | 5.62 % | +2.29 % | **+67.6 %** |
+| city | 1 | 7 | 0.28 % | +0.18 % | 0.28 % | 1 845 | 0.28 % | +0.18 % | ±0 % |
+| city | 3 | 5 | 0.54 % | +0.54 % | 0.11 % | 3 529 | 0.54 % | +0.54 % | ±0 % |
+| city | 5 | 3 | 1.36 % | +1.36 % | 1.41 % | 9 033 | 1.36 % | +1.36 % | ±0 % |
+
+Four things this says, in order of how much they should change what the UI does.
+
+1. **The district split is real information.** It cuts kvarter error by **a fifth at one year and a
+   third at five** against a baseline that has the same city total and no district detail. The
+   boligprognose is doing work. §8's caveat stands — it is an unpublished construction schedule —
+   but "unverifiable" and "worthless" are different claims, and the second one is now refuted.
+2. **The city skill of exactly ±0 % is the control.** At city level the forecast *is* the baseline by
+   construction, so any number other than zero would mean the baseline was implemented wrong. It is
+   zero at all three horizons.
+3. **🚩 The forecast runs hot, and increasingly so with horizon** — bias +0.29 % → +1.01 % → +2.23 %
+   at kvarter level, +1.41 % for bydele and **+1.36 % for the city itself** at five years. Part of
+   this is the city total (KK's 2020 and 2021 vintages projected through the pandemic, which
+   suppressed migration into Copenhagen), and part is the split. Either way, **a KKFR number is more
+   likely to be too high than too low**, and the UI should not present it as unbiased.
+4. **Aggregation helps a lot.** Bydel MAPE at five years is 1.82 % against the kvarter's 6.22 %.
+   A bydel figure is roughly three times as reliable as a kvarter figure. Where a panel can show
+   either, the bydel one carries far more weight.
+
+**Worst and best kvarterer**, all horizons ≥ 1 pooled (`bt_mape`, `bt_baseline_mape`):
+
+| | kvarter | MAPE | baseline | bias | | kvarter | MAPE | baseline |
+|---|---|---:|---:|---:|---|---|---:|---:|
+| 1 | Vesterbro – **Syd** | 15.12 % | 28.78 % | +6.81 % | 1 | Østerbro – Nord/Komponistkvarteret | 1.08 % | 4.06 % |
+| 2 | Brønshøj-Husum – Bellahøj | 10.65 % | 14.30 % | +10.36 % | 2 | Amager Vest – Amagerbro Vest | 1.11 % | 3.43 % |
+| 3 | Bispebjerg – **Utterslev** | 9.02 % | 4.26 % | +9.02 % | 3 | Amager Øst – Amagerbro Øst | 1.20 % | 3.44 % |
+| 4 | Amager Vest – Faste Batteri | 8.32 % | 8.67 % | +6.70 % | 4 | Vanløse – Jyllingevej Kvarter | 1.25 % | 3.53 % |
+| 5 | Østerbro – **Nordhavn** | 8.17 % | 11.00 % | +7.23 % | 5 | … | | |
+| 6 | Valby – **Vigerslev** | 8.06 % | 5.65 % | +8.06 % | | | | |
+| 7 | Kgs. Enghave – Holmene | 7.34 % | 8.52 % | −7.10 % | | | | |
+| 8 | Christianshavn – Holmen og Refshaleøen | 6.97 % | 1.54 % | −6.02 % | | | | |
+
+**The two kvarterer §8 leads with are the two least reliable.** Vesterbro Syd — the +203 % headline —
+has by far the worst record at 15.12 %, and Nordhavn is fifth at 8.17 %; both over-forecast. The
+split still beats pro rata for both (28.78 % and 11.00 %), so the district detail is helping even
+there — it is just helping from a much worse starting point, because a kvarter whose population is
+scheduled to triple is genuinely hard.
+
+**Three kvarterer where the split is *worse* than pro rata** — Utterslev (9.02 % vs 4.26 %),
+Vigerslev (8.06 % vs 5.65 %) and Holmen og Refshaleøen (6.97 % vs 1.54 %). Those are the cases where
+KK's housing programme said something would happen and it did not. A reliability figure per kvarter
+(`bt_mape` beside `bt_baseline_mape`) is exactly what a reader needs to tell them apart, which is why
+§3 part b audits them for UI use.
+
+---
+
+### 9.4 The build-out signal — `fc_netmig`
+
+`KKFRBEDI` carries the **movement** side of the same run as `KKFR2026`: who is born, who dies, who
+moves in and who moves out of each district, per year. Its Danish metadata, quoted in full:
+
+> **`KKFRBEDI` — "Fremskrivning af befolkningens bevægelser efter distrikt, bevægelsesart, alder og
+> tid"**
+> *"Projection of the population's movements by district, type of movement, age and time."*
+>
+> `BEVÆGELSE` ("bevægelsesart" / *"type of movement"*):
+> `01` **Levendefødte** *(live births)* · `02` **Døde** *(deaths)* · `03` **Fødselsoverskud**
+> *(natural increase — literally "birth surplus")* · `04` **Tilflyttede** *(persons moved in —
+> KK's English label: "Migration to district")* · `05` **Fraflyttede** *(persons moved out —
+> "Migration from district")* · `06` **Nettotilflytning** *(net in-migration — "Netmigration")*
+>
+> Footnote: *"Kilde: Københavns Kommunes beregninger på baggrund af udtræk fra CPR"* —
+> *"Source: Københavns Kommune's own calculations based on an extract from the CPR."*
+
+So `fc_netmig` = Σ of the published `06 Nettotilflytning`. But **the label alone does not say what
+"net move" counts**, and the answer matters enormously, so it was checked arithmetically rather than
+read off:
+
+> ### 🔑 At district level, a "move" includes moves between two Copenhagen districts
+>
+> In 2026 the 68 kvarter rows report **104 317 Tilflyttede** between them. The city's own total
+> in-moves for the same year, from `KKFRBEV`, are **55 225** (36 348 from other Danish municipalities
+> + 18 877 immigrated). The ~49 000 difference is **internal Copenhagen moves**, which appear once as
+> an out-move in one kvarter and once as an in-move in another.
+>
+> That is also why **`OMRKK = 1000` does not exist in `KKFRBEDI`**: at city level the internal moves
+> cancel and the concept changes, so KK publishes the city split in `KKFRBEV` instead, with different
+> categories (`08 Nettotilflytning fra andre kommuner`, `09 Nettoindvandring`).
+
+This is exactly the right quantity for a build-out signal. A kvarter that opens 2 000 new dwellings
+fills them from the rest of Copenhagen as much as from outside it, and `06` captures both.
+
+**The city figure is a sum, not a published cell.** `meta.netmig.city_is_a_sum` records this. Summing
+net migration across districts is precisely what cancels the internal moves, so Σ kvarterer is the
+correct city-level quantity — and it agrees with Σ lokaludvalg and Σ bydele to ≤ 8 persons over the
+five-year window and ≤ 2 over the full one (check 9f, ±10 tolerance).
+
+**Windows.** A movement year Y is the flow *during* Y, bridging the 1 January stocks of Y and Y+1.
+`KKFRBEDI` runs 2026–2059 against `KKFR2026`'s 2026–2060 stocks, which lines up exactly. So
+
+- `fc_netmig_5y` sums movement years **2026–2030** (the 2026 → 2031 stock window)
+- `fc_netmig` sums movement years **2026–2039** (the 2026 → 2040 stock window)
+
+The per-1 000 variants divide by the published 2026 population. **They are totals over the window,
+not yearly rates** — divide by 5 or 14 for a rate.
+
+#### The bydele
+
+| code | bydel | `fc_netmig_5y` | / 1 000 | `fc_netmig` | / 1 000 | `fc_abs` |
+|---|---|---:|---:|---:|---:|---:|
+| `1010` | Amager Vest | +2 552 | +27.8 | −6 094 | −66.5 | +8 174 |
+| `1004` | Vesterbro/Kongens Enghave | +101 | +1.2 | +491 | +5.8 | +18 644 |
+| `1007` | Brønshøj-Husum | −357 | −7.9 | −2 226 | −49.4 | +1 242 |
+| `1009` | Amager Øst | −621 | −9.7 | +3 566 | +55.8 | +13 050 |
+| `1005` | Valby | −1 097 | −16.5 | −4 444 | −66.9 | +4 871 |
+| `1002` | Østerbro | −1 198 | −14.6 | −573 | −7.0 | +11 289 |
+| `1006` | Vanløse | −1 186 | −29.1 | −4 779 | −117.1 | −959 |
+| `1001` | Indre By | −2 686 | −46.8 | −3 511 | −61.2 | +1 317 |
+| `1008` | Bispebjerg | −3 222 | −57.8 | −9 802 | −175.9 | −2 311 |
+| `1003` | Nørrebro | −3 734 | −46.7 | −12 769 | −159.8 | +558 |
+| | **København i alt** | **−11 657** | **−17.4** | **−40 626** | **−60.5** | **+55 469** |
+
+**Copenhagen grows on births, not migration.** The city's net migration is **−40 626 over
+2026–2039** while its population rises +55 469. Every bydel but two is negative over the full window.
+This is not a quirk of the projection: `KKFRBEV` has net inter-municipal migration at about
+−6 100 a year throughout, partly offset by positive net immigration. A panel that shows `fc_netmig`
+without this context will read as a city in decline, which is not what the same run says about its
+population.
+
+#### Kvarter rankings — `fc_netmig_per1000`, 2026–2039
+
+| | largest net inflow | / 1 000 | persons | 5-yr / 1 000 | | largest net outflow | / 1 000 |
+|---|---|---:|---:|---:|---|---|---:|
+| 1 | Østerbro – **Nordhavn** | **+1 424.3** | +9 308 | +339.1 | 1 | Nørrebro – Mimersgade/Nørrebro St. | −247.3 |
+| 2 | Christianshavn – Holmen og Refshaleøen | +943.8 | +3 328 | −100.7 | 2 | Vesterbro – Vest | −241.3 |
+| 3 | Amager Øst – Amagerbro Øst | +349.2 | +8 208 | +10.5 | 3 | Østerbro – Rosenvænget | −239.8 |
+| 4 | Kgs. Enghave – Gl. Sydhavn | +282.6 | +4 022 | +96.0 | 4 | Østerbro – Nord/Komponistkvarteret | −228.8 |
+| 5 | Amager Vest – Ørestad City | +246.3 | +2 857 | +327.3 | 5 | Bispebjerg – Nordvest | −226.4 |
+| 6 | Østerbro – Ny Ryvang | +223.6 | +735 | +140.9 | 6 | Nørrebro – Stefansgade/Nørrebroparken | −221.7 |
+| 7 | Vesterbro – **Syd** | +173.4 | +825 | **+336.6** | 7 | Østerbro – Århusgade Syd | −218.6 |
+| 8 | Brønshøj-Husum – Husum Nord | +140.7 | +1 258 | +68.7 | 8 | Amager Vest – Bryggen Syd | −209.8 |
+| 9 | Vesterbro – Central | +90.0 | +2 091 | −29.7 | 9 | Bispebjerg – Utterslev | −203.3 |
+| 10 | Amager Vest – Urbanplanen | +72.1 | +324 | +76.7 | 10 | Østerbro – Århusgade Nord | −197.8 |
+
+✅ Nordhavn and Vesterbro Syd are where they were expected. **The 5-year column reorders the table
+sharply** and should be shown beside the 14-year one: Vesterbro Syd is 7th over the full window but
+**2nd on the near window** (+336.6), while Holmen og Refshaleøen is 2nd overall yet **negative
+(−100.7) over the first five years** — its construction starts later. Amagerbro Øst is 3rd overall
+on +10.5 in the near window for the same reason. A single horizon hides the schedule.
+
+---
+
+### 9.5 🚩 Five kvarterer where `fc_netmig` and the stock table disagree
+
+Over a window, ΔP should equal natural increase + net migration. For 62 of 67 kvarterer, all 12
+lokaludvalg, all 10 bydele and the city, it does. **For five kvarterer it does not**, and the failure
+is not small:
+
+| kvarter | `fc_abs` | `fc_netmig` | gap | bydel |
+|---|---:|---:|---:|---|
+| Amager Øst – Amagerbro Øst | +2 416 | **+8 208** | −10 465 | `1009` |
+| Amager Øst – **Nordøstamager** | **+10 414** | **−1 053** | +10 095 | `1009` |
+| Vesterbro – **Syd** | +9 660 | +825 | +7 633 | `1004` |
+| Vesterbro – Central | −71 | +2 091 | −7 605 | `1004` |
+| Amager Øst – Sundbyøster | +793 | −1 459 | +412 | `1009` |
+
+They come in **adjacent pairs inside one bydel**, and they cancel there. What KK's district split is
+doing is moving projected population between neighbouring kvarterer without booking it as a move —
+almost certainly the boligprognose assigning a development across a kvarter boundary.
+
+**The consequence is severe if ignored.** Nordøstamager's population grows by 10 414, the third
+largest gain in the city, while its net migration reads **−1 053**. A panel that showed
+`fc_netmig_per1000` on a choropleth would paint the city's fastest-building kvarter as an outflow
+area, and the inflow would appear next door in Amagerbro Øst, whose population barely moves.
+
+`fc_netmig_reconciles` is stored **per code** for exactly this reason, alongside `fc_netmig_gap` and
+`fc_netmig_gap_per1000`. Anything that renders `fc_netmig` must respect the flag — suppress the
+value, or show it with the gap. Check 9f prints the five every run.
+
+The threshold is `|gap| ≤ max(5 × window years, 1 % of P₂₀₂₆)` and it is **not delicate**: every gap
+it passes is ≤ 26 persons and every gap it catches is ≥ 412. See §3 part b for why that makes it a
+threshold rather than an assumption.
+
+---
+
+### 9.6 One further finding — `KKFRBEV`'s `07 Fødselsoverskud` does not reconcile
+
+Not used by anything here, but recorded so the next person does not lose an afternoon to it.
+At city level the population change reconciles exactly as
+
+    ΔP = (01 Levendefødte − 02 Døde) + 08 Nettotilflytning fra andre kommuner + 09 Nettoindvandring
+
+— to ≤ 4 persons in every year of the window. It does **not** reconcile using `07 Fødselsoverskud`,
+which is published as 10 068 for 2026 where `01 − 02` is 10 078 − 3 526 = **6 552**, a difference of
+3 516 that grows to 4 120 by 2039. Whatever `07` is, it is not births minus deaths, and the label
+says it should be. **Use `01 − 02`.** `KKFRBEDI`'s own `03 Fødselsoverskud` is fine — it equals
+`01 − 02` to ±1 — so this is specific to `KKFRBEV`.
+
+---
+
+### 9.7 Phase B notes
+
+1. **Nothing here goes into `config/indicators.json`.** Same rule as §8: Copenhagen-only keys stay
+   out of the registry in Phase A and are added under the `cph` key by Phase B. Check 0 part b
+   asserts they have not leaked in, so this is enforced rather than hoped for.
+2. **`fc_netmig` needs its flag.** Respect `fc_netmig_reconciles` per area (§9.5). The simplest
+   honest rendering is to grey the five out on the choropleth and show `fc_netmig_gap` in their
+   popup with one line of explanation.
+3. **Show both windows.** `fc_netmig_5y_per1000` beside `fc_netmig_per1000`, because the ordering
+   changes substantially between them and the difference *is* the construction schedule (§9.4).
+   Do not compute anything between `fc_netmig` and `fc_abs` beyond what is already stored — the
+   residual is natural increase, which the movement table publishes directly as `03`.
+4. **A reliability figure belongs next to every kvarter forecast.** `bt_mape`, `bt_baseline_mape` and
+   `bt_bias` are audited for UI use (§3 part b). The single most useful sentence a panel can carry
+   is: *over 2019–2025 this kvarter's five-year forecasts were off by X % on average, against Y % for
+   a no-detail baseline.* For Vesterbro Syd that is 15.12 % against 28.78 % — which is simultaneously
+   a warning and a defence, and the reader deserves both.
+5. **State the upward bias once, globally.** +2.23 % at five years for kvarterer, +1.36 % for the
+   city (§9.3). This is a property of the source, not of a particular area, so it belongs in the
+   layer's `warn`, not in 67 popups.
+6. **Do not require the backtest to exist.** `cph_backtest.json` depends on KK continuing to serve
+   unlisted tables (§9.1). Checks 9f and 10 skip rather than fail when a file is missing; the UI
+   should degrade the same way.

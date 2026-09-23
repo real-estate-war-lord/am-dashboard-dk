@@ -63,6 +63,7 @@ SRC = ROOT / "data" / "processed" / "forecast.json"
 NET = ROOT / "data" / "processed" / "net_dwellings.json"
 GAP = ROOT / "data" / "processed" / "housing_gap.json"
 CPH = ROOT / "data" / "processed" / "cph_forecast.json"
+CBT = ROOT / "data" / "processed" / "cph_backtest.json"
 HOUSING_RAW = ROOT / "data" / "raw" / "forecast" / "housing"
 FORECAST_RAW = ROOT / "data" / "raw" / "forecast" / "dst"
 API = "https://api.statbank.dk/v1"
@@ -105,16 +106,51 @@ AUDIT = {
 FROM_FORECAST_JSON = {k for k in AUDIT if k.startswith("fc_")}
 FROM_NET_DWELLINGS = {"hist_net_dwell"}
 
-# ---- check 9: how far the Copenhagen levels may miss the city total ----------------
-# KK rounds every published cell independently, so a sum of N of them drifts from the
-# published total by a few persons and the drift grows with N. Measured on the 2026
-# vintage: Σ 68 kvarterer is within 5 of the city in the worst year (2038), Σ 11 bydele
-# within 2, and Σ kvarterer of one bydel within 2. The tolerances are set just above
-# those, not at them, so ordinary rounding does not fail the check — and far below the
-# smallest kvarter (Metropolzonen, 2 882 people in 2026), so a dropped or misparented
-# area still cannot hide inside the slack. Raise these only with a note saying why.
-TOL_CITY = 10       # Σ all kvarterer (68 cells) vs the published city total
-TOL_BYDEL = 5       # Σ the kvarterer of one bydel (≤10 cells) vs that bydel's own value
+# ---- check 0, part b: the Copenhagen-only keys --------------------------------------
+# These live in data/processed/cph_forecast.json and data/processed/cph_backtest.json and
+# are deliberately NOT in config/indicators.json: Phase A's rule is that Copenhagen-only
+# indicators stay out of the registry and reach the UI through a Phase B note under the
+# `cph` key instead (docs/FORECAST.md §8, §9). The hard-data rule applies to them all the
+# same, so they are audited here and check 0 also asserts that none has crept into the
+# registry. (value, file) — the file the key must actually appear in.
+#
+# y0 = the vintage year; win5 / win = the movement years each window sums (§9).
+AUDIT_CPH = {
+ "fc_netmig_5y":           ("KKFRBEDI", "Σ `06 Nettotilflytning` over movement years "
+                                        "y0…y0+4", None, "cph"),
+ "fc_netmig_5y_per1000":   ("KKFRBEDI + KKFR<V>", "fc_netmig_5y / P_y0 × 1000", None, "cph"),
+ "fc_netmig":              ("KKFRBEDI", "Σ `06 Nettotilflytning` over movement years "
+                                        "y0…y_last−1", None, "cph"),
+ "fc_netmig_per1000":      ("KKFRBEDI + KKFR<V>", "fc_netmig / P_y0 × 1000", None, "cph"),
+ "fc_netmig_gap":          ("KKFRBEDI + KKFR<V>",
+                            "(P_(y_last) − P_y0) − Σ(`03 Fødselsoverskud` + "
+                            "`06 Nettotilflytning`) over the window", None, "cph"),
+ "fc_netmig_gap_per1000":  ("KKFRBEDI + KKFR<V>", "fc_netmig_gap / P_y0 × 1000", None, "cph"),
+ "fc_netmig_reconciles":   ("KKFRBEDI + KKFR<V>",
+                            "|fc_netmig_gap| ≤ max(5 × window years, 1 % of P_y0) — a QA "
+                            "threshold on published cells, not a parameter of any "
+                            "displayed value; see §9 for why it is not delicate",
+                            None, "cph"),
+ "bt_mape":                ("KKFR<V> + KKBEF1",
+                            "mean over (vintage, horizon ≥ 1) of |F − A| / A × 100",
+                            None, "backtest"),
+ "bt_bias":                ("KKFR<V> + KKBEF1",
+                            "mean over (vintage, horizon ≥ 1) of (F − A) / A × 100",
+                            None, "backtest"),
+ "bt_medape":              ("KKFR<V> + KKBEF1",
+                            "median over (vintage, horizon ≥ 1) of |F − A| / A × 100 — "
+                            "MAPE's companion, since a few small kvarterer dominate the "
+                            "mean", None, "backtest"),
+ "bt_mae":                 ("KKFR<V> + KKBEF1",
+                            "mean over (vintage, horizon ≥ 1) of |F − A|, in persons",
+                            None, "backtest"),
+ "bt_baseline_mape":       ("KKFR<V> + KKBEF1",
+                            "bt_mape with F = KKFR<V>(k, V) × KKFR<V>(city, V+h) / "
+                            "KKFR<V>(city, V)", None, "backtest"),
+}
+
+# check 9's rounding tolerances live with the Copenhagen geography that defines them
+from build_cph_forecast import TOL_BYDEL, TOL_CITY  # noqa: E402
 
 
 def folk1a_latest() -> tuple[str, dict[str, int]]:
@@ -216,6 +252,7 @@ def audit(doc: dict) -> list[str]:
     if stale:
         print(f"   ✗ audited but no longer in the registry: {', '.join(stale)}")
         fails.append("registry audit")
+    fails += audit_cph(keys)
     produced = set(next(iter(indicators(doc).values()), {}))
     want = {k for k in keys if k in FROM_FORECAST_JSON}
     if want - produced:
@@ -226,8 +263,8 @@ def audit(doc: dict) -> list[str]:
         print(f"   ✗ no build produces {', '.join(orphan)}")
         fails.append("registry audit")
     if not fails:
-        print(f"\n   ✓ {len(keys)} of {len(keys)} indicators are published figures or plain "
-              f"arithmetic on them — 0 assumptions")
+        print(f"\n   ✓ {len(keys)} registry + {len(AUDIT_CPH)} Copenhagen-only indicators "
+              f"are published figures or plain arithmetic on them — 0 assumptions")
     return fails
 
 
@@ -360,6 +397,132 @@ def copenhagen(kom: dict, years: list[str], dst_table: str, top: int) -> list[st
     kk, dst = area[city][widest]["total"], kom["101"][widest]["total"]
     print(f"     widest {widest}: {kk - dst:+,} ({(kk - dst) / dst * 100:+.2f} %) over "
           f"{len(overlap)} shared years".replace(",", " "))
+
+    # ---- f. the build-out signal ----
+    fails += netmig(c, cmeta, kvart, bydele, drawn, names)
+    return fails
+
+
+def netmig(c: dict, cmeta: dict, kvart: list, bydele: list, drawn: list,
+           names: dict) -> list[str]:
+    """Check 9f — fc_netmig from KKFRBEDI: coverage, additivity, and reconciliation.
+
+    Coverage and additivity **fail**. The reconciliation flag is reported, not failed: the
+    five kvarterer it catches are a property of Københavns Kommune's own district split,
+    not of this build, and they will still be there next vintage. What must not happen is
+    that they go unnoticed, which is what the flag and this block exist to prevent.
+    """
+    fails = []
+    v, nm = c["indicators"], cmeta["netmig"]
+    keys = [k for k in nm["keys"] if not k.endswith("_per1000")]
+    allk = nm["keys"]
+    print(f"\n   build-out signal — {nm['table']} `{nm['movement_code']} "
+          f"{nm['movement_label']}`, movement years {nm['window_5y'][0]}–"
+          f"{nm['window_5y'][-1]} and {nm['window_full'][0]}–{nm['window_full'][-1]}")
+    holes = [(a, k) for a in kvart + bydele + [cmeta["relative_baseline"]]
+             for k in allk if v.get(a, {}).get(k) is None]
+    ok = not holes and len(kvart) == 68
+    print(f"   {'✓' if ok else '✗'} fc_netmig present for {len(kvart)} kvarterer + "
+          f"{len(bydele)} bydele + the city, {len(holes)} missing")
+    if not ok:
+        print(f"     {holes[:4]}")
+        fails.append("cph netmig coverage")
+
+    city = cmeta["relative_baseline"]
+    for key in keys:
+        gk = abs(sum(v[a][key] for a in kvart) - v[city][key])
+        gl = abs(sum(v[a][key] for a in cmeta["levels"]["lokaludvalg"]) - v[city][key])
+        gb = abs(sum(v[a][key] for a in bydele) - v[city][key])
+        good = max(gk, gl, gb) <= TOL_CITY
+        print(f"   {'✓' if good else '✗'} Σ {key}: kvarterer {gk:+}, lokaludvalg {gl:+}, "
+              f"bydele {gb:+} vs the city, tolerance ±{TOL_CITY}")
+        if not good:
+            fails.append("cph netmig additivity")
+        bad = []
+        for b in bydele:
+            kids = [k for k in kvart if cmeta["hierarchy"].get(k, {}).get("bydel") == b]
+            g = abs(sum(v[k][key] for k in kids) - v[b][key])
+            if not kids or g > TOL_BYDEL:
+                bad.append((b, g))
+        print(f"   {'✓' if not bad else '✗'} Σ kvarterer of each bydel = that bydel for "
+              f"{key}, {len(bydele) - len(bad)}/{len(bydele)} within ±{TOL_BYDEL}")
+        if bad:
+            print(f"     {bad}")
+            fails.append("cph netmig additivity")
+
+    off = [k for k in drawn if not v[k]["fc_netmig_reconciles"]]
+    worst_ok = max((abs(v[k]["fc_netmig_gap"]) for k in drawn
+                    if v[k]["fc_netmig_reconciles"]), default=0)
+    off_b = [b for b in bydele if not v[b]["fc_netmig_reconciles"]]
+    print(f"   🚩 fc_netmig_reconciles — {len(drawn) - len(off)}/{len(drawn)} kvarterer and "
+          f"{len(bydele) - len(off_b)}/{len(bydele)} bydele reconcile with the stock table; "
+          f"{len(off)} kvarterer do not (information, see docs/FORECAST.md §9)")
+    for k in sorted(off, key=lambda k: -abs(v[k]["fc_netmig_gap"])):
+        print(f"     {k} {names.get(k, ''):<26} gap {v[k]['fc_netmig_gap']:>+7} persons  "
+              f"fc_abs {v[k]['fc_abs']:>+7}  fc_netmig {v[k]['fc_netmig']:>+7}  "
+              f"bydel {cmeta['hierarchy'][k]['bydel']}")
+    print(f"     largest gap among the {len(drawn) - len(off)} that do reconcile: "
+          f"{worst_ok} persons — the two groups are 16× apart, so the threshold is not "
+          f"doing the work")
+    return fails
+
+
+def backtest(top: int) -> list[str]:
+    """Check 10 — the KK forecast backtest.
+
+    Everything here is **information**: it measures Københavns Kommune's forecasting
+    record, which is a fact about their model, not about this build. The one thing that
+    can fail is internal — a summary the build claims but did not compute.
+    """
+    if not CBT.exists():
+        print(f"\n10. KK forecast backtest — {CBT.relative_to(ROOT)} not built, skipped "
+              f"(run scripts/build_cph_backtest.py)")
+        return []
+    fails = []
+    b = json.loads(CBT.read_text(encoding="utf-8"))
+    m, kv, bd, city, areas = (b["meta"], b["kvarter_summary"], b["bydel_summary"],
+                              b["city_summary"], b["areas"])
+    print(f"\n10. KK forecast backtest — vintages {', '.join(str(v) for v in m['vintages_served'])} "
+          f"vs {m['actual_table']} (information only)")
+    print(f"    the catalogue lists {m['current_table']} alone; the superseded ids are "
+          f"unlisted but still served")
+    scored = m["vintages_scored"]
+    if not scored:
+        print("    ✗ no vintage was scored"); return ["backtest"]
+    for label, s_ in (("67 kvarterer", kv), ("10 bydele", bd), ("city", city)):
+        row = " · ".join(f"h{h} {s_[h]['forecast']['mape']:.2f}%/{s_[h]['baseline']['mape']:.2f}%"
+                         for h in sorted(s_, key=int) if h != "0")
+        skill = " · ".join(f"h{h} {s_[h]['skill_pct']:+.0f}%"
+                           for h in sorted(s_, key=int) if h != "0")
+        print(f"    {label:<13} MAPE forecast/baseline  {row}   skill {skill}")
+    h0 = kv.get("0")
+    if h0:
+        print(f"    horizon 0 (base year vs observed, not a forecast error): kvarter MAPE "
+              f"{h0['forecast']['mape']:.2f} %, MAE {h0['forecast']['mae']:.1f} persons")
+    # internal: every horizon summary must rest on pairs that exist
+    for name, s_ in (("kvarter", kv), ("bydel", bd), ("city", city)):
+        for h, r in s_.items():
+            if not r["n"] or r["forecast"]["mape"] is None:
+                print(f"    ✗ {name} horizon {h} has no scored pairs")
+                fails.append("backtest")
+    missing = [k for k in areas if areas[k]["bt_mape"] is None]
+    if missing:
+        print(f"    ✗ {len(missing)} areas have no bt_mape: {missing[:4]}")
+        fails.append("backtest")
+    if m["additivity_warnings"]:
+        print(f"    ⚠ {len(m['additivity_warnings'])} additivity warnings in the source "
+              f"vintages, e.g. {m['additivity_warnings'][0]}")
+    else:
+        print(f"    ✓ every vintage's own cells pass the ±{m['tolerances']['city']} / "
+              f"±{m['tolerances']['bydel']} additivity tolerances")
+    rank = sorted(((areas[k]["bt_mape"], k) for k in areas
+                   if len(k) == 5 and k != "29999"), reverse=True)
+    print(f"    worst {min(top, 5)} kvarterer by MAPE (horizons ≥1 pooled), "
+          f"forecast vs baseline")
+    for i, (mp, k) in enumerate(rank[:min(top, 5)], 1):
+        a = areas[k]
+        print(f"     {i}. {k} {b['names'].get(k, ''):<30} {mp:>6.2f}% vs "
+              f"{a['bt_baseline_mape']:>6.2f}%  bias {a['bt_bias']:>+6.2f}%  n={a['bt_n']}")
     return fails
 
 
@@ -431,6 +594,53 @@ def net_dwellings(kom: dict, base_year: str) -> list[str]:
         print(f"   {'✓' if ok else '✗'} {c} {NAMES.get(c, ''):<13} "
               f"({b:,} − {a:,}) / {span} = {(b - a) / span:>+8,.0f} dwellings/yr   "
               f"/ {pop:,} × 1000 = {per1000:+.2f}   stored {stored:+.2f}".replace(",", " "))
+    return fails
+
+
+def audit_cph(registry_keys: list[str]) -> list[str]:
+    """Check 0b — the Copenhagen-only keys, which are audited but stay out of the registry.
+
+    Three failures, same idea as check 0a: an unaudited key reaching a file, an audited key
+    no file produces, or a Copenhagen-only key that has leaked into config/indicators.json
+    against the Phase A rule.
+    """
+    fails, produced = [], {}
+    for tag, path, where in (("cph", CPH, lambda d: next(iter(d["indicators"].values()), {})),
+                             ("backtest", CBT, lambda d: next(iter(d["areas"].values()), {}))):
+        produced[tag] = set(where(json.loads(path.read_text(encoding="utf-8")))) \
+            if path.exists() else None
+    print(f"\n   Copenhagen-only keys — audited here, deliberately not in the registry "
+          f"(Phase A rule, §8/§9)")
+    w = max((len(k) for k in AUDIT_CPH), default=14)
+    for k, (table, arith, assumption, tag) in AUDIT_CPH.items():
+        have = produced[tag]
+        if have is None:
+            print(f"   · {k:<{w}}  {table:<19}  {arith.splitlines()[0][:52]}   "
+                  f"(file not built, skipped)")
+            continue
+        ok = k in have and not assumption and k not in registry_keys
+        print(f"   {'✓' if ok else '✗'} {k:<{w}}  {table:<19}  {arith}")
+        if assumption:
+            print(f"     {'':<{w}}  ⚠ ASSUMPTION: {assumption}")
+            fails.append("registry audit")
+        if k not in have:
+            print(f"     {'':<{w}}  ✗ not produced in {tag}")
+            fails.append("registry audit")
+        if k in registry_keys:
+            print(f"     {'':<{w}}  ✗ has leaked into config/indicators.json — Copenhagen-"
+                  f"only keys stay out of the registry in Phase A")
+            fails.append("registry audit")
+    for tag, path in (("cph", CPH), ("backtest", CBT)):
+        have = produced[tag]
+        if have is None:
+            continue
+        extra = sorted(x for x in have
+                       if (x.startswith("fc_netmig") or x.startswith("bt_"))
+                       and x not in AUDIT_CPH and not x.endswith("_by_horizon")
+                       and x != "bt_n")
+        if extra:
+            print(f"   ✗ {path.name} produces unaudited keys: {', '.join(extra)}")
+            fails.append("registry audit")
     return fails
 
 
@@ -690,6 +900,9 @@ def main():
 
     # ---- 9. the Copenhagen kvarter forecast ----
     fails += copenhagen(kom, years, meta["table"], args.top)
+
+    # ---- 10. the KK forecast backtest ----
+    fails += backtest(args.top)
 
     print()
     if fails:

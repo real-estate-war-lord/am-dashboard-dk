@@ -134,6 +134,13 @@ and contacted to *Københavns Kommunes Tværgående Analyseenhed*:
 so like DST this must be resolved from the catalogue, not hard-coded. `KKFRBEDI`/`KKFRBEV` keep
 stable names across vintages.
 
+> **Correction (2026-09-23).** "Gone from the catalogue" is true of the *listing* only. The
+> superseded ids are still served: `GET /v1/s30/tableinfo/KKFR2021` answers normally, as does a data
+> request, and **eight vintages 2019–2026 are reachable today** with an identical schema and an
+> identical 93-code `OMRKK` list. `scripts/build_cph_backtest.py` probes the ids directly for exactly
+> this reason, and `docs/FORECAST.md` §9 backtests all of them. Resolution of the *current* vintage
+> still goes through the catalogue, as above.
+
 Nothing relevant is on **opendata.dk / admin.opendata.dk CKAN**: `package_search` for `prognose`
 returns 4 datasets (a KK *air-quality* forecast, plus Vejle and Hedensted municipal population
 forecasts); `fremskrivning` returns 0; `boligprogram` returns 1 (Hedensted). Copenhagen publishes its

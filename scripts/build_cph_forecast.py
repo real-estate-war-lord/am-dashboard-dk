@@ -78,10 +78,46 @@ DB = "s30"
 UA = {"User-Agent": "am-dashboard-dk/0.1", "Content-Type": "application/json"}
 
 CITY = "1000"
+# ---- how far a sum of districts may miss the published total -----------------------
+# KK rounds every published cell independently, so a sum of N of them drifts from the
+# published total by a few persons and the drift grows with N. Measured on the 2026
+# vintage: Σ 68 kvarterer is within 5 of the city in the worst year (2038), Σ 13
+# lokaludvalg within 3, and Σ kvarterer of one bydel within 2. The tolerances are set
+# just above those, not at them, so ordinary rounding does not fail a check — and far
+# below the smallest kvarter (Metropolzonen, 2 882 people in 2026), so a dropped or
+# misparented area still cannot hide inside the slack. Raise these only with a note
+# saying why. validate_forecast.py and build_cph_backtest.py import them from here.
+TOL_CITY = 10       # Σ all kvarterer (68 cells) vs the published city total
+TOL_BYDEL = 5       # Σ the kvarterer of one bydel (≤10 cells) vs that bydel's own value
 # One "Uden for inddeling" bucket per level. Kept in the file so each level re-sums to the
 # city total; never drawn, because they have no geometry.
 UNALLOCATED = {"bydel": "1099", "lokaludvalg": "2099", "kvarter": "29999"}
 CELL_CAP = 1_000_000     # the API's pre-flight limit for a CSV selection
+
+# KKFRBEDI — the movement side of the same run. Its name carries no vintage (unlike
+# KKFR<YYYY>), so it is named directly; `updated` is checked against the projection's so a
+# mismatched pair cannot be built silently. BEVÆGELSE codes, from its own Danish metadata:
+MOVES = {"01": "levendefoedte", "02": "doede", "03": "foedselsoverskud",
+         "04": "tilflyttede", "05": "fraflyttede", "06": "nettotilflytning"}
+NETMIG, MOVED_IN, MOVED_OUT, NAT_INCR = "06", "04", "05", "03"
+BEDI = "KKFRBEDI"
+NETMIG_5Y = 5            # the short window, in movement years
+
+# ---- when does fc_netmig fail to reconcile with the stock table? -------------------
+# Over a window, ΔP should equal (natural increase + net migration). Three things make it
+# not exactly equal, and only the third is worth flagging:
+#   · per-cell rounding, ±1 per summed cell per year, so it accumulates with the window —
+#     hence NETMIG_TOL_YEAR × the number of movement years rather than a flat figure;
+#   · a small systematic difference between KKFRBEDI's district totals and the stock
+#     table's, about 36 persons a year city-wide (0.006 % of the city) — proportional to
+#     size, hence the relative term;
+#   · 🚩 KK's district split moving projected population between two adjacent kvarterer
+#     without booking it as a move. That one is structural, runs to thousands of persons,
+#     and would make fc_netmig read backwards for the affected areas.
+# Measured on the 2026 vintage the two populations are far apart — every rounding/residual
+# gap is ≤ 26 persons, every structural one ≥ 412 — so the threshold is not delicate.
+NETMIG_TOL_YEAR = TOL_BYDEL     # accumulated rounding allowance, per movement year
+NETMIG_TOL_REL = 0.01           # …or 1 % of the area's base population, whichever is larger
 
 
 def get(url: str):
@@ -143,6 +179,10 @@ def parents(code: str) -> tuple[str | None, str | None]:
 def tableinfo(table: str) -> dict:
     p = RAW / f"{table}.meta.json"
     return json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
+
+
+def meta_updated(info: dict) -> str | None:
+    return (info.get("updated") or "")[:10] or None
 
 
 def codes_of(info: dict, var: str) -> list[str]:
@@ -212,6 +252,101 @@ def fetch(table: str, years: list[str], omrkk: list[str], today: str) -> list[pa
         p.write_text(text, encoding="utf-8")
         out.append(p)
     return out
+
+
+def fetch_moves(years: list[str], today: str) -> pathlib.Path:
+    """Pull KKFRBEDI: 92 districts × 6 movement types × ALDER=TOT × the window.
+
+    ~7 700 cells, so never split. ALDER here is 5-year bands (`01` = 0–4 … `20` = 95+)
+    plus `TOT`, which is the only one this build wants.
+    """
+    info = get(f"{API}/{DB}/tableinfo/{BEDI}?lang=da&format=JSON")
+    RAW.mkdir(parents=True, exist_ok=True)
+    (RAW / f"{BEDI}.meta.json").write_text(json.dumps(info, ensure_ascii=False, indent=1),
+                                           encoding="utf-8")
+    for stale in RAW.glob(f"{BEDI}_moves_*_{today}.csv"):
+        stale.unlink()
+    have = {x["id"] for v in info["variables"] if v["id"] == "Tid" for x in v["values"]}
+    use = [y for y in years if y in have]
+    text = post_csv({"table": BEDI, "format": "CSV", "delimiter": "Semicolon", "lang": "en",
+                     "valuePresentation": "Code",
+                     "variables": [{"code": "OMRKK", "values": ["*"]},
+                                   {"code": "BEVÆGELSE", "values": ["*"]},
+                                   {"code": "ALDER", "values": ["TOT"]},
+                                   {"code": "Tid", "values": use}]})
+    if text.lstrip().startswith("{"):
+        sys.exit(f"{BEDI}: API returned an error instead of CSV:\n{text[:400]}")
+    p = RAW / f"{BEDI}_moves_{use[0]}-{use[-1]}_{today}.csv"
+    p.write_text(text, encoding="utf-8")
+    return p
+
+
+def newest_moves() -> pathlib.Path:
+    files = sorted(RAW.glob(f"{BEDI}_moves_*_20??-??-??.csv"))
+    if not files:
+        sys.exit(f"no cached {BEDI} pull in {RAW} — run without --no-fetch")
+    return files[-1]
+
+
+def read_moves(path: pathlib.Path) -> dict[str, dict[str, dict[str, int]]]:
+    """{code: {year: {BEVÆGELSE: n}}} — KKFRBEDI has no city row, by design (see §9)."""
+    out: dict[str, dict[str, dict[str, int]]] = {}
+    with path.open(encoding="utf-8-sig", newline="") as f:
+        for r in csv.DictReader(f, delimiter=";"):
+            if r["ALDER"] != "TOT":
+                continue
+            out.setdefault(r["OMRKK"], {}).setdefault(r["TID"], {})[r["BEVÆGELSE"]] = \
+                int(r["INDHOLD"])
+    return out
+
+
+def netmig(mv: dict, omrkk: dict, years: list[str], kvarterer: list[str]) -> dict[str, dict]:
+    """fc_netmig per code: Σ KKFRBEDI `06 Nettotilflytning` over each window.
+
+    A movement year Y is the flow *during* Y, bridging the 1 January stocks of Y and Y+1,
+    so the 2026→2031 window sums movement years 2026…2030 and the 2026→2040 window sums
+    2026…2039. Only published cells are added; the per-1 000 figure divides by the base
+    year's published population.
+
+    The city has no KKFRBEDI row — at city level the moves between two Copenhagen districts
+    cancel and KK publishes that split in KKFRBEV instead — so its value is Σ of the kvarter
+    level. That sum is what cancels the internal moves, and `meta` records that it is a sum
+    rather than a published cell.
+
+    🚩 **`fc_netmig_reconciles` is not decoration.** The two tables should satisfy
+    ΔP = natural increase + net migration over the window, and for 62 of 68 kvarterer they
+    do, to a handful of persons. For four they do not, in two adjacent pairs inside one
+    bydel each — KK's district split moves projected population between neighbouring
+    kvarterer without booking it as a move, so Nordøstamager's stock grows by 10 414 while
+    its net migration is −1 053 and neighbouring Amagerbro Øst carries the inflow instead.
+    The flag is per code; anything showing fc_netmig must respect it (docs/FORECAST.md §9).
+    """
+    y0 = years[0]
+    win5 = [y for y in years[:NETMIG_5Y] if y in next(iter(mv.values()))]
+    win_all = [y for y in years[:-1] if y in next(iter(mv.values()))]
+    out = {}
+    for code in omrkk:
+        src = kvarterer if code == CITY else [code]
+        if any(k not in mv for k in src):
+            continue
+        p0 = omrkk[code][y0]["total"]
+        vals = {}
+        for key, win in (("fc_netmig_5y", win5), ("fc_netmig", win_all)):
+            n = sum(mv[k][y][NETMIG] for k in src for y in win)
+            vals[key] = n
+            vals[f"{key}_per1000"] = None if not p0 else round(n / p0 * 1000, 1)
+        # ΔP over the window vs (natural increase + net migration) from the movement table.
+        # win_all's last movement year bridges into the following 1 January stock, so the
+        # stock end is win_all[-1] + 1, not win_all[-1].
+        moved = sum(mv[k][y][NAT_INCR] + mv[k][y][NETMIG] for k in src for y in win_all)
+        stock_end = omrkk[code][str(int(win_all[-1]) + 1)]["total"]
+        gap = stock_end - omrkk[code][y0]["total"] - moved
+        tol = max(NETMIG_TOL_YEAR * len(win_all), NETMIG_TOL_REL * p0)
+        vals["fc_netmig_gap"] = gap
+        vals["fc_netmig_gap_per1000"] = None if not p0 else round(gap / p0 * 1000, 1)
+        vals["fc_netmig_reconciles"] = abs(gap) <= tol
+        out[code] = vals
+    return {"values": out, "window_5y": win5, "window_full": win_all}
 
 
 def rows(paths: list[pathlib.Path]):
@@ -310,9 +445,30 @@ def main():
     vals = indicators({"meta": {"first_year": years[0], "last_year": years[-1]},
                        "kommuner": omrkk}, ref=omrkk[CITY])
 
+    # ---- the build-out signal: net in-migration per district, from the same run ----
+    if args.no_fetch:
+        p_mv = newest_moves()
+        bedi_info = tableinfo(BEDI)
+        print(f"  cached {p_mv.name}")
+    else:
+        p_mv = fetch_moves(years, today)
+        bedi_info = tableinfo(BEDI)
+    bedi_updated = (bedi_info.get("updated") or "")[:10] or None
+    if bedi_updated and meta_updated(info) and bedi_updated != meta_updated(info):
+        print(f"  ⚠ {BEDI} was updated {bedi_updated} but {table} {meta_updated(info)} — "
+              f"the movement and stock tables may not be the same run", file=sys.stderr)
+    mv = read_moves(p_mv)
+    nm = netmig(mv, omrkk, years, by_level["kvarter"])
+    for code, v in nm["values"].items():
+        vals[code].update(v)
+    missing_nm = sorted(set(omrkk) - set(nm["values"]))
+    print(f"  {BEDI} {nm['window_full'][0]}–{nm['window_full'][-1]} · "
+          f"{len(nm['values'])} districts with fc_netmig"
+          + (f" · no movement row for {', '.join(missing_nm)}" if missing_nm else ""))
+
     meta = {
         "table": table, "db": DB, "vintage": vintage,
-        "updated": (info.get("updated") or "")[:10] or None,
+        "updated": meta_updated(info),
         "fetched": paths[0].stem[-10:], "built": today,
         "years": years, "first_year": years[0], "last_year": years[-1],
         "mid_year": str(vintage + 5),
@@ -332,6 +488,37 @@ def main():
         "hierarchy": {c: {"lokaludvalg": lok, "bydel": byd}
                       for c in by_level.get("kvarter", [])
                       for lok, byd in [parents(c)]},
+        "netmig": {
+            "table": BEDI, "updated": bedi_updated,
+            "movement_code": NETMIG, "movement_label": "Nettotilflytning / Netmigration",
+            "window_5y": [nm["window_5y"][0], nm["window_5y"][-1]],
+            "window_full": [nm["window_full"][0], nm["window_full"][-1]],
+            "keys": ["fc_netmig_5y", "fc_netmig_5y_per1000", "fc_netmig",
+                     "fc_netmig_per1000"],
+            "definition": "Σ of KKFRBEDI's published `06 Nettotilflytning` over the "
+                          "movement years of each window. A movement year Y is the flow "
+                          "during Y, bridging the 1 January stocks of Y and Y+1, so the "
+                          f"{years[0]}→{str(int(years[0]) + NETMIG_5Y)} window sums "
+                          f"{nm['window_5y'][0]}–{nm['window_5y'][-1]} and the "
+                          f"{years[0]}→{years[-1]} window sums "
+                          f"{nm['window_full'][0]}–{nm['window_full'][-1]}. The per-1 000 "
+                          f"figure divides by the published {years[0]} population; it is "
+                          "the total over the window, not a yearly rate.",
+            "scope": "🔑 At district level KKFRBEDI's Tilflyttede/Fraflyttede count EVERY "
+                     "move across the district boundary, INCLUDING moves between two "
+                     "Copenhagen districts. Σ districts' in-moves is roughly twice the "
+                     "city's own in-moves for that reason. So fc_netmig is net migration "
+                     "into the kvarter from anywhere — the rest of Copenhagen included — "
+                     "which is exactly what a new development produces. See "
+                     "docs/FORECAST.md §9.",
+            "city_is_a_sum": "KKFRBEDI publishes no city row (OMRKK 1000 is absent): at "
+                             "city level the internal moves cancel and KK publishes that "
+                             "split in KKFRBEV instead, with different categories. The "
+                             "city figure here is Σ of the kvarter level — summing net "
+                             "migration across districts is what cancels the internal "
+                             "moves — and is a sum, not a published cell.",
+            "no_city_row": CITY not in mv,
+        },
         "relative_baseline": CITY,
         "relative_note": "fc_20_34_rel is measured against the KK city total (OMRKK 1000), "
                          "NOT against Denmark — label it 'vs København'. The 93 OMRKK codes "
@@ -363,11 +550,11 @@ def main():
           f"({vals[CITY]['fc_growth']:+.1f} %)".replace(",", " "))
 
     if args.rank:
-        report(omrkk, vals, names, by_level["kvarter"], years, args.rank)
+        report(omrkk, vals, names, by_level["kvarter"], years, args.rank, nm)
 
 
-def report(omrkk, vals, names, kvarterer, years, n):
-    """Top/bottom n kvarterer by fc_growth, fc_abs and fc_20_34_abs."""
+def report(omrkk, vals, names, kvarterer, years, n, nm):
+    """Top/bottom n kvarterer by fc_growth, fc_abs, fc_20_34_abs and fc_netmig_per1000."""
     y0, y1 = years[0], years[-1]
     drawn = [c for c in kvarterer if c != UNALLOCATED["kvarter"]]
     for key, unit, field, hi, lo in (
@@ -383,6 +570,20 @@ def report(omrkk, vals, names, kvarterer, years, n):
                 fmt = f"{v:+,.0f}" if unit == "persons" else f"{v:+.1f} %"
                 print(f"   {i:>2}. {c} {names.get(c, ''):<38} {fmt:>9}   "
                       f"{field} {a:>7,} → {b:>7,}".replace(",", " "))
+
+    w = nm["window_full"]
+    rank = sorted((vals[c]["fc_netmig_per1000"], c) for c in drawn
+                  if vals[c].get("fc_netmig_per1000") is not None)
+    print(f"\nfc_netmig_per1000 · movement years {w[0]}–{w[-1]} · {len(rank)} kvarterer "
+          f"· net in-migration per 1 000 inhabitants of {y0}, over the whole window")
+    for title, part in (("largest net inflow", rank[::-1][:n]),
+                        ("largest net outflow", rank[:n])):
+        print(f"  {title} {n}")
+        for i, (v, c) in enumerate(part, 1):
+            print(f"   {i:>2}. {c} {names.get(c, ''):<38} {v:>+9.1f}   "
+                  f"persons {vals[c]['fc_netmig']:>+7,}  5-yr "
+                  f"{vals[c]['fc_netmig_5y_per1000']:>+7.1f}  pop {y0} "
+                  f"{omrkk[c][y0]['total']:>7,}".replace(",", " "))
 
 
 if __name__ == "__main__":
