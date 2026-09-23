@@ -570,7 +570,7 @@ function vMakro() {
   <div class="card accent" id="mapcard">
     <div class="card-head tools-only">
       <div class="tools">${areaSearch()}${tpBox()}${muni && microAvail(muni.code) ? `<div class="seg"><button class="sg ${!MK.micro ? "on" : ""}" data-micro="0">Areas</button><button class="sg ${MK.micro ? "on" : ""}" data-micro="1">Buildings (${nf(MICRO_IDX[String(Number(muni.code))].n, 0)})</button></div>` : ""}${muni && muni.code === CPH_MUNI && CPH && !microMode() ? `<div class="seg"><button class="sg ${MK.cphView !== "postnr" ? "on" : ""}" data-cphview="kvarter">Quarters (${CPH.areas.length})</button><button class="sg ${MK.cphView === "postnr" ? "on" : ""}" data-cphview="postnr">Postal codes</button></div>` : ""}${INFRA.length ? `<div class="seg"><button class="sg ${MK.infra ? "on" : ""}" data-infra title="Show planned and ongoing infrastructure projects on top of the map">Infra projects</button></div>` : ""}${PUB ? `<div class="seg"><button class="sg ${MK.pub ? "on" : ""}" data-public title="Public buildings from BBR: schools, daycare, health and culture${MK.muni && !pubAvail(MK.muni) ? " — no BBR pull for this municipality yet" : ""}">Public buildings</button></div>` : ""}${microMode() ? mindSelect() : indSelect() + yearSelect()}${D.portfolio ? `<button class="lk mini ${MK.own ? "primary" : ""}" data-mkown>● Own properties</button>` : ""}<button class="lk" data-fs title="Full screen (Esc to exit)">⤢ Full screen</button></div>
-      ${microMode() ? "" : indQuick()}<div class="tperr" id="tperr" role="status" ${TP.msg ? "" : 'style="display:none"'}>${esc(TP.msg)}</div></div>
+      ${microMode() ? "" : indQuick()}<div class="tperr" id="tperr" role="status" ${TP.msg ? "" : 'style="display:none"'}>${esc(TP.msg)}</div>${tpNote()}</div>
     ${microMode() ? microExplain() : indExplain(ind)}
     ${muni && !microMode() ? muniStrip(muni) : ""}
     <div class="mapwrap"><div id="lfmap"></div><div class="maplegs"><div class="maplegend publiclegend" id="publiclegend"></div><div class="maplegend infralegend" id="infralegend"></div></div><div class="maplegend" id="maplegend"></div></div>
@@ -1185,6 +1185,9 @@ function tpBox() {
   return `<span class="tpbox"><input id="tpq" class="indsel tpq" type="search" placeholder="Paste Google Maps link or coordinates" autocomplete="off" aria-label="Test property location">
     <span class="tptip" tabindex="0" role="note" aria-label="Accepted formats">?<span class="tptipc"><b>Accepted formats</b>${TP_FORMATS.map(([, ex, what]) => `<i>${esc(ex)}</i><span>${esc(what)}</span>`).join("")}<span class="tpwarn">Short maps.app.goo.gl links can't be read — open one and copy the full URL.</span></span></span></span>`;
 }
+/* the privacy line under the input: the parsing is local, but the coordinates travel in the hash of any link shared */
+const TP_NOTE = "Processed in your browser. The location is stored only in the page URL; don't paste confidential deal locations if you share the link.";
+const tpNote = () => `<p class="cap tpnote">${TP_NOTE}</p>`;
 function tpErrEl() { return document.getElementById("tperr"); }
 function tpErr(msg) { TP.msg = msg || ""; const el = tpErrEl(); if (el) { el.textContent = TP.msg; el.style.display = TP.msg ? "" : "none"; } }
 /* Enter or paste in the box: parse the text, then (once the kommune rings are there) drop the pin */
@@ -1627,6 +1630,7 @@ function anEmpty() {
   return `<div class="card accent"><div class="card-head"><h3>Test property</h3><span class="hint">one address, read against every layer</span></div>
     <div class="tools">${tpBox()}</div>
     <div class="tperr" id="tperr" role="status" ${TP.msg ? "" : `style="display:none"`}>${esc(TP.msg)}</div>
+    ${tpNote()}
     <p class="anlead">Paste a Google Maps link to analyse a location.</p>
     <p class="cap">The sheet reads the pin's area statistics, the safety figures, every infrastructure project within ${nf(AN_INFRA_M / 1000, 0)} km and the public buildings and schools within ${nf(AN_RING_M, 0)} m. The same box sits on the map toolbar; a pin dropped there carries over.</p></div>`;
 }
