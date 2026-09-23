@@ -3255,7 +3255,7 @@
   ]
  },
  "forecast": {
-  "_doc": "Outlook group — DST's municipal population projection, built by scripts/build_forecast.py into data/processed/forecast.json and checked by scripts/validate_forecast.py. Held under its own top-level key rather than in `indicators[]` because `calc: forecast` and `db: forecast` are not yet implemented: build_makro.py would fall through to a StatBank raw-file lookup and raise FileNotFoundError. Phase B moves these entries into `indicators[]` once build_makro.py, and app.js's colour model, understand them (see docs/FORECAST.md, Phase B notes). `field` names the metric build_forecast.py derives; `scale: diverging` with `center: 0` asks for a two-ended ramp from `hue_neg` through the paper tint to `hue_pos`, with class breaks symmetric about the centre — the existing renderer only does the single-ended `hue` ramp with quintile breaks, which is why `hue` is kept as the positive end. `direction: neutral` means neither end is 'better': shrinking is not failure and growth is not success, so these must not be ranked or coloured good/bad.",
+  "_doc": "Outlook group — DST's municipal population projection, built by scripts/build_forecast.py into data/processed/forecast.json and checked by scripts/validate_forecast.py. Held under its own top-level key rather than in `indicators[]` because `calc: forecast` and `db: forecast` are not yet implemented: build_makro.py would fall through to a StatBank raw-file lookup and raise FileNotFoundError. Phase B moves these entries into `indicators[]` once build_makro.py, and app.js's colour model, understand them (see docs/FORECAST.md, Phase B notes). Entries are looked up by `key` — `indicators()` in scripts/build_forecast.py returns one dict per kommune keyed by exactly these keys — and `field` names the underlying field the value is derived from. `calc: housing_gap` / `db: housing_gap` is the second Outlook source: data/processed/housing_gap.json from scripts/build_housing_gap.py, which compares the dwellings the projection's five-year growth implies against the recent completion pace; it is inert here for the same reason. `scale: diverging` with `center: 0` asks for a two-ended ramp from `hue_neg` through the paper tint to `hue_pos`, with class breaks symmetric about the centre — the existing renderer only does the single-ended `hue` ramp with quintile breaks, which is why `hue` is kept as the positive end. `direction: neutral` means neither end is 'better': shrinking is not failure and growth is not success, so these must not be ranked or coloured good/bad.",
   "first_year": "2026",
   "last_year": "2040",
   "mid_year": "2031",
@@ -3503,6 +3503,87 @@
     "chip": true
    },
    {
+    "key": "fc_20_34_rel",
+    "label": "Young adults 20–34 vs Denmark 2026→2040",
+    "short": "20–34 vs DK",
+    "unit": "pp",
+    "level": "kommune",
+    "hue": [
+     90,
+     60,
+     150
+    ],
+    "hue_pos": [
+     90,
+     60,
+     150
+    ],
+    "hue_neg": [
+     166,
+     42,
+     22
+    ],
+    "scale": "diverging",
+    "center": 0,
+    "group": "Outlook",
+    "direction": "neutral",
+    "sources": [
+     {
+      "db": "forecast",
+      "table": "forecast",
+      "geo": "kommune"
+     }
+    ],
+    "calc": "forecast",
+    "field": "a20_34",
+    "fmt": "signdec1",
+    "desc": "The municipality's projected change in 20–34-year-olds 2026→2040 minus Denmark's, in percentage points. Denmark's own 20–34 population falls 7.1 % over the window, so only 7 of 98 municipalities gain any at all and the absolute map is almost uniformly negative; this one shows who holds young adults better or worse than the country.",
+    "source": "Danmarks Statistik FRKM126 (municipal population projection, 2026 vintage), national control total FRDK126 — see docs/FORECAST.md",
+    "warn": "A projection, not a measurement. DST's municipal projection assumes each municipality's recent fertility, mortality and migration behaviour continues; it carries no housing programme, so a large planned development does not appear in it.",
+    "note": "Computed in scripts/build_forecast.py from data/processed/forecast.json: the 2026 vintage of DST's municipal projection, ages folded into 0–5, 6–16, 17–19, 20–34, 35–64, 65–79 and 80+. Christiansø (411) is not a municipality and has no value. Never read together with Københavns Kommune's own forecast, which is a different run — see docs/FORECAST.md. Denmark here is the sum of the same 98 municipalities, not a separately rounded national table; it agrees with FRDK126's published age detail to 0.001 pp (scripts/validate_forecast.py check 5). Read it as a share-of-cohort map: a positive value is a municipality losing 20–34-year-olds more slowly than Denmark, which for most of the top ten is what is actually happening.",
+    "note_short": "Measured against Denmark's own −7.1 %, not against zero — a positive value usually still means a shrinking cohort, just a slower one."
+   },
+   {
+    "key": "fc_20_34_abs",
+    "label": "Projected change, young adults 20–34 (persons)",
+    "short": "20–34 ±",
+    "unit": "persons",
+    "level": "kommune",
+    "hue": [
+     90,
+     60,
+     150
+    ],
+    "hue_pos": [
+     90,
+     60,
+     150
+    ],
+    "hue_neg": [
+     166,
+     42,
+     22
+    ],
+    "scale": "diverging",
+    "center": 0,
+    "group": "Outlook",
+    "direction": "neutral",
+    "sources": [
+     {
+      "db": "forecast",
+      "table": "forecast",
+      "geo": "kommune"
+     }
+    ],
+    "calc": "forecast",
+    "field": "a20_34",
+    "fmt": "int",
+    "desc": "Projected change in 20–34-year-olds from 2026 to 2040, in persons. Size rather than rate: København loses 15 978 and Fanø 54, which the percentage map ranks the other way round.",
+    "source": "Danmarks Statistik FRKM126 (municipal population projection, 2026 vintage), national control total FRDK126 — see docs/FORECAST.md",
+    "warn": "A projection, not a measurement. DST's municipal projection assumes each municipality's recent fertility, mortality and migration behaviour continues; it carries no housing programme, so a large planned development does not appear in it.",
+    "note": "Computed in scripts/build_forecast.py from data/processed/forecast.json: the 2026 vintage of DST's municipal projection, ages folded into 0–5, 6–16, 17–19, 20–34, 35–64, 65–79 and 80+. Christiansø (411) is not a municipality and has no value. Never read together with Københavns Kommune's own forecast, which is a different run — see docs/FORECAST.md. The 98 values sum to Denmark's own change, −85 641 persons (scripts/validate_forecast.py check 5). Heavily skewed — København alone is a fifth of the national loss — so a linear diverging ramp needs clamping."
+   },
+   {
     "key": "fc_80p",
     "label": "Projected change, 80 and over",
     "short": "80+ outlook",
@@ -3541,6 +3622,47 @@
     "source": "Danmarks Statistik FRKM126 (municipal population projection, 2026 vintage), national control total FRDK126 — see docs/FORECAST.md",
     "warn": "A projection, not a measurement. DST's municipal projection assumes each municipality's recent fertility, mortality and migration behaviour continues; it carries no housing programme, so a large planned development does not appear in it.",
     "note": "Computed in scripts/build_forecast.py from data/processed/forecast.json: the 2026 vintage of DST's municipal projection, ages folded into 0–5, 6–16, 17–19, 20–34, 35–64, 65–79 and 80+. Christiansø (411) is not a municipality and has no value. Never read together with Københavns Kommune's own forecast, which is a different run — see docs/FORECAST.md."
+   },
+   {
+    "key": "fc_hh_gap",
+    "label": "Housing gap next 5 yrs, dwellings per 1,000 inh.",
+    "short": "Housing gap",
+    "unit": "dwellings / 1,000 inh.",
+    "level": "kommune",
+    "hue": [
+     12,
+     94,
+     104
+    ],
+    "hue_pos": [
+     12,
+     94,
+     104
+    ],
+    "hue_neg": [
+     166,
+     42,
+     22
+    ],
+    "scale": "diverging",
+    "center": 0,
+    "group": "Outlook",
+    "direction": "neutral",
+    "sources": [
+     {
+      "db": "housing_gap",
+      "table": "housing_gap",
+      "geo": "kommune"
+     }
+    ],
+    "calc": "housing_gap",
+    "field": "gap_per_1000",
+    "fmt": "signdec1",
+    "desc": "Dwellings the projected population growth 2026→2031 implies, minus the dwellings the recent building pace would deliver, per 1 000 inhabitants. Positive = undersupply.",
+    "source": "Danmarks Statistik FOLK1A (population), FAM55N (households), BYGV33 (dwellings by phase of construction) and FRKM126 (2026 municipal population projection) — see docs/FORECAST.md §7",
+    "warn": "Positive = undersupply. An arithmetic comparison, not a housing-market forecast: household size is held at its 2026 level and the building pace is the flat 2021–2025 average, while DST's projection is itself not housing-driven, so neither side responds to the other.",
+    "note": "Computed in scripts/build_housing_gap.py into data/processed/housing_gap.json. demand_5y = (P2031 − P2026) / persons_per_hh, where persons_per_hh is the municipality's own FOLK1A population ÷ FAM55N households at 1 January 2026; supply_5y = mean yearly BYGV33 completions 2021–2025 × 5 (all uses, all builder types); gap = demand_5y − supply_5y; the indicator is gap ÷ P2026 × 1000. Direction is neutral and the indicator must not be ranked good-to-bad — but for an owner a positive gap (undersupply) is supportive for rents and a negative one is not. Denmark as a whole sits at −22.3 and all 98 municipalities are negative in this vintage, because Denmark completes roughly five times the dwellings its projected population growth alone requires; the spread between municipalities is the story, not the sign. Demolitions, vacancy, second homes, conversions and the historical fall in household size are not modelled, and where the projection shrinks, demand_5y is negative so any completions at all read as oversupply. housing_gap.json also carries the permitted-not-started pipeline (BYGV33 permits minus starts over the latest four quarters) as context; it enters no figure here.",
+    "note_short": "Household size held constant; demolitions, vacancy and second homes are not modelled. All 98 municipalities are negative — Denmark builds about five times what its projected population growth alone requires, so read the spread, not the sign."
    }
   ]
  }

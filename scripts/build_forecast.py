@@ -41,7 +41,7 @@ Usage
   python scripts/build_forecast.py --no-fetch         # rebuild from the newest cached CSV
   python scripts/build_forecast.py --years 20         # a longer window (may need BULK)
   python scripts/build_forecast.py --indicators       # print the derived Outlook values
-  python scripts/build_forecast.py --indicators fc_20_34 --top 10
+  python scripts/build_forecast.py --indicators fc_20_34_rel --top 10
 """
 import argparse
 import csv
@@ -108,26 +108,54 @@ def age_bucket(code: str) -> str | None:
     return None
 
 
-# key -> (field in forecast.json, end year) ; "growth_5y" uses the mid year instead
-FIELDS = {"growth": "total", "growth_5y": "total", "abs": "total",
-          "a0_5": "a0_5", "a6_16": "a6_16", "a17_19": "a17_19",
-          "a20_34": "a20_34", "a35_64": "a35_64", "a65_79": "a65_79", "a80p": "a80p"}
+# indicator key -> the field in forecast.json it is derived from. Documentation only —
+# the arithmetic lives in indicators(); "growth_5y" uses the mid year, the "_rel" and
+# "_abs" pair are a pp difference against Denmark and a person count respectively.
+FIELDS = {"fc_growth": "total", "fc_growth_5y": "total", "fc_abs": "total",
+          "fc_0_5": "a0_5", "fc_6_16": "a6_16", "fc_20_34": "a20_34",
+          "fc_20_34_rel": "a20_34", "fc_20_34_abs": "a20_34", "fc_80p": "a80p"}
+
+# how --indicators KEY prints a value
+UNITS = {"fc_abs": "persons", "fc_20_34_abs": "persons", "fc_20_34_rel": "pp"}
+
+
+def national_pct(kom: dict, field: str, y0: str, y1: str) -> float | None:
+    """Denmark's own change in `field`, y0→y1, as Σ of the 98 kommuner in this file.
+
+    Deliberately summed from the same cells the per-kommune percentages come from, so
+    fc_20_34_rel is measured against its own aggregate rather than against a separately
+    rounded national table. validate_forecast.py check 5 reconciles it with FRDK's
+    published age detail — they agree to 0.001 pp.
+    """
+    a = sum(s[y0][field] for s in kom.values())
+    b = sum(s[y1][field] for s in kom.values())
+    return None if not a else (b - a) / a * 100
 
 
 def indicators(doc: dict, mid_offset: int = 5) -> dict[str, dict[str, float | int | None]]:
     """Outlook values per kommune: {code: {"fc_growth": %, ..., "fc_abs": persons}}.
 
     Every percentage is the change from the vintage year to the last year of the window,
-    except fc_growth_5y which stops `mid_offset` years in. fc_abs is persons, not a rate.
+    except fc_growth_5y which stops `mid_offset` years in. fc_abs and fc_20_34_abs are
+    persons, not rates; fc_20_34_rel is percentage points against Denmark.
     """
     kom, meta = doc["kommuner"], doc["meta"]
     y0, y1 = meta["first_year"], meta["last_year"]
     ymid = str(int(y0) + mid_offset)
+    # Denmark's 20–34 cohort shrinks in this vintage, so the absolute fc_20_34 map is
+    # almost uniformly negative and unreadable. fc_20_34_rel re-centres it on Denmark.
+    nat_20_34 = national_pct(kom, "a20_34", y0, y1)
     out = {}
     for code, series in kom.items():
-        def pct(field, end):
+        def raw(field, end):
             a, b = series[end][field], series[y0][field]
-            return None if not b else round((a - b) / b * 100, 2)
+            return None if not b else (a - b) / b * 100
+
+        def pct(field, end):
+            v = raw(field, end)
+            return None if v is None else round(v, 2)
+
+        r20 = raw("a20_34", y1)
         out[code] = {
             "fc_growth": pct("total", y1),
             "fc_growth_5y": pct("total", ymid) if ymid in series else None,
@@ -135,6 +163,8 @@ def indicators(doc: dict, mid_offset: int = 5) -> dict[str, dict[str, float | in
             "fc_0_5": pct("a0_5", y1),
             "fc_6_16": pct("a6_16", y1),
             "fc_20_34": pct("a20_34", y1),
+            "fc_20_34_rel": None if r20 is None or nat_20_34 is None else round(r20 - nat_20_34, 2),
+            "fc_20_34_abs": series[y1]["a20_34"] - series[y0]["a20_34"],
             "fc_80p": pct("a80p", y1),
         }
     return out
@@ -198,19 +228,30 @@ def main():
             print(json.dumps(vals, ensure_ascii=False, indent=1))
             return
         key = args.indicators
+        known = sorted(next(iter(vals.values())))
+        if key not in known:
+            sys.exit(f"unknown key {key!r} — one of {', '.join(known)}")
         rank = sorted((v[key], c) for c, v in vals.items() if v.get(key) is not None)
-        unit = "persons" if key == "fc_abs" else "%"
-        print(f"{key} · {y0}→{y1} · {len(rank)} kommuner · {unit}\n")
-        def show(rows, head):
-            print(head)
+        unit = UNITS.get(key, "%")
+        # the 20–34 keys are about the cohort, so show the cohort rather than the headcount
+        field = FIELDS.get(key, "total")
+        nat = national_pct(doc["kommuner"], "a20_34", y0, y1)
+        head = f"{key} · {y0}→{y1} · {len(rank)} kommuner · {unit}"
+        if key == "fc_20_34_rel":
+            head += f" vs Denmark {nat:+.2f} %"
+        print(head + "\n")
+
+        def show(rows, title):
+            print(title)
             for i, (v, c) in enumerate(rows, 1):
-                pop0, pop1 = doc["kommuner"][c][y0]["total"], doc["kommuner"][c][y1]["total"]
-                fmt = f"{v:+,.0f}" if key == "fc_abs" else f"{v:+.1f} %"
-                print(f"  {i:>2}. {c:>3} {names.get(c, ''):<22} {fmt:>10}   "
-                      f"pop {pop0:>9,} → {pop1:>9,}".replace(",", " "))
-        show(rank[::-1][:args.top], f"Top {args.top}")
+                a, b = doc["kommuner"][c][y0][field], doc["kommuner"][c][y1][field]
+                fmt = f"{v:+,.0f}" if unit == "persons" else f"{v:+.1f} {unit}"
+                print(f"  {i:>2}. {c:>3} {names.get(c, ''):<22} {fmt:>11}   "
+                      f"{field} {a:>9,} → {b:>9,}".replace(",", " "))
+        hi, lo = ("Largest gains", "Largest losses") if unit == "persons" else ("Top", "Bottom")
+        show(rank[::-1][:args.top], f"{hi} {args.top}")
         print()
-        show(rank[:args.top], f"Bottom {args.top}")
+        show(rank[:args.top], f"{lo} {args.top}")
         return
     today = dt.date.today().isoformat()
 
