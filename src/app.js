@@ -90,6 +90,10 @@ const CH = { ind: (IND[0] || {}).key, areas: [], y0: "", y1: "", median: true, t
 const PR = { id: null };                                                          /* project datasheet */
 const PB = { kom: null, id: null };                                               /* public-building sheet */
 const PL = { key: "" };                                                           /* public list panel: "<level>:<code>:<cat>:<kind>" */
+/* public-buildings filter, shared by the map, the legend and the area card. cats = null means all. */
+const PF = { cats: null, kind: "both" };
+const PF_SHORT = { education: "edu", institutions: "inst", health: "health", culture: "culture" };
+const PF_LONG = Object.fromEntries(Object.entries(PF_SHORT).map(([k, v]) => [v, k]));
 const PIPE = { type: "", status: "" };                                            /* pipeline filters */
 const T = { q: "", level: "kommune", region: "", minPop: 0 };                     /* table view filters */
 const REGIONS = ["Hovedstaden", "Sjælland", "Syddanmark", "Midtjylland", "Nordjylland"];
@@ -124,6 +128,10 @@ function hashFor() {
   if (S.view === "makro" && MK.micro) { q.push("micro=1"); q.push(`mind=${MK.mind}`); }
   if (S.view === "makro" && MK.infra) q.push("infra=1");   /* the overlay survives every level change */
   if (S.view === "makro" && MK.pub) q.push("public=1");
+  if (MK.pub || S.view === "publist") {
+    if (PF.cats) q.push(`pub=${[...PF.cats].map(c => PF_SHORT[c]).join(",")}`);
+    if (PF.kind !== "both") q.push(`pubkind=${PF.kind}`);
+  }
   if (S.view === "makro" && MK.focus) q.push(`focus=${encodeURIComponent(MK.focus)}`);
   let p;
   if (S.view === "area") { p = `area/${AR.type}/${AR.code}`; if (AR.group) q.push(`g=${encodeURIComponent(AR.group)}`); if (AR.sub !== "kvarter") q.push(`sub=${AR.sub}`); if (AR.tab !== "ind") q.push(`t=${AR.tab}`); }
@@ -153,13 +161,14 @@ function parseHash() {
   else if (v === "market") { S.view = "market"; MKT.src = q.src === "1"; }
   else if (v === "project" && parts[1]) { S.view = "project"; PR.id = decodeURIComponent(parts[1]); }
   else if (v === "public" && parts[2]) { S.view = "public"; PB.kom = parts[1]; PB.id = decodeURIComponent(parts[2]); }
-  else if (v === "publist" && parts[1]) { S.view = "publist"; PL.key = decodeURIComponent(parts.slice(1).join(":")); }
+  else if (v === "publist" && parts[1]) { S.view = "publist"; PL.key = decodeURIComponent(parts.slice(1).join(":")); pubParseFilter(q); }
   else if (v === "pipeline") { S.view = "pipeline"; PIPE.type = q.ptype || ""; PIPE.status = q.pstatus || ""; }
   else if (v === "charts") { S.view = "charts"; CH.ind = q.ind || CH.ind; CH.areas = q.a ? q.a.split(",").filter(Boolean) : CH.areas; CH.y0 = q.y0 || CH.y0; CH.y1 = q.y1 || CH.y1; CH.median = q.med !== "0"; CH.mode = q.mode || "auto"; CH.dist = q.dist || "size";
     CH.fq = q.fq === "q" ? "q" : "year"; CH.ov = q.ov ? q.ov.split(",").filter(Boolean) : []; CH.nat = q.nat !== "0"; }
   else { S.view = "makro"; MK.muni = parts[1] && byCode[parts[1]] ? parts[1] : null; MK.cphView = parts[2] === "postnr" ? "postnr" : "kvarter";
          MK.micro = q.micro === "1" && microAvail(MK.muni); if (q.mind && MICRO_INDS.some(i => i.key === q.mind)) MK.mind = q.mind;
-         MK.infra = q.infra === "1"; MK.pub = q.public === "1"; MK.focus = q.focus || null; if (MK.focus) MK.infra = true; }
+         MK.infra = q.infra === "1"; MK.pub = q.public === "1";
+         pubParseFilter(q); MK.focus = q.focus || null; if (MK.focus) MK.infra = true; }
   if (!curInds().some(i => i.key === MK.ind)) MK.ind = (curInds()[0] || {}).key;
   if (!yearsFor(MK.ind).includes(MK.year)) MK.year = LATEST;
   if (S.view === "makro") {
@@ -242,7 +251,19 @@ document.addEventListener("click", e => {
   if ((el = g("[data-micro]"))) { MK.micro = el.dataset.micro === "1"; syncHash(); renderKeep(); return; }
   if (g("[data-infra]")) { MK.infra = !MK.infra; syncHash(); renderKeep(); return; }
   if (g("[data-public]")) { MK.pub = !MK.pub; syncHash(); renderKeep(); return; }
-  if ((el = g("[data-publist]"))) { go(`publist/${el.dataset.publist}`); return; }
+  if ((el = g("[data-pubonly]"))) { pubSetFilter({ cats: new Set([el.dataset.pubonly]) }); return; }
+  if (g("[data-puball]")) { pubSetFilter({ cats: null, kind: "both" }); return; }
+  if ((el = g("[data-pubcat]"))) { const k = el.dataset.pubcat;
+    if (e.shiftKey) { pubSetFilter({ cats: new Set([k]) }); return; }
+    const cur = PF.cats ? new Set(PF.cats) : new Set(Object.keys(PUB_CAT));
+    cur.has(k) ? cur.delete(k) : cur.add(k);
+    pubSetFilter({ cats: cur.size === Object.keys(PUB_CAT).length ? null : cur }); return; }
+  if ((el = g("[data-pubkind]"))) { const k = el.dataset.pubkind;
+    pubSetFilter({ kind: PF.kind === k ? "both" : k }); return; }
+  if ((el = g("[data-publist]"))) {
+    const f = el.dataset.pubfilter;      /* the card segments set the same filter the legend uses */
+    if (f) { const [c, k] = f.split(":"); PF.cats = c ? new Set([c]) : null; PF.kind = k === "case" ? "open" : k === "existing" ? "existing" : "both"; }
+    go(`publist/${el.dataset.publist}`); return; }
   if ((el = g("[data-pubsheet]"))) { const row = el.closest("[data-pubkom]"); go(`public/${(row && row.dataset.pubkom) || (MK.muni || CPH_MUNI)}/${el.dataset.pubsheet}`); return; }
   if (g("[data-mcsv]")) { exportMicroCsv(); return; }
   if ((el = g("[data-argroup]"))) { AR.group = el.dataset.argroup; syncHash(); renderKeep(); return; }
@@ -1515,12 +1536,30 @@ function pubLoad(code) {
     .catch(() => { delete PUB_FILES["_loading_" + k]; PUB_FILES["_error_" + k] = true; });
 }
 /* what to draw: the municipality in view, else every loaded file — and at national zoom only the open cases */
-function pubRows() {
+function pubParseFilter(q) {
+  const raw = (q.pub || "").trim();
+  PF.cats = !raw || raw === "all" ? null : new Set(raw.split(",").map(c => PF_LONG[c]).filter(Boolean));
+  if (PF.cats && !PF.cats.size) PF.cats = null;
+  PF.kind = ["existing", "open"].includes(q.pubkind) ? q.pubkind : "both";
+}
+const pubCatOn = c => !PF.cats || PF.cats.has(c);
+const pubKindOn = kind => PF.kind === "both" || (PF.kind === "existing" ? kind === "existing" : kind === "case");
+function pubSetFilter({ cats, kind }) {
+  if (cats !== undefined) PF.cats = cats;
+  if (kind !== undefined) PF.kind = kind;
+  syncHash(); renderKeep();
+}
+/* every loaded building that passes the filter, before the zoom rule */
+function pubAll() {
   const loaded = Object.keys(PUB_FILES).filter(k => !k.startsWith("_"));
   const keys = MK.muni && pubAvail(MK.muni) ? [String(Number(MK.muni))] : loaded;
-  const rows = keys.flatMap(k => (PUB_FILES[k] || {}).buildings || []);
+  return keys.flatMap(k => (PUB_FILES[k] || {}).buildings || [])
+    .filter(b => pubCatOn(b.cat) && pubKindOn(b.kind) && (b.kind === "existing" || b.recent));
+}
+function pubRows() {
+  const rows = pubAll();
   const wide = !MK.muni && (!LF.map || LF.map.getZoom() < 11);
-  return wide ? rows.filter(b => b.kind === "case" && b.recent) : rows.filter(b => b.kind === "existing" || b.recent);
+  return wide ? rows.filter(b => b.kind === "case") : rows;
 }
 function pubPopup(b) {
   const c = pubCat(b), row = (l, v) => v == null || v === "" ? "" : `<span class="lfrow"><span>${esc(l)}</span><b>${v}</b></span>`;
@@ -1581,19 +1620,26 @@ function setPublicLegend() {
   el.style.display = MK.pub && PUB ? "" : "none";
   if (!(MK.pub && PUB)) return;
   const rows = pubRows(), n = rows.length, cases = rows.filter(b => b.kind === "case").length;
-  el.innerHTML = `<div class="lgtitle">Public buildings<span>BBR ${esc(PUB.built)} · pilot: ${PUB.kommuner.map(k => esc((byCode[k] || {}).name || k)).join(", ")}</span></div>
-    ${Object.entries(PUB_CAT).map(([k, c]) => `<div class="lgrow"><i style="background:${c.color};border-radius:50%"></i>${c.label}</div>`).join("")}
-    <div class="lgrow gk"><i class="pk-exist"></i>existing<i class="pk-case"></i>open case</div>
+  const filtered = !!PF.cats || PF.kind !== "both";
+  /* the rows are toggles: click hides or shows a category, shift-click (or "only") isolates it */
+  const catRow = (k, c) => `<div class="lgrow pubtog ${pubCatOn(k) ? "" : "off"}" data-pubcat="${k}" title="click to hide or show · shift-click for only this one">
+      <i style="background:${c.color};border-radius:50%"></i>${esc(c.label)}<b class="only" data-pubonly="${k}">only</b></div>`;
+  const kindRow = `<div class="lgrow gk">
+      <span class="pubtog ${pubKindOn("existing") ? "" : "off"}" data-pubkind="existing"><i class="pk-exist"></i>existing</span>
+      <span class="pubtog ${pubKindOn("case") ? "" : "off"}" data-pubkind="open"><i class="pk-case"></i>open case</span></div>`;
+  el.innerHTML = `<div class="lgtitle">Public buildings<span>BBR ${esc(PUB.built)} · ${PUB.kommuner.length} municipalities${filtered ? ` · <b class="only" data-puball>All</b>` : ""}</span></div>
+    ${Object.entries(PUB_CAT).map(([k, c]) => catRow(k, c)).join("")}
+    ${kindRow}
     <div class="lgnote">${nf(n - cases, 0)} existing · ${nf(cases, 0)} open cases (permit ≤ ${PUB.recent_years} yr) drawn${MK.muni ? "" : " · zoom in for the existing stock"}</div>`;
 }
 /* the PUBLIC line on an area card */
 function publicLine(level, code) {
   const e = pubOf(level, code); if (!e) return "";
   const seg = Object.entries(PUB_CAT).map(([k, c]) => { const v = (e.counts || {})[k] || {};
-    return v.existing ? `<button class="lk mini" data-publist="${level}:${code}:${k}:existing" style="border-color:${c.color}66">${nf(v.existing, 0)} ${esc(k === "institutions" ? "daycare/inst." : c.label.toLowerCase())}</button>` : ""; }).join("");
+    return v.existing ? `<button class="lk mini" data-publist="${level}:${code}:${k}:existing" data-pubfilter="${k}:existing" style="border-color:${c.color}66">${nf(v.existing, 0)} ${esc(k === "institutions" ? "daycare/inst." : c.label.toLowerCase())}</button>` : ""; }).join("");
   const cases = Object.values(e.counts || {}).reduce((s, v) => s + (v.case || 0), 0);
   if (!seg && !cases) return "";
-  return `<span class="upcoming"><em>Public</em>${seg}${cases ? `<button class="lk mini" data-publist="${level}:${code}::case">${cases} open case${cases > 1 ? "s" : ""}</button>` : ""}</span>`;
+  return `<span class="upcoming"><em>Public</em>${seg}${cases ? `<button class="lk mini" data-publist="${level}:${code}::case" data-pubfilter=":case">${cases} open case${cases > 1 ? "s" : ""}</button>` : ""}</span>`;
 }
 
 /* ---------- Project datasheet (#project/<id>) and Pipeline table (#pipeline) ---------- */

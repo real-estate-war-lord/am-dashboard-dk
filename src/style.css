@@ -1450,3 +1450,11 @@ th .thn{display:inline}
 .maplegend .lgrow.gk i.pk-exist{width:10px;flex-basis:10px;height:10px;border-radius:50%;background:var(--muted);border:0}
 .maplegend .lgrow.gk i.pk-case{width:10px;flex-basis:10px;height:10px;border-radius:50%;background:#fff;border:2px dashed var(--muted)}
 .publab b{font-size:10px}
+/* clickable legend rows (public buildings filter) */
+.maplegend.publiclegend{pointer-events:auto}
+.maplegend .lgrow.pubtog,.maplegend .pubtog{cursor:pointer;border-radius:4px;padding:1px 3px;margin:0 -3px}
+.maplegend .lgrow.pubtog:hover,.maplegend .pubtog:hover{background:rgba(20,28,24,.06)}
+.maplegend .pubtog.off{opacity:.38;text-decoration:line-through}
+.maplegend .only{font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-left:auto;padding-left:6px;cursor:pointer}
+.maplegend .only:hover{color:var(--ink);text-decoration:underline}
+.maplegend .lgrow.gk .pubtog{display:inline-flex;align-items:center;gap:4px}
