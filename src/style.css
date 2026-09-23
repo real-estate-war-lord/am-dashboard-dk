@@ -1502,3 +1502,63 @@ th .thn{display:inline}
 .tppop .hlc b{font-size:17px}
 .tppop .hlc em{font-size:9.5px}
 .tppop .cap{margin:2px 0 0}
+
+/* ---------- Analysis sheet: one property against every layer ---------- */
+/* the title is an input, so the identity column needs a basis of its own — a bare input shrinks to ~20 characters */
+.anhead .arid{flex:1 1 420px;min-width:0}
+.anhead .anlab{font-family:var(--disp);font-size:30px;font-weight:700;letter-spacing:-.03em;color:var(--ink);
+  display:block;width:100%;border:1px solid transparent;border-radius:8px;background:transparent;padding:2px 7px;margin:0 0 8px -7px}
+.anhead .anlab:hover{border-color:var(--line)}
+.anhead .anlab:focus{border-color:var(--ink);background:var(--panel2);outline:none}
+.anhead .hl{grid-template-columns:repeat(5,minmax(0,1fr))}
+.anlead{font-family:var(--disp);font-size:17px;color:var(--ink2);margin:14px 0 2px}
+/* the empty state has the whole card to itself — the box does not have to share a toolbar */
+.card>.tools .tpbox .tpq{min-width:min(460px,60vw)}
+#anmap{height:clamp(320px,calc(100vh - 520px),460px);border:1px solid var(--line);border-radius:10px;background:var(--panel2);position:relative;z-index:0;isolation:isolate}
+#anmap path{cursor:pointer}
+/* the indicator table: group headers, then the percentile bar column */
+.antbl tbody tr.angrp>th,.tbl tbody tr.angrp>th{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);font-weight:500;border-bottom:1px solid var(--line);padding-top:11px;background:transparent}
+.tbl tbody tr.angrp:hover{background:transparent}
+.tbl th.anbc{width:160px;text-align:left}
+.tbl td.anbc{min-width:140px}
+.anbw{display:flex;align-items:center;gap:7px}
+.anbar{position:relative;display:block;flex:1 1 auto;height:8px;min-width:64px;background:var(--line2);border-radius:2px;overflow:hidden}
+.anbar i{display:block;height:100%;background:#1C6B5C;border-radius:2px}
+.anbw em{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--muted);flex:0 0 auto;min-width:18px;text-align:right}
+/* the four category counts above the nearest-buildings table */
+.card .hl.anhl4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:9px;overflow:hidden;margin:2px 0 4px}
+@media (max-width:820px){.card .hl.anhl4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+/* a station that has not opened yet, inside the 1 200 m ring */
+.anchips{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 12px}
+.anchip{display:flex;flex-direction:column;gap:1px;text-align:left;cursor:pointer;font:inherit;
+  border:1px solid var(--line);border-left:3px solid var(--muted);border-radius:8px;background:var(--panel2);padding:7px 12px 6px}
+.anchip:hover{background:var(--panel);border-color:var(--ink)}
+.anchip b{font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.anchip span{font-family:var(--disp);font-size:15px;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
+.anchip em{font-style:normal;font-family:var(--mono);font-size:10.5px;color:var(--ink2)}
+.anchip.st-construction{border-left-color:#1C6B5C}
+.anchip.st-decided{border-left-color:#5C5F52}
+.anchip.st-study{border-left-color:#8A8C81}
+.anfacts{display:flex;flex-wrap:wrap;gap:6px 26px;margin:12px 0 2px;font-size:12px;color:var(--ink2)}
+.anfacts span{display:flex;align-items:baseline;gap:6px}
+.anfacts em{font-style:normal;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.anfacts b{font-family:var(--mono);font-size:14px}
+/* status pill outside a map popup */
+.card .ipill{display:inline-block;font-style:normal;font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;
+  border:1px solid var(--line);border-radius:999px;padding:1px 7px;color:var(--ink2);white-space:nowrap}
+.card .ipill.st-construction{color:#1C6B5C;border-color:#BBD8CF}
+.card .ipill.st-decided{color:#5C5F52;border-color:#D6D8CE}
+.card .ipill.st-opened{color:#8A8C81}
+/* a section still waiting for its file: height kept, nothing claimed */
+.anskel{display:grid;gap:7px;margin:10px 0 2px}
+.anskel span{display:block;height:15px;border-radius:4px;
+  background:linear-gradient(90deg,var(--line2) 0%,var(--panel2) 50%,var(--line2) 100%);background-size:220% 100%;
+  animation:anshim 1.4s linear infinite}
+.anskel span:nth-child(2){width:88%}.anskel span:nth-child(3){width:72%}
+.anskel span:nth-child(4){width:80%}.anskel span:nth-child(5){width:60%}
+@keyframes anshim{from{background-position:120% 0}to{background-position:-120% 0}}
+@media (prefers-reduced-motion:reduce){.anskel span{animation:none}}
+@media (max-width:1180px){.anhead .hl{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:820px){.anhead .hl{grid-template-columns:repeat(2,minmax(0,1fr))}.anhead .anlab{font-size:24px}}
