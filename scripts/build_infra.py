@@ -18,6 +18,9 @@ Output
   stations                                                     a line through this project's own stations
   (empty)                                                      no geometry — the feature still carries its data
 
+`map: false` in the CSV keeps a project out of the map layer (a nationwide systems programme has no
+alignment); it is still in the file, for the pipeline table.
+
 A row whose source yields nothing keeps `"geometry": null`; nothing is invented to fill a gap.
 Lines are simplified to ~20 m. Needs: pip3 install shapely (pdfplumber only for the PDF parser).
 
@@ -211,6 +214,7 @@ def main():
                 "budget_mdkk": num(row["budget_mdkk"]), "agency": row["agency"] or None,
                 "kommuner": kommuner_of(g, komm, row.get("kommuner_override", "")), "parent_id": row["parent_id"] or None,
                 "schematic": (row["geometry_source"] or "").startswith("manual") or row["geometry_source"] == "stations",
+                "map": (row.get("map") or "true").strip().lower() != "false",
                 "source_url": row["source_url"], "source_doc": row["source_doc"] or None,
                 "geometry_source": row["geometry_source"] or None, "updated": today, "notes": row["notes"] or None,
             },

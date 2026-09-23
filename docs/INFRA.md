@@ -42,6 +42,7 @@ they show *where* a project runs, never how it will be built, and must not be me
 | `source_doc` | string \| null | e.g. `Anlægsstatus 1H 2026 p. 34` |
 | `geometry_source` | string \| null | how the geometry was resolved (§4), kept in the output so every shape can be traced |
 | `updated` | date | build date |
+| `map` | bool | default `true`. `false` keeps the project off the map while leaving it in the file — for a programme with no alignment (`signalprogrammet`, nationwide signalling), which belongs in the pipeline table only |
 | `schematic` | bool | true when the geometry was drawn by hand (`manual:…`) or derived from station points (`stations`) — it shows where a project runs, not how it will be built |
 | `kommuner_override` (CSV only) | list of codes | used when the spatial join returns nothing, e.g. Lynetteholm, which is reclaimed land outside every DAGI municipality polygon |
 | `notes` | string \| null | caveats: schematic geometry, price level, phased openings |
@@ -137,6 +138,6 @@ and its `source_url`.
   publishes an alignment — Kattegat, Aarhus Letbane etape 2, Storstrømsbroen, Nordhavnstunnel,
   Ringsted–Odense, Signalprogrammet and the Lynetteholm and Nordhavn areas — and the two M5 lines are
   drawn through their station points. Signalprogrammet is nationwide, so its line is only a sketch of
-  the main København–Odense–Fredericia–Aarhus–Aalborg corridor. They are fit for showing *where* a
+  the main København–Odense–Fredericia–Aarhus–Aalborg corridor and the project carries `map: false`. They are fit for showing *where* a
   project is, not for any measurement.
 - `kommuner` is computed from the geometry; `kommuner_override` covers what the join cannot answer.

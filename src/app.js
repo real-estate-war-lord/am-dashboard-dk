@@ -66,7 +66,7 @@ const cphMode = () => !!(CPH && MK.muni === CPH_MUNI && MK.cphView !== "postnr")
 const S = { view: "makro" };
 const YEARS = [...new Set([...((D.meta && D.meta.years) || []), ...((D.cph && D.cph.meta && D.cph.meta.years) || [])])].sort();
 const LATEST = (D.meta && D.meta.latest_year) || (YEARS[YEARS.length - 1] || "");
-const MK = { ind: (IND[0] || {}).key, muni: null, own: false, year: LATEST, cphView: "kvarter", micro: false, mind: "rented_pct" };
+const MK = { ind: (IND[0] || {}).key, muni: null, own: false, year: LATEST, cphView: "kvarter", micro: false, mind: "rented_pct", infra: false };
 /* Micro (building) layer: dist/micro/<kommune>.json, loaded on demand; D.micro = index {code: {file, n}} */
 const MICRO_IDX = (D.micro && D.micro.municipalities) || {};
 const MICRO = {};                                  /* code → {meta, b:[…]} once loaded */
@@ -118,6 +118,7 @@ const curInd = () => { const L = curInds(); return L.find(i => i.key === MK.ind)
 function hashFor() {
   const q = [`ind=${encodeURIComponent(MK.ind || "")}`]; if (MK.year && MK.year !== LATEST) q.push(`y=${MK.year}`);
   if (S.view === "makro" && MK.micro) { q.push("micro=1"); q.push(`mind=${MK.mind}`); }
+  if (S.view === "makro" && MK.infra) q.push("infra=1");   /* the overlay survives every level change */
   let p;
   if (S.view === "area") { p = `area/${AR.type}/${AR.code}`; if (AR.group) q.push(`g=${encodeURIComponent(AR.group)}`); if (AR.sub !== "kvarter") q.push(`sub=${AR.sub}`); if (AR.tab !== "ind") q.push(`t=${AR.tab}`); }
   else if (S.view === "table") p = `table/${T.level}`;
@@ -143,7 +144,8 @@ function parseHash() {
   else if (v === "charts") { S.view = "charts"; CH.ind = q.ind || CH.ind; CH.areas = q.a ? q.a.split(",").filter(Boolean) : CH.areas; CH.y0 = q.y0 || CH.y0; CH.y1 = q.y1 || CH.y1; CH.median = q.med !== "0"; CH.mode = q.mode || "auto"; CH.dist = q.dist || "size";
     CH.fq = q.fq === "q" ? "q" : "year"; CH.ov = q.ov ? q.ov.split(",").filter(Boolean) : []; CH.nat = q.nat !== "0"; }
   else { S.view = "makro"; MK.muni = parts[1] && byCode[parts[1]] ? parts[1] : null; MK.cphView = parts[2] === "postnr" ? "postnr" : "kvarter";
-         MK.micro = q.micro === "1" && microAvail(MK.muni); if (q.mind && MICRO_INDS.some(i => i.key === q.mind)) MK.mind = q.mind; }
+         MK.micro = q.micro === "1" && microAvail(MK.muni); if (q.mind && MICRO_INDS.some(i => i.key === q.mind)) MK.mind = q.mind;
+         MK.infra = q.infra === "1"; }
   if (!curInds().some(i => i.key === MK.ind)) MK.ind = (curInds()[0] || {}).key;
   if (!yearsFor(MK.ind).includes(MK.year)) MK.year = LATEST;
   if (S.view === "makro") {
@@ -216,6 +218,7 @@ document.addEventListener("click", e => {
   if (g("[data-chcsv]")) { chartCsv(); return; }
   if (g("[data-chclear]")) { CH.areas = []; syncHash(); renderKeep(); return; }
   if ((el = g("[data-micro]"))) { MK.micro = el.dataset.micro === "1"; syncHash(); renderKeep(); return; }
+  if (g("[data-infra]")) { MK.infra = !MK.infra; syncHash(); renderKeep(); return; }
   if (g("[data-mcsv]")) { exportMicroCsv(); return; }
   if ((el = g("[data-argroup]"))) { AR.group = el.dataset.argroup; syncHash(); renderKeep(); return; }
   if ((el = g("[data-artab]"))) { AR.tab = el.dataset.artab; syncHash(); renderKeep(); return; }
@@ -319,7 +322,12 @@ function legendHtml(sc, ind, key, note) {
     (lowerBetter(ind.key || "") ? `<div class="lgnote">↓ lower is better · darkest = highest</div>` : "") +
     `${note ? `<div class="lgnote">${note}</div>` : ""}`;
 }
-function setLegend(id, sc, ind, key, note) { const el = document.getElementById(id); if (el) el.innerHTML = legendHtml(sc, ind, key, note); }
+function setLegend(id, sc, ind, key, note) { const el = document.getElementById(id); if (el) el.innerHTML = legendHtml(sc, ind, key, note); setInfraLegend(); }
+function setInfraLegend() {
+  const el = document.getElementById("infralegend"); if (!el) return;
+  el.style.display = MK.infra && INFRA.length ? "" : "none";
+  if (MK.infra && INFRA.length) el.innerHTML = infraLegendHtml();
+}
 const GROUP_ORDER = ["Demographics", "Income & jobs", "Housing stock", "Housing stock (BBR)", "Rents", "Prices & market", "Construction", "Safety"];
 /* "label · unit" for selects, leaving out unit parts the label already says ("Reported crime · per 1,000 inh." + "rolling 4Q") */
 function optLabel(i) {
@@ -448,11 +456,11 @@ function vMakro() {
   return `
   <div class="card accent" id="mapcard">
     <div class="card-head tools-only">
-      <div class="tools">${areaSearch()}${muni && microAvail(muni.code) ? `<div class="seg"><button class="sg ${!MK.micro ? "on" : ""}" data-micro="0">Areas</button><button class="sg ${MK.micro ? "on" : ""}" data-micro="1">Buildings (${nf(MICRO_IDX[String(Number(muni.code))].n, 0)})</button></div>` : ""}${muni && muni.code === CPH_MUNI && CPH && !microMode() ? `<div class="seg"><button class="sg ${MK.cphView !== "postnr" ? "on" : ""}" data-cphview="kvarter">Quarters (${CPH.areas.length})</button><button class="sg ${MK.cphView === "postnr" ? "on" : ""}" data-cphview="postnr">Postal codes</button></div>` : ""}${microMode() ? mindSelect() : indSelect() + yearSelect()}${D.portfolio ? `<button class="lk mini ${MK.own ? "primary" : ""}" data-mkown>● Own properties</button>` : ""}<button class="lk" data-fs title="Full screen (Esc to exit)">⤢ Full screen</button></div>
+      <div class="tools">${areaSearch()}${muni && microAvail(muni.code) ? `<div class="seg"><button class="sg ${!MK.micro ? "on" : ""}" data-micro="0">Areas</button><button class="sg ${MK.micro ? "on" : ""}" data-micro="1">Buildings (${nf(MICRO_IDX[String(Number(muni.code))].n, 0)})</button></div>` : ""}${muni && muni.code === CPH_MUNI && CPH && !microMode() ? `<div class="seg"><button class="sg ${MK.cphView !== "postnr" ? "on" : ""}" data-cphview="kvarter">Quarters (${CPH.areas.length})</button><button class="sg ${MK.cphView === "postnr" ? "on" : ""}" data-cphview="postnr">Postal codes</button></div>` : ""}${INFRA.length ? `<div class="seg"><button class="sg ${MK.infra ? "on" : ""}" data-infra title="Show planned and ongoing infrastructure projects on top of the map">Infra projects</button></div>` : ""}${microMode() ? mindSelect() : indSelect() + yearSelect()}${D.portfolio ? `<button class="lk mini ${MK.own ? "primary" : ""}" data-mkown>● Own properties</button>` : ""}<button class="lk" data-fs title="Full screen (Esc to exit)">⤢ Full screen</button></div>
       ${microMode() ? "" : indQuick()}</div>
     ${microMode() ? microExplain() : indExplain(ind)}
     ${muni && !microMode() ? muniStrip(muni) : ""}
-    <div class="mapwrap"><div id="lfmap"></div><div class="maplegend" id="maplegend"></div></div>
+    <div class="mapwrap"><div id="lfmap"></div><div class="maplegend infralegend" id="infralegend"></div><div class="maplegend" id="maplegend"></div></div>
     ${srcNote(`<p class="cap">${muni ? "Click a polygon for its figures and a link to its page." : "Click a polygon for its figures; open a municipality with the search box above or from the popup. Table view lists everything side by side."} Colour classes: quintiles of the visible areas. Boundaries: DAGI, Klimadatastyrelsen (simplified); basemap OpenStreetMap.</p>`)}
   </div>`;
 }
@@ -795,6 +803,115 @@ function arMapInit() {
   const b = boundsOf(own); if (b) map.fitBounds(b, { padding: kommuneLevel ? [90, 90] : e.type === "kommune" ? [10, 10] : [70, 70], maxZoom: kommuneLevel ? 9 : 13 });
 }
 
+
+/* ---------- Infrastructure projects overlay (data/geo/infra_projects.geojson, see docs/INFRA.md) ---------- */
+const INFRA = ((D.infra && D.infra.features) || []).filter(f => f.geometry);
+/* four tones of the map's own palette: the overlay must not compete with the choropleth underneath */
+const INFRA_ST = {
+  study:        { label: "Study",        color: "#8A8C81", dash: "2 5", weight: 2.2, fill: false },
+  decided:      { label: "Decided",      color: "#5C5F52", dash: "8 5", weight: 2.6, fill: false },
+  construction: { label: "Under construction", color: "#1C6B5C", dash: "", weight: 3.2, fill: true },
+  opened:       { label: "Opened",       color: "#9A9D92", dash: "", weight: 1.6, fill: true },
+};
+const INFRA_TYPE = { metro: "Metro", letbane: "Light rail", brt: "BRT", rail: "Rail", road: "Road",
+                     bridge_tunnel: "Bridge / tunnel", urban_dev: "Urban development", hospital: "Hospital", university: "University" };
+const infraSt = p => INFRA_ST[p.status] || INFRA_ST.study;
+const isPt = f => f.geometry.type === "Point";
+const isArea = f => f.geometry.type === "Polygon" || f.geometry.type === "MultiPolygon";
+/* "M5: København H" → "København H" for map labels */
+const infraShort = p => (p.name || "").replace(/^[^:]{1,14}:\s*/, "");
+function infraStyle(p) {
+  const s = infraSt(p);
+  return { color: s.color, weight: p.schematic ? Math.max(1.2, s.weight * .6) : s.weight,
+           opacity: p.schematic ? .75 : .95, dashArray: s.dash || null, lineCap: "round", lineJoin: "round" };
+}
+function infraPopup(p) {
+  const bn = p.budget_mdkk == null ? null : nf(p.budget_mdkk / 1000, 1) + " bn DKK" + (/2015 prices/i.test(p.notes || "") ? " (2015 prices)" : "");
+  const row = (l, v) => v ? `<span class="lfrow"><span>${esc(l)}</span><b>${v}</b></span>` : "";
+  const yr = p.open_year ? `${p.open_year}${p.open_year_original && p.open_year_original !== p.open_year ? ` <span class="dim">originally ${p.open_year_original}</span>` : ""}` : "–";
+  const komm = (p.kommuner || []).map(c => byCode[c]).filter(Boolean);
+  return `<div class="lfpop"><b>${esc(p.name)}</b>
+    <span class="infrapills"><i class="ipill">${esc(INFRA_TYPE[p.type] || p.type)}</i><i class="ipill st-${esc(p.status)}">${esc(infraSt(p).label)}</i>${p.schematic ? `<i class="ipill dim">schematic corridor</i>` : ""}</span>
+    <div class="lfrows">${row("Opening", yr)}${row("Budget", bn)}${row("Agency", esc(p.agency || ""))}
+      ${row("Municipalities", komm.length ? komm.slice(0, 4).map(m => esc(m.name)).join(", ") + (komm.length > 4 ? ` +${komm.length - 4}` : "") : "")}</div>
+    ${p.schematic ? `<p class="cap">Schematic corridor — not an official alignment. It shows where the project runs, not how it will be built.</p>` : ""}
+    ${p.notes ? `<p class="cap">${esc(p.notes)}</p>` : ""}
+    <span class="lfact">${komm.length === 1 ? `<button class="lk mini primary" data-go="${withQ(pageOf(komm[0]))}">${esc(komm[0].name)} ›</button>` : ""}
+      <a class="lk mini" href="${esc(p.source_url)}" target="_blank" rel="noopener">Source ↗</a></span>
+    <p class="cap dim">${esc(p.source_doc || "")}${p.source_doc ? " · " : ""}updated ${esc(p.updated || "")}</p></div>`;
+}
+/* hatched fill for development areas — an SVG pattern added once to the map's overlay pane */
+function infraHatch() {
+  const svg = LF.map.getPane("overlayPane").querySelector("svg");
+  if (!svg || svg.querySelector("#infra-hatch")) return !!svg;
+  const ns = "http://www.w3.org/2000/svg";
+  const defs = document.createElementNS(ns, "defs"), pat = document.createElementNS(ns, "pattern");
+  pat.setAttribute("id", "infra-hatch"); pat.setAttribute("width", "7"); pat.setAttribute("height", "7");
+  pat.setAttribute("patternUnits", "userSpaceOnUse"); pat.setAttribute("patternTransform", "rotate(45)");
+  const line = document.createElementNS(ns, "line");
+  line.setAttribute("x1", "0"); line.setAttribute("y1", "0"); line.setAttribute("x2", "0"); line.setAttribute("y2", "7");
+  line.setAttribute("stroke", "#1C6B5C"); line.setAttribute("stroke-width", "2"); line.setAttribute("opacity", ".45");
+  pat.appendChild(line); defs.appendChild(pat); svg.insertBefore(defs, svg.firstChild);
+  return true;
+}
+function lfInfraLayers() {
+  ["infraG", "infraStG", "infraLabG"].forEach(k => { if (LF[k]) { LF.map.removeLayer(LF[k]); LF[k] = null; } });
+  if (!LF.map || !MK.infra || !INFRA.length) return;
+  const lines = [], stations = [];
+  INFRA.forEach(f => {
+    const p = f.properties;
+    if (isPt(f)) { stations.push(f); return; }
+    const style = isArea(f) ? { ...infraStyle(p), weight: 1.2, fillColor: infraSt(p).color, fillOpacity: .14 } : infraStyle(p);
+    const layer = L.geoJSON(f, { style, interactive: true });
+    layer.bindPopup(() => infraPopup(p), { maxWidth: 440, autoPanPadding: [24, 24] });
+    layer._infra = p;
+    lines.push(layer);
+  });
+  LF.infraG = L.layerGroup(lines).addTo(LF.map);
+  if (infraHatch()) lines.forEach(l => { const f = l.toGeoJSON().features[0]; if (f && (f.geometry.type === "Polygon" || f.geometry.type === "MultiPolygon"))
+    l.eachLayer(x => x._path && x._path.setAttribute("fill", "url(#infra-hatch)")); });
+  /* stations sit above their line */
+  LF.infraStG = L.layerGroup(stations.map(f => {
+    const p = f.properties, s = infraSt(p), c = f.geometry.coordinates;
+    const m = L.circleMarker([c[1], c[0]], { radius: 5, color: s.color, weight: 2, opacity: .95,
+      fillColor: s.fill ? s.color : "#FFFFFF", fillOpacity: s.fill ? .9 : 1 });
+    m.bindPopup(() => infraPopup(p), { maxWidth: 440, autoPanPadding: [24, 24] });
+    m._infra = p; m._ll = [c[1], c[0]];
+    return m;
+  })).addTo(LF.map);
+  lfInfraLabels();
+}
+function lfInfraLabels() {
+  if (LF.infraLabG) { LF.map.removeLayer(LF.infraLabG); LF.infraLabG = null; }
+  if (!LF.map || !MK.infra || !INFRA.length) return;
+  const z = LF.map.getZoom(), labs = [], placed = [];
+  const put = (ll, html, cls) => {
+    const pt = LF.map.latLngToContainerPoint(ll);
+    if (placed.some(q => Math.abs(q.x - pt.x) < 78 && Math.abs(q.y - pt.y) < 20)) return;
+    placed.push(pt);
+    labs.push(L.marker(ll, { interactive: false, icon: L.divIcon({ className: "lflab infralab " + cls, iconSize: null, html }) }));
+  };
+  if (z >= 12) INFRA.filter(isPt).forEach(f => {
+    const p = f.properties, c = f.geometry.coordinates;
+    put([c[1], c[0]], `<b>${esc(infraShort(p))}</b>${p.open_year ? ` <i>· ${p.open_year}</i>` : ""}`, "infralab-st");
+  });
+  /* one label per line, at mid-zoom: national view is too crowded, close-up the station labels take over */
+  if (z >= 8 && z < 12) INFRA.filter(f => !isPt(f) && !isArea(f)).forEach(f => {
+    const p = f.properties;
+    const cs = f.geometry.type === "MultiLineString" ? f.geometry.coordinates.flat() : f.geometry.coordinates;
+    const c = cs[Math.floor(cs.length / 2)];
+    put([c[1], c[0]], `<b>${esc(infraShort(p))}</b>`, "infralab-line");
+  });
+  LF.infraLabG = L.layerGroup(labs).addTo(LF.map);
+}
+function infraLegendHtml() {
+  const sw = s => `<div class="lgrow"><i class="ilg" style="border-color:${INFRA_ST[s].color};${INFRA_ST[s].dash ? `border-top-style:dashed` : ""};${INFRA_ST[s].fill ? `background:${INFRA_ST[s].color}22` : ""}"></i>${INFRA_ST[s].label}</div>`;
+  return `<div class="lgtitle">Infra projects<span>${INFRA.length} projects · Fingerplan, Anlægsstatus, OSM</span></div>
+    ${["study", "decided", "construction", "opened"].map(sw).join("")}
+    <div class="lgrow gk"><i class="gk-line"></i>line<i class="gk-st"></i>station<i class="gk-area"></i>area</div>
+    <div class="lgnote">dotted = schematic corridor, not an official alignment</div>`;
+}
+
 /* ---------- Leaflet layers (macro map) ---------- */
 function lfPopup(a, muni) {
   /* two levels: the selected indicator big + four headline figures and the ways onward; every value behind "all values" */
@@ -973,6 +1090,7 @@ function lfMicroLayers() {
     m._dw = r[2]; m._row = r; m.bindPopup(() => microPopup(r), { maxWidth: 440, autoPanPadding: [24, 24] }); return m; });
   LF.microG = L.layerGroup(marks).addTo(LF.map); LF.microMarks = marks;
   setLegend("maplegend", sc, ind, "micro:" + ind.key, "buildings with ≥ 2 dwellings · dot size = dwellings");
+  lfInfraLayers();
   if (cnt) cnt.textContent = `${nf(rows.length, 0)} of ${nf(d.meta.n, 0)} buildings · ${nf(rows.reduce((s_, r) => s_ + r[2], 0), 0)} dwellings`;
 }
 function lfLayers() {
@@ -1004,6 +1122,7 @@ function lfLayers() {
   });
   LF.areaG = L.layerGroup(polys).addTo(LF.map);
   LF.ctx = { areas, munis, sc, micro, ind, vk };
+  lfInfraLayers();
   lfLabels();
   setLegend("maplegend", sc, ind, ind.key, micro ? (cphMode() ? "quarters" + (bydelLevel(ind) ? " · ^ one figure per bydel" : "") : "postal codes") : (ind.level === "postnr" && !MK.muni ? "municipalities · zoom in for postal codes" : "municipalities" + (fine ? ` · ° ${cphMode() ? "quarters" : "postal codes"} take the municipality value` : "")));
   if (LF.ownG) { LF.map.removeLayer(LF.ownG); LF.ownG = null; }
@@ -1033,6 +1152,7 @@ function lfInit() {
     el.querySelectorAll("details").forEach(d => d.addEventListener("toggle", () => { const pp = ev.popup; if (pp._updateLayout) { pp._updateLayout(); pp._updatePosition(); pp._adjustPan(); } })); });
   map.on("zoomend", () => {
     /* rebuild polygons only when the display level changes — rebuilding on every pan would kill open popups */
+    lfInfraLabels();
     if (microMode()) { (LF.microMarks || []).forEach(m => m.setRadius(microRadius(m._dw))); return; }
     const z = map.getZoom(), fine = !!MK.muni || z >= MICRO_ZOOM, lvl = (fine ? "micro" : z < 8 ? "national" : "macro") + (cphMode() ? "-cph" : "") + (MK.muni || "");
     if (lvl !== LF.level) lfLayers(); else if (fine) lfLabels();
