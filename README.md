@@ -73,6 +73,7 @@ make validate   # check every table/value code against the live API
 make fetch      # ~36 pulls to data/raw (no key)
 make build      # raw → data/processed → dist/index.html
 make serve      # http://localhost:8080
+make test       # unit tests (python + node --test)
 ```
 
 `make geo` re-vendors boundaries (DAWA closed 2026-10-01 — see `docs/GEO.md` for the Datafordeler route). Rents are updated yearly with `scripts/import_lbf.py` and `scripts/import_boligstat.py` (see `data/external/SOURCES.md`).

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Assemble the self-contained dashboard: dist/index.html.
 
-Inlines src/style.css, vendored Leaflet, src/app.js and the processed data
+Inlines src/style.css, vendored Leaflet, src/testprop.js, src/app.js and the data
 (data/processed/makro.json + market.json, optional portfolio.json) into the
 template src/index.html — one file that opens from disk or GitHub Pages.
 
@@ -19,6 +19,62 @@ PROC = ROOT / "data" / "processed"
 
 def load(p: pathlib.Path):
     return json.loads(p.read_text(encoding="utf-8")) if p.exists() else None
+
+
+def kommuner_lookup(out_dir: pathlib.Path):
+    """dist/geo/kommuner_lookup.json — simplified kommune rings for the test-property pin.
+
+    Postal codes can cross a kommune border, so the pin asks these polygons which
+    municipality a point is really in. Holes are kept: Frederiksberg is a hole in
+    København, and dropping it would put every Frederiksberg pin in København.
+    The page fetches this lazily, the first time a pin is dropped.
+    """
+    src = ROOT / "data" / "geo" / "kommuner.geojson"
+    if not src.exists():
+        print("  ⚠ data/geo/kommuner.geojson missing — no kommune lookup (pins fall back to the postal code)")
+        return
+    gj = load(src)
+    try:
+        from shapely.geometry import mapping, shape
+        simplify = 0.0005
+    except ImportError:
+        shape = None
+        simplify = None
+        print("  · shapely not installed — kommune rings shipped unsimplified")
+    rows = []
+    for f in gj.get("features", []):
+        props = f.get("properties") or {}
+        geom = f.get("geometry")
+        if not geom:
+            continue
+        if shape is not None:
+            g = shape(geom).simplify(simplify, preserve_topology=True)
+            if not g.is_empty:
+                geom = mapping(g)
+        polys = geom["coordinates"] if geom["type"] == "MultiPolygon" else [geom["coordinates"]]
+        out, s_, w_, n_, e_ = [], 90.0, 180.0, -90.0, -180.0
+        for poly in polys:
+            rings = []
+            for ring in poly:                      # [outer, hole, hole, ...]
+                pts = [[round(y, 5), round(x, 5)] for x, y in ring]
+                if len(pts) >= 4:
+                    rings.append(pts)
+            if not rings:
+                continue
+            for lat, lon in rings[0]:
+                s_, n_ = min(s_, lat), max(n_, lat)
+                w_, e_ = min(w_, lon), max(e_, lon)
+            out.append(rings)
+        if out:
+            rows.append({"code": props.get("kode"), "name": props.get("navn"),
+                         "bb": [s_, w_, n_, e_], "polys": out})
+    gd = out_dir / "geo"
+    gd.mkdir(parents=True, exist_ok=True)
+    dest = gd / "kommuner_lookup.json"
+    dest.write_text(json.dumps({"built": dt.date.today().isoformat(), "source": "DAGI kommuner (DAWA), simplified",
+                                "kommuner": rows}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    print(f"wrote {dest} ({dest.stat().st_size/1024:.0f} kB) · {len(rows)} kommuner"
+          + (f" · simplified {simplify}" if simplify else " · not simplified"))
 
 
 def main():
@@ -65,6 +121,7 @@ def main():
     html = (html.replace("{{LEAFLET_CSS}}", (SRC / "vendor" / "leaflet.css").read_text(encoding="utf-8"))
                 .replace("{{APP_CSS}}", (SRC / "style.css").read_text(encoding="utf-8"))
                 .replace("{{LEAFLET_JS}}", (SRC / "vendor" / "leaflet.js").read_text(encoding="utf-8"))
+                .replace("{{TESTPROP_JS}}", (SRC / "testprop.js").read_text(encoding="utf-8"))
                 .replace("{{APP_JS}}", (SRC / "app.js").read_text(encoding="utf-8"))
                 .replace("{{DATA}}", payload)
                 .replace("{{BUILT}}", built))
@@ -92,6 +149,7 @@ def main():
         for f in (PROC / "micro").glob("*.json"):
             shutil.copy(f, md / f.name)
         print(f"copied {len(list(md.glob('*.json')))} micro files → {md}")
+    kommuner_lookup(out.parent)
     print(f"wrote {out} ({out.stat().st_size/1e6:.1f} MB) · {len(data['municipalities'])} municipalities · {len(data['areas'])} areas")
 
 

@@ -99,6 +99,13 @@ const PF = { cats: null, kind: "both" };
 const PF_SHORT = { education: "edu", institutions: "inst", health: "health", culture: "culture" };
 const PF_LONG = Object.fromEntries(Object.entries(PF_SHORT).map(([k, v]) => [v, k]));
 const PIPE = { type: "", status: "" };                                            /* pipeline filters */
+const AN = { a: "", label: "" };                                                  /* analysis view: the pinned coordinates */
+/* Test property: one pin dropped from a pasted Google Maps link or a "lat, lon" pair (parseLocation, src/testprop.js).
+   It lives in the map hash (pin=, pl=), so it survives a reload and every level change. */
+const TP_LABEL = "Test property";
+const TP_RINGS = [500, 1000, 1200];                                               /* metres — the dashed walk/bike rings */
+const TP = { lat: null, lon: null, label: TP_LABEL, res: null, msg: "", fit: false };
+const KOM = { list: null, err: false, p: null };   /* dist/geo/kommuner_lookup.json, fetched the first time a pin is dropped */
 const T = { q: "", level: "kommune", region: "", minPop: 0 };                     /* table view filters */
 const REGIONS = ["Hovedstaden", "Sjælland", "Syddanmark", "Midtjylland", "Nordjylland"];
 const LF = { map: null, center: [56.0, 10.5], zoom: 7 };
@@ -114,6 +121,8 @@ const STRIP_EXTRA = ["crime_1000"];
 const QUICK_KEYS = ["growth", "price_m2", "rent_private", "unemp", "renters", "supply"].concat(IND.filter(i => i.chip).map(i => i.key));
 /* link into the chart generator with one area pre-selected */
 const chartLink = (key, type, code) => `charts?ind=${encodeURIComponent(key)}&a=${type}:${code}&y0=&y1=&med=1`;
+/* link into the test-property analysis view — a placeholder route until the analysis itself lands */
+const analysisLink = (lat, lon, label) => `analysis?a=${Number(lat).toFixed(5)},${Number(lon).toFixed(5)}` + (label ? `&la=${encodeURIComponent(label)}` : "");
 /* value of indicator k for municipality/area o in the selected year (latest = live field, else history) */
 const V = (o, k, y) => { const yr = y || MK.year; if (!o) return null; if (!yr || yr === LATEST) return o[k] ?? null; const h = o.hist && o.hist[k]; return h && h[yr] != null ? h[yr] : null; };
 /* first year a year selector offers (registry `map_from`; Safety: 2008, the first full rolling year) — Charts go further back */
@@ -137,11 +146,14 @@ function hashFor() {
     if (PF.kind !== "both") q.push(`pubkind=${PF.kind}`);
   }
   if (S.view === "makro" && MK.focus) q.push(`focus=${encodeURIComponent(MK.focus)}`);
+  /* the test-property pin rides along with the map hash so the link opens on the same spot */
+  if (S.view === "makro" && TP.lat != null) { q.push(`pin=${TP.lat.toFixed(5)},${TP.lon.toFixed(5)}`); if (TP.label && TP.label !== TP_LABEL) q.push(`pl=${encodeURIComponent(TP.label)}`); }
   let p;
   if (S.view === "area") { p = `area/${AR.type}/${AR.code}`; if (AR.group) q.push(`g=${encodeURIComponent(AR.group)}`); if (AR.sub !== "kvarter") q.push(`sub=${AR.sub}`); if (AR.tab !== "ind") q.push(`t=${AR.tab}`); }
   else if (S.view === "table") p = `table/${T.level}`;
   else if (S.view === "charts") { p = "charts"; q.length = 0; q.push(`ind=${encodeURIComponent(CH.ind)}`, `a=${CH.areas.join(",")}`, `y0=${CH.y0}`, `y1=${CH.y1}`, `med=${CH.median ? 1 : 0}`); if (CH.mode !== "auto") q.push(`mode=${CH.mode}`); if (CH.mode === "dist") q.push(`dist=${CH.dist}`);
     if (CH.fq === "q") q.push("fq=q"); if (CH.ov.length) q.push(`ov=${CH.ov.join(",")}`); if (!CH.nat) q.push("nat=0"); }
+  else if (S.view === "analysis") { p = "analysis"; q.length = 0; if (AN.a) q.push(`a=${AN.a}`); if (AN.label) q.push(`la=${encodeURIComponent(AN.label)}`); }
   else if (S.view === "market") { p = "market"; if (MKT.src) q.push("src=1"); }
   else if (S.view === "project") { p = `project/${PR.id}`; }
   else if (S.view === "public") { p = `public/${PB.kom}/${PB.id}`; }
@@ -171,12 +183,13 @@ function parseHash() {
   else if (v === "school" && parts[1]) { S.view = "school"; SC.nr = decodeURIComponent(parts[1]); schoolsLoad(); }
   else if (v === "schoollist" && parts[1]) { S.view = "schoollist"; SL.key = decodeURIComponent(parts.slice(1).join(":")); schoolsLoad(); }
   else if (v === "pipeline") { S.view = "pipeline"; PIPE.type = q.ptype || ""; PIPE.status = q.pstatus || ""; }
+  else if (v === "analysis") { S.view = "analysis"; AN.a = q.a || ""; AN.label = q.la || ""; komLoad(); }
   else if (v === "charts") { S.view = "charts"; CH.ind = q.ind || CH.ind; CH.areas = q.a ? q.a.split(",").filter(Boolean) : CH.areas; CH.y0 = q.y0 || CH.y0; CH.y1 = q.y1 || CH.y1; CH.median = q.med !== "0"; CH.mode = q.mode || "auto"; CH.dist = q.dist || "size";
     CH.fq = q.fq === "q" ? "q" : "year"; CH.ov = q.ov ? q.ov.split(",").filter(Boolean) : []; CH.nat = q.nat !== "0"; }
   else { S.view = "makro"; MK.muni = parts[1] && byCode[parts[1]] ? parts[1] : null; MK.cphView = parts[2] === "postnr" ? "postnr" : "kvarter";
          MK.micro = q.micro === "1" && microAvail(MK.muni); if (q.mind && MICRO_INDS.some(i => i.key === q.mind)) MK.mind = q.mind;
          MK.infra = q.infra === "1"; MK.pub = q.public === "1";
-         pubParseFilter(q); MK.focus = q.focus || null; if (MK.focus) MK.infra = true; }
+         pubParseFilter(q); MK.focus = q.focus || null; if (MK.focus) MK.infra = true; tpParse(q); }
   if (!curInds().some(i => i.key === MK.ind)) MK.ind = (curInds()[0] || {}).key;
   if (!yearsFor(MK.ind).includes(MK.year)) MK.year = LATEST;
   if (S.view === "makro") {
@@ -197,8 +210,9 @@ const VIEWS = [
   ["table",   "Table",         "Every municipality, postal code and quarter side by side — filter, sort, export", "table"],
   ["charts",  "Charts",        "Pick an indicator, areas and years — export the chart as PNG or the data as CSV", "charts"],
   ["market",  "Market",        "Prices, rents, supply, construction, macro indicators — and the data sources", "market"],
-  ["pipeline", "Pipeline",     "Every infrastructure project in the layer: budget, status, opening year, municipalities", "pipeline"]];
-const NAV_GROUPS = [["Market intelligence", ["makro", "table", "charts", "market", "pipeline"]]];
+  ["pipeline", "Pipeline",     "Every infrastructure project in the layer: budget, status, opening year, municipalities", "pipeline"],
+  ["analysis", "Test property", "Drop a pin from a Google Maps link and analyse its surroundings", "analysis"]];
+const NAV_GROUPS = [["Market intelligence", ["makro", "table", "charts", "market", "pipeline"]], ["Test property", ["analysis"]]];
 const viewOf = id => VIEWS.find(v => v[0] === id) || VIEWS[0];
 
 function renderNav() {
@@ -218,6 +232,7 @@ function crumbs() {
   else if (S.view === "project") { const f = projectEntity(); c.push(["Pipeline", "pipeline"]); tail = f ? f.properties.name : "Project"; kind = f ? (INFRA_TYPE[f.properties.type] || f.properties.type) : ""; }
   else if (S.view === "school") { const s = SCH_BY[SC.nr]; if (s && byCode[s.kom]) c.push([s.kommune, `area/kommune/${s.kom}` + q]); tail = s ? s.name : "School"; kind = s ? (SCH_TYPE[s.type] || s.type) : "Uddannelsesstatistik.dk"; }
   else if (S.view === "schoollist") { tail = "Schools"; kind = "sorted by FP9 grade"; }
+  else if (S.view === "analysis") { c.push(["Map", "map" + q]); tail = AN.label || TP_LABEL; kind = "test property"; }
   else { tail = viewOf(S.view)[1]; kind = { table: "every area side by side", charts: "PNG and CSV export", market: "national series and sources", pipeline: `${INFRA_ALL.length} projects · budget, status, opening year` }[S.view] || ""; }
   return { c, tail, kind };
 }
@@ -226,7 +241,7 @@ function renderTop() {
   document.getElementById("hd").innerHTML = `<nav class="crumbs">${c.map(([l, h]) => `<button data-go="${esc(h)}">${esc(l)}</button><i>›</i>`).join("")}<b>${esc(tail)}</b>${kind ? `<span class="dim">${esc(kind)}</span>` : ""}</nav>`;
 }
 const RENDER = { makro: vMakro, table: vTable, area: vArea, charts: vCharts, market: vMarket, pipeline: vPipeline, project: vProject,
-                 public: vPublic, publist: vPubList, school: vSchool, schoollist: vSchoolList };
+                 public: vPublic, publist: vPubList, school: vSchool, schoollist: vSchoolList, analysis: vAnalysis };
 function render() {
   renderNav(); renderTop();
   const body = document.getElementById("body");
@@ -308,12 +323,20 @@ document.addEventListener("change", e => {
   if (el.id === "tregion") { T.region = el.value; renderTableBody(); }
   if (el.id === "tminpop") { T.minPop = Number(el.value) || 0; renderTableBody(); }
 });
+/* pasting is the normal way in: act on the pasted text straight away, no Enter needed */
+document.addEventListener("paste", e => {
+  if (!e.target || e.target.id !== "tpq") return;
+  const t = ((e.clipboardData || window.clipboardData) || { getData: () => "" }).getData("text");
+  if (!t) return;
+  e.preventDefault(); e.target.value = t.trim(); tpGo(t);
+});
 document.addEventListener("input", e => { if (e.target.id === "tq") { T.q = e.target.value.trim().toLowerCase(); renderTableBody(); } });
 document.addEventListener("toggle", e => { if (e.target.classList && e.target.classList.contains("indx")) UI.indxOpen = e.target.open; }, true);
 document.addEventListener("keydown", e => {
   if (e.key === "Enter" && e.target.id === "areaq") { areaSearchGo(e.target.value); return; }
   if (e.key === "Enter" && e.target.id === "chq") { chartAdd(null, e.target.value); return; }
   if (e.key === "Enter" && e.target.id === "mf-addr") { microFind(e.target.value); return; }
+  if (e.key === "Enter" && e.target.id === "tpq") { tpGo(e.target.value); return; }
   if (e.key === "Escape" && S.view === "area") history.back();
 });
 
@@ -523,8 +546,8 @@ function vMakro() {
   return `
   <div class="card accent" id="mapcard">
     <div class="card-head tools-only">
-      <div class="tools">${areaSearch()}${muni && microAvail(muni.code) ? `<div class="seg"><button class="sg ${!MK.micro ? "on" : ""}" data-micro="0">Areas</button><button class="sg ${MK.micro ? "on" : ""}" data-micro="1">Buildings (${nf(MICRO_IDX[String(Number(muni.code))].n, 0)})</button></div>` : ""}${muni && muni.code === CPH_MUNI && CPH && !microMode() ? `<div class="seg"><button class="sg ${MK.cphView !== "postnr" ? "on" : ""}" data-cphview="kvarter">Quarters (${CPH.areas.length})</button><button class="sg ${MK.cphView === "postnr" ? "on" : ""}" data-cphview="postnr">Postal codes</button></div>` : ""}${INFRA.length ? `<div class="seg"><button class="sg ${MK.infra ? "on" : ""}" data-infra title="Show planned and ongoing infrastructure projects on top of the map">Infra projects</button></div>` : ""}${PUB ? `<div class="seg"><button class="sg ${MK.pub ? "on" : ""}" data-public title="Public buildings from BBR: schools, daycare, health and culture${MK.muni && !pubAvail(MK.muni) ? " — no BBR pull for this municipality yet" : ""}">Public buildings</button></div>` : ""}${microMode() ? mindSelect() : indSelect() + yearSelect()}${D.portfolio ? `<button class="lk mini ${MK.own ? "primary" : ""}" data-mkown>● Own properties</button>` : ""}<button class="lk" data-fs title="Full screen (Esc to exit)">⤢ Full screen</button></div>
-      ${microMode() ? "" : indQuick()}</div>
+      <div class="tools">${areaSearch()}${tpBox()}${muni && microAvail(muni.code) ? `<div class="seg"><button class="sg ${!MK.micro ? "on" : ""}" data-micro="0">Areas</button><button class="sg ${MK.micro ? "on" : ""}" data-micro="1">Buildings (${nf(MICRO_IDX[String(Number(muni.code))].n, 0)})</button></div>` : ""}${muni && muni.code === CPH_MUNI && CPH && !microMode() ? `<div class="seg"><button class="sg ${MK.cphView !== "postnr" ? "on" : ""}" data-cphview="kvarter">Quarters (${CPH.areas.length})</button><button class="sg ${MK.cphView === "postnr" ? "on" : ""}" data-cphview="postnr">Postal codes</button></div>` : ""}${INFRA.length ? `<div class="seg"><button class="sg ${MK.infra ? "on" : ""}" data-infra title="Show planned and ongoing infrastructure projects on top of the map">Infra projects</button></div>` : ""}${PUB ? `<div class="seg"><button class="sg ${MK.pub ? "on" : ""}" data-public title="Public buildings from BBR: schools, daycare, health and culture${MK.muni && !pubAvail(MK.muni) ? " — no BBR pull for this municipality yet" : ""}">Public buildings</button></div>` : ""}${microMode() ? mindSelect() : indSelect() + yearSelect()}${D.portfolio ? `<button class="lk mini ${MK.own ? "primary" : ""}" data-mkown>● Own properties</button>` : ""}<button class="lk" data-fs title="Full screen (Esc to exit)">⤢ Full screen</button></div>
+      ${microMode() ? "" : indQuick()}<div class="tperr" id="tperr" role="status" ${TP.msg ? "" : 'style="display:none"'}>${esc(TP.msg)}</div></div>
     ${microMode() ? microExplain() : indExplain(ind)}
     ${muni && !microMode() ? muniStrip(muni) : ""}
     <div class="mapwrap"><div id="lfmap"></div><div class="maplegend publiclegend" id="publiclegend"></div><div class="maplegend infralegend" id="infralegend"></div><div class="maplegend" id="maplegend"></div></div>
@@ -1077,6 +1100,149 @@ function kkRows(kk) {
 /* which sub-area (quarter / postal code) of the drilled municipality a point lies in — ray casting on the rings */
 function pip(pt, ring) { let ins = false; for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) { const yi = ring[i][0], xi = ring[i][1], yj = ring[j][0], xj = ring[j][1]; if ((yi > pt[0]) !== (yj > pt[0]) && pt[1] < (xj - xi) * (pt[0] - yi) / (yj - yi) + xi) ins = !ins; } return ins; }
 function areaAt(lat, lon) { return muniAreas(MK.muni).find(a => (a.rings || []).some(r => pip([lat, lon], r))) || null; }
+
+/* ---------- Test property: parse → locate → pin ---------- */
+/* the map's own colour tokens live in :root so the marker, the rings and the CSS agree on one tone */
+const cssVar = (name, fallback) => { try { const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim(); return v || fallback; } catch (e) { return fallback; } };
+/* a polygon's [south, west, north, east] box, cached on the area — the prefilter before the ray casting */
+function bboxOf(a) {
+  if (a._bb) return a._bb;
+  let s = 90, w = 180, n = -90, e = -180;
+  (a.rings || []).forEach(r => r.forEach(q => { if (q[0] < s) s = q[0]; if (q[0] > n) n = q[0]; if (q[1] < w) w = q[1]; if (q[1] > e) e = q[1]; }));
+  return (a._bb = [s, w, n, e]);
+}
+const inBox = (lat, lon, b) => lat >= b[0] && lat <= b[2] && lon >= b[1] && lon <= b[3];
+/* which area of a list a point falls in — bbox first, ray casting only on the handful that survive */
+function areaOf(list, lat, lon) { return (list || []).find(a => inBox(lat, lon, bboxOf(a)) && (a.rings || []).some(r => pip([lat, lon], r))) || null; }
+/* a kommune polygon is outer ring minus its holes: Frederiksberg is a hole in København, and without
+   the holes every Frederiksberg pin would land in København */
+const inPoly = (pt, poly) => pip(pt, poly[0]) && !poly.slice(1).some(h => pip(pt, h));
+function komLoad() {
+  if (!KOM.p) KOM.p = fetch("geo/kommuner_lookup.json").then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(d => { KOM.list = d.kommuner || []; }).catch(() => { KOM.err = true; });
+  return KOM.p;
+}
+function komAt(lat, lon) {
+  if (!KOM.list) return null;
+  const pt = [lat, lon];
+  const hit = KOM.list.find(k => inBox(lat, lon, k.bb) && (k.polys || []).some(poly => inPoly(pt, poly)));
+  return hit ? byCode[String(Number(hit.code))] || null : null;
+}
+/* where a point is, at every level the dashboard knows: kommune · postal code · Copenhagen quarter.
+   `approx` means the kommune came from the postal code (the ring file had not loaded or failed) — a
+   postal code can cross a kommune border, so that answer is a best guess, not the register's. */
+function locate(lat, lon) {
+  const postnr = areaOf(AREAS, lat, lon);
+  let kommune = komAt(lat, lon), approx = false;
+  if (!kommune && postnr) { kommune = byCode[postnr.muni] || null; approx = true; }
+  if (!kommune && !postnr) return { error: "in water or outside Denmark" };
+  const kvarter = CPH && kommune && kommune.code === CPH_MUNI ? areaOf(CPH.areas, lat, lon) : null;
+  return { kommune, postnr, kvarter, approx };
+}
+/* the located result for the current pin, recomputed once the kommune ring file arrives */
+function tpRes() {
+  if (TP.lat == null) return null;
+  const stamp = `${TP.lat},${TP.lon},${KOM.list ? 1 : 0}`;
+  if (!TP.res || TP.res._stamp !== stamp) { const r = locate(TP.lat, TP.lon); r._stamp = stamp; TP.res = r; }
+  return TP.res;
+}
+/* the pin's finest known area, dressed as an area-page entity so tileStats/headlineHtml work on it */
+function tpEntity(r) {
+  if (!r || r.error) return null;
+  if (r.kvarter && CPH) return { type: "kvarter", typeLabel: "Copenhagen quarter", o: r.kvarter, name: r.kvarter.name, code: r.kvarter.code, muni: byCode[CPH_MUNI], bydel: r.kvarter.bydel, inds: IND_Q, peers: CPH.areas, peerLabel: "quarters" };
+  if (r.postnr) return { type: "postnr", typeLabel: "Postal-code area", o: r.postnr, name: `${r.postnr.nr} ${r.postnr.name}`, code: r.postnr.nr, muni: byCode[r.postnr.muni], inds: IND, peers: AREAS, peerLabel: "postal codes" };
+  if (r.kommune) return { type: "kommune", typeLabel: "Municipality", o: r.kommune, name: r.kommune.name, code: r.kommune.code, muni: null, inds: IND, peers: MUNI, peerLabel: "municipalities" };
+  return null;
+}
+const tpWhere = r => [r.kommune ? r.kommune.name : null, r.postnr ? `${r.postnr.nr} ${r.postnr.name}` : null, r.kvarter ? r.kvarter.name : null].filter(Boolean).join(" · ");
+
+/* the input on the map toolbar, its "?" tooltip and the inline error line under it */
+function tpBox() {
+  return `<span class="tpbox"><input id="tpq" class="indsel tpq" type="search" placeholder="Paste Google Maps link or coordinates" autocomplete="off" aria-label="Test property location">
+    <span class="tptip" tabindex="0" role="note" aria-label="Accepted formats">?<span class="tptipc"><b>Accepted formats</b>${TP_FORMATS.map(([, ex, what]) => `<i>${esc(ex)}</i><span>${esc(what)}</span>`).join("")}<span class="tpwarn">Short maps.app.goo.gl links can't be read — open one and copy the full URL.</span></span></span></span>`;
+}
+function tpErrEl() { return document.getElementById("tperr"); }
+function tpErr(msg) { TP.msg = msg || ""; const el = tpErrEl(); if (el) { el.textContent = TP.msg; el.style.display = TP.msg ? "" : "none"; } }
+/* Enter or paste in the box: parse the text, then (once the kommune rings are there) drop the pin */
+function tpGo(text) {
+  const r = parseLocation(text);
+  if (r.error) { tpErr(r.message); return; }
+  tpErr("");
+  komLoad().then(() => tpDrop(r.lat, r.lon));
+}
+function tpDrop(lat, lon) {
+  const res = locate(lat, lon);
+  if (res.error) { tpErr(`${lat.toFixed(5)}, ${lon.toFixed(5)} is ${res.error} — no municipality or postal code covers it.`); return; }
+  if (!TP.label) TP.label = TP_LABEL;
+  TP.fit = true;   /* the layer builder fits the map to the outer ring instead of the municipality */
+  /* drill to the pin's municipality at postal-code level with the ordinary navigation */
+  go(`map/${res.kommune.code}${res.kommune.code === CPH_MUNI ? "/postnr" : ""}?ind=${encodeURIComponent(MK.ind)}`
+     + (MK.year !== LATEST ? `&y=${MK.year}` : "") + (MK.infra ? "&infra=1" : "") + (MK.pub ? "&public=1" : "")
+     + `&pin=${lat.toFixed(5)},${lon.toFixed(5)}` + (TP.label !== TP_LABEL ? `&pl=${encodeURIComponent(TP.label)}` : ""));
+}
+function tpParse(q) {
+  const m = (q.pin || "").match(/^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/);
+  if (!m) { TP.lat = TP.lon = null; TP.res = null; return; }
+  TP.lat = Number(m[1]); TP.lon = Number(m[2]); TP.label = q.pl || TP_LABEL;
+  /* the exact kommune needs the ring file; until it lands the popup says "approx." and then corrects itself */
+  if (!KOM.list && !KOM.err) komLoad().then(() => { if (S.view === "makro" && LF.map) tpLayers(); });
+}
+function tpLayers() {
+  if (!LF.map) return;
+  if (LF.tpG) { LF.map.removeLayer(LF.tpG); LF.tpG = null; }
+  if (TP.lat == null) return;
+  const col = cssVar("--pin", "#33372C"), ll = [TP.lat, TP.lon];
+  /* non-interactive rings, so a click still reaches the polygon underneath */
+  const rings = TP_RINGS.map(m => L.circle(ll, { radius: m, color: col, weight: 1, opacity: .8, dashArray: "5 6", fill: false, interactive: false }));
+  const mark = L.marker(ll, { icon: L.divIcon({ className: "tp-pin", iconSize: [22, 22], iconAnchor: [11, 11], html: "<i></i>" }), zIndexOffset: 1200, title: TP.label || TP_LABEL });
+  mark.bindPopup(() => tpPopup(), { maxWidth: 520, maxHeight: 520, autoPanPadding: [24, 24] });
+  LF.tpG = L.layerGroup(rings.concat([mark])).addTo(LF.map);
+  LF.tpMark = mark;
+  if (TP.fit) { TP.fit = false; LF.pendingFit = null; LF.map.fitBounds(rings[rings.length - 1].getBounds(), { padding: [18, 18] }); setTimeout(() => mark.openPopup(), 320); }
+}
+function tpPopup() {
+  const r = tpRes(); if (!r) return "";
+  if (r.error) return `<div class="lfpop tppop"><b>${esc(TP.label || TP_LABEL)}</b><span class="dim">${TP.lat.toFixed(5)}, ${TP.lon.toFixed(5)} — ${esc(r.error)}</span>
+    <span class="lfact"><button class="lk mini" data-tp="remove">Remove</button></span></div>`;
+  const e = tpEntity(r);
+  return `<div class="lfpop tppop">
+    <input id="tplab" class="tplab" value="${esc(TP.label || TP_LABEL)}" maxlength="60" aria-label="Test property label" title="Rename this pin — the name travels in the link">
+    <span class="dim">${esc(tpWhere(r))}${r.approx ? ` <span class="tag">approx.</span>` : ""} · ${TP.lat.toFixed(5)}, ${TP.lon.toFixed(5)}</span>
+    ${r.approx ? `<p class="cap">Municipality taken from the postal code — a postal code can cross a municipality border.</p>` : ""}
+    ${e ? headlineHtml(e) : ""}
+    ${e ? `<span class="lfsec">${esc(e.typeLabel)} · ${esc(e.name)}</span>` : ""}
+    <span class="dim">Rings: ${TP_RINGS.map(m => nf(m, 0) + " m").join(" · ")}</span>
+    <span class="lfact"><button class="lk mini primary" data-go="${analysisLink(TP.lat, TP.lon, TP.label)}">Analyse ›</button>
+      <button class="lk mini" data-tp="copy">Copy link</button><button class="lk mini" data-tp="remove">Remove</button></span></div>`;
+}
+function tpAction(kind, btn) {
+  if (kind === "copy") {
+    const url = location.origin + location.pathname + location.search + "#" + hashFor();
+    const flash = txt => { if (!btn) return; const old = btn.textContent; btn.textContent = txt; setTimeout(() => { btn.textContent = old; }, 1600); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(() => flash("Link copied"), () => flash("Copy failed"));
+    else flash("Copy failed");
+    return;
+  }
+  if (kind === "remove") { TP.lat = TP.lon = null; TP.res = null; TP.label = TP_LABEL; TP.fit = false; if (LF.map) LF.map.closePopup(); tpErr(""); go(hashFor()); }
+}
+
+/* ---------- Analysis (placeholder: the analysis itself comes in the next step) ---------- */
+function vAnalysis() {
+  const m = (AN.a || "").match(/^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/);
+  const lat = m ? Number(m[1]) : null, lon = m ? Number(m[2]) : null;
+  const r = lat == null ? null : locate(lat, lon);
+  const back = lat == null ? withQ("map")
+    : withQ("map" + (r && !r.error && r.kommune ? `/${r.kommune.code}${r.kommune.code === CPH_MUNI ? "/postnr" : ""}` : ""))
+      + `&pin=${lat.toFixed(5)},${lon.toFixed(5)}` + (AN.label && AN.label !== TP_LABEL ? `&pl=${encodeURIComponent(AN.label)}` : "");
+  return `<div class="card accent">
+    <div class="card-head"><h3>${esc(AN.label || TP_LABEL)}</h3><span class="hint">${lat == null ? "no location" : `${lat.toFixed(5)}, ${lon.toFixed(5)}`}</span></div>
+    ${r && !r.error ? `<p>${esc(tpWhere(r))}${r.approx ? " (approx.)" : ""} — rings at ${TP_RINGS.map(x => nf(x, 0) + " m").join(", ")}.</p>` : ""}
+    ${r && r.error ? `<p class="empty">That point is ${esc(r.error)}.</p>` : ""}
+    <p class="empty">Analysis coming in the next step.</p>
+    <div class="tools"><button class="lk primary" data-go="${esc(back)}">‹ Back to the map</button>${lat == null ? "" : `<a class="lk" target="_blank" rel="noopener" href="https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=16/${lat}/${lon}">Open in OpenStreetMap ↗</a>`}</div>
+    <p class="cap">Drop a pin from the macro map: paste a Google Maps link or a "lat, lon" pair into the box on the map toolbar.</p>
+  </div>`;
+}
 function lfLabels() {
   /* labels are rebuilt on every zoom step: a name is shown only when its polygon is wide enough on screen */
   if (!LF.map || !LF.ctx) return;
@@ -1219,6 +1385,7 @@ function lfMicroLayers() {
     const m = L.circleMarker([r[0], r[1]], { renderer: LF.canvas, radius: microRadius(r[2]), color: "#141C18", weight: .6, opacity: .7, fillColor: tt == null ? "#C4CBC4" : mkShade(tt, "micro:" + ind.key), fillOpacity: .85 });
     m._dw = r[2]; m._row = r; m.bindPopup(() => microPopup(r), { maxWidth: 440, autoPanPadding: [24, 24] }); return m; });
   LF.microG = L.layerGroup(marks).addTo(LF.map); LF.microMarks = marks;
+  tpLayers();
   setLegend("maplegend", sc, ind, "micro:" + ind.key, "buildings with ≥ 2 dwellings · dot size = dwellings");
   lfInfraLayers();
   lfPublicLayers();
@@ -1267,6 +1434,7 @@ function lfLayers() {
     });
     LF.ownG = L.layerGroup(marks).addTo(LF.map);
   }
+  tpLayers();
 }
 function lfInit() {
   const el = document.getElementById("lfmap");
@@ -1281,6 +1449,11 @@ function lfInit() {
   /* Leaflet stops click propagation inside popups, so page links in popups are wired here */
   map.on("popupopen", ev => { const el = ev.popup.getElement(); if (!el) return;
     el.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => go(b.dataset.go)));
+    el.querySelectorAll("[data-tp]").forEach(b => b.addEventListener("click", () => tpAction(b.dataset.tp, b)));
+    el.querySelectorAll("[data-arind]").forEach(b => b.addEventListener("click", () => { MK.ind = b.dataset.arind; if (!yearsFor(MK.ind).includes(MK.year)) MK.year = LATEST; go(hashFor()); }));
+    const lab = el.querySelector("#tplab");
+    if (lab) { lab.addEventListener("input", () => { TP.label = lab.value.trim() || TP_LABEL; syncHash(); if (LF.tpMark) LF.tpMark.options.title = TP.label; });
+               lab.addEventListener("keydown", ev => { if (ev.key === "Enter") { ev.preventDefault(); lab.blur(); } }); }
     /* re-fit the popup when "all values" opens — popup.update() would rebuild the content and close the fold again */
     el.querySelectorAll("details").forEach(d => d.addEventListener("toggle", () => { const pp = ev.popup; if (pp._updateLayout) { pp._updateLayout(); pp._updatePosition(); pp._adjustPan(); } })); });
   map.on("zoomend", () => {

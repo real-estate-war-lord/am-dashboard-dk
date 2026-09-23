@@ -22,6 +22,7 @@ import datetime as dt
 import hashlib
 import json
 import pathlib
+import re
 import sys
 import time
 import urllib.parse
@@ -68,6 +69,15 @@ def years_since(iso, today):
     return round((today - dt.date.fromisoformat(iso[:10])).days / 365.25, 1) if iso else None
 
 
+# some OSM objects carry a service URL in name= (a Dataforsyningen WMS endpoint has turned up
+# in Fredensborg) — that is never a building name, so it is dropped before the join
+URL_NAME = re.compile(r"https?://|(?:^|\s)www\.|/wms\b", re.I)
+
+
+def looks_like_url(name):
+    return bool(name) and bool(URL_NAME.search(name))
+
+
 def osm_names(kommune, bbox, offline=False):
     """Named public facilities from OpenStreetMap, for labelling a BBR building that has no name of its own."""
     ql = "".join(f'nwr["amenity"="{a}"]["name"]({bbox});' for a in OSM_AMENITY)
@@ -94,8 +104,9 @@ def osm_names(kommune, bbox, offline=False):
     out = []
     for e in json.loads(cache.read_text(encoding="utf-8")).get("elements", []):
         c = e.get("center") or ({"lat": e.get("lat"), "lon": e.get("lon")} if e.get("lat") else None)
-        if c and (e.get("tags") or {}).get("name"):
-            out.append((c["lat"], c["lon"], e["tags"]["name"], e["tags"]["amenity"]))
+        name = (e.get("tags") or {}).get("name")
+        if c and name and not looks_like_url(name):
+            out.append((c["lat"], c["lon"], name, e["tags"]["amenity"]))
     return out
 
 

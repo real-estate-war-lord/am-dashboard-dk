@@ -9,6 +9,9 @@
   /* kategoriset sarjavärit (identiteetti, ei status) — validoitu scripts/validate_palette.js:
      lightness-kaista, kroma, CVD-erottuvuus, normaalinäön erottuvuus ja kontrasti: kaikki PASS */
   --k1:#1C6B5C;--k2:#B07A1E;--k3:#5C5F52;--k4:#B0331B;
+  /* test-property pin: a neutral dark tone that belongs to no indicator hue, so the pin
+     never reads as a value on the choropleth underneath it */
+  --pin:#33372C;
   --disp:'Familjen Grotesk',ui-sans-serif,system-ui,sans-serif;
   --body:'Inter',ui-sans-serif,system-ui,sans-serif;
   --mono:'IBM Plex Mono',ui-monospace,Menlo,monospace;
@@ -1467,3 +1470,35 @@ th .thn{display:inline}
 .lfrow .schsig { margin-left: 2px; }
 /* the schools trend is a small three-point series — keep it at its natural size, not full-bleed */
 .schchart { max-width: 660px; width: 100%; height: auto; display: block; }
+
+
+/* ---------- Test property: the map-toolbar input, its "?" tooltip and the pin ---------- */
+.tpbox{position:relative;display:inline-flex;align-items:center;gap:4px}
+.tpbox .tpq{min-width:280px}
+.tptip{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;flex:0 0 18px;
+  border:1px solid var(--line);border-radius:50%;background:var(--panel2);color:var(--muted);
+  font-family:var(--mono);font-size:10.5px;cursor:help;user-select:none}
+.tptip:hover,.tptip:focus{background:var(--ink);color:#fff;border-color:var(--ink);outline:none}
+.tptipc{display:none;position:absolute;z-index:1200;top:calc(100% + 7px);left:0;width:430px;max-width:78vw;
+  background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 10px 28px rgba(0,0,0,.14);
+  padding:11px 13px;cursor:auto;text-align:left;color:var(--ink2);font-size:12px;line-height:1.5}
+.tptip:hover .tptipc,.tptip:focus .tptipc,.tptip:focus-within .tptipc{display:block}
+.tptipc b{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.tptipc i{display:block;font-style:normal;font-family:var(--mono);font-size:10.5px;color:var(--ink);
+  word-break:break-all;margin-top:7px}
+.tptipc span{display:block;font-size:11.5px;color:var(--muted)}
+.tptipc .tpwarn{margin-top:9px;padding-top:8px;border-top:1px solid var(--line2);color:var(--warn);font-size:11.5px}
+.tperr{flex-basis:100%;margin-top:7px;font-family:var(--mono);font-size:11px;line-height:1.5;color:var(--bad);max-width:760px}
+
+.tp-pin i{display:block;width:16px;height:16px;border-radius:50%;background:var(--pin);
+  border:3px solid #fff;box-shadow:0 0 0 1px var(--pin),0 1px 5px rgba(0,0,0,.4)}
+.lfpop .tplab{font-family:var(--disp);font-size:16px;font-weight:600;letter-spacing:-.02em;color:var(--ink);
+  width:100%;border:1px solid transparent;border-radius:6px;background:transparent;padding:2px 5px;margin:0 0 4px -5px}
+.lfpop .tplab:hover{border-color:var(--line)}
+.lfpop .tplab:focus{border-color:var(--ink);background:var(--panel2);outline:none}
+.tppop .hl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:8px 0 2px}
+.tppop .hlc{padding:7px 9px 6px}
+.tppop .hlc b{font-size:17px}
+.tppop .hlc em{font-size:9.5px}
+.tppop .cap{margin:2px 0 0}

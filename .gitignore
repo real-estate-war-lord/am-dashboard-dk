@@ -25,3 +25,4 @@ data/raw/public/
 dist/public_index.json
 dist/public/
 data/raw/uddstat/
+dist/geo
