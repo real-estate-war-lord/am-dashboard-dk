@@ -9,6 +9,8 @@ Inputs
 
 Output
   data/geo/infra_projects.geojson       FeatureCollection, WGS84, one feature per CSV row
+  data/processed/infra_index.json       which projects touch each municipality, postal code and
+                                        Copenhagen quarter (+ points within 1.2 km of the polygon)
 
 `geometry_source` in the CSV decides where a geometry comes from:
   fingerplan:<layer>:all | fingerplan:<layer>:<attr>=<value>   vendored Fingerplan 2019 features
@@ -34,12 +36,13 @@ import json
 import pathlib
 import sys
 import time
+import math
 import urllib.error
 import urllib.parse
 import urllib.request
 
 from shapely.geometry import LineString, MultiLineString, MultiPoint, Point, Polygon, mapping, shape
-from shapely.ops import unary_union
+from shapely.ops import transform as shapely_transform, unary_union
 from shapely import wkt as shapely_wkt
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -47,6 +50,9 @@ SRC = ROOT / "data" / "external" / "infra_projects.csv"
 FP = ROOT / "data" / "raw" / "fingerplan"
 OSM_CACHE = ROOT / "data" / "raw" / "osm"
 OUT = ROOT / "data" / "geo" / "infra_projects.geojson"
+IDX = ROOT / "data" / "processed" / "infra_index.json"
+NEAR_M = 1200                        # a station or site this close still serves the area
+STATUS_ORDER = {"construction": 0, "decided": 1, "study": 2, "opened": 3}
 OVERPASS = "https://overpass-api.de/api/interpreter"
 UA = {"User-Agent": "am-dashboard-dk/2.1 (+https://github.com/real-estate-war-lord/am-dashboard-dk)"}
 SIMPLIFY_DEG = 20 / 111_320          # ~20 m at this latitude, in degrees
@@ -173,6 +179,66 @@ def kommuner_of(geom, komm, override=""):
     return sorted(set(hits), key=int)
 
 
+# ---------- which projects serve which area ----------
+
+def metric(geom, lat0):
+    """Local equal-distance projection (metres) — good to a few metres over Denmark, and it keeps the
+    build free of pyproj. Used for the 1.2 km search radius and for lengths and areas."""
+    k = math.cos(math.radians(lat0)) * 111_320.0
+    return shapely_transform(lambda x, y, z=None: (x * k, y * 111_320.0), geom)
+
+
+def polygons_of(path, code_key, name_key=None):
+    if not path.exists():
+        return []
+    out = []
+    for f in json.loads(path.read_text(encoding="utf-8"))["features"]:
+        pr = f["properties"]
+        code = str(pr.get(code_key) or "")
+        if code:
+            out.append((code.lstrip("0") if code_key == "kode" else code, pr.get(name_key) if name_key else None, shape(f["geometry"])))
+    return out
+
+
+def build_index(feats):
+    """{"<level>:<code>": {projects: [...], projects_upcoming, stations_planned_1200m}}.
+    A project counts for an area when its geometry touches the polygon, and a station or site point
+    also counts when it lies within 1.2 km of it."""
+    geo = ROOT / "data" / "geo"
+    levels = [("kommune", polygons_of(geo / "kommuner.geojson", "kode", "navn")),
+              ("postnr", polygons_of(geo / "postnumre.geojson", "nr", "navn")),
+              ("kvarter", polygons_of(geo / "cph_kvarterer.geojson", "kvarternr", "kvarternavn"))]
+    projects = [(f["properties"], shape(f["geometry"])) for f in feats if f.get("geometry")]
+    idx = {}
+    for level, polys in levels:
+        for code, _name, poly in polys:
+            lat0 = poly.centroid.y
+            pm = metric(poly, lat0)
+            hits = []
+            for pr, g in projects:
+                point_like = g.geom_type == "Point"
+                if poly.intersects(g):
+                    dist = 0.0
+                elif point_like:
+                    dist = pm.distance(metric(g, lat0))
+                    if dist > NEAR_M:
+                        continue
+                else:
+                    continue
+                hits.append({"id": pr["id"], "name": pr["name"], "label_short": pr["label_short"], "type": pr["type"],
+                             "status": pr["status"], "open_year": pr["open_year"], "open_window": pr["open_window"],
+                             "distance_m": round(dist)})
+            hits.sort(key=lambda h: (STATUS_ORDER.get(h["status"], 9), h["open_year"] or 9999, h["name"]))
+            if hits:
+                idx[f"{level}:{code}"] = {
+                    "projects": hits,
+                    "projects_upcoming": sum(1 for h in hits if h["status"] != "opened"),
+                    "stations_planned_1200m": sum(1 for h in hits if h["status"] != "opened"
+                                                  and next(p for p, _g in projects if p["id"] == h["id"])["parent_id"]),
+                }
+    return idx
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-osm", action="store_true", help="use only cached Overpass answers")
@@ -220,7 +286,8 @@ def main():
             "type": "Feature",
             "properties": {
                 "id": row["id"], "name": row["name"], "label_short": short_label(row), "type": row["type"], "status": row["status"],
-                "open_year": num(row["open_year"], int), "open_year_original": num(row["open_year_original"], int),
+                "open_year": num(row["open_year"], int), "open_window": row.get("open_window") or None,
+                "open_year_original": num(row["open_year_original"], int),
                 "budget_mdkk": num(row["budget_mdkk"]), "agency": row["agency"] or None,
                 "kommuner": kommuner_of(g, komm, row.get("kommuner_override", "")), "parent_id": row["parent_id"] or None,
                 "schematic": (row["geometry_source"] or "").startswith("manual") or row["geometry_source"] == "stations",
@@ -238,6 +305,14 @@ def main():
                                                         "Transportministeriet, Status for anlægs- og byggeprojekter",
                                                         "© OpenStreetMap contributors (ODbL)"]},
                                "features": feats}, ensure_ascii=False), encoding="utf-8")
+
+    idx = build_index(feats)
+    IDX.parent.mkdir(parents=True, exist_ok=True)
+    IDX.write_text(json.dumps({"built": today, "near_m": NEAR_M, "areas": idx}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    lv = {}
+    for k in idx:
+        lv[k.split(":")[0]] = lv.get(k.split(":")[0], 0) + 1
+    print(f'wrote {IDX.relative_to(ROOT)}: {len(idx)} areas with projects ({", ".join(f"{k} {v}" for k, v in lv.items())})')
 
     n_geo = sum(1 for f in feats if f["geometry"])
     print(f'wrote {OUT.relative_to(ROOT)}: {len(feats)} features, {n_geo} with geometry, {len(feats) - n_geo} without')

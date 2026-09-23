@@ -87,6 +87,8 @@ const AR = { type: null, code: null, group: "", ind: null, sub: "kvarter", tab: 
 const UI = { indxOpen: false, mfOpen: false };                                    /* fold states that survive a re-render */
 const MKT = { src: false };                                                        /* market: sources panel open */
 const CH = { ind: (IND[0] || {}).key, areas: [], y0: "", y1: "", median: true, title: "", mode: "auto", dist: "size", fq: "year", ov: [], nat: true };   /* chart generator; fq = year | q, ov = overlay indicators, nat = Denmark line */
+const PR = { id: null };                                                          /* project datasheet */
+const PIPE = { type: "", status: "" };                                            /* pipeline filters */
 const T = { q: "", level: "kommune", region: "", minPop: 0 };                     /* table view filters */
 const REGIONS = ["Hovedstaden", "Sjælland", "Syddanmark", "Midtjylland", "Nordjylland"];
 const LF = { map: null, center: [56.0, 10.5], zoom: 7 };
@@ -119,12 +121,15 @@ function hashFor() {
   const q = [`ind=${encodeURIComponent(MK.ind || "")}`]; if (MK.year && MK.year !== LATEST) q.push(`y=${MK.year}`);
   if (S.view === "makro" && MK.micro) { q.push("micro=1"); q.push(`mind=${MK.mind}`); }
   if (S.view === "makro" && MK.infra) q.push("infra=1");   /* the overlay survives every level change */
+  if (S.view === "makro" && MK.focus) q.push(`focus=${encodeURIComponent(MK.focus)}`);
   let p;
   if (S.view === "area") { p = `area/${AR.type}/${AR.code}`; if (AR.group) q.push(`g=${encodeURIComponent(AR.group)}`); if (AR.sub !== "kvarter") q.push(`sub=${AR.sub}`); if (AR.tab !== "ind") q.push(`t=${AR.tab}`); }
   else if (S.view === "table") p = `table/${T.level}`;
   else if (S.view === "charts") { p = "charts"; q.length = 0; q.push(`ind=${encodeURIComponent(CH.ind)}`, `a=${CH.areas.join(",")}`, `y0=${CH.y0}`, `y1=${CH.y1}`, `med=${CH.median ? 1 : 0}`); if (CH.mode !== "auto") q.push(`mode=${CH.mode}`); if (CH.mode === "dist") q.push(`dist=${CH.dist}`);
     if (CH.fq === "q") q.push("fq=q"); if (CH.ov.length) q.push(`ov=${CH.ov.join(",")}`); if (!CH.nat) q.push("nat=0"); }
   else if (S.view === "market") { p = "market"; if (MKT.src) q.push("src=1"); }
+  else if (S.view === "project") { p = `project/${PR.id}`; }
+  else if (S.view === "pipeline") { p = "pipeline"; if (PIPE.type) q.push(`ptype=${PIPE.type}`); if (PIPE.status) q.push(`pstatus=${PIPE.status}`); }
   else if (S.view === "makro") p = "map" + (MK.muni ? "/" + MK.muni + (MK.muni === CPH_MUNI && MK.cphView === "postnr" ? "/postnr" : "") : "");
   else p = S.view;
   return p + "?" + q.join("&");
@@ -141,11 +146,13 @@ function parseHash() {
   else if (v === "table") { S.view = "table"; if (["kommune", "postnr", "kvarter"].includes(parts[1])) T.level = parts[1]; }
   else if (v === "sources") { S.view = "market"; MKT.src = true; }
   else if (v === "market") { S.view = "market"; MKT.src = q.src === "1"; }
+  else if (v === "project" && parts[1]) { S.view = "project"; PR.id = decodeURIComponent(parts[1]); }
+  else if (v === "pipeline") { S.view = "pipeline"; PIPE.type = q.ptype || ""; PIPE.status = q.pstatus || ""; }
   else if (v === "charts") { S.view = "charts"; CH.ind = q.ind || CH.ind; CH.areas = q.a ? q.a.split(",").filter(Boolean) : CH.areas; CH.y0 = q.y0 || CH.y0; CH.y1 = q.y1 || CH.y1; CH.median = q.med !== "0"; CH.mode = q.mode || "auto"; CH.dist = q.dist || "size";
     CH.fq = q.fq === "q" ? "q" : "year"; CH.ov = q.ov ? q.ov.split(",").filter(Boolean) : []; CH.nat = q.nat !== "0"; }
   else { S.view = "makro"; MK.muni = parts[1] && byCode[parts[1]] ? parts[1] : null; MK.cphView = parts[2] === "postnr" ? "postnr" : "kvarter";
          MK.micro = q.micro === "1" && microAvail(MK.muni); if (q.mind && MICRO_INDS.some(i => i.key === q.mind)) MK.mind = q.mind;
-         MK.infra = q.infra === "1"; }
+         MK.infra = q.infra === "1"; MK.focus = q.focus || null; if (MK.focus) MK.infra = true; }
   if (!curInds().some(i => i.key === MK.ind)) MK.ind = (curInds()[0] || {}).key;
   if (!yearsFor(MK.ind).includes(MK.year)) MK.year = LATEST;
   if (S.view === "makro") {
@@ -165,12 +172,13 @@ const VIEWS = [
   ["makro",   "Macro map",     "Demographics, income, housing and prices by municipality, postal code and Copenhagen quarter", "map"],
   ["table",   "Table",         "Every municipality, postal code and quarter side by side — filter, sort, export", "table"],
   ["charts",  "Charts",        "Pick an indicator, areas and years — export the chart as PNG or the data as CSV", "charts"],
-  ["market",  "Market",        "Prices, rents, supply, construction, macro indicators — and the data sources", "market"]];
-const NAV_GROUPS = [["Market intelligence", ["makro", "table", "charts", "market"]]];
+  ["market",  "Market",        "Prices, rents, supply, construction, macro indicators — and the data sources", "market"],
+  ["pipeline", "Pipeline",     "Every infrastructure project in the layer: budget, status, opening year, municipalities", "pipeline"]];
+const NAV_GROUPS = [["Market intelligence", ["makro", "table", "charts", "market", "pipeline"]]];
 const viewOf = id => VIEWS.find(v => v[0] === id) || VIEWS[0];
 
 function renderNav() {
-  const on = S.view === "area" ? "makro" : S.view;
+  const on = S.view === "area" ? "makro" : S.view === "project" ? "pipeline" : S.view;
   document.getElementById("nav").innerHTML = NAV_GROUPS.map(([lab, ids]) => `<div class="nav-glab">${lab}</div>` +
     ids.map(id => { const v = viewOf(id); return `<button class="nav-item ${on === id ? "on" : ""}" data-go="${v[3]}" title="${esc(v[2])}"><b>${v[1]}</b></button>`; }).join("")).join("");
 }
@@ -183,14 +191,15 @@ function crumbs() {
   else if (S.view === "makro") { const m = MK.muni ? byCode[MK.muni] : null;
     if (m) { if (microMode()) { c.push([m.name, `map/${m.code}` + q]); tail = "Buildings"; kind = "BBR register"; } else { tail = m.name; kind = cphMode() ? "quarters" : "postal codes"; } }
     else { tail = "Map"; kind = "municipalities and postal codes"; } }
-  else { tail = viewOf(S.view)[1]; kind = { table: "every area side by side", charts: "PNG and CSV export", market: "national series and sources" }[S.view] || ""; }
+  else if (S.view === "project") { const f = projectEntity(); c.push(["Pipeline", "pipeline"]); tail = f ? f.properties.name : "Project"; kind = f ? (INFRA_TYPE[f.properties.type] || f.properties.type) : ""; }
+  else { tail = viewOf(S.view)[1]; kind = { table: "every area side by side", charts: "PNG and CSV export", market: "national series and sources", pipeline: `${INFRA_ALL.length} projects · budget, status, opening year` }[S.view] || ""; }
   return { c, tail, kind };
 }
 function renderTop() {
   const { c, tail, kind } = crumbs();
   document.getElementById("hd").innerHTML = `<nav class="crumbs">${c.map(([l, h]) => `<button data-go="${esc(h)}">${esc(l)}</button><i>›</i>`).join("")}<b>${esc(tail)}</b>${kind ? `<span class="dim">${esc(kind)}</span>` : ""}</nav>`;
 }
-const RENDER = { makro: vMakro, table: vTable, area: vArea, charts: vCharts, market: vMarket };
+const RENDER = { makro: vMakro, table: vTable, area: vArea, charts: vCharts, market: vMarket, pipeline: vPipeline, project: vProject };
 function render() {
   renderNav(); renderTop();
   const body = document.getElementById("body");
@@ -205,6 +214,11 @@ document.addEventListener("click", e => {
   if ((el = g("[data-go]"))) { go(el.dataset.go); return; }
   if ((el = g("[data-tlevel]"))) { T.level = el.dataset.tlevel; if (!curInds().some(i => i.key === MK.ind)) MK.ind = curInds()[0].key; syncHash(); renderKeep(); return; }
   if (g("[data-csv]")) { exportCsv(); return; }
+  if (g("[data-csv-pipe]")) { exportPipelineCsv(); return; }
+  if (g("[data-back]")) { history.back(); return; }
+  if ((el = g("[data-pipe]"))) { const f = INFRA_BY[el.dataset.pipe];
+    go(f && f.properties.map !== false ? `map?ind=${encodeURIComponent(MK.ind)}&infra=1&focus=${encodeURIComponent(el.dataset.pipe)}` : `project/${el.dataset.pipe}`); return; }
+  if ((el = g("[data-project]"))) { go(`project/${el.dataset.project}`); return; }
   if (g("[data-xall]")) { exportAll(); return; }
   if (g("[data-mkown]")) { MK.own = !MK.own; renderKeep(); return; }
   if ((el = g("[data-cphview]"))) { MK.cphView = el.dataset.cphview; go(hashFor()); return; }
@@ -245,6 +259,8 @@ document.addEventListener("change", e => {
   if (el.id === "chtitle") { CH.title = el.value; const t = document.getElementById("chsvgtitle"); if (t) t.textContent = CH.title || chartAutoTitle(); }
   if (el.id === "mf-type") { MF.type = el.value; lfLayers(); mfBtn(); }
   if (["mf-mindw", "mf-yfrom", "mf-yto", "mf-rent"].includes(el.id)) { MF.minDw = Number(document.getElementById("mf-mindw").value) || 1; MF.yFrom = document.getElementById("mf-yfrom").value; MF.yTo = document.getElementById("mf-yto").value; MF.rentMin = Number(document.getElementById("mf-rent").value) || 0; lfLayers(); mfBtn(); }
+  if (el.id === "pptype") { PIPE.type = el.value; syncHash(); renderKeep(); }
+  if (el.id === "ppstatus") { PIPE.status = el.value; syncHash(); renderKeep(); }
   if (el.id === "tregion") { T.region = el.value; renderTableBody(); }
   if (el.id === "tminpop") { T.minPop = Number(el.value) || 0; renderTableBody(); }
 });
@@ -328,7 +344,7 @@ function setInfraLegend() {
   el.style.display = MK.infra && INFRA.length ? "" : "none";
   if (MK.infra && INFRA.length) el.innerHTML = infraLegendHtml();
 }
-const GROUP_ORDER = ["Demographics", "Income & jobs", "Housing stock", "Housing stock (BBR)", "Rents", "Prices & market", "Construction", "Safety"];
+const GROUP_ORDER = ["Demographics", "Income & jobs", "Housing stock", "Housing stock (BBR)", "Rents", "Prices & market", "Construction", "Safety", "Growth signals"];
 /* "label · unit" for selects, leaving out unit parts the label already says ("Reported crime · per 1,000 inh." + "rolling 4Q") */
 function optLabel(i) {
   const parts = (i.unit || "").split(" · ").filter(u => u && !i.label.includes(u) && !i.label.endsWith("· " + u.split(" ")[0]));
@@ -443,10 +459,17 @@ function muniStrip(m) {
     .concat(STRIP_EXTRA.map(k => IND.find(i => i.key === k)).filter(has));
   const cell = i => { const rk = rankOf(m, i.key, MUNI); return `<div><span>${esc(i.short || i.label)}</span><b>${fmtOf(i)(V(m, i.key))}</b><em>${rk ? `#${rk.r} of ${rk.n}` : ""}</em></div>`; };
   return `<div class="mstrip">
-    <div class="mstrip-id"><b>${esc(m.name)}</b><span class="dim">${esc(m.region || "")} · ${m.pop != null ? nf(m.pop, 0) + " inhabitants" : ""} · ${muniAreas(m.code).length} ${cphMode() ? "quarters" : "postal codes"}</span></div>
+    <div class="mstrip-id"><b>${esc(m.name)}</b><span class="dim">${esc(m.region || "")} · ${m.pop != null ? nf(m.pop, 0) + " inhabitants" : ""} · ${muniAreas(m.code).length} ${cphMode() ? "quarters" : "postal codes"}</span>${upcomingLine("kommune", m.code)}</div>
     <div class="mstrip-k">${key.map(cell).join("")}</div>
     <div class="mstrip-act"><button class="lk primary" data-go="${withQ(pageOf(m))}">Open ${esc(m.name)} page ›</button><button class="lk" data-go="${chartLink(MK.ind, "kommune", m.code)}" title="Open the chart generator with this municipality">↗ Chart</button></div>
   </div>`;
+}
+/* "Upcoming: M5 phase 1 (2036) · Nordhavnstunnel (2028) · +3 more" — projects that have not opened */
+function upcomingLine(level, code) {
+  const up = infraOf(level, code).filter(p => p.status !== "opened");
+  if (!up.length) return "";
+  const show = up.slice(0, 3).map(p => `<button class="lk mini" data-project="${esc(p.id)}" title="${esc(p.name)}">${esc(p.label_short || p.name)}${p.open_year || p.open_window ? ` (${esc(openLabel(p))})` : ""}</button>`).join("");
+  return `<span class="upcoming"><em>Upcoming</em>${show}${up.length > 3 ? `<button class="lk mini" data-go="pipeline">+${up.length - 3} more</button>` : ""}</span>`;
 }
 function vMakro() {
   if (!AREAS.length || !MUNI.length) return `<div class="card"><p class="empty">No macro data built yet — run <code>make fetch</code>, <code>make geo</code> and <code>make build</code>.</p></div>`;
@@ -562,6 +585,9 @@ function exportAll() {
   MUNI.forEach(m => emit("municipality", m, m.code, m.name, "Denmark", m.region || "", IND, asofNat("kommune")));
   AREAS.forEach(a => { const m = byCode[a.muni] || {}; emit("postal_code", a, a.nr, a.name, m.name || "", m.region || "", IND.filter(i => i.level === "postnr"), asofNat("postnr")); });
   if (CPH) CPH.areas.forEach(q => emit("copenhagen_quarter", q, q.code, q.name, q.bydel || "", "Hovedstaden", IND_CPH, (i, y) => (y !== LATEST && i.hist_asof && i.hist_asof[y]) || (i.asof && i.asof.kvarter) || ""));
+  INFRA_ALL.forEach(f => { const p = f.properties;
+    out.push(["project", p.id, p.name, p.agency || "", (p.kommuner || []).join(" "), "", p.open_year ?? p.open_window ?? "", p.type, p.status,
+              "mio. DKK", p.budget_mdkk ?? "", p.source_doc || p.source_url].map(cl).join(";")); });
   const mac = D.macro || {}; Object.entries(mac.series || {}).forEach(([k, ser]) => { const lt = (mac.latest || {})[k] || {};
     ser.forEach(pt => { if (pt.v != null) out.push(["macro", k, lt.label || k, "Denmark", "", "", pt.t, k, lt.label || k, lt.unit || "", pt.v, lt.src || ""].map(cl).join(";")); }); });
   downloadCsv(out, `macro-dashboard-dk_all_${(D.meta && D.meta.built) || "data"}.csv`);
@@ -805,7 +831,29 @@ function arMapInit() {
 
 
 /* ---------- Infrastructure projects overlay (data/geo/infra_projects.geojson, see docs/INFRA.md) ---------- */
-const INFRA = ((D.infra && D.infra.features) || []).filter(f => f.geometry);
+const INFRA_ALL = ((D.infra && D.infra.features) || []).filter(f => f.geometry);
+/* the map layer leaves out projects flagged map:false (a nationwide programme with no alignment) */
+const INFRA = INFRA_ALL.filter(f => f.properties.map !== false);
+const INFRA_BY = {}; INFRA_ALL.forEach(f => INFRA_BY[f.properties.id] = f);
+/* which projects serve an area: data/processed/infra_index.json, keyed "<level>:<code>" */
+const INFRA_IDX = D.infra_index || {};
+const infraOf = (level, code) => (INFRA_IDX[`${level}:${code}`] || {}).projects || [];
+const openLabel = p => p.open_window || (p.open_year ? String(p.open_year) : "–");
+/* metres per degree, scaled for longitude at the geometry's latitude — enough for lengths and areas */
+function geomStats(f) {
+  const g = f.geometry, K = 111320;
+  const flat = c => Array.isArray(c) && typeof c[0] === "number" ? [c] : c.flatMap(flat);
+  const pts = flat(g.coordinates); if (!pts.length) return {};
+  const lat0 = pts.reduce((s, q) => s + q[1], 0) / pts.length, kx = Math.cos(lat0 * Math.PI / 180) * K;
+  const lines = g.type === "MultiLineString" ? g.coordinates : g.type === "LineString" ? [g.coordinates] : [];
+  let km = 0;
+  lines.forEach(cs => cs.forEach((c, i) => { if (i) km += Math.hypot((c[0] - cs[i - 1][0]) * kx, (c[1] - cs[i - 1][1]) * K) / 1000; }));
+  const rings = g.type === "MultiPolygon" ? g.coordinates.map(r => r[0]) : g.type === "Polygon" ? [g.coordinates[0]] : [];
+  let m2 = 0;
+  rings.forEach(r => { let a = 0; r.forEach((c, i) => { const n = r[(i + 1) % r.length]; a += (c[0] * kx) * (n[1] * K) - (n[0] * kx) * (c[1] * K); }); m2 += Math.abs(a) / 2; });
+  const stations = INFRA_ALL.filter(x => x.properties.parent_id === f.properties.id).length;
+  return { km: km || null, ha: m2 ? m2 / 10000 : null, stations: stations || null };
+}
 /* four tones of the map's own palette: the overlay must not compete with the choropleth underneath */
 const INFRA_ST = {
   study:        { label: "Study",        color: "#8A8C81", dash: "2 5", weight: 2.2, fill: false },
@@ -814,7 +862,7 @@ const INFRA_ST = {
   opened:       { label: "Opened",       color: "#9A9D92", dash: "", weight: 1.6, fill: true },
 };
 const INFRA_TYPE = { metro: "Metro", letbane: "Light rail", brt: "BRT", rail: "Rail", road: "Road",
-                     bridge_tunnel: "Bridge / tunnel", urban_dev: "Urban development", hospital: "Hospital", university: "University" };
+                     bridge_tunnel: "Bridge / tunnel", urban_dev: "Urban development", hospital: "Hospital", university: "University", public_building: "State building" };
 const infraSt = p => INFRA_ST[p.status] || INFRA_ST.study;
 const isPt = f => f.geometry.type === "Point";
 const isArea = f => f.geometry.type === "Polygon" || f.geometry.type === "MultiPolygon";
@@ -836,7 +884,7 @@ function infraPopup(p) {
       ${row("Municipalities", komm.length ? komm.slice(0, 4).map(m => esc(m.name)).join(", ") + (komm.length > 4 ? ` +${komm.length - 4}` : "") : "")}</div>
     ${p.schematic ? `<p class="cap">Schematic corridor — not an official alignment. It shows where the project runs, not how it will be built.</p>` : ""}
     ${p.notes ? `<p class="cap">${esc(p.notes)}</p>` : ""}
-    <span class="lfact">${komm.length === 1 ? `<button class="lk mini primary" data-go="${withQ(pageOf(komm[0]))}">${esc(komm[0].name)} ›</button>` : ""}
+    <span class="lfact"><button class="lk mini primary" data-go="project/${esc(p.id)}">Open project sheet ›</button>${komm.length === 1 ? `<button class="lk mini" data-go="${withQ(pageOf(komm[0]))}">${esc(komm[0].name)} ›</button>` : ""}
       <a class="lk mini" href="${esc(p.source_url)}" target="_blank" rel="noopener">Source ↗</a></span>
     <p class="cap dim">${esc(p.source_doc || "")}${p.source_doc ? " · " : ""}updated ${esc(p.updated || "")}</p></div>`;
 }
@@ -902,6 +950,15 @@ function lfInfraLayers() {
   });
   LF.infraStG = L.layerGroup(marks).addTo(LF.map);
   lfInfraLabels();
+  if (MK.focus) {
+    const f = INFRA_BY[MK.focus], lay = lines.concat(marks).find(l => (l._infra || {}).id === MK.focus);
+    if (f && lay) {
+      const b = lay.getBounds ? lay.getBounds() : L.latLngBounds([lay.getLatLng()], [lay.getLatLng()]);
+      LF.map.fitBounds(b, { padding: [60, 60], maxZoom: 14 });
+      setTimeout(() => openInfra(f.properties, b.getCenter()), 400);
+    }
+    MK.focus = null; syncHash();
+  }
 }
 function lfInfraLabels() {
   if (LF.infraLabG) { LF.map.removeLayer(LF.infraLabG); LF.infraLabG = null; }
@@ -1417,6 +1474,118 @@ function chartCsv() {
     downloadCsv([["area", ind.key].join(";")].concat(ents.map(e => [e.name, V(e.o, ind.key) ?? (e.type === "postnr" && e.muni ? V(e.muni, ind.key) : "") ?? ""].join(";"))), `chart_${ind.key}_latest.csv`); return; }
   const { ind, ys, series } = chartSeries();
   downloadCsv([[isQ(ys[0] || "") ? "quarter" : "year"].concat(series.map(s_ => s_.name)).join(";")].concat(ys.map((yy, i) => [yy].concat(series.map(s_ => s_.pts[i].v ?? "")).map(v => String(v).replace(/;/g, ",")).join(";"))), `chart_${ind.key}.csv`);
+}
+
+
+/* ---------- Project datasheet (#project/<id>) and Pipeline table (#pipeline) ---------- */
+function projectEntity() { return INFRA_BY[PR.id] || null; }
+/* the postal codes and quarters a project serves, from the spatial index */
+function infraAreas(id, level) {
+  return Object.entries(INFRA_IDX).filter(([k, v]) => k.startsWith(level + ":") && v.projects.some(p => p.id === id))
+    .map(([k]) => k.split(":")[1]);
+}
+function vProject() {
+  const f = projectEntity();
+  if (!f) return `<div class="card"><p class="empty">Unknown project.</p></div>`;
+  const p = f.properties, s = geomStats(f), st = infraSt(p);
+  const bn = p.budget_mdkk == null ? null : nf(p.budget_mdkk / 1000, 1) + " bn DKK";
+  const priceNote = /2015 prices|price level|PL\d|09PL|PL09/i.test(p.notes || "") ? "price basis — see the note below" : "";
+  setTimeout(prMapInit, 0);
+  const tile = (l, v, sub) => v == null || v === "" ? "" : `<div><span>${esc(l)}</span><b>${v}</b>${sub ? `<em>${esc(sub)}</em>` : ""}</div>`;
+  const kom = (p.kommuner || []).map(c => byCode[c]).filter(Boolean);
+  const pnr = infraAreas(p.id, "postnr").map(c => byNr[c]).filter(Boolean);
+  const kva = infraAreas(p.id, "kvarter").map(c => byQ[c]).filter(Boolean);
+  const chips = (list, href) => list.map(o => `<button class="lk mini" data-go="${withQ(href(o))}">${esc(o.name || o.nr)}</button>`).join("");
+  return `
+  <div class="card accent arhead">
+    <div class="arid">
+      <h2>${esc(p.name)}</h2>
+      <div class="artags"><span class="tag">${esc(INFRA_TYPE[p.type] || p.type)}</span><span class="tag st-${esc(p.status)}">${esc(st.label)}</span>${p.agency ? `<span class="tag">${esc(p.agency)}</span>` : ""}${p.schematic ? `<span class="tag">schematic geometry</span>` : ""}</div>
+    </div>
+    <div class="tools"><button class="lk" data-back>‹ Back</button>${p.map !== false ? `<button class="lk primary" data-go="map?ind=${encodeURIComponent(MK.ind)}&infra=1&focus=${encodeURIComponent(p.id)}">Show on map</button>` : ""}<a class="lk" href="${esc(p.source_url)}" target="_blank" rel="noopener">Source ↗</a></div>
+    <div class="hl">
+      <span class="hlc"><span>Opening</span><b>${esc(openLabel(p))}</b><em>${p.open_year_original && p.open_year_original !== p.open_year ? `originally ${p.open_year_original}` : ""}</em></span>
+      <span class="hlc"><span>Budget</span><b>${bn || "–"}</b><em>${esc(priceNote)}</em></span>
+      ${s.km ? `<span class="hlc"><span>Length</span><b>${nf(s.km, 1)} km</b><em>${p.schematic ? "schematic" : "as mapped"}</em></span>` : ""}
+      ${s.stations ? `<span class="hlc"><span>Stations</span><b>${s.stations}</b><em>in this project</em></span>` : ""}
+      ${s.ha ? `<span class="hlc"><span>Area</span><b>${nf(s.ha, 0)} ha</b><em>${p.schematic ? "schematic" : "as mapped"}</em></span>` : ""}
+    </div>
+  </div>
+  ${p.schematic ? `<div class="card"><p class="cap">⚠ Schematic corridor — not an official alignment. It shows where the project runs, not how it will be built, so the length above is indicative.</p></div>` : ""}
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-head"><h3>Where it runs</h3><span class="hint">over ${esc(curInd().short || curInd().label)}</span></div>
+      <div class="mapwrap"><div id="prmap"></div><div class="maplegend small" id="prlegend"></div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>Areas served</h3><span class="hint">click to open it on the map</span></div>
+      ${kom.length ? `<p class="cap">Municipalities</p><div class="tfilters">${chips(kom, o => "map/" + o.code)}</div>` : ""}
+      ${pnr.length ? `<p class="cap">Postal codes (${pnr.length})</p><div class="tfilters">${chips(pnr.slice(0, 14), o => pageOf(o))}${pnr.length > 14 ? `<span class="hint">+${pnr.length - 14} more</span>` : ""}</div>` : ""}
+      ${kva.length ? `<p class="cap">Copenhagen quarters (${kva.length})</p><div class="tfilters">${chips(kva.slice(0, 10), o => pageOf(o))}${kva.length > 10 ? `<span class="hint">+${kva.length - 10} more</span>` : ""}</div>` : ""}
+      <p class="cap">${esc(p.notes || "")}</p>
+      <p class="cap dim">${esc(p.source_doc || "")}${p.source_doc ? " · " : ""}geometry: ${esc(p.geometry_source || "–")} · updated ${esc(p.updated || "")}</p>
+    </div>
+  </div>`;
+}
+function prMapInit() {
+  const el = document.getElementById("prmap"); if (!el || typeof L === "undefined") return;
+  const f = projectEntity(); if (!f) return;
+  if (LF.pmap) { try { LF.pmap.remove(); } catch (e) {} LF.pmap = null; }
+  const map = L.map(el, { center: [56, 10.5], zoom: 7, scrollWheelZoom: true, zoomSnap: .5, attributionControl: false });
+  LF.pmap = map;
+  L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, className: "basemap" }).addTo(map);
+  /* the current choropleth underneath, so the project is read against the market picture */
+  const ind = curInd(), sc = scaleOf(MUNI, m => V(m, ind.key));
+  MUNI.forEach(m => muniAreas(m.code).forEach(a => {
+    const t = sc.t(V(m, ind.key));
+    L.polygon(a.rings, { color: "#FFFFFF", weight: .5, fillColor: t == null ? "#C4CBC4" : mkShade(t, ind.key), fillOpacity: .55, interactive: false }).addTo(map);
+  }));
+  const p = f.properties, style = infraStyle(p);
+  const layer = f.geometry.type === "Point"
+    ? L.circleMarker([f.geometry.coordinates[1], f.geometry.coordinates[0]], { radius: 8, color: infraSt(p).color, weight: 3, fillColor: "#FFFFFF", fillOpacity: 1 })
+    : L.geoJSON(f, { style: { ...style, weight: Math.max(style.weight, 4) } });
+  layer.addTo(map);
+  INFRA_ALL.filter(x => x.properties.parent_id === p.id && x.geometry.type === "Point").forEach(x =>
+    L.circleMarker([x.geometry.coordinates[1], x.geometry.coordinates[0]], { radius: 5, color: infraSt(x.properties).color, weight: 2, fillColor: "#FFFFFF", fillOpacity: 1 })
+      .bindTooltip(esc(infraShort(x.properties))).addTo(map));
+  const b = layer.getBounds ? layer.getBounds() : L.latLngBounds([layer.getLatLng()], [layer.getLatLng()]);
+  map.fitBounds(b, { padding: [40, 40], maxZoom: 13 });
+  setLegend("prlegend", sc, ind, ind.key, "municipalities");
+}
+/* ---------- Pipeline ---------- */
+function pipeRows() {
+  return INFRA_ALL.filter(f => (!PIPE.type || f.properties.type === PIPE.type) && (!PIPE.status || f.properties.status === PIPE.status))
+    .slice().sort((a, b) => (INFRA_ORDER[a.properties.status] - INFRA_ORDER[b.properties.status])
+      || ((a.properties.open_year || 9999) - (b.properties.open_year || 9999)) || a.properties.name.localeCompare(b.properties.name));
+}
+const INFRA_ORDER = { construction: 0, decided: 1, study: 2, opened: 3 };
+function vPipeline() {
+  const rows = pipeRows();
+  const types = [...new Set(INFRA_ALL.map(f => f.properties.type))].sort();
+  const bn = v => v == null ? "–" : nf(v / 1000, 1);
+  return `
+  <div class="card accent">
+    <div class="card-head tools-only"><div class="tools">
+      <select id="pptype" class="indsel"><option value="">All types</option>${types.map(x => `<option value="${x}" ${PIPE.type === x ? "selected" : ""}>${esc(INFRA_TYPE[x] || x)}</option>`).join("")}</select>
+      <select id="ppstatus" class="indsel"><option value="">All statuses</option>${Object.keys(INFRA_ORDER).map(s => `<option value="${s}" ${PIPE.status === s ? "selected" : ""}>${esc(INFRA_ST[s].label)}</option>`).join("")}</select>
+      <span class="hint">${rows.length} of ${INFRA_ALL.length} projects</span>
+      <button class="lk mini" data-csv-pipe>⤓ Export CSV</button></div></div>
+    <div class="scrollx"><table class="tbl compact wraphead" data-sortable><thead><tr>
+      <th>Project</th><th>Type</th><th>Status</th><th>Opening</th><th class="num">Budget<br><span class="dim">bn DKK</span></th><th>Agency</th><th>Municipalities</th></tr></thead>
+      <tbody>${rows.map(f => { const p = f.properties; const kom = (p.kommuner || []).map(c => (byCode[c] || {}).name).filter(Boolean);
+        return `<tr class="clickrow" data-pipe="${esc(p.id)}"><th><span class="thn">${esc(p.name)} <span class="go">›</span></span>${p.schematic ? ` <span class="dim">schematic</span>` : ""}</th>
+          <td class="dim">${esc(INFRA_TYPE[p.type] || p.type)}</td><td><span class="ipill st-${esc(p.status)}">${esc(infraSt(p).label)}</span></td>
+          <td data-v="${p.open_year || ""}">${esc(openLabel(p))}${p.open_year_original && p.open_year_original !== p.open_year ? ` <span class="dim">orig. ${p.open_year_original}</span>` : ""}</td>
+          <td class="num" data-v="${p.budget_mdkk ?? ""}">${bn(p.budget_mdkk)}</td><td class="dim">${esc(p.agency || "")}</td>
+          <td class="dim">${esc(kom.slice(0, 3).join(", "))}${kom.length > 3 ? ` +${kom.length - 3}` : ""}</td></tr>`; }).join("")}</tbody></table></div>
+    <p class="cap">Every project in the layer, including the ones kept off the map (a nationwide programme has no alignment). Click a row to see it on the map, or to open its sheet when it has no alignment. Budgets are in the price level each source states — open a project for the caveat. Sources and method: <code>docs/INFRA.md</code>.</p>
+  </div>`;
+}
+function exportPipelineCsv() {
+  const cl = v => String(v == null ? "" : v).replace(/;/g, ",").replace(/\r?\n/g, " ");
+  const head = ["id", "name", "type", "status", "open_year", "open_window", "open_year_original", "budget_mdkk", "agency", "kommuner", "schematic", "source_url", "source_doc", "updated", "notes"];
+  const lines = [head.join(";")].concat(pipeRows().map(f => head.map(k => cl(k === "kommuner" ? (f.properties.kommuner || []).join(" ") : f.properties[k])).join(";")));
+  downloadCsv(lines, `infra_pipeline_${(D.meta && D.meta.built) || "data"}.csv`);
 }
 
 /* ---------- Market view (Denmark-only panel) ---------- */

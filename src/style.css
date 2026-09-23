@@ -1437,3 +1437,10 @@ th .thn{display:inline}
 .infralab{pointer-events:auto;cursor:pointer}
 .infralab.infralab-e{transform:translate(-100%,-50%)}
 .infralab.infralab-w{transform:translate(0,-50%)}
+/* upcoming-projects line on the area card, pipeline pills */
+.upcoming{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:5px}
+.upcoming em{font-style:normal;font-family:var(--mono);font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.tbl .ipill{font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border:1px solid var(--line);border-radius:999px;color:var(--muted);white-space:nowrap}
+.tbl .ipill.st-construction{color:#1C6B5C;border-color:#BBD8CF}
+.tag.st-construction{color:#1C6B5C;border-color:#BBD8CF}
+#prmap{height:360px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}

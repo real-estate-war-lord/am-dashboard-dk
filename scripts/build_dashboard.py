@@ -36,6 +36,7 @@ def main():
     cph = load(pathlib.Path(args.cph))
     micro_idx = load(PROC / "micro" / "index.json")
     infra = load(ROOT / "data" / "geo" / "infra_projects.geojson")
+    infra_index = load(PROC / "infra_index.json")
     built = (makro.get("meta") or {}).get("built") or dt.date.today().isoformat()
     data = {
         "meta": makro.get("meta", {"built": built, "sources": [], "attribution": []}),
@@ -48,8 +49,9 @@ def main():
         "cph": cph,
         "micro": micro_idx,
         # infrastructure overlay: only the features meant for the map (scripts/build_infra.py, docs/INFRA.md)
-        "infra": {"features": [f for f in (infra or {}).get("features", []) if (f["properties"].get("map") is not False)],
-                  "meta": (infra or {}).get("meta")} if infra else None,
+        # every project: the map layer filters on `map`, the Pipeline table lists them all
+        "infra": {"features": (infra or {}).get("features", []), "meta": (infra or {}).get("meta")} if infra else None,
+        "infra_index": (infra_index or {}).get("areas") if infra_index else None,
     }
     payload = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</script", "<\\/script")
     html = (SRC / "index.html").read_text(encoding="utf-8")

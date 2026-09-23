@@ -34,6 +34,7 @@ they show *where* a project runs, never how it will be built, and must not be me
 | `type` | enum | `metro` · `letbane` · `brt` · `rail` · `road` · `bridge_tunnel` · `urban_dev` · `hospital` · `university` · `public_building` (a state building: courthouse, ministry, parliament) |
 | `status` | enum | `study` · `decided` · `construction` · `opened` (see §5) |
 | `open_year` | int \| null | currently expected opening year |
+| `open_window` | string \| null | used instead of a year when the source gives a span rather than a date ("2030–2032"); popups and the datasheet show it in place of `open_year` |
 | `open_year_original` | int \| null | opening year first decided, when the source names one — the delay is the interesting number |
 | `budget_mdkk` | number \| null | approved total expenditure, mio. DKK, in the price level the source states (noted per row) |
 | `agency` | string | Banedanmark, Vejdirektoratet, Sund & Bælt, Metroselskabet, By & Havn, … |
@@ -50,6 +51,26 @@ they show *where* a project runs, never how it will be built, and must not be me
 
 Geometry: `LineString` / `MultiLineString` for alignments, `Point` for stations, `Polygon` /
 `MultiPolygon` for development areas, and `null` when no source has one.
+
+## 2b. Which projects serve an area — `data/processed/infra_index.json`
+
+`scripts/build_infra.py` also writes a spatial index: for every municipality, postal code and Copenhagen
+quarter, the projects whose geometry touches the polygon, plus stations and single sites (hospital,
+university, state building) within **1,200 m** of it. Keys are `"<level>:<code>"`, e.g. `kommune:101`.
+
+```
+"kommune:101": { "projects": [ {id, name, label_short, type, status, open_year, open_window, distance_m} … ],
+                 "projects_upcoming": 21, "stations_planned_1200m": 9 }
+```
+
+Projects are sorted by status (construction → decided → study → opened) and then by opening year.
+Distances are measured in a local metre projection, which keeps the build free of a pyproj dependency.
+The two counts feed the registry indicators **`projects_upcoming`** and **`stations_planned_1200m`**
+(group *Growth signals*, municipality and postal-code level, `calc: infra_index`). They count what this
+curated list holds, not every building site in Denmark — that caveat travels with the indicators' `note`.
+
+The dashboard uses the index for the *Upcoming* line on an area card, for "Areas served" on a project
+datasheet, and for the Pipeline table.
 
 ## 3. Sources
 
@@ -125,6 +146,10 @@ Anlægsstatus appears twice a year (spring and autumn). Per edition:
 
 Separately: when Metroselskabet, Aarhus Letbane or By & Havn publish a new timetable, update the row
 and its `source_url`.
+
+**1 January 2027:** Region Hovedstaden and Region Sjælland merge into **Region Østdanmark** — update
+`agency` on the affected hospital rows (Nyt Hospital Nordsjælland, Nyt Hospital Bispebjerg, Ny Psykiatri
+Bispebjerg and any later Copenhagen-area hospital).
 
 ## 7. Known gaps
 

@@ -1,5 +1,5 @@
 {
- "_doc": "Indicator registry for the Danish makro view. `db` = '' (Statistics Denmark), 's20' (Finans Danmark) or 's30' (Copenhagen). `level` = finest geography the indicator natively exists at. `calc` describes the post-processing in build_makro.py. `hue` = RGB target for the choropleth ramp (paper #EFF2EE → hue). `pull` names a raw file when one table is fetched with several selections. `SUM` = omit the variable so the API returns its total. `TODO:word` = placeholder; validate_config.py lists codes whose label contains the word. `direction` = 'higher_better' | 'lower_better' — which end of the scale is favourable (ranking and good/bad colouring). `note` = glossary text for the indicator's details. `chip` = true puts the indicator in the quick-pick chip row. Rolling-quarter calcs (Safety): `rolling4q_per_1000_pop` = sum of the numerator over the latest 4 quarters ÷ FOLK1A population at the same end quarter × 1000; `rolling4q_per_1000_dwellings` = same sum ÷ BOL101 dwellings of the latest year × 1000; `rolling4q_yoy_pct` = latest 4Q sum vs the 4 quarters before, %. For the yearly history each calendar year is filed as its Q1–Q4 sum (÷ population at Q4); the live value is the rolling 4Q ending at the latest quarter. A `select` value may be a list of codes (rows matching any of them are summed). `history_from` = first year of the yearly history (Charts axis; default: history_years back from the latest year); `map_from` = first year offered by the map/table year selector, and the start of the quarterly rolling series; `breaks` = series breaks drawn in Charts, [{at: '2013K3' | '2023', text}]. `note_short` = the one caveat worth repeating in a map popup (the full `note` stays in the ⓘ details).",
+ "_doc": "Indicator registry for the Danish makro view. `db` = '' (Statistics Denmark), 's20' (Finans Danmark) or 's30' (Copenhagen). `level` = finest geography the indicator natively exists at. `calc` describes the post-processing in build_makro.py. `hue` = RGB target for the choropleth ramp (paper #EFF2EE → hue). `pull` names a raw file when one table is fetched with several selections. `SUM` = omit the variable so the API returns its total. `TODO:word` = placeholder; validate_config.py lists codes whose label contains the word. `direction` = 'higher_better' | 'lower_better' — which end of the scale is favourable (ranking and good/bad colouring). `note` = glossary text for the indicator's details. `chip` = true puts the indicator in the quick-pick chip row. Rolling-quarter calcs (Safety): `rolling4q_per_1000_pop` = sum of the numerator over the latest 4 quarters ÷ FOLK1A population at the same end quarter × 1000; `rolling4q_per_1000_dwellings` = same sum ÷ BOL101 dwellings of the latest year × 1000; `rolling4q_yoy_pct` = latest 4Q sum vs the 4 quarters before, %. For the yearly history each calendar year is filed as its Q1–Q4 sum (÷ population at Q4); the live value is the rolling 4Q ending at the latest quarter. A `select` value may be a list of codes (rows matching any of them are summed). `history_from` = first year of the yearly history (Charts axis; default: history_years back from the latest year); `map_from` = first year offered by the map/table year selector, and the start of the quarterly rolling series; `breaks` = series breaks drawn in Charts, [{at: '2013K3' | '2023', text}]. `note_short` = the one caveat worth repeating in a map popup (the full `note` stays in the ⓘ details). `calc: infra_index` reads data/processed/infra_index.json (scripts/build_infra.py) instead of a StatBank pull.",
  "indicators": [
   {
    "key": "growth",
@@ -1845,6 +1845,68 @@
      "text": "1 July 2013: Criminal Code amendments on sexual offences (more offences classed as rape, §216) — series break in the penal-code total (DST footnote, STRAF11/STRAF22)."
     }
    ]
+  },
+  {
+   "key": "projects_upcoming",
+   "label": "Upcoming infrastructure projects",
+   "short": "Projects",
+   "unit": "projects",
+   "desc": "Projects in the curated infrastructure layer that have not opened yet (study, decided or under construction) and touch the area — plus stations and sites within 1,200 m.",
+   "level": "postnr",
+   "hue": [
+    40,
+    84,
+    128
+   ],
+   "group": "Growth signals",
+   "direction": "higher_better",
+   "sources": [
+    {
+     "db": "infra",
+     "table": "infra_index",
+     "geo": "kommune"
+    },
+    {
+     "db": "infra",
+     "table": "infra_index",
+     "geo": "postnr"
+    }
+   ],
+   "calc": "infra_index",
+   "fmt": "int",
+   "source": "Curated infrastructure-project layer (docs/INFRA.md): Fingerplan 2019, Transportministeriet Anlægsstatus, regions, agencies, OpenStreetMap",
+   "note": "Counted from the curated project list, so it reflects what that list holds — it is not a complete register of everything being built in Denmark. A project counts for an area when its geometry touches the area; stations and single sites also count within 1,200 m."
+  },
+  {
+   "key": "stations_planned_1200m",
+   "label": "Planned stations within 1.2 km",
+   "short": "Planned stations",
+   "unit": "stations",
+   "desc": "Stations of not-yet-opened projects (metro, light rail, BRT) whose point lies within 1,200 m of the area.",
+   "level": "postnr",
+   "hue": [
+    40,
+    84,
+    128
+   ],
+   "group": "Growth signals",
+   "direction": "higher_better",
+   "sources": [
+    {
+     "db": "infra",
+     "table": "infra_index",
+     "geo": "kommune"
+    },
+    {
+     "db": "infra",
+     "table": "infra_index",
+     "geo": "postnr"
+    }
+   ],
+   "calc": "infra_index",
+   "fmt": "int",
+   "source": "Curated infrastructure-project layer (docs/INFRA.md): Fingerplan 2019, Transportministeriet Anlægsstatus, regions, agencies, OpenStreetMap",
+   "note": "Counted from the curated project list, so it reflects what that list holds — it is not a complete register of everything being built in Denmark. A project counts for an area when its geometry touches the area; stations and single sites also count within 1,200 m."
   }
  ],
  "macro": [

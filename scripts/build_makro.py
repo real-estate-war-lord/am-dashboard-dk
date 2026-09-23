@@ -321,6 +321,31 @@ def load_bbr():
     return _BBR or None
 
 
+_INFRA_IDX = None
+
+
+def infra_index():
+    """data/processed/infra_index.json from scripts/build_infra.py, or None."""
+    global _INFRA_IDX
+    if _INFRA_IDX is None:
+        p = ROOT / "data" / "processed" / "infra_index.json"
+        _INFRA_IDX = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
+    return _INFRA_IDX or None
+
+
+def calc_infra_index(ind, year=None):
+    """Counts per area from the curated project layer — a snapshot, so no history."""
+    ix = infra_index()
+    if year or not ix:
+        return {}
+    per = f"projects {ix['built']}"
+    out = {}
+    for geo in ("kommune", "postnr"):
+        vals = {k.split(":", 1)[1]: v.get(ind["key"]) for k, v in ix["areas"].items() if k.startswith(geo + ":")}
+        out[geo] = ({a: v for a, v in vals.items() if v is not None}, per)
+    return out
+
+
 def compute(ind, year=None):
     """Returns {geo: ({area: value}, period)} for one indicator, optionally for a
     reference year (rows after that year are dropped; see rows_for_year)."""
@@ -334,6 +359,8 @@ def compute(ind, year=None):
         per = f"BBR {b['meta']['built']}"
         return {"kommune": ({k: v.get(ind["key"]) for k, v in b["kommune"].items()}, per),
                 "postnr": ({k: v.get(ind["key"]) for k, v in b["postnr"].items()}, per)}
+    if calc == "infra_index":
+        return calc_infra_index(ind, year)
     if calc.startswith("rolling4q"):
         vals, p = calc_rolling4q(ind, year)
         return {srcs[0]["geo"]: (vals, p)} if p else {}
@@ -534,7 +561,7 @@ def main():
     for ind in c["indicators"]:
         for s in ind["sources"]:
             key = (s.get("db", ""), s.get("table", ""))
-            if key in seen or s.get("db") in ("boligstat", "lbf", "bbr"):
+            if key in seen or s.get("db") in ("boligstat", "lbf", "bbr", "infra"):
                 continue
             seen.add(key)
             m = meta(*key)
@@ -544,6 +571,12 @@ def main():
     if bbr:
         sources.append({"key": "bbr", "label": f"BBR via Datafordeler — housing stock ({len(bbr['meta']['municipalities'])} municipalities, {bbr['meta']['dwellings']:,} dwellings)".replace(",", " "),
                         "tables": "BBR_Enhed, BBR_Bygning (GraphQL v3)", "asof": bbr["meta"]["built"], "url": "https://datafordeler.dk/dataoversigt/bygnings-og-boligregistret-bbr/bbr-graphql/", "licence": "free (Klimadatastyrelsen)"})
+    ix = infra_index()
+    if ix:
+        sources.append({"key": "infra", "label": f"Infrastructure projects — curated layer ({len(ix['areas'])} areas with projects)",
+                        "tables": "data/geo/infra_projects.geojson · Fingerplan 2019, Anlægsstatus, regions and agencies, OpenStreetMap",
+                        "asof": ix["built"], "fetched": ix["built"], "url": "https://github.com/real-estate-war-lord/am-dashboard-dk/blob/main/docs/INFRA.md",
+                        "licence": "see docs/INFRA.md"})
     if (EXT / "rent_private.csv").exists():
         sources.append({"key": "boligstat", "label": "Social- og Boligstyrelsen, boligstat.dk — private rental rent DKK/m²", "url": "https://boligstat.dk", "licence": "public"})
     if (EXT / "rent_social.csv").exists():
