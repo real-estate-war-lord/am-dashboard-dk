@@ -1,29 +1,49 @@
 #!/usr/bin/env python3
-"""Check data/processed/forecast.json and data/processed/housing_gap.json against their
-own sources. Runnable on its own.
+"""Check the v2.4 Outlook data files against their own sources. Runnable on its own.
 
-Seven checks, in order:
+  data/processed/forecast.json        DST municipal projection            [map]
+  data/processed/net_dwellings.json   BOL101 net additions per year       [map]
+  data/processed/housing_gap.json     demand-vs-supply comparison         [research only]
+
+**The hard-data rule.** Every indicator the map shows must be an official published figure
+or plain arithmetic on official figures — a difference, a share, a per-1,000, a sum.
+Nothing shown in the UI may contain an assumption, a trend, a cap or a model of our own.
+Check 0 audits the registry against that rule; it is why `housing_gap.json`, which needs a
+household-size trend, is validated here but is no longer a registry entry. See
+docs/FORECAST.md §0.
+
+Checks, in order:
+  0. registry audit  — every entry in config/indicators.json's `forecast` key against the
+                       source tables and the exact arithmetic recorded below, and against
+                       the keys indicators() actually produces  [FAILS on any mismatch]
   1. coverage        — every kommune × every year present, nothing missing or null
   2. reconciliation  — Σ kommuner vs the national projection (FRDK) per year   [FAILS > 0.1 %]
   3. base year       — the projection's first year vs the latest actual FOLK1A, per kommune,
                        five largest deviations                                 [information only]
   4. smoke test      — København and Aarhus against the figures in docs/FORECAST_SOURCES.md §1.4
   5. 20–34 baseline  — the Denmark figure fc_20_34_rel is measured against, checked against
-                       FRDK's own age detail, and the two identities that define the pair
-                       fc_20_34_rel / fc_20_34_abs                             [FAILS]
-  6. housing gap     — 98 kommuner with every component present and non-null, and the two
-                       identities that define gap_per_1000_rel                 [FAILS]
-  7. gap by hand     — gap_per_1000 recomputed for five kommuner straight from the raw
-                       FOLK1A / FAM55N / BOL101 cells, household-size trend, cap and all
-                       — a second implementation of the formula                [FAILS]
+                       FRDK's own age detail, the two identities that define the pair
+                       fc_20_34_rel / fc_20_34_abs, and fc_pop_rate_5y recomputed from the
+                       two projection cells it is made of                      [FAILS]
+  6. net dwellings   — 98 kommuner with every component present, and hist_net_dwell
+                       recomputed for five kommuner straight from the raw BOL101 and
+                       FOLK1A cells                                            [FAILS]
+  7. housing gap     — research only. 98 kommuner with every component present and non-null,
+                       and the two identities that define gap_per_1000_rel     [FAILS]
+  8. gap by hand     — research only. gap_per_1000 recomputed for five kommuner straight
+                       from the raw FOLK1A / FAM55N / BOL101 cells, household-size trend,
+                       cap and all — a second implementation of the formula    [FAILS]
+  9. Copenhagen      — the KK kvarter forecast: coverage, the three additivity identities,
+                       KKFR vs the latest KKBEF1 actual and KK vs DST          [FAILS on 1-3]
 
-Checks 6 and 7 are skipped, not failed, when housing_gap.json has not been built.
+Checks 6, 7/8 and 9 are skipped, not failed, when their file has not been built.
 Exit status is non-zero if a check marked FAIL does not pass.
 
 Usage
   python scripts/validate_forecast.py
   python scripts/validate_forecast.py --tolerance 0.05
   python scripts/validate_forecast.py --top 10        # longer 20–34 rankings
+  python scripts/validate_forecast.py --audit         # check 0 on its own
 """
 import argparse
 import csv
@@ -37,7 +57,9 @@ sys.path.insert(0, __file__.rsplit("/", 1)[0])
 from build_forecast import indicators, national_pct  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
+CFG = ROOT / "config" / "indicators.json"
 SRC = ROOT / "data" / "processed" / "forecast.json"
+NET = ROOT / "data" / "processed" / "net_dwellings.json"
 GAP = ROOT / "data" / "processed" / "housing_gap.json"
 HOUSING_RAW = ROOT / "data" / "raw" / "forecast" / "housing"
 FORECAST_RAW = ROOT / "data" / "raw" / "forecast" / "dst"
@@ -49,10 +71,37 @@ EXPECTED = {"101": {"2026": 671714, "2031": 689101, "2040": 711011},
             "751": {"2026": 378361, "2031": 399885, "2040": 431031}}
 NAMES = {"101": "København", "751": "Aarhus", "153": "Brøndby", "665": "Lemvig",
          "147": "Frederiksberg"}
-# check 7 — a spread of sizes and directions: two big cities, a suburb that grows, a
-# shrinking rural kommune, and the densest kommune in the country
+# checks 6 and 8 — a spread of sizes and directions: two big cities, a suburb that grows,
+# a shrinking rural kommune, and the densest kommune in the country
 BY_HAND = ["101", "751", "153", "665", "147"]
 FIELDS = ("total", "a0_5", "a6_16", "a17_19", "a20_34", "a35_64", "a65_79", "a80p")
+
+# ---- check 0: the hard-data audit -------------------------------------------------
+# One row per entry in config/indicators.json's `forecast` key. `arith` is the exact
+# arithmetic, written out; `assumption` is what the entry assumes beyond the published
+# cells it reads. Under the hard-data rule every `assumption` must be None. Adding an
+# indicator to the registry without adding it here fails the check, which is the point:
+# the audit cannot fall silently out of date.
+#
+# P = forecast.json `total`, a<group> = that age group's count, y0/y5/y1 = the first,
+# mid (y0+5) and last year of the window.
+AUDIT = {
+ "fc_growth":      ("FRKM1xx", "(P_y1 − P_y0) / P_y0 × 100", None),
+ "fc_growth_5y":   ("FRKM1xx", "(P_y5 − P_y0) / P_y0 × 100", None),
+ "fc_pop_rate_5y": ("FRKM1xx", "(P_y5 − P_y0) / 5 / P_y0 × 1000", None),
+ "fc_abs":         ("FRKM1xx", "P_y1 − P_y0", None),
+ "fc_0_5":         ("FRKM1xx", "(a0_5_y1 − a0_5_y0) / a0_5_y0 × 100", None),
+ "fc_6_16":        ("FRKM1xx", "(a6_16_y1 − a6_16_y0) / a6_16_y0 × 100", None),
+ "fc_20_34":       ("FRKM1xx", "(a20_34_y1 − a20_34_y0) / a20_34_y0 × 100", None),
+ "fc_20_34_rel":   ("FRKM1xx", "fc_20_34 − the same expression on Σ of the 98 kommuner", None),
+ "fc_20_34_abs":   ("FRKM1xx", "a20_34_y1 − a20_34_y0", None),
+ "fc_80p":         ("FRKM1xx", "(a80p_y1 − a80p_y0) / a80p_y0 × 100", None),
+ "hist_net_dwell": ("BOL101 + FOLK1A",
+                    "(stock_end − stock_start) / span_years / population × 1000", None),
+}
+# indicators() returns these and only these; hist_net_dwell comes from the other build.
+FROM_FORECAST_JSON = {k for k in AUDIT if k.startswith("fc_")}
+FROM_NET_DWELLINGS = {"hist_net_dwell"}
 
 
 def folk1a_latest() -> tuple[str, dict[str, int]]:
@@ -121,10 +170,130 @@ def frdk_20_34(table: str, y0: str, y1: str) -> tuple[float, str]:
     return (tot[y1] - tot[y0]) / tot[y0] * 100, origin
 
 
+def audit(doc: dict) -> list[str]:
+    """Check 0 — every map indicator against the hard-data rule (docs/FORECAST.md §0).
+
+    Three ways this fails, all of them the same failure: an indicator reaching the UI
+    without anyone having written down what it is made of.
+      · an entry in the registry that AUDIT does not describe, or the reverse
+      · an entry whose AUDIT row records an assumption
+      · a key the registry expects from indicators() that indicators() does not return
+    """
+    fails = []
+    reg = json.loads(CFG.read_text(encoding="utf-8")).get("forecast", {}).get("indicators", [])
+    keys = [i["key"] for i in reg]
+    print(f"0. registry audit — config/indicators.json `forecast` key, "
+          f"{len(keys)} indicators, hard-data rule\n")
+    w = max((len(k) for k in set(keys) | set(AUDIT)), default=14)
+    for k in keys:
+        row = AUDIT.get(k)
+        if row is None:
+            print(f"   ✗ {k:<{w}}  not in the audit table — add it to AUDIT in this script")
+            fails.append("registry audit")
+            continue
+        table, arith, assumption = row
+        ind = next(i for i in reg if i["key"] == k)
+        flag = "✗" if assumption else "✓"
+        print(f"   {flag} {k:<{w}}  {table:<17}  {arith}")
+        print(f"     {'':<{w}}  {ind['unit']} · group {ind['group']} · calc {ind['calc']}"
+              + (f"  ⚠ ASSUMPTION: {assumption}" if assumption else ""))
+        if assumption:
+            fails.append("registry audit")
+    stale = sorted(set(AUDIT) - set(keys))
+    if stale:
+        print(f"   ✗ audited but no longer in the registry: {', '.join(stale)}")
+        fails.append("registry audit")
+    produced = set(next(iter(indicators(doc).values()), {}))
+    want = {k for k in keys if k in FROM_FORECAST_JSON}
+    if want - produced:
+        print(f"   ✗ indicators() does not return {', '.join(sorted(want - produced))}")
+        fails.append("registry audit")
+    orphan = sorted(k for k in keys if k not in FROM_FORECAST_JSON | FROM_NET_DWELLINGS)
+    if orphan:
+        print(f"   ✗ no build produces {', '.join(orphan)}")
+        fails.append("registry audit")
+    if not fails:
+        print(f"\n   ✓ {len(keys)} of {len(keys)} indicators are published figures or plain "
+              f"arithmetic on them — 0 assumptions")
+    return fails
+
+
+def net_dwellings(kom: dict, base_year: str) -> list[str]:
+    """Check 6 — net_dwellings.json, and hist_net_dwell recomputed from the raw cells.
+
+    The second computation reads the BOL101 and FOLK1A CSVs the build recorded and does the
+    four operations by hand, so a bug in the build's folding or in its area filter shows up
+    as a mismatch rather than as two copies of the same wrong number.
+    """
+    if not NET.exists():
+        print(f"\n6. net dwellings — {NET.relative_to(ROOT)} not built, skipped "
+              f"(run scripts/build_net_dwellings.py)")
+        return []
+    fails = []
+    n = json.loads(NET.read_text(encoding="utf-8"))
+    nmeta, nk = n["meta"], n["kommuner"]
+    parts = ("stock_start", "stock_end", "span_years", "net_total", "net_per_year",
+             "pop", "hist_net_dwell")
+    holes = [(c, f) for c in nk for f in parts if nk[c].get(f) is None]
+    absent = sorted(set(kom) - set(nk))
+    start, base = nmeta["window"]
+    span, period = nmeta["span_years"], nmeta["pop_period"]
+    print(f"\n6. net dwellings — {len(nk)} kommuner × {len(parts)} components, "
+          f"{len(holes)} null, {len(absent)} kommuner absent")
+    if len(nk) != 98 or holes or absent:
+        print(f"   ✗ FAIL {holes[:3]} {absent[:3]}")
+        fails.append("net dwellings")
+    else:
+        dk = nmeta["national"]
+        print(f"   ✓ complete; BOL101 stock {start} → {base} ({span} years"
+              + (f", DST publishes no {', '.join(nmeta['tables']['BOL101']['closed_years'])}"
+                 if nmeta["tables"]["BOL101"].get("closed_years") else "")
+              + f"), population {period}")
+        print(f"   Denmark: {dk['stock_start']:,} → {dk['stock_end']:,} dwellings, "
+              f"{dk['net_per_year']:+,.0f}/yr over {dk['pop']:,} inhabitants = "
+              f"{dk['hist_net_dwell']:+.2f} per 1 000".replace(",", " "))
+
+    # Σ kommuner = Denmark, the same identity the Outlook layer asserts
+    sums = {f: sum(nk[c][f] for c in nk) for f in ("stock_start", "stock_end", "pop")}
+    bad_sum = [f for f in sums if sums[f] != nmeta["national"][f]]
+    print(f"   {'✓' if not bad_sum else '✗'} Σ kommuner = Denmark for "
+          f"{', '.join(sorted(set(sums) - set(bad_sum)))}")
+    if bad_sum:
+        fails.append("net dwellings")
+
+    print(f"   hist_net_dwell recomputed from the raw cells, {len(BY_HAND)} kommuner")
+    pulls = {t: raw_path(nmeta["tables"][t]["pull"]) for t in ("BOL101", "FOLK1A")}
+    if any(v is None for v in pulls.values()):
+        gone = [t for t, v in pulls.items() if v is None]
+        print(f"   ⚠ raw pulls for {', '.join(gone)} are not on disk (gitignored) — "
+              f"rerun scripts/build_net_dwellings.py to restore them")
+        return fails
+    raw = {k: read_csv(pulls[k]) for k in pulls}
+
+    def cells(table, code, period_, **eq):
+        return sum(int(r["INDHOLD"]) for r in raw[table]
+                   if r["OMRÅDE"] == code and r["TID"] == period_
+                   and all(r.get(k) == v for k, v in eq.items()))
+
+    for c in BY_HAND:
+        a, b = cells("BOL101", c, start), cells("BOL101", c, base)
+        pop = cells("FOLK1A", c, period)
+        per1000 = (b - a) / span / pop * 1000
+        stored = nk[c]["hist_net_dwell"]
+        ok = abs(per1000 - stored) < 0.01
+        if not ok:
+            fails.append("net dwellings by hand")
+        print(f"   {'✓' if ok else '✗'} {c} {NAMES.get(c, ''):<13} "
+              f"({b:,} − {a:,}) / {span} = {(b - a) / span:>+8,.0f} dwellings/yr   "
+              f"/ {pop:,} × 1000 = {per1000:+.2f}   stored {stored:+.2f}".replace(",", " "))
+    return fails
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tolerance", type=float, default=0.1, help="max Σ-vs-national deviation, %%")
     ap.add_argument("--top", type=int, default=10, help="rows at each end of the 20–34 rankings")
+    ap.add_argument("--audit", action="store_true", help="run check 0 on its own and stop")
     args = ap.parse_args()
     if not SRC.exists():
         sys.exit(f"{SRC.relative_to(ROOT)} not found — run scripts/build_forecast.py first")
@@ -135,6 +304,17 @@ def main():
 
     print(f"forecast.json · {meta['table']} vintage {meta['vintage']} "
           f"(updated {meta['updated']}, fetched {meta['fetched']}) · {years[0]}–{years[-1]}\n")
+
+    # ---- 0. the hard-data audit ----
+    fails += audit(d)
+    if args.audit:
+        print()
+        if fails:
+            print(f"FAILED: {', '.join(sorted(set(fails)))}")
+            sys.exit(1)
+        print("audit passed")
+        return
+    print()
 
     # ---- 1. coverage ----
     missing_years = [(c, y) for c in kom for y in years if y not in kom[c]]
@@ -225,6 +405,21 @@ def main():
           f"Denmark's own change".replace(",", " "))
     if bad_rel or sum_abs != nat_abs:
         fails.append("20-34 baseline")
+
+    # fc_pop_rate_5y recomputed from the two projection cells, here rather than by calling
+    # indicators() again — the whole value of the check is that it is a second expression.
+    y5 = str(int(y0) + 5)
+    bad_rate = [c for c in kom
+                if abs(vals[c]["fc_pop_rate_5y"]
+                       - (kom[c][y5]["total"] - kom[c][y0]["total"]) / 5
+                       / kom[c][y0]["total"] * 1000) > 0.011]
+    dk_rate = (sum(kom[c][y5]["total"] for c in kom) - sum(kom[c][y0]["total"] for c in kom)) \
+        / 5 / sum(kom[c][y0]["total"] for c in kom) * 1000
+    print(f"   {'✓' if not bad_rate else '✗'} fc_pop_rate_5y = (P{y5} − P{y0}) / 5 / P{y0} "
+          f"× 1000 for {len(kom) - len(bad_rate)}/{len(kom)} kommuner "
+          f"(Denmark {dk_rate:+.2f} persons / 1 000 / yr)")
+    if bad_rate:
+        fails.append("20-34 baseline")
     info = FORECAST_RAW / f"{meta['table']}.meta.json"
     names = {x["id"]: x["text"] for v in json.loads(info.read_text())["variables"]
              if v["id"] == "KOMMUNEDK" for x in v["values"]} if info.exists() else {}
@@ -243,9 +438,12 @@ def main():
     print("\n   fc_20_34_abs — persons")
     rank("fc_20_34_abs", "persons", f"largest gains {args.top}", f"largest losses {args.top}")
 
-    # ---- 6 & 7. the housing gap ----
+    # ---- 6. net dwelling additions ----
+    fails += net_dwellings(kom, years[0])
+
+    # ---- 7 & 8. the housing gap — research only, not a map indicator ----
     if not GAP.exists():
-        print(f"\n6/7. housing gap — {GAP.relative_to(ROOT)} not built, skipped "
+        print(f"\n7/8. housing gap — {GAP.relative_to(ROOT)} not built, skipped "
               f"(run scripts/build_housing_gap.py)")
     else:
         g = json.loads(GAP.read_text())
@@ -257,7 +455,8 @@ def main():
                  "gap_per_1000_rel", "gap_const_gross", "pipeline_permitted")
         holes = [(c, f) for c in gk for f in parts if gk[c].get(f) is None]
         absent = sorted(set(kom) - set(gk))
-        print(f"\n6. housing gap — {len(gk)} kommuner × {len(parts)} components, "
+        print(f"\n7. housing gap — research only, not shown on the map "
+              f"(docs/FORECAST.md §7)\n   {len(gk)} kommuner × {len(parts)} components, "
               f"{len(holes)} null, {len(absent)} kommuner absent")
         if len(gk) != 98 or holes or absent:
             print(f"   ✗ FAIL {holes[:3]} {absent[:3]}"); fails.append("housing gap coverage")
@@ -288,7 +487,7 @@ def main():
         if bad_rel or bad_sum:
             fails.append("housing gap coverage")
 
-        print(f"\n7. gap_per_1000 recomputed from the raw cells, {len(BY_HAND)} kommuner")
+        print(f"\n8. gap_per_1000 recomputed from the raw cells, {len(BY_HAND)} kommuner")
         pulls = {t: raw_path(gmeta["tables"][t]["pull"]) for t in ("FOLK1A", "FAM55N", "BOL101")}
         if any(v is None for v in pulls.values()):
             gone = [t for t, v in pulls.items() if v is None]

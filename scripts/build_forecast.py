@@ -111,12 +111,15 @@ def age_bucket(code: str) -> str | None:
 # indicator key -> the field in forecast.json it is derived from. Documentation only —
 # the arithmetic lives in indicators(); "growth_5y" uses the mid year, the "_rel" and
 # "_abs" pair are a pp difference against Denmark and a person count respectively.
-FIELDS = {"fc_growth": "total", "fc_growth_5y": "total", "fc_abs": "total",
-          "fc_0_5": "a0_5", "fc_6_16": "a6_16", "fc_20_34": "a20_34",
+FIELDS = {"fc_growth": "total", "fc_growth_5y": "total", "fc_pop_rate_5y": "total",
+          "fc_abs": "total", "fc_0_5": "a0_5", "fc_6_16": "a6_16", "fc_20_34": "a20_34",
           "fc_20_34_rel": "a20_34", "fc_20_34_abs": "a20_34", "fc_80p": "a80p"}
 
 # how --indicators KEY prints a value
-UNITS = {"fc_abs": "persons", "fc_20_34_abs": "persons", "fc_20_34_rel": "pp"}
+UNITS = {"fc_abs": "persons", "fc_20_34_abs": "persons", "fc_20_34_rel": "pp",
+         "fc_pop_rate_5y": "persons / 1 000 inh. / yr"}
+# keys whose window stops at the mid year rather than the last year of the projection
+MID_KEYS = {"fc_growth_5y", "fc_pop_rate_5y"}
 
 
 def national_pct(kom: dict, field: str, y0: str, y1: str) -> float | None:
@@ -136,8 +139,10 @@ def indicators(doc: dict, mid_offset: int = 5) -> dict[str, dict[str, float | in
     """Outlook values per kommune: {code: {"fc_growth": %, ..., "fc_abs": persons}}.
 
     Every percentage is the change from the vintage year to the last year of the window,
-    except fc_growth_5y which stops `mid_offset` years in. fc_abs and fc_20_34_abs are
-    persons, not rates; fc_20_34_rel is percentage points against Denmark.
+    except fc_growth_5y and fc_pop_rate_5y, which stop `mid_offset` years in. fc_abs and
+    fc_20_34_abs are persons, not rates; fc_20_34_rel is percentage points against Denmark;
+    fc_pop_rate_5y is persons per 1 000 inhabitants per year, the unit that makes the
+    projection directly readable beside the measured building pace (hist_net_dwell).
     """
     kom, meta = doc["kommuner"], doc["meta"]
     y0, y1 = meta["first_year"], meta["last_year"]
@@ -156,9 +161,16 @@ def indicators(doc: dict, mid_offset: int = 5) -> dict[str, dict[str, float | in
             return None if v is None else round(v, 2)
 
         r20 = raw("a20_34", y1)
+        # persons per 1 000 inhabitants per year over the first `mid_offset` years —
+        # the same two published cells as fc_growth_5y, divided by the years they span
+        # and by the base population instead of being expressed as a percentage.
+        p0 = series[y0]["total"]
+        rate = None if not p0 or ymid not in series else \
+            (series[ymid]["total"] - p0) / mid_offset / p0 * 1000
         out[code] = {
             "fc_growth": pct("total", y1),
             "fc_growth_5y": pct("total", ymid) if ymid in series else None,
+            "fc_pop_rate_5y": None if rate is None else round(rate, 2),
             "fc_abs": series[y1]["total"] - series[y0]["total"],
             "fc_0_5": pct("a0_5", y1),
             "fc_6_16": pct("a6_16", y1),
@@ -235,8 +247,10 @@ def main():
         unit = UNITS.get(key, "%")
         # the 20–34 keys are about the cohort, so show the cohort rather than the headcount
         field = FIELDS.get(key, "total")
+        # the 5-year keys stop at the mid year — print the cells they actually compare
+        y_end = str(int(y0) + 5) if key in MID_KEYS else y1
         nat = national_pct(doc["kommuner"], "a20_34", y0, y1)
-        head = f"{key} · {y0}→{y1} · {len(rank)} kommuner · {unit}"
+        head = f"{key} · {y0}→{y_end} · {len(rank)} kommuner · {unit}"
         if key == "fc_20_34_rel":
             head += f" vs Denmark {nat:+.2f} %"
         print(head + "\n")
@@ -244,7 +258,7 @@ def main():
         def show(rows, title):
             print(title)
             for i, (v, c) in enumerate(rows, 1):
-                a, b = doc["kommuner"][c][y0][field], doc["kommuner"][c][y1][field]
+                a, b = doc["kommuner"][c][y0][field], doc["kommuner"][c][y_end][field]
                 fmt = f"{v:+,.0f}" if unit == "persons" else f"{v:+.1f} {unit}"
                 print(f"  {i:>2}. {c:>3} {names.get(c, ''):<22} {fmt:>11}   "
                       f"{field} {a:>9,} → {b:>9,}".replace(",", " "))

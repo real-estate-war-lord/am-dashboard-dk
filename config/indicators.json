@@ -3255,7 +3255,7 @@
   ]
  },
  "forecast": {
-  "_doc": "Outlook group — DST's municipal population projection, built by scripts/build_forecast.py into data/processed/forecast.json and checked by scripts/validate_forecast.py. Held under its own top-level key rather than in `indicators[]` because `calc: forecast` and `db: forecast` are not yet implemented: build_makro.py would fall through to a StatBank raw-file lookup and raise FileNotFoundError. Phase B moves these entries into `indicators[]` once build_makro.py, and app.js's colour model, understand them (see docs/FORECAST.md, Phase B notes). Entries are looked up by `key` — `indicators()` in scripts/build_forecast.py returns one dict per kommune keyed by exactly these keys — and `field` names the underlying field the value is derived from. `calc: housing_gap` / `db: housing_gap` is the second Outlook source: data/processed/housing_gap.json from scripts/build_housing_gap.py, which compares the households the projection's five-year growth implies — household size carried forward on a capped trend — against the recent net change in the dwelling stock; it is inert here for the same reason. Its two entries differ only by `field`, so the Phase B branch must read `field` rather than hard-code one name: `fc_hh_gap_rel` (gap_per_1000_rel, measured against Denmark) is the one meant for the map and is listed first, `fc_hh_gap` (gap_per_1000) carries the level. `scale: diverging` with `center: 0` asks for a two-ended ramp from `hue_neg` through the paper tint to `hue_pos`, with class breaks symmetric about the centre — the existing renderer only does the single-ended `hue` ramp with quintile breaks, which is why `hue` is kept as the positive end. `direction: neutral` means neither end is 'better': shrinking is not failure and growth is not success, so these must not be ranked or coloured good/bad.",
+  "_doc": "Phase A staging area for v2.4. Every entry here is either an official published figure or plain arithmetic on official figures — differences, shares, per-1,000, sums. No entry uses an assumption, a trend, a cap or a model of our own; see docs/FORECAST.md §0 for the rule and §3 for the per-indicator audit. Held under its own top-level key rather than in `indicators[]` because the `calc`/`db` values below are not yet implemented: build_makro.py would fall through to a StatBank raw-file lookup and raise FileNotFoundError. Phase B moves these entries into `indicators[]` once build_makro.py, and app.js's colour model, understand them (see docs/FORECAST.md §5). Two sources. `calc: forecast` / `db: forecast` reads data/processed/forecast.json, built by scripts/build_forecast.py from DST's municipal population projection; entries are looked up by `key`, because `indicators()` in that script returns one dict per kommune keyed by exactly these keys, and `field` only names the underlying cell the value comes from. `calc: net_dwellings` / `db: net_dwellings` reads data/processed/net_dwellings.json from scripts/build_net_dwellings.py and is looked up by `field`. The `group` differs on purpose: the fc_* entries are projections and belong in Outlook, while hist_net_dwell is measured history and belongs in the housing group next to the other BOL101 indicators — it is staged here only because its calc is new. fc_pop_rate_5y (persons per 1,000 per year) and hist_net_dwell (dwellings per 1,000 per year) are meant to be read side by side in the popup and the area page, each with its own unit and with no difference or ratio computed between them: persons are not dwellings without a household-size assumption, and this layer makes none. data/processed/housing_gap.json and its fc_hh_gap* indicators were removed from this registry for exactly that reason — they need a household-size trend — and are kept as research only (docs/FORECAST.md §7). `scale: diverging` with `center: 0` asks for a two-ended ramp from `hue_neg` through the paper tint to `hue_pos`, with class breaks symmetric about the centre — the existing renderer only does the single-ended `hue` ramp with quintile breaks, which is why `hue` is kept as the positive end. `direction: neutral` means neither end is 'better': shrinking is not failure and growth is not success, so these must not be ranked or coloured good/bad.",
   "first_year": "2026",
   "last_year": "2040",
   "mid_year": "2031",
@@ -3340,6 +3340,47 @@
     "source": "Danmarks Statistik FRKM126 (municipal population projection, 2026 vintage), national control total FRDK126 — see docs/FORECAST.md",
     "warn": "A projection, not a measurement. DST's municipal projection assumes each municipality's recent fertility, mortality and migration behaviour continues; it carries no housing programme, so a large planned development does not appear in it.",
     "note": "Computed in scripts/build_forecast.py from data/processed/forecast.json: the 2026 vintage of DST's municipal projection, ages folded into 0–5, 6–16, 17–19, 20–34, 35–64, 65–79 and 80+. Christiansø (411) is not a municipality and has no value. Never read together with Københavns Kommune's own forecast, which is a different run — see docs/FORECAST.md."
+   },
+   {
+    "key": "fc_pop_rate_5y",
+    "label": "Projected population change 2026→2031, per 1,000 inhabitants per year",
+    "short": "Outlook / 1,000 / yr",
+    "unit": "persons / 1,000 inh. / yr",
+    "level": "kommune",
+    "hue": [
+     10,
+     88,
+     70
+    ],
+    "hue_pos": [
+     10,
+     88,
+     70
+    ],
+    "hue_neg": [
+     166,
+     42,
+     22
+    ],
+    "scale": "diverging",
+    "center": 0,
+    "group": "Outlook",
+    "direction": "neutral",
+    "sources": [
+     {
+      "db": "forecast",
+      "table": "forecast",
+      "geo": "kommune"
+     }
+    ],
+    "calc": "forecast",
+    "field": "total",
+    "fmt": "signdec1",
+    "desc": "(P2031 − P2026) ÷ 5 ÷ P2026 × 1 000 — the projected population change over the first five years, expressed as persons per 1 000 inhabitants per year. The same two cells as fc_growth_5y, in the unit that can be read beside a per-1,000 housing figure such as hist_net_dwell.",
+    "source": "Danmarks Statistik FRKM126 (municipal population projection, 2026 vintage), national control total FRDK126 — see docs/FORECAST.md",
+    "warn": "A projection, not a measurement. DST's municipal projection assumes each municipality's recent fertility, mortality and migration behaviour continues; it carries no housing programme, so a large planned development does not appear in it.",
+    "note": "Computed in scripts/build_forecast.py from data/processed/forecast.json: the 2026 vintage of DST's municipal projection, ages folded into 0–5, 6–16, 17–19, 20–34, 35–64, 65–79 and 80+. Christiansø (411) is not a municipality and has no value. Never read together with Københavns Kommune's own forecast, which is a different run — see docs/FORECAST.md. Its unit is persons; hist_net_dwell's unit is dwellings. The two are shown side by side and are deliberately never differenced — turning persons into dwellings needs a household-size assumption, which this layer does not make (docs/FORECAST.md §0).",
+    "note_short": "Persons per 1,000 inhabitants per year, over the first five years of the projection — the near end, where it is least uncertain."
    },
    {
     "key": "fc_abs",
@@ -3624,10 +3665,10 @@
     "note": "Computed in scripts/build_forecast.py from data/processed/forecast.json: the 2026 vintage of DST's municipal projection, ages folded into 0–5, 6–16, 17–19, 20–34, 35–64, 65–79 and 80+. Christiansø (411) is not a municipality and has no value. Never read together with Københavns Kommune's own forecast, which is a different run — see docs/FORECAST.md."
    },
    {
-    "key": "fc_hh_gap_rel",
-    "label": "Housing gap vs Denmark, next 5 yrs",
-    "short": "Housing gap vs DK",
-    "unit": "dwellings / 1,000 inh.",
+    "key": "hist_net_dwell",
+    "label": "Net dwelling additions per year 2020–2026, per 1,000 inhabitants",
+    "short": "Net dwellings/yr",
+    "unit": "dwellings / 1,000 inh. / yr · 2020–2026",
     "level": "kommune",
     "hue": [
      12,
@@ -3646,65 +3687,23 @@
     ],
     "scale": "diverging",
     "center": 0,
-    "group": "Outlook",
+    "group": "Housing stock",
     "direction": "neutral",
     "sources": [
      {
-      "db": "housing_gap",
-      "table": "housing_gap",
+      "db": "net_dwellings",
+      "table": "net_dwellings",
       "geo": "kommune"
      }
     ],
-    "calc": "housing_gap",
-    "field": "gap_per_1000_rel",
+    "calc": "net_dwellings",
+    "field": "hist_net_dwell",
     "fmt": "signdec1",
-    "desc": "The municipality's housing gap per 1 000 inhabitants minus Denmark's. Positive = the household growth the 2026→2031 projection implies outruns the recent pace of net dwelling additions by more than it does nationally — a tighter market than the country; negative = looser. Every municipality is negative in absolute terms, so this is the version that reads as a map.",
-    "source": "Danmarks Statistik FOLK1A (population), FAM55N (households), BOL101 (dwelling stock) and FRKM126 (2026 municipal population projection) — see docs/FORECAST.md §7",
-    "warn": "Measured against Denmark, not against zero: a positive value means tighter than the country, not undersupplied. An arithmetic comparison, not a housing-market forecast: household size is carried forward on a capped linear trend, the building pace is the flat 2020–2026 net stock change, and DST's projection is itself not housing-driven, so neither side responds to the other. A backtest of the same formula on 2020→2025 ranks municipalities no better than the simpler version it replaced.",
-    "note": "Computed in scripts/build_housing_gap.py into data/processed/housing_gap.json. persons_per_hh is the municipality's own FOLK1A population ÷ FAM55N households at 1 January, read for six years and carried forward at its mean yearly change, with the total five-year move capped at ±5 % and floored at 1.6 persons; demand_5y = P2031 / persons_per_hh_2031 − P2026 / persons_per_hh_2026, i.e. the households the projection implies rather than the people; supply_5y = the change in the BOL101 dwelling stock 2020→2026 annualised over its six years × 5, which nets demolitions, mergers and conversions off (BOL101 publishes no 2021 or 2022, both closed by DST); gap = demand_5y − supply_5y and the per-1 000 figure is gap ÷ P2026 × 1000. Direction is neutral and the indicator must not be ranked good-to-bad — but for an owner a tighter market is supportive for rents and a looser one is not. housing_gap.json stores every component, both superseded variants (constant household size, gross BYGV33 completions) and the permitted-not-started pipeline as context; none of the context fields enters the figure. Vacancy, second homes and student housing are not modelled, and where the projection shrinks demand_5y is negative, so any net additions read as oversupply. This indicator subtracts Denmark's own gap_per_1000 of −13.9, where Denmark is the sum of the same 98 municipalities computed the same way, not a separately averaged national ratio (scripts/validate_forecast.py check 6 asserts both the identity and the sum). That puts 41 of 98 municipalities above the line and 57 below, against 0 of 98 on the absolute version. The two ends mean different things and the popup must show demand_5y alongside the gap: at the top are built-out municipalities whose projected household growth nearly matches their net additions, at the bottom a mix of shrinking municipalities, where demand_5y is negative and any building reads as oversupply, and fast-building growth municipalities such as Høje-Taastrup. Christiansø (411) is not a municipality and has no value.",
-    "note_short": "Measured against Denmark's own −13.9 per 1 000, not against zero — all 98 municipalities are negative in absolute terms, so a positive value means tighter than the country, not undersupplied.",
-    "chip": true
-   },
-   {
-    "key": "fc_hh_gap",
-    "label": "Housing gap next 5 yrs, dwellings per 1,000 inh.",
-    "short": "Housing gap",
-    "unit": "dwellings / 1,000 inh.",
-    "level": "kommune",
-    "hue": [
-     12,
-     94,
-     104
-    ],
-    "hue_pos": [
-     12,
-     94,
-     104
-    ],
-    "hue_neg": [
-     166,
-     42,
-     22
-    ],
-    "scale": "diverging",
-    "center": 0,
-    "group": "Outlook",
-    "direction": "neutral",
-    "sources": [
-     {
-      "db": "housing_gap",
-      "table": "housing_gap",
-      "geo": "kommune"
-     }
-    ],
-    "calc": "housing_gap",
-    "field": "gap_per_1000",
-    "fmt": "signdec1",
-    "desc": "Households the projected population growth 2026→2031 implies, minus the dwellings the recent pace of net additions to the stock would deliver, per 1 000 inhabitants. Positive = undersupply. All 98 municipalities are negative in this vintage — for a map use the vs-Denmark version, fc_hh_gap_rel.",
-    "source": "Danmarks Statistik FOLK1A (population), FAM55N (households), BOL101 (dwelling stock) and FRKM126 (2026 municipal population projection) — see docs/FORECAST.md §7",
-    "warn": "Positive = undersupply. An arithmetic comparison, not a housing-market forecast: household size is carried forward on a capped linear trend, the building pace is the flat 2020–2026 net stock change, and DST's projection is itself not housing-driven, so neither side responds to the other. A backtest of the same formula on 2020→2025 ranks municipalities no better than the simpler version it replaced.",
-    "note": "Computed in scripts/build_housing_gap.py into data/processed/housing_gap.json. persons_per_hh is the municipality's own FOLK1A population ÷ FAM55N households at 1 January, read for six years and carried forward at its mean yearly change, with the total five-year move capped at ±5 % and floored at 1.6 persons; demand_5y = P2031 / persons_per_hh_2031 − P2026 / persons_per_hh_2026, i.e. the households the projection implies rather than the people; supply_5y = the change in the BOL101 dwelling stock 2020→2026 annualised over its six years × 5, which nets demolitions, mergers and conversions off (BOL101 publishes no 2021 or 2022, both closed by DST); gap = demand_5y − supply_5y and the per-1 000 figure is gap ÷ P2026 × 1000. Direction is neutral and the indicator must not be ranked good-to-bad — but for an owner a tighter market is supportive for rents and a looser one is not. housing_gap.json stores every component, both superseded variants (constant household size, gross BYGV33 completions) and the permitted-not-started pipeline as context; none of the context fields enters the figure. Vacancy, second homes and student housing are not modelled, and where the projection shrinks demand_5y is negative, so any net additions read as oversupply. Denmark as a whole sits at −13.9 per 1 000 and all 98 municipalities are negative in this vintage, because Denmark adds roughly twice the dwellings the projected household growth alone requires; the spread between municipalities is the story, not the sign, and fc_hh_gap_rel is the version that maps it. The earlier formula — household size frozen at its 2026 value and BYGV33 gross completions as supply — put Denmark at −22.5; both of its variants are kept in housing_gap.json as demand_5y_const, supply_5y_gross and gap_const_gross.",
-    "note_short": "All 98 municipalities are negative — Denmark adds about twice the dwellings its projected household growth requires, so read the spread, not the sign. Vacancy, second homes and student housing are not modelled."
+    "desc": "(dwelling stock 1 January 2026 − 1 January 2020) ÷ 6 ÷ population × 1 000 — how many dwellings the municipality's housing stock actually gained per year over the window, per 1,000 inhabitants. Net, so demolitions, mergers and conversions out of housing are already subtracted; measured, not projected.",
+    "source": "Danmarks Statistik BOL101 (dwelling stock, 1 January 2020 and 2026) and FOLK1A (population, latest quarter) — see docs/FORECAST.md §3",
+    "warn": "History, not a forecast — this is what was built, not what will be. The window is six years rather than five because DST publishes no BOL101 for 2021 or 2022 (both closed over errors in the Building and Housing Register), so the change is annualised over the span that actually separates its two ends.",
+    "note": "Computed in scripts/build_net_dwellings.py into data/processed/net_dwellings.json. Both terms are published cells and the arithmetic between them is a difference, a division by the span in years, a division by population and × 1 000 — no trend, no cap, no model. The window years are resolved from BOL101 itself on every run, so the label must be rendered from meta.label_years rather than hard-coded. BOL101 counts dwellings that exist, not dwellings that are available: vacancy, second homes and student housing are not distinguished. The denominator is inhabitants, not dwellings, so this is not a growth rate of the stock. Denmark sits at +5.07 and one municipality (Ærø) is negative. Christiansø (411) reports 0 dwellings in BOL101 and has no value.",
+    "note_short": "Net change in the dwelling stock 2020–2026, annualised — measured, not projected, and net of demolitions and mergers."
    }
   ]
  }

@@ -2,13 +2,56 @@
 
 **Status:** v2.4 Phase A · 2026-09-23 · data pipeline only, nothing wired into the app yet
 **Source research:** [`docs/FORECAST_SOURCES.md`](FORECAST_SOURCES.md)
-**Build:** `scripts/build_forecast.py`, `scripts/build_housing_gap.py` · **Check:** `scripts/validate_forecast.py`
-**Output:** `data/processed/forecast.json`, `data/processed/housing_gap.json`
+**Build:** `scripts/build_forecast.py`, `scripts/build_net_dwellings.py` · **Check:** `scripts/validate_forecast.py`
+**Output:** `data/processed/forecast.json`, `data/processed/net_dwellings.json`
+**Research only, not in the UI:** `scripts/build_housing_gap.py` → `data/processed/housing_gap.json` (§7)
 **Registry:** `config/indicators.json` → top-level `forecast` key (see §5 for why not `indicators[]`)
 
 The Outlook layer projects each Danish municipality forward from Statistics Denmark's official
 municipal population projection. Phase A ends with a checked `forecast.json` and a registry entry;
 Phase B renders it.
+
+---
+
+## 0. 🚫 The hard-data rule
+
+> **Every indicator the map shows must be either an official published figure or plain arithmetic
+> on official figures — a difference, a share, a per-1,000, a sum. Nothing shown in the UI may
+> contain an assumption, a trend, a cap or a model of our own.**
+
+The rule is not a style preference. This dashboard's value is that a number on it can be traced to a
+cell in a published table and reproduced by anyone with the table id. The moment an indicator needs a
+parameter we chose — a household size carried forward, a cap on how far it may move, a share assumed
+constant — the number stops being a fact about Denmark and becomes a fact about our choices, and the
+user has no way to tell the two apart on a choropleth.
+
+**What the rule allows.** DST's population projection is itself a model, and a large one. That is
+fine: it is *their* published model, cited by table id and vintage, and the user can read its
+assumptions (`docs/FORECAST_SOURCES.md` §1). What we do to it is subtract two of its cells and divide
+by a third. The same goes for Københavns Kommune's own forecast (§4, §8). The line the rule draws is
+between **arithmetic on someone else's published figures** and **modelling of our own**.
+
+**What it cost.** `fc_hh_gap` and `fc_hh_gap_rel` — the housing gap — were removed from the registry
+in this pass. They compared projected household formation with the recent pace of net dwelling
+additions, and the demand side needed household size carried forward on a fitted, capped trend. Its
+own backtest could not show the trend helped (§7). The build and the file are kept as research, and
+`validate_forecast.py` still checks them, but no Phase B note puts them on the map or in a popup.
+
+**What replaced them.** Two indicators, neither of which needs an assumption, and which are meant to
+be read **side by side without anything computed between them**:
+
+| | | |
+|---|---|---|
+| `fc_pop_rate_5y` | projected population change 2026→2031 | **persons** per 1,000 inhabitants per year |
+| `hist_net_dwell` | measured net dwelling additions 2020–2026 | **dwellings** per 1,000 inhabitants per year |
+
+The units are different on purpose. Turning persons into dwellings requires a household size, which
+is exactly the assumption the rule forbids, so **the two are never differenced, divided or netted**.
+The popup shows both with their units and lets the reader do what only the reader can do.
+
+§3's audit table lists every registry entry with its source table and its exact arithmetic;
+`validate_forecast.py` check 0 enforces it and fails if an indicator reaches the registry without a
+row there.
 
 ---
 
@@ -83,28 +126,87 @@ Municipality codes are the plain three-digit DST codes (`101`, `751`, …) — t
 
 ---
 
-## 3. Indicator definitions
+## 3. Indicator definitions — and the audit
 
-Seven indicators, all municipality-level, all derived by `indicators()` in `scripts/build_forecast.py`
-(one definition, so Phase B imports it rather than reimplementing it). *P* is `total`; a group name
-means that group's count. *y₀* = first year (2026), *y₁* = last year (2040), *y₅* = y₀ + 5 (2031).
+Eleven indicators, all municipality-level. Ten are `indicators()` in `scripts/build_forecast.py`
+(one definition, so Phase B imports it rather than reimplementing it); `hist_net_dwell` comes from
+`scripts/build_net_dwellings.py` and a second file. *P* is `total`; a group name means that group's
+count. *y₀* = first year (2026), *y₁* = last year (2040), *y₅* = y₀ + 5 (2031).
 
-| key | label | definition | unit | fmt |
-|---|---|---|---|---|
-| `fc_growth` | Projected population growth 2026→2040 | (P₂₀₄₀ − P₂₀₂₆) / P₂₀₂₆ × 100 | % | `signpct1` |
-| `fc_growth_5y` | Projected population growth 2026→2031 | (P₂₀₃₁ − P₂₀₂₆) / P₂₀₂₆ × 100 | % | `signpct1` |
-| `fc_abs` | Projected population change 2026→2040 | P₂₀₄₀ − P₂₀₂₆ | persons | `int` |
-| `fc_0_5` | Projected change, children 0–5 | (a0_5₂₀₄₀ − a0_5₂₀₂₆) / a0_5₂₀₂₆ × 100 | % | `signpct1` |
-| `fc_6_16` | Projected change, children 6–16 | as above on `a6_16` | % | `signpct1` |
-| `fc_20_34` | Projected change, young adults 20–34 | as above on `a20_34` | % | `signpct1` |
-| `fc_20_34_rel` | Young adults 20–34 vs Denmark 2026→2040 | `fc_20_34` − Denmark's own 20–34 change | pp | `signdec1` |
-| `fc_20_34_abs` | Projected change, young adults 20–34 (persons) | a20_34₂₀₄₀ − a20_34₂₀₂₆ | persons | `int` |
-| `fc_80p` | Projected change, 80 and over | as above on `a80p` | % | `signpct1` |
-| `fc_hh_gap` | Housing gap next 5 yrs, dwellings per 1,000 inh. | see **§7** | dwellings / 1 000 inh. | `signdec1` |
+| key | label | definition | unit | fmt | group |
+|---|---|---|---|---|---|
+| `fc_growth` | Projected population growth 2026→2040 | (P₂₀₄₀ − P₂₀₂₆) / P₂₀₂₆ × 100 | % | `signpct1` | Outlook |
+| `fc_growth_5y` | Projected population growth 2026→2031 | (P₂₀₃₁ − P₂₀₂₆) / P₂₀₂₆ × 100 | % | `signpct1` | Outlook |
+| `fc_pop_rate_5y` | Projected population change 2026→2031, per 1,000 inh. per year | (P₂₀₃₁ − P₂₀₂₆) / 5 / P₂₀₂₆ × 1000 | persons / 1 000 inh. / yr | `signdec1` | Outlook |
+| `fc_abs` | Projected population change 2026→2040 | P₂₀₄₀ − P₂₀₂₆ | persons | `int` | Outlook |
+| `fc_0_5` | Projected change, children 0–5 | (a0_5₂₀₄₀ − a0_5₂₀₂₆) / a0_5₂₀₂₆ × 100 | % | `signpct1` | Outlook |
+| `fc_6_16` | Projected change, children 6–16 | as above on `a6_16` | % | `signpct1` | Outlook |
+| `fc_20_34` | Projected change, young adults 20–34 | as above on `a20_34` | % | `signpct1` | Outlook |
+| `fc_20_34_rel` | Young adults 20–34 vs Denmark 2026→2040 | `fc_20_34` − Denmark's own 20–34 change | pp | `signdec1` | Outlook |
+| `fc_20_34_abs` | Projected change, young adults 20–34 (persons) | a20_34₂₀₄₀ − a20_34₂₀₂₆ | persons | `int` | Outlook |
+| `fc_80p` | Projected change, 80 and over | as above on `a80p` | % | `signpct1` | Outlook |
+| `hist_net_dwell` | Net dwelling additions per year 2020–2026, per 1,000 inh. | (stock₂₀₂₆ − stock₂₀₂₀) / 6 / pop × 1000 | dwellings / 1 000 inh. / yr | `signdec1` | **Housing stock** |
 
 `fc_growth` and `fc_20_34` carry `chip: true` — the growth headline and the demand signal.
-`fc_hh_gap` comes from a second build and a second file; the other nine are `indicators()` in
-`scripts/build_forecast.py`.
+
+**`hist_net_dwell` is not in Outlook, on purpose.** It is a measurement, not a projection: what the
+dwelling stock actually did over the last published window. Putting it under Outlook would imply it
+says something about the future, which it does not. It belongs beside the other BOL101 indicators in
+**Housing stock**, and it is staged in the `forecast` key only because its `calc` is new (§5).
+Its window is **six years, not five** — DST publishes no BOL101 for 2021 or 2022, both closed over
+errors in the Building and Housing Register — so the change is annualised over the span that actually
+separates its two ends. The years are resolved from the table on every run and recorded in
+`meta.label_years`; the label must be rendered from that, never hard-coded.
+
+### The audit — every indicator, its source table and its exact arithmetic
+
+Required by §0 and enforced by `validate_forecast.py` check 0, which fails if an entry appears in the
+registry without a row in its `AUDIT` table, if a row records an assumption, or if no build produces
+the key. **`assumption` is `None` for all eleven.**
+
+| key | source table(s) | exact arithmetic | assumption |
+|---|---|---|---|
+| `fc_growth` | `FRKM1xx` | (P_y1 − P_y0) / P_y0 × 100 | none |
+| `fc_growth_5y` | `FRKM1xx` | (P_y5 − P_y0) / P_y0 × 100 | none |
+| `fc_pop_rate_5y` | `FRKM1xx` | (P_y5 − P_y0) / 5 / P_y0 × 1000 | none |
+| `fc_abs` | `FRKM1xx` | P_y1 − P_y0 | none |
+| `fc_0_5` | `FRKM1xx` | (a0_5_y1 − a0_5_y0) / a0_5_y0 × 100 | none |
+| `fc_6_16` | `FRKM1xx` | (a6_16_y1 − a6_16_y0) / a6_16_y0 × 100 | none |
+| `fc_20_34` | `FRKM1xx` | (a20_34_y1 − a20_34_y0) / a20_34_y0 × 100 | none |
+| `fc_20_34_rel` | `FRKM1xx` | `fc_20_34` − the same expression evaluated on Σ of the 98 kommuner | none |
+| `fc_20_34_abs` | `FRKM1xx` | a20_34_y1 − a20_34_y0 | none |
+| `fc_80p` | `FRKM1xx` | (a80p_y1 − a80p_y0) / a80p_y0 × 100 | none |
+| `hist_net_dwell` | `BOL101` + `FOLK1A` | (stock_end − stock_start) / span_years / population × 1000 | none |
+
+Three things are worth stating explicitly, because each *looks* like it might be an assumption:
+
+- **The age-group boundaries** (0–5, 6–16, 17–19, 20–34, 35–64, 65–79, 80+) are a choice, but they
+  are a choice of **which published single-year cells to add up**, not a choice about a value. The
+  groups are contiguous and exhaustive, so nothing is dropped or imputed, and `total` is DST's own
+  `ALDER=TOT` cell rather than the sum (§2).
+- **"Denmark" in `fc_20_34_rel`** is Σ of the same 98 municipalities from the same file, not a
+  separately rounded national table and not an average of ratios. Check 5 reconciles it against
+  `FRDK126`'s published age detail to 0.0004 pp.
+- **`hist_net_dwell`'s six-year span** is read from the table, not assumed. BOL101's published years
+  determine the window; if DST reopens 2021 and 2022 the window becomes five years on the next run
+  with no code change.
+
+What is *not* in the table — the things the source itself assumes — belongs in each entry's `warn`
+and is stated at the source, not hidden: DST's projection carries each municipality's recent
+fertility, mortality and migration behaviour forward and contains **no housing programme**; BOL101
+counts dwellings that exist, not dwellings that are available.
+
+### The pair that must not be combined
+
+`fc_pop_rate_5y` and `hist_net_dwell` share a denominator (per 1 000 inhabitants) and a period basis
+(per year), which makes them directly readable against each other — and makes it tempting to subtract
+one from the other. **Do not.** Denmark is +2.34 persons and +5.07 dwellings per 1 000 per year; the
+difference of those two numbers is not a surplus of 2.73 dwellings, because a person is not a
+household. Converting between them needs an average household size, and a *projected* household size
+at that — which is precisely the assumption §0 forbids and §7 is the record of.
+
+Phase B shows them **side by side, each labelled with its own unit**, and computes nothing between
+them.
 
 ### The 20–34 pair — why an absolute map of `fc_20_34` is unreadable
 
@@ -133,12 +235,13 @@ skewed — København alone is a fifth of the national loss — so its diverging
 
 ### Colour and direction
 
-Every Outlook indicator is **`direction: "neutral"`**. Neither end is "better": a shrinking
-municipality is not failing and a growing one is not succeeding, so these must never be ranked
-good-to-bad or coloured with the good/bad ramp the other groups use. The registry's existing
+Every indicator staged in the `forecast` key is **`direction: "neutral"`**, `hist_net_dwell`
+included. Neither end is "better": a shrinking municipality is not failing and a growing one is not
+succeeding, and a municipality that built a lot is not thereby doing well — so these must never be
+ranked good-to-bad or coloured with the good/bad ramp the other groups use. The registry's existing
 `direction` vocabulary is `higher_better` / `lower_better` only, so `neutral` is new — see §5.
 
-Every Outlook indicator uses a **diverging scale centred on 0** (`scale: "diverging"`, `center: 0`),
+Every one of them uses a **diverging scale centred on 0** (`scale: "diverging"`, `center: 0`),
 from `hue_neg` through the paper tint to `hue_pos`. Zero is a real boundary here — growth and decline
 are different phenomena, not two ends of one quantity — and the 2026 vintage puts municipalities on
 both sides of it for five of the seven indicators.
@@ -152,14 +255,15 @@ town gaining 4 600, which is the one distinction the indicator exists to make.
 diverging ramp renders one-sided. That is truthful rather than wrong — the spread between
 municipalities is the story — but it is worth knowing before wondering why half the legend is unused.
 
-**`fc_hh_gap` is one-sided too, and for a bigger reason** — all 98 municipalities are negative in
-this vintage, Denmark included. §7 explains why; the ramp is left centred on 0 because zero is the
-real boundary of the question ("is enough being built?"), not because the data straddles it.
+**`hist_net_dwell` is effectively one-sided as well** — 97 of 98 municipalities added dwellings over
+2020–2026, and the exception (Ærø, −0.44 per 1 000 per year) is barely below the line. The ramp stays
+centred on 0 because zero is a real boundary for a *net* change: it separates a stock that grew from
+one that shrank, which no amount of spread makes equivalent.
 
 Hues reuse the existing palette rather than inventing colours: rust `[166, 42, 22]` for the negative
-end throughout; green `[10, 88, 70]` for total-population growth, blue `[40, 84, 128]` for the child
-cohorts, purple `[90, 60, 150]` for 20–34 and 80+ (and for both new 20–34 indicators), teal
-`[12, 94, 104]` for the undersupply end of `fc_hh_gap`.
+end throughout; green `[10, 88, 70]` for total-population growth (including `fc_pop_rate_5y`), blue
+`[40, 84, 128]` for the child cohorts, purple `[90, 60, 150]` for 20–34 and 80+ (and for both 20–34
+sub-indicators), teal `[12, 94, 104]` for the positive end of `hist_net_dwell`.
 
 ---
 
@@ -195,10 +299,10 @@ different questions.
 
 ## 5. Phase B notes — what has to change in files Phase A did not touch
 
-Phase A added files only — `scripts/build_forecast.py`, `scripts/build_housing_gap.py`,
-`scripts/validate_forecast.py` and this document. The one shared file it edited is
-`config/indicators.json`, and it appended a **new top-level `forecast` key** rather than adding to
-`indicators[]`. That was deliberate:
+Phase A added files only — `scripts/build_forecast.py`, `scripts/build_net_dwellings.py`,
+`scripts/build_housing_gap.py`, `scripts/validate_forecast.py` and this document. The one shared file
+it edited is `config/indicators.json`, and it appended a **new top-level `forecast` key** rather than
+adding to `indicators[]`. That was deliberate:
 
 > `scripts/build_makro.py:400 compute()` dispatches on `calc`. An unknown `calc` falls through to the
 > generic loop at the end, which calls `rows(db, table)` → `statbank_common.latest_raw()` → returns
@@ -211,14 +315,15 @@ Phase A added files only — `scripts/build_forecast.py`, `scripts/build_housing
 So Phase B's first job is to move the block and teach the pipeline about it:
 
 1. **`config/indicators.json`** — move the eleven entries from `forecast.indicators` into
-   `indicators[]`, keeping `_doc`, `first_year`, `last_year` and `mid_year` wherever they are still
-   useful. Extend the top-level `_doc` to document `calc: forecast`, `calc: housing_gap`,
-   `db: forecast`, `db: housing_gap`, `field`, `scale`, `center`, `hue_pos`/`hue_neg` and
-   `direction: neutral`. Consider moving `chip: true` from `fc_20_34` to `fc_20_34_rel` — the
-   relative version is the one that reads as a map (§3). **`fc_hh_gap_rel` is the default of the
-   two housing-gap entries** and is listed before `fc_hh_gap` for that reason; whatever mechanism
-   Phase B uses to pick a group's opening indicator must land on it, because `fc_hh_gap` renders
-   one-sided on a diverging ramp (§7).
+   `indicators[]`, keeping `first_year`, `last_year` and `mid_year` wherever they are still useful.
+   **The ten `fc_*` entries go to the `Outlook` group; `hist_net_dwell` goes to `Housing stock`**,
+   beside the other BOL101 indicators — it is a measurement, not a projection (§3). Extend the
+   top-level `_doc` to document `calc: forecast`, `calc: net_dwellings`, `db: forecast`,
+   `db: net_dwellings`, `field`, `scale`, `center`, `hue_pos`/`hue_neg` and `direction: neutral`,
+   and carry the hard-data rule (§0) into it. Consider moving `chip: true` from `fc_20_34` to
+   `fc_20_34_rel` — the relative version is the one that reads as a map (§3).
+   **Nothing from `housing_gap.json` goes into `indicators[]`.** It was removed in this pass and
+   stays research (§0, §7).
 2. **`scripts/build_makro.py`**
    - `compute()` (~line 400): add a `calc == "forecast"` branch, next to `infra_index` /
      `public_index` / `schools`. It should read `data/processed/forecast.json` and call
@@ -227,17 +332,18 @@ So Phase B's first job is to move the block and teach the pipeline about it:
      when `year` is set, exactly as the `bbr` branch does. Entries are looked up by `key`:
      `indicators()` returns one dict per kommune keyed by exactly the registry keys, so the branch
      is a lookup, not a dispatch on `field`.
-   - a second branch for `calc == "housing_gap"`, reading `data/processed/housing_gap.json` and
-     returning `kommuner[code][ind["field"]]` — `gap_per_1000_rel` for `fc_hh_gap_rel` and
-     `gap_per_1000` for `fc_hh_gap`, so the branch is a `field` lookup rather than one hard-coded
-     name. Same snapshot rule: `{}` when `year` is set.
+   - a second branch for `calc == "net_dwellings"`, reading `data/processed/net_dwellings.json` and
+     returning `kommuner[code][ind["field"]]`, so the branch is a `field` lookup rather than one
+     hard-coded name. Same snapshot rule: `{}` when `year` is set. `net_dwellings.json` holds every
+     component (`stock_start`, `stock_end`, `span_years`, `net_per_year`, `pop`), so the popup can
+     show the working without a second read.
    - the indicator-output block (~line 594): add `"scale"`, `"center"`, `"hue_pos"`, `"hue_neg"` and
      `"field"` to the key list copied into `makro.json`, or the app never sees them.
-   - the source-list loop (~line 622): add `"forecast"` **and `"housing_gap"`** to the `db` skip set
-     (`"boligstat", "lbf", "bbr", "infra", "public", "schools"`), then append a source entry for each
-     from the respective `meta` (label, `asof` = `meta.updated`, `fetched`, `url`, `licence`) the
-     way `infra_index` and `public_index` already do. `housing_gap.json`'s `meta.tables` carries a
-     per-table `updated` stamp, so its source entry should name FOLK1A, FAM55N, BOL101 and BYGV33
+   - the source-list loop (~line 622): add `"forecast"` **and `"net_dwellings"`** to the `db` skip
+     set (`"boligstat", "lbf", "bbr", "infra", "public", "schools"`), then append a source entry for
+     each from the respective `meta` (label, `asof` = `meta.updated`, `fetched`, `url`, `licence`)
+     the way `infra_index` and `public_index` already do. `net_dwellings.json`'s `meta.tables`
+     carries a per-table `updated` stamp, so its source entry should name **BOL101 and FOLK1A**
      rather than one table.
 3. **`src/app.js`**
    - `mkShade()` (~line 399) builds a **single-ended** ramp from the paper tint to `hue`. It needs a
@@ -254,13 +360,20 @@ So Phase B's first job is to move the block and teach the pipeline about it:
      `neutral` case that suppresses good/bad colouring and the "↓ lower is better" legend note, and
      leaves ranking unsigned.
    - `legendHtml()` (~line 420) should show the centre tick for a diverging scale.
-4. **`Makefile`** — add `build_forecast` then `build_housing_gap` before `build_makro`, and
-   `validate_forecast` alongside the other checks. Both builds need network unless run with
-   `--no-fetch`, and `build_housing_gap.py` must run **after** `build_forecast.py` — it reads
-   `forecast.json` for P₂₀₂₆ and P₂₀₃₁.
-5. **`README.md` / `CHANGELOG.md`** — the Outlook layer, its sources, the §4 splicing rule and the
-   §7 housing gap.
-6. **Data-layer follow-ups** (not blocking Phase B):
+4. **`Makefile`** — add `build_forecast` and `build_net_dwellings` before `build_makro`, and
+   `validate_forecast` alongside the other checks. Both need network unless run with `--no-fetch`;
+   they are independent of each other, so the order between them does not matter.
+   `build_housing_gap.py` is **not** part of the build — it is research, run by hand, and must run
+   after `build_forecast.py` because it reads `forecast.json` for P₂₀₂₆ and P₂₀₃₁.
+5. **`README.md` / `CHANGELOG.md`** — the Outlook layer, its sources, the §0 hard-data rule and the
+   §4 splicing rule.
+6. **The popup and the area page** — show `fc_pop_rate_5y` and `hist_net_dwell` **side by side, each
+   with its own unit** (persons per 1 000 per year, dwellings per 1 000 per year), and compute
+   **nothing** between them: no difference, no ratio, no "surplus" or "shortfall" wording. §0 and §3
+   say why. `hist_net_dwell`'s label carries its real years, read from `meta.label_years`, and its
+   working (`stock_start` → `stock_end` over `span_years`) belongs in the popup so the six-year
+   window is visible rather than surprising.
+7. **Data-layer follow-ups** (not blocking Phase B):
    - Split the fetch out of `build_forecast.py` into `scripts/fetch_forecast.py` if the repo's
      `fetch_*` / `build_*` separation matters more than the script staying self-contained.
    - `FRKM226` (components of change per municipality: births, deaths, internal migration in/out)
@@ -268,14 +381,16 @@ So Phase B's first job is to move the block and teach the pipeline about it:
      a municipality grows. One extra pull, no new source.
    - The Copenhagen kvarter outlook (`s30/KKFR2026`) is a separate build with its own splicing rule;
      it keys straight onto the existing `OMRKK` kvarter geometry.
-   - `fc_hh_gap` with an **official household projection** rather than a fitted household-size
-     trend. DST publishes one (`FRHUS1xx`); using it would replace the extrapolation and its ±5 %
-     cap — the largest remaining modelling choice in §7 — with a published figure, and would make
-     the demand side directly comparable with the projection's own assumptions.
-   - **Rerun the §7 backtest on the next vintage.** It currently says the new formula ranks
+   - **The one route back for a housing-balance indicator.** DST publishes an official household
+     projection (`FRHUS1xx`). Built on that, the demand side would be a published figure rather than
+     our fitted, capped household-size trend, and the whole indicator would become arithmetic on two
+     official projections — which §0 allows. That, not a better-tuned trend, is what would make it
+     admissible; §7 is the record of why the fitted version is not.
+   - **Rerun the §7 backtest on the next vintage.** It currently says the fitted formula ranks
      municipalities *worse* than the superseded one on the 2020→2025 window, while both of its
-     components score better in isolation (§7). One window is not a verdict; the code is already
-     written, so a second one costs a rerun.
+     components score better in isolation (§7). One window is not a verdict, and the code is already
+     written — but until it says otherwise the indicator stays out of the UI regardless, because §0
+     rules it out on its inputs, not on its score.
 
 ---
 
@@ -284,15 +399,27 @@ So Phase B's first job is to move the block and teach the pipeline about it:
 ```bash
 python3 scripts/build_forecast.py                 # resolve vintage, pull, build forecast.json
 python3 scripts/build_forecast.py --no-fetch      # rebuild from the newest cached CSV
-python3 scripts/build_housing_gap.py              # needs forecast.json; writes housing_gap.json
-python3 scripts/build_housing_gap.py --no-fetch   # rebuild from cached CSVs only
-python3 scripts/validate_forecast.py              # seven checks; non-zero exit on failure
+python3 scripts/build_net_dwellings.py            # BOL101 + FOLK1A → net_dwellings.json
+python3 scripts/build_net_dwellings.py --no-fetch # rebuild from cached CSVs only
+python3 scripts/validate_forecast.py              # the checks below; non-zero exit on failure
+python3 scripts/validate_forecast.py --audit      # check 0 on its own — the hard-data audit
 python3 scripts/build_forecast.py --indicators fc_20_34_rel --top 10
-python3 scripts/build_forecast.py --indicators fc_20_34_abs --top 10
+python3 scripts/build_forecast.py --indicators fc_pop_rate_5y --top 10
+
+# research only, not part of the build and not in the UI (§0, §7)
+python3 scripts/build_housing_gap.py              # needs forecast.json; writes housing_gap.json
 ```
+
+`build_net_dwellings.py` shares its BOL101 and FOLK1A pulls with `build_housing_gap.py` in
+`data/raw/forecast/housing/`, so whichever runs first pays for the download.
 
 `validate_forecast.py` prints, in order:
 
+0. **registry audit** — every entry in `config/indicators.json`'s `forecast` key against its source
+   table and its exact arithmetic (the §3 table), against the keys `indicators()` actually returns,
+   and against the hard-data rule. **Fails** if an entry has no audit row, if a row records an
+   assumption, if an audited key has left the registry, or if no build produces a key. Currently
+   **11 of 11 indicators, 0 assumptions**.
 1. **coverage** — 98 kommuner × 15 years, 0 missing, Christiansø excluded as intended.
 2. **reconciliation** — Σ kommuner vs `FRDK126` per year. **Fails above ±0.1 %.** Current max
    deviation **−0.0021 %** (2027), which is per-cell rounding in the same projection run.
@@ -304,16 +431,26 @@ python3 scripts/build_forecast.py --indicators fc_20_34_abs --top 10
    (671 714 / 689 101 / 711 011 and 378 361 / 399 885 / 431 031). ✅ exact.
 5. **20–34 baseline** — Denmark's 20–34 change as Σ of the 98 municipalities against `FRDK126`'s
    published age detail (**fails** if they disagree by more than 0.01 pp; currently 0.0004 pp), plus
-   the two identities `fc_20_34_rel = fc_20_34 − Denmark` (98/98) and `Σ fc_20_34_abs = −85 641`.
-   Then the rankings for both. The `FRDK126` age detail is read from the cached research snapshot
-   when present and pulled from the API otherwise — 106 ages × 2 years.
-6. **housing gap coverage** — 98 municipalities × 10 components, 0 null, none absent.
-7. **housing gap by hand** — `gap_per_1000` recomputed for København, Aarhus, Brøndby, Lemvig and
-   Frederiksberg straight from the raw `FOLK1A` / `FAM55N` / `BYGV33` cells and printed cell by
+   the identities `fc_20_34_rel = fc_20_34 − Denmark` (98/98), `Σ fc_20_34_abs = −85 641` and
+   `fc_pop_rate_5y = (P₂₀₃₁ − P₂₀₂₆) / 5 / P₂₀₂₆ × 1000` (98/98, written out a second time rather
+   than by calling `indicators()` again — Denmark is **+2.34** persons per 1 000 per year). Then the
+   rankings. The `FRDK126` age detail is read from the cached research snapshot when present and
+   pulled from the API otherwise — 106 ages × 2 years.
+6. **net dwellings** — 98 municipalities × 7 components, 0 null, none absent; `Σ kommuner = Denmark`
+   for `stock_start`, `stock_end` and `pop`; then `hist_net_dwell` recomputed for København, Aarhus,
+   Brøndby, Lemvig and Frederiksberg straight from the raw `BOL101` and `FOLK1A` cells and printed
+   cell by cell. Denmark: 3 113 345 → 3 296 927 dwellings, **+30 597 a year over 6 031 608
+   inhabitants = +5.07 per 1 000**.
+7. **housing gap coverage** — *research only, not a map indicator.* 98 municipalities × 20
+   components, 0 null, none absent.
+8. **housing gap by hand** — *research only.* `gap_per_1000` recomputed for the same five
+   municipalities straight from the raw `FOLK1A` / `FAM55N` / `BOL101` cells and printed cell by
    cell, then compared with the stored value.
 
-Checks 6 and 7 are **skipped, not failed**, when `housing_gap.json` has not been built, and check 7
-reports politely if the raw pulls it names have been cleaned away (they are gitignored).
+Checks 6, 7 and 8 are **skipped, not failed**, when their file has not been built, and 6 and 8 report
+politely if the raw pulls they name have been cleaned away (they are gitignored). 7 and 8 still run
+against `housing_gap.json` even though nothing renders it — a research file that has quietly gone
+wrong is still worth knowing about.
 
 ### Sanity check — `fc_20_34`, 2026→2040
 
@@ -378,10 +515,22 @@ list, in size order: the 2010s youth bulge ageing out of the age band it was cou
 
 ---
 
-## 7. The housing gap — `fc_hh_gap_rel` and `fc_hh_gap`
+## 7. The housing gap — 🚫 **research only, removed from the UI**
 
 **Build:** `scripts/build_housing_gap.py` · **Output:** `data/processed/housing_gap.json`
-**Check:** `scripts/validate_forecast.py` checks 6 and 7
+**Check:** `scripts/validate_forecast.py` checks 7 and 8 · **Registry:** none
+
+> **This indicator is not on the map and has no Phase B note that would put it there.**
+> `fc_hh_gap` and `fc_hh_gap_rel` were removed from `config/indicators.json` under the hard-data rule
+> (§0): the demand side needs household size carried forward on a fitted, capped trend, which is an
+> assumption of ours rather than a published figure. The build, the file and the backtest are kept
+> because the question is a good one and the working is worth preserving — but nothing below is a
+> plan to render it. The measured half of the question now lives in `hist_net_dwell` (§3), which
+> needs no assumption at all.
+>
+> The one route back is DST's **official** household projection (`FRHUS1xx`), which would make the
+> demand side a published figure; see §5 note 7. Everything from "Formula" on is the record of the
+> version that was built, kept as it was written.
 
 > *Are enough dwellings being built for the growth DST projects?*
 
@@ -507,7 +656,7 @@ situation as the projection tables in `data/raw/forecast/dst/`, and it is what r
 }
 ```
 
-Every component is stored, not just the answer, so the popup can show the working and check 7 can
+Every component is stored, not just the answer, so the working is on record and check 8 can
 recompute it. **Both superseded variants are stored too** — `demand_5y_const` (household size frozen)
 and `supply_5y_gross` (gross completions), combined in `gap_const_gross` — so the effect of each fix
 stays visible in the data rather than only in this document. The stored numbers are rounded for
@@ -553,7 +702,7 @@ demand is −242 rather than −447. Gladsaxe, top of the old ranking, falls to 
 Because every municipality is still negative, a diverging ramp centred on 0 renders one-sided —
 exactly the problem `fc_20_34_rel` solves for §3, and solved the same way. `fc_hh_gap_rel` subtracts
 **Denmark's own −13.87**, where Denmark is the Σ of the same 98 municipalities computed the same way
-(check 6 asserts both the identity and the sum). That puts **41 of 98 above the line and 57 below**,
+(check 7 asserts both the identity and the sum). That puts **41 of 98 above the line and 57 below**,
 and the reading is *tighter or looser than the country*, not *undersupplied or oversupplied*.
 
 | | tightest against the country | vs DK | per 1 000 | | loosest against the country | vs DK | per 1 000 |
@@ -696,9 +845,9 @@ Næstved is 13th, Frederikssund 12th, Favrskov 14th and Tønder 16th, while Stev
 
 ### Validation
 
-`scripts/validate_forecast.py` check 6 asserts 98 municipalities with all twenty components present
+`scripts/validate_forecast.py` check 7 asserts 98 municipalities with all twenty components present
 and non-null, plus the two identities `fc_hh_gap_rel` depends on: `gap_per_1000_rel = gap_per_1000 −
-Denmark's`, for all 98, and `Σ kommuner = Denmark` for `demand_5y`, `supply_5y` and `p_base`. Check 7
+Denmark's`, for all 98, and `Σ kommuner = Denmark` for `demand_5y`, `supply_5y` and `p_base`. Check 8
 recomputes `gap_per_1000` for **København, Aarhus, Brøndby, Lemvig and Frederiksberg** from the raw
 CSV cells — a second implementation reading the pulls directly, with its own copy of the trend, the
 cap and the annualised stock window, not the build's numbers — and prints every step:
@@ -719,14 +868,24 @@ against 1 178 net additions. Brøndby is the one municipality that gains 20–34
 (§3), and it is the one case here where household size **rises** (2.29 → 2.32), so its demand falls
 from 1 669 to 1 381 while its net additions, 2 359, are 274 below its completions.
 
-### Popup text — Phase B
+### Why the sentence could not be written — the reason the indicator is out
+
+The popup this indicator needed would have read:
 
 > *Projection implies ~N more households, recent pace adds ~M dwellings → gap K*
 
-with `N` = `demand_5y`, `M` = `supply_5y`, `K` = `gap`, and — because of everything above — the
-sentence must survive **N being negative**. "Implies ~−242 more households" is wrong; the shrinking
-case wants its own wording ("projection implies 242 fewer households; 44 dwellings added"). The popup
-should also carry `persons_per_hh` → `persons_per_hh_mid` (the working behind the demand side),
-`stock_prev` → `stock_base`, and `pipeline_permitted`; `note_short` should reach the map so the
-"measured against Denmark, not against zero" caveat travels with the number, exactly as it does for
-`fc_20_34_rel`.
+Three things went wrong with it, and together they are the case for §0.
+
+1. **"Implies ~N more households" is our claim, not DST's.** DST projects *people*. The step from
+   people to households is `persons_per_hh` carried forward five years on a fitted trend and capped
+   at ±5 %, and the whole sentence hangs on it. A reader has no way to see that from the map.
+2. **The sentence breaks on the shrinking case.** N is negative for 14 municipalities, where
+   "implies ~−242 more households" is nonsense and the wording has to fork. That is a symptom: the
+   quantity is not one thing.
+3. **The backtest could not defend the trend.** On 2020→2025 the fitted version ranks municipalities
+   *worse* than the frozen-household-size version it replaced. A modelling choice that cannot beat
+   its own null has no business colouring 98 polygons.
+
+What survives is the half that needs no model: `hist_net_dwell` (§3) shows M — the measured net
+additions — on its own, and `fc_pop_rate_5y` shows the projected population change in persons beside
+it. The reader sees both official figures and is not handed a conversion nobody published.
