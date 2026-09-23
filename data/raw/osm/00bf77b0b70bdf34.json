@@ -1,0 +1,598 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-09-22T08:45:51Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "way",
+  "id": 37451407,
+  "bounds": {
+    "minlat": 55.6407153,
+    "minlon": 12.6157784,
+    "maxlat": 55.6433286,
+    "maxlon": 12.6170656
+  },
+  "nodes": [
+    6988428915,
+    5487431873,
+    6988428914,
+    4723964785,
+    8088587,
+    4725812249,
+    1482081955,
+    8078576,
+    9072338897,
+    7740735204,
+    7740735205,
+    14054889221,
+    14054889230,
+    274874462
+  ],
+  "geometry": [
+    { "lat": 55.6407153, "lon": 12.6170656 },
+    { "lat": 55.6411020, "lon": 12.6168753 },
+    { "lat": 55.6411226, "lon": 12.6168651 },
+    { "lat": 55.6413867, "lon": 12.6167335 },
+    { "lat": 55.6414441, "lon": 12.6167049 },
+    { "lat": 55.6421576, "lon": 12.6163523 },
+    { "lat": 55.6422562, "lon": 12.6163036 },
+    { "lat": 55.6426499, "lon": 12.6161090 },
+    { "lat": 55.6426811, "lon": 12.6160938 },
+    { "lat": 55.6429807, "lon": 12.6159479 },
+    { "lat": 55.6432047, "lon": 12.6158388 },
+    { "lat": 55.6432428, "lon": 12.6158202 },
+    { "lat": 55.6432882, "lon": 12.6157981 },
+    { "lat": 55.6433286, "lon": 12.6157784 }
+  ],
+  "tags": {
+    "bicycle": "yes",
+    "cycleway": "track",
+    "foot": "yes",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Amagerbrogade",
+    "name:etymology:wikidata": "Q3375590",
+    "shoulder": "no",
+    "sidewalk": "both",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q3373779"
+  }
+},
+{
+  "type": "way",
+  "id": 161861732,
+  "bounds": {
+    "minlat": 55.6467452,
+    "minlon": 12.6112408,
+    "maxlat": 55.6531887,
+    "maxlon": 12.6141504
+  },
+  "nodes": [
+    8084929,
+    8663243439,
+    17556289,
+    10567973471,
+    8895232,
+    4082233308,
+    8085596,
+    9103445150,
+    9057292557,
+    8085603,
+    8447399,
+    17556264,
+    8909826,
+    6906108630,
+    17556260,
+    265144986,
+    4082233309,
+    6902390403,
+    17552613,
+    7170192,
+    9060541921,
+    17552612,
+    1368465942,
+    5926663912,
+    11842242478,
+    7459412
+  ],
+  "geometry": [
+    { "lat": 55.6467452, "lon": 12.6141504 },
+    { "lat": 55.6468340, "lon": 12.6141104 },
+    { "lat": 55.6473996, "lon": 12.6138560 },
+    { "lat": 55.6475594, "lon": 12.6137887 },
+    { "lat": 55.6480855, "lon": 12.6135485 },
+    { "lat": 55.6484633, "lon": 12.6133769 },
+    { "lat": 55.6485233, "lon": 12.6133496 },
+    { "lat": 55.6489496, "lon": 12.6131506 },
+    { "lat": 55.6491095, "lon": 12.6130760 },
+    { "lat": 55.6494241, "lon": 12.6129291 },
+    { "lat": 55.6496163, "lon": 12.6128436 },
+    { "lat": 55.6501959, "lon": 12.6125814 },
+    { "lat": 55.6503435, "lon": 12.6125149 },
+    { "lat": 55.6507348, "lon": 12.6123465 },
+    { "lat": 55.6508770, "lon": 12.6122853 },
+    { "lat": 55.6510320, "lon": 12.6122253 },
+    { "lat": 55.6511088, "lon": 12.6121910 },
+    { "lat": 55.6514411, "lon": 12.6120426 },
+    { "lat": 55.6514955, "lon": 12.6120183 },
+    { "lat": 55.6516534, "lon": 12.6119469 },
+    { "lat": 55.6519772, "lon": 12.6118013 },
+    { "lat": 55.6520296, "lon": 12.6117797 },
+    { "lat": 55.6525239, "lon": 12.6115599 },
+    { "lat": 55.6525878, "lon": 12.6115304 },
+    { "lat": 55.6531146, "lon": 12.6112765 },
+    { "lat": 55.6531887, "lon": 12.6112408 }
+  ],
+  "tags": {
+    "cycleway": "track",
+    "cycleway:width": "3",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Amagerbrogade",
+    "name:etymology:wikidata": "Q3375590",
+    "sidewalk": "both",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q3373779"
+  }
+},
+{
+  "type": "way",
+  "id": 237099578,
+  "bounds": {
+    "minlat": 55.6437987,
+    "minlon": 12.6146032,
+    "maxlat": 55.6457412,
+    "maxlon": 12.6155447
+  },
+  "nodes": [
+    14054889223,
+    14054889226,
+    14054889224,
+    6739053733,
+    6742010576,
+    17556298,
+    281684193,
+    7123980890
+  ],
+  "geometry": [
+    { "lat": 55.6437987, "lon": 12.6155447 },
+    { "lat": 55.6438874, "lon": 12.6154992 },
+    { "lat": 55.6439480, "lon": 12.6154682 },
+    { "lat": 55.6442614, "lon": 12.6153076 },
+    { "lat": 55.6443370, "lon": 12.6152688 },
+    { "lat": 55.6444959, "lon": 12.6151874 },
+    { "lat": 55.6456425, "lon": 12.6146475 },
+    { "lat": 55.6457412, "lon": 12.6146032 }
+  ],
+  "tags": {
+    "cycleway": "track",
+    "cycleway:width": "3",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Amagerbrogade",
+    "name:etymology:wikidata": "Q3375590",
+    "sidewalk": "both",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q3373779"
+  }
+},
+{
+  "type": "way",
+  "id": 504370306,
+  "bounds": {
+    "minlat": 55.6593213,
+    "minlon": 12.6043742,
+    "maxlat": 55.6609347,
+    "maxlon": 12.6063847
+  },
+  "nodes": [
+    13091941,
+    8088632,
+    2387533882,
+    5298340096,
+    6906108632,
+    2760235817,
+    8086412,
+    2760235818,
+    6902390401,
+    8097291,
+    26635740
+  ],
+  "geometry": [
+    { "lat": 55.6593213, "lon": 12.6063847 },
+    { "lat": 55.6594604, "lon": 12.6062105 },
+    { "lat": 55.6595861, "lon": 12.6060557 },
+    { "lat": 55.6599459, "lon": 12.6056062 },
+    { "lat": 55.6600974, "lon": 12.6054169 },
+    { "lat": 55.6602737, "lon": 12.6051970 },
+    { "lat": 55.6603718, "lon": 12.6050742 },
+    { "lat": 55.6604290, "lon": 12.6049993 },
+    { "lat": 55.6605885, "lon": 12.6048023 },
+    { "lat": 55.6608440, "lon": 12.6044911 },
+    { "lat": 55.6609347, "lon": 12.6043742 }
+  ],
+  "tags": {
+    "cycleway": "track",
+    "cycleway:width": "2.2",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Amagerbrogade",
+    "name:etymology:wikidata": "Q3375590",
+    "oneway": "no",
+    "sidewalk:both": "separate",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q3373779"
+  }
+},
+{
+  "type": "way",
+  "id": 654420616,
+  "bounds": {
+    "minlat": 55.6560666,
+    "minlon": 12.6077869,
+    "maxlat": 55.6581315,
+    "maxlon": 12.6095350
+  },
+  "nodes": [
+    8084953,
+    8215301,
+    8215295,
+    17551064,
+    444962959,
+    6897896803,
+    2760235814,
+    12105684393
+  ],
+  "geometry": [
+    { "lat": 55.6560666, "lon": 12.6095350 },
+    { "lat": 55.6562399, "lon": 12.6094303 },
+    { "lat": 55.6567993, "lon": 12.6090745 },
+    { "lat": 55.6574408, "lon": 12.6086126 },
+    { "lat": 55.6575682, "lon": 12.6084786 },
+    { "lat": 55.6578698, "lon": 12.6081089 },
+    { "lat": 55.6579798, "lon": 12.6079740 },
+    { "lat": 55.6581315, "lon": 12.6077869 }
+  ],
+  "tags": {
+    "cycleway": "track",
+    "cycleway:width": "2.2",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Amagerbrogade",
+    "name:etymology:wikidata": "Q3375590",
+    "sidewalk:both": "separate",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q3373779"
+  }
+},
+{
+  "type": "way",
+  "id": 734215843,
+  "bounds": {
+    "minlat": 55.6462282,
+    "minlon": 12.6141504,
+    "maxlat": 55.6467452,
+    "maxlon": 12.6143844
+  },
+  "nodes": [
+    8084930,
+    8960110436,
+    6898281984,
+    6897896804,
+    8663243441,
+    8084929
+  ],
+  "geometry": [
+    { "lat": 55.6462282, "lon": 12.6143844 },
+    { "lat": 55.6462959, "lon": 12.6143537 },
+    { "lat": 55.6464141, "lon": 12.6143002 },
+    { "lat": 55.6465468, "lon": 12.6142402 },
+    { "lat": 55.6466741, "lon": 12.6141826 },
+    { "lat": 55.6467452, "lon": 12.6141504 }
+  ],
+  "tags": {
+    "cycleway": "track",
+    "cycleway:width": "3",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Amagerbrogade",
+    "name:etymology:wikidata": "Q3375590",
+    "sidewalk": "both",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q3373779"
+  }
+},
+{
+  "type": "way",
+  "id": 744356312,
+  "bounds": {
+    "minlat": 55.6531887,
+    "minlon": 12.6107321,
+    "maxlat": 55.6542238,
+    "maxlon": 12.6112408
+  },
+  "nodes": [
+    7459412,
+    11842242480,
+    7459408,
+    12921367505,
+    8084679
+  ],
+  "geometry": [
+    { "lat": 55.6531887, "lon": 12.6112408 },
+    { "lat": 55.6533053, "lon": 12.6111852 },
+    { "lat": 55.6537069, "lon": 12.6109935 },
+    { "lat": 55.6541251, "lon": 12.6107820 },
+    { "lat": 55.6542238, "lon": 12.6107321 }
+  ],
+  "tags": {
+    "cycleway": "track",
+    "cycleway:width": "3",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Amagerbrogade",
+    "name:etymology:wikidata": "Q3375590",
+    "sidewalk": "both",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q3373779"
+  }
+},
+{
+  "type": "way",
+  "id": 746795158,
+  "bounds": {
+    "minlat": 55.6404938,
+    "minlon": 12.6170656,
+    "maxlat": 55.6407153,
+    "maxlon": 12.6171772
+  },
+  "nodes": [
+    7737277,
+    7211080,
+    6988428915
+  ],
+  "geometry": [
+    { "lat": 55.6404938, "lon": 12.6171772 },
+    { "lat": 55.6406697, "lon": 12.6170905 },
+    { "lat": 55.6407153, "lon": 12.6170656 }
+  ],
+  "tags": {
+    "bicycle": "yes",
+    "cycleway": "track",
+    "foot": "yes",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Amagerbrogade",
+    "name:etymology:wikidata": "Q3375590",
+    "sidewalk": "both",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q3373779"
+  }
+},
+{
+  "type": "way",
+  "id": 762841022,
+  "bounds": {
+    "minlat": 55.6457412,
+    "minlon": 12.6143844,
+    "maxlat": 55.6462282,
+    "maxlon": 12.6146032
+  },
+  "nodes": [
+    7123980890,
+    7123980891,
+    8960110438,
+    8084930
+  ],
+  "geometry": [
+    { "lat": 55.6457412, "lon": 12.6146032 },
+    { "lat": 55.6458922, "lon": 12.6145353 },
+    { "lat": 55.6461132, "lon": 12.6144361 },
+    { "lat": 55.6462282, "lon": 12.6143844 }
+  ],
+  "tags": {
+    "cycleway": "track",
+    "cycleway:width": "3",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Amagerbrogade",
+    "name:etymology:wikidata": "Q3375590",
+    "sidewalk": "both",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q3373779"
+  }
+},
+{
+  "type": "way",
+  "id": 1103285342,
+  "bounds": {
+    "minlat": 55.6589292,
+    "minlon": 12.6063847,
+    "maxlat": 55.6593213,
+    "maxlon": 12.6068512
+  },
+  "nodes": [
+    8097299,
+    13091941
+  ],
+  "geometry": [
+    { "lat": 55.6589292, "lon": 12.6068512 },
+    { "lat": 55.6593213, "lon": 12.6063847 }
+  ],
+  "tags": {
+    "cycleway": "track",
+    "cycleway:width": "2.2",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Amagerbrogade",
+    "name:etymology:wikidata": "Q3375590",
+    "oneway": "no",
+    "sidewalk:both": "separate",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q3373779"
+  }
+},
+{
+  "type": "way",
+  "id": 1103285343,
+  "bounds": {
+    "minlat": 55.6581315,
+    "minlon": 12.6068512,
+    "maxlat": 55.6589292,
+    "maxlon": 12.6077869
+  },
+  "nodes": [
+    12105684393,
+    2760235815,
+    7211077,
+    6898320085,
+    8097299
+  ],
+  "geometry": [
+    { "lat": 55.6581315, "lon": 12.6077869 },
+    { "lat": 55.6582665, "lon": 12.6076411 },
+    { "lat": 55.6586941, "lon": 12.6071472 },
+    { "lat": 55.6587028, "lon": 12.6071362 },
+    { "lat": 55.6589292, "lon": 12.6068512 }
+  ],
+  "tags": {
+    "cycleway": "track",
+    "cycleway:width": "2.2",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Amagerbrogade",
+    "name:etymology:wikidata": "Q3375590",
+    "oneway": "no",
+    "sidewalk:both": "separate",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q3373779"
+  }
+},
+{
+  "type": "way",
+  "id": 1275403009,
+  "bounds": {
+    "minlat": 55.6542238,
+    "minlon": 12.6095350,
+    "maxlat": 55.6560666,
+    "maxlon": 12.6107321
+  },
+  "nodes": [
+    8084679,
+    11842242470,
+    1369055528,
+    6902390402,
+    8086459,
+    6906108631,
+    7211079,
+    1474884406,
+    8086456,
+    8215303,
+    8084953
+  ],
+  "geometry": [
+    { "lat": 55.6542238, "lon": 12.6107321 },
+    { "lat": 55.6542755, "lon": 12.6107032 },
+    { "lat": 55.6546817, "lon": 12.6104521 },
+    { "lat": 55.6548185, "lon": 12.6103691 },
+    { "lat": 55.6549009, "lon": 12.6103191 },
+    { "lat": 55.6550435, "lon": 12.6102250 },
+    { "lat": 55.6551015, "lon": 12.6101867 },
+    { "lat": 55.6551609, "lon": 12.6101434 },
+    { "lat": 55.6554467, "lon": 12.6099449 },
+    { "lat": 55.6556544, "lon": 12.6098064 },
+    { "lat": 55.6560666, "lon": 12.6095350 }
+  ],
+  "tags": {
+    "cycleway": "track",
+    "cycleway:width": "2.2",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Amagerbrogade",
+    "name:etymology:wikidata": "Q3375590",
+    "sidewalk:both": "separate",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q3373779"
+  }
+},
+{
+  "type": "way",
+  "id": 1545230705,
+  "bounds": {
+    "minlat": 55.6433286,
+    "minlon": 12.6155447,
+    "maxlat": 55.6437987,
+    "maxlon": 12.6157784
+  },
+  "nodes": [
+    274874462,
+    14054889222,
+    14054889228,
+    14054889223
+  ],
+  "geometry": [
+    { "lat": 55.6433286, "lon": 12.6157784 },
+    { "lat": 55.6436084, "lon": 12.6156393 },
+    { "lat": 55.6436681, "lon": 12.6156096 },
+    { "lat": 55.6437987, "lon": 12.6155447 }
+  ],
+  "tags": {
+    "bicycle": "yes",
+    "cycleway": "track",
+    "foot": "yes",
+    "highway": "tertiary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Amagerbrogade",
+    "name:etymology:wikidata": "Q3375590",
+    "shoulder": "no",
+    "sidewalk": "both",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q3373779"
+  }
+}
+
+  ]
+}

@@ -1,0 +1,248 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-09-22T18:46:01Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 593753613,
+  "lat": 55.6722590,
+  "lon": 12.5648209,
+  "tags": {
+    "light_rail": "yes",
+    "local_ref": "9",
+    "name": "København H",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 993839499,
+  "lat": 55.6724669,
+  "lon": 12.5654151,
+  "tags": {
+    "local_ref": "4",
+    "name": "København H",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 993839519,
+  "lat": 55.6725219,
+  "lon": 12.5655758,
+  "tags": {
+    "local_ref": "3",
+    "name": "København H",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 993839525,
+  "lat": 55.6725571,
+  "lon": 12.5656785,
+  "tags": {
+    "local_ref": "2",
+    "name": "København H",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 993839535,
+  "lat": 55.6724353,
+  "lon": 12.5653230,
+  "tags": {
+    "local_ref": "5",
+    "name": "København H",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 993839613,
+  "lat": 55.6723802,
+  "lon": 12.5651619,
+  "tags": {
+    "local_ref": "6",
+    "name": "København H",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 993844054,
+  "lat": 55.6723467,
+  "lon": 12.5650640,
+  "tags": {
+    "local_ref": "7",
+    "name": "København H",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 993873117,
+  "lat": 55.6722889,
+  "lon": 12.5648951,
+  "tags": {
+    "local_ref": "8",
+    "name": "København H",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1057660199,
+  "lat": 55.6702230,
+  "lon": 12.5669620,
+  "tags": {
+    "local_ref": "26",
+    "name": "København H",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 3768742268,
+  "lat": 55.6726166,
+  "lon": 12.5658525,
+  "tags": {
+    "local_ref": "1",
+    "name": "København H",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "train": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 3772213971,
+  "lat": 55.6721130,
+  "lon": 12.5643942,
+  "tags": {
+    "light_rail": "yes",
+    "local_ref": "12",
+    "name": "København H",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 3772213972,
+  "lat": 55.6721688,
+  "lon": 12.5645574,
+  "tags": {
+    "light_rail": "yes",
+    "local_ref": "11",
+    "name": "København H",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 3772213973,
+  "lat": 55.6722028,
+  "lon": 12.5646566,
+  "tags": {
+    "light_rail": "yes",
+    "local_ref": "10",
+    "name": "København H",
+    "public_transport": "stop_position",
+    "railway": "stop"
+  }
+},
+{
+  "type": "node",
+  "id": 6835764540,
+  "lat": 55.6713493,
+  "lon": 12.5639281,
+  "tags": {
+    "name": "København H",
+    "network": "Metro",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "subway": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 6835764543,
+  "lat": 55.6714463,
+  "lon": 12.5638242,
+  "tags": {
+    "name": "København H",
+    "network": "Metro",
+    "public_transport": "stop_position",
+    "railway": "stop",
+    "subway": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 71407436,
+  "bounds": {
+    "minlat": 55.6675941,
+    "minlon": 12.5663645,
+    "maxlat": 55.6679008,
+    "maxlon": 12.5668924
+  },
+  "nodes": [
+    849698846,
+    849698788,
+    849698884,
+    849698837,
+    849698773,
+    849698735,
+    849698868,
+    849698813,
+    849698753,
+    849698711,
+    849698846
+  ],
+  "geometry": [
+    { "lat": 55.6676704, "lon": 12.5663645 },
+    { "lat": 55.6677643, "lon": 12.5665596 },
+    { "lat": 55.6677816, "lon": 12.5665335 },
+    { "lat": 55.6679008, "lon": 12.5667812 },
+    { "lat": 55.6678273, "lon": 12.5668924 },
+    { "lat": 55.6677487, "lon": 12.5667291 },
+    { "lat": 55.6676685, "lon": 12.5668503 },
+    { "lat": 55.6675972, "lon": 12.5667022 },
+    { "lat": 55.6676573, "lon": 12.5666113 },
+    { "lat": 55.6675941, "lon": 12.5664800 },
+    { "lat": 55.6676704, "lon": 12.5663645 }
+  ],
+  "tags": {
+    "building": "yes",
+    "name": "København H",
+    "railway": "signal_box"
+  }
+}
+
+  ]
+}

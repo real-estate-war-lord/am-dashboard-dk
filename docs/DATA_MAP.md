@@ -317,6 +317,11 @@ am-dashboard-dk/
 | 2026-09-22 | `crime_1000` Aarhus recomputed by hand from `data/raw`: STRAF11 code 1 5937 + 5010 + 4281 + 5202 = 20 430 ÷ FOLK1A 2026K3 378 270 × 1000 | ✅ 54.01 = dashboard 54.01 |
 | 2026-09-22 | `crime_1000` Odense recomputed by hand from `data/raw`: STRAF11 code 1 2970 + 3608 + 2523 + 2977 = 12 078 ÷ FOLK1A 2026K3 213 140 × 1000 | ✅ 56.67 = dashboard 56.67 |
 | 2026-09-22 | Copenhagen bydele from the KK Tryghedsundersøgelse PDF, three rows read off the pages: Indre By 90 % / 263 per 1 000 (pp. 70, 74), Bispebjerg 80 % (pp. 49–50), Valby 79 % / 43 (p. 98) | ✅ CSV matches; Bispebjerg fact box p. 49 prints Brønshøj-Husum's 76 % / 64 % — results page p. 50 and the p. 7 map give 80 % / 70 %, which is what the CSV uses |
+| 2026-09-23 | `m5-phase-1` re-read at metroselskabet.dk/m5 | ✅ open_year 2036 ("Første etape af M5 der efter planen åbner i 2036"); no budget on the page, CSV empty ✓ |
+| 2026-09-23 | `femern-tunnel` re-read at the cited Femern A/S article (17 May 2026) | ❌→fixed: the article gives **no** opening year for the road (only "vejforbindelsen åbner først" and that Germany cannot open its rail land facilities in 2029); `open_year` 2032 was not in the source and has been emptied, `open_year_original` 2029 kept. Budget 55.100 mio. kr. (2015 prices) verified in Anlægsstatus 1H 2026 p. 50 |
+| 2026-09-23 | `nordhavnstunnel` re-read in Anlægsstatus 1H 2026 p. 34 | ✅ "Nordhavnstunnel 4.495,2 … 2028" = CSV 4 495,2 / 2028 |
+| 2026-09-23 | `nyt-hospital-nordsjaelland` re-read in the Q2 2026 quarterly report (Region H) | ✅ opening: "Ultimo sep. 2027 · 1. patient" = CSV 2027. ⚠ the budget 7.992 mio. kr. (PL25E2) is **not** restated in that report — it comes from the Q3 2025 report; `source_doc` now cites both |
+| 2026-09-23 | `hilleroedmotorvejen-forlaengelse` re-read in Anlægsstatus 1H 2026 p. 34 | ✅ "Udvidelse af Hillerødmotorvejens forlængelse til motorvej 1.614,7 … 2027" = CSV 1 614,7 / 2027 |
 
 ### 7b. Calculation verification (phase B, 2026-09-14)
 
@@ -355,5 +360,30 @@ Dashboard values as built on 2026-09-22 (window 2025K3→2026K2; clearance 2025)
 | Esbjerg | 561 | 4 878 | 114 824 | 42,5 | 4,7 | 3,8 | −12,3 % | 2 096 / 5 421 → 38,7 % | ⟨statistikbanken⟩ | pending |
 | Randers | 730 | 3 671 | 100 921 | 36,4 | 5,0 | 4,1 | −11,6 % | 1 282 / 4 176 → 30,7 % | ⟨statistikbanken⟩ | pending |
 | Denmark | 000 | 300 999 | 6 031 699 | 49,9 | 5,0 | 5,3 | −5,0 % | 84 741 / 327 755 → 25,9 % | ⟨statistikbanken⟩ | pending |
+
+## 8. Infrastructure overlay (v2.1)
+
+The curated layer of major transport and public projects — 51 projects with geometry, their status,
+budget and opening year — has its own document: [`docs/INFRA.md`](INFRA.md). It covers the schema,
+the `geometry_source` vocabulary, the status words, every source with its licence, the twice-yearly
+refresh procedure and the known gaps. The data lives in `data/external/infra_projects.csv` (the list
+of record), `data/geo/infra_projects.geojson` (built) and `data/processed/infra_index.json` (which
+projects serve each municipality, postal code and quarter).
+
+### Deliberately not automated
+
+| left manual | why |
+|---|---|
+| **Plandata.dk planning pipeline** (kommuneplanrammer → planned housing capacity per area) | An option, not a decision: the WFS is open and would give a "planned m² per area" indicator, but plot ratios and allowed use need interpretation per municipality before the number means anything. |
+| **Vejdirektoratet's geocloud WFS** (road project alignments) | Login-gated; the open Fingerplan layers plus OpenStreetMap cover what the overlay needs. |
+| **A national register of planned infrastructure** | There is none. Anlægsstatus is a PDF of state projects, the Fingerplan covers Greater Copenhagen only, and the rest lives on each agency's own pages — which is why the project list is curated by hand and every row carries its source. |
+
+### Planned for v2.2
+
+**Public buildings overlay from BBR (Datafordeler):** existing public-use buildings (`byg021BygningensAnvendelse`
+42x — schools, institutions, hospitals, offices of public administration) plus buildings under
+construction or with an open building case. The BBR schema for building cases has to be verified
+first — the fields and their coverage are not confirmed yet.
+
 
 Sources: Danmarks Statistik API docs (https://www.dst.dk/en/Statistik/brug-statistikken/muligheder-i-statistikbanken/api) · Finans Danmark Boligmarkedsstatistikken (https://finansdanmark.dk/tal-og-data/boligstatistik/boligmarkedsstatistikken/) · Klimadatastyrelsen, DAWA lukker 1. oktober 2026 (https://www.klimadatastyrelsen.dk/om-klimadatastyrelsen/nyheder/nyhedsarkiv/2026/jul/dawa-lukker-d-1-oktober-2026) · Datafordeler transition plan (https://datafordeler.dk/vejledning/transitionsnetvaerk/) · BBR GraphQL (https://datafordeler.dk/dataoversigt/bygnings-og-boligregistret-bbr/bbr-graphql/) · boligstat.dk om husleje (https://boligstat.dk/boligstat/dokumenter/omhusleje.html) · Landsbyggefonden Huslejestatistik 2026 (https://lbf.dk/viden/statistikker/huslejestatistik/huslejestatistik-2026) · DST STRAF11 documentation (https://www.dst.dk/documentationofstatistics/c1ac7749-1e15-4d3a-8ed0-fb2d26a9fe93) · Plandata WFS (https://geoserver.plandata.dk/geoserver/wfs?request=GetCapabilities&service=WFS) · Eurostat API (https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nama_10r_3gdp?geo=DK011&unit=EUR_HAB&time=2023) · Frie geografiske data, vilkår (https://dataforsyningen.dk/asset/PDF/rettigheder_vilkaar/Vilk%C3%A5r%20for%20brug%20af%20frie%20geografiske%20data.pdf)

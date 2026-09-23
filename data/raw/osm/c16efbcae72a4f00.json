@@ -1,0 +1,2029 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-09-22T08:45:51Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "way",
+  "id": 18892732,
+  "bounds": {
+    "minlat": 56.1426534,
+    "minlon": 10.2068708,
+    "maxlat": 56.1431736,
+    "maxlon": 10.2089838
+  },
+  "nodes": [
+    13478507000,
+    195440073,
+    4206136914,
+    4206136910,
+    4206136906,
+    1834740325,
+    4206136900,
+    1834740323,
+    12043285688,
+    4206136891,
+    1834740321
+  ],
+  "geometry": [
+    { "lat": 56.1431736, "lon": 10.2089838 },
+    { "lat": 56.1431666, "lon": 10.2085506 },
+    { "lat": 56.1430963, "lon": 10.2080959 },
+    { "lat": 56.1430612, "lon": 10.2079256 },
+    { "lat": 56.1430249, "lon": 10.2077619 },
+    { "lat": 56.1429831, "lon": 10.2076008 },
+    { "lat": 56.1429386, "lon": 10.2074310 },
+    { "lat": 56.1428840, "lon": 10.2072692 },
+    { "lat": 56.1428344, "lon": 10.2071652 },
+    { "lat": 56.1428056, "lon": 10.2071048 },
+    { "lat": 56.1426534, "lon": 10.2068708 }
+  ],
+  "tags": {
+    "bicycle": "no",
+    "foot": "no",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "sidewalk": "no",
+    "source:bicycle": "sign",
+    "source:foot": "sign",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 23661032,
+  "bounds": {
+    "minlat": 56.1416727,
+    "minlon": 10.2038152,
+    "maxlat": 56.1418706,
+    "maxlon": 10.2046895
+  },
+  "nodes": [
+    8150639153,
+    8150639151,
+    5266524330,
+    8150639152,
+    8150639140,
+    117405
+  ],
+  "geometry": [
+    { "lat": 56.1418706, "lon": 10.2046895 },
+    { "lat": 56.1418108, "lon": 10.2044602 },
+    { "lat": 56.1417630, "lon": 10.2042529 },
+    { "lat": 56.1417286, "lon": 10.2040766 },
+    { "lat": 56.1417212, "lon": 10.2040403 },
+    { "lat": 56.1416727, "lon": 10.2038152 }
+  ],
+  "tags": {
+    "bicycle": "no",
+    "cycleway": "no",
+    "destination:ref": "451;O1;15;26;E45",
+    "foot": "no",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "sidewalk": "no",
+    "source:bicycle": "sign",
+    "source:foot": "sign",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "turn:lanes": "through|through",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 23678489,
+  "bounds": {
+    "minlat": 56.1428699,
+    "minlon": 10.2075091,
+    "maxlat": 56.1430528,
+    "maxlon": 10.2082980
+  },
+  "nodes": [
+    4206136895,
+    4206136899,
+    4206136903,
+    6397808244,
+    13478556307,
+    256391300
+  ],
+  "geometry": [
+    { "lat": 56.1428699, "lon": 10.2075091 },
+    { "lat": 56.1429357, "lon": 10.2077230 },
+    { "lat": 56.1429767, "lon": 10.2078880 },
+    { "lat": 56.1430084, "lon": 10.2080463 },
+    { "lat": 56.1430429, "lon": 10.2082418 },
+    { "lat": 56.1430528, "lon": 10.2082980 }
+  ],
+  "tags": {
+    "bicycle": "no",
+    "foot": "no",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "sidewalk": "no",
+    "source:bicycle": "sign",
+    "source:foot": "sign",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "turn:lanes": "left|right",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 56202429,
+  "bounds": {
+    "minlat": 56.1414377,
+    "minlon": 10.2026379,
+    "maxlat": 56.1416400,
+    "maxlon": 10.2036553
+  },
+  "nodes": [
+    1583987300,
+    8150639099,
+    4517890471,
+    7099842539
+  ],
+  "geometry": [
+    { "lat": 56.1416400, "lon": 10.2036553 },
+    { "lat": 56.1416094, "lon": 10.2034899 },
+    { "lat": 56.1415267, "lon": 10.2030887 },
+    { "lat": 56.1414377, "lon": 10.2026379 }
+  ],
+  "tags": {
+    "bicycle": "use_sidepath",
+    "cycleway": "separate",
+    "highway": "secondary",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "placement": "right_of:1",
+    "ref": "O1;501",
+    "sidewalk": "separate",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 56202430,
+  "bounds": {
+    "minlat": 56.1415335,
+    "minlon": 10.2036734,
+    "maxlat": 56.1415677,
+    "maxlon": 10.2038372
+  },
+  "nodes": [
+    1583987296,
+    84566323
+  ],
+  "geometry": [
+    { "lat": 56.1415335, "lon": 10.2036734 },
+    { "lat": 56.1415677, "lon": 10.2038372 }
+  ],
+  "tags": {
+    "cycleway:right": "shared_lane",
+    "highway": "secondary",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "placement": "right_of:2",
+    "ref": "O1;501",
+    "sidewalk": "separate",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "turn:lanes": "left||",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 56322690,
+  "bounds": {
+    "minlat": 56.1403315,
+    "minlon": 10.1946164,
+    "maxlat": 56.1403428,
+    "maxlon": 10.1947190
+  },
+  "nodes": [
+    4209327590,
+    3660337750
+  ],
+  "geometry": [
+    { "lat": 56.1403428, "lon": 10.1947190 },
+    { "lat": 56.1403315, "lon": 10.1946164 }
+  ],
+  "tags": {
+    "cycleway:right": "lane",
+    "foot": "use_sidepath",
+    "highway": "secondary",
+    "lanes": "2",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "sidewalk": "separate",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 56322692,
+  "bounds": {
+    "minlat": 56.1403319,
+    "minlon": 10.1958514,
+    "maxlat": 56.1412122,
+    "maxlon": 10.2020521
+  },
+  "nodes": [
+    9044664338,
+    84566319,
+    84566320,
+    11216040732,
+    11216040734,
+    8491423520,
+    368356853,
+    1559349747,
+    10762921680,
+    10762921678,
+    10762921676,
+    8150639148,
+    84566322,
+    8150639147
+  ],
+  "geometry": [
+    { "lat": 56.1403319, "lon": 10.1958514 },
+    { "lat": 56.1404077, "lon": 10.1965845 },
+    { "lat": 56.1405580, "lon": 10.1980421 },
+    { "lat": 56.1406597, "lon": 10.1990220 },
+    { "lat": 56.1406920, "lon": 10.1992850 },
+    { "lat": 56.1407242, "lon": 10.1995303 },
+    { "lat": 56.1407379, "lon": 10.1996349 },
+    { "lat": 56.1407597, "lon": 10.1997541 },
+    { "lat": 56.1408536, "lon": 10.2002672 },
+    { "lat": 56.1409588, "lon": 10.2007883 },
+    { "lat": 56.1410352, "lon": 10.2011671 },
+    { "lat": 56.1411387, "lon": 10.2016797 },
+    { "lat": 56.1411862, "lon": 10.2019245 },
+    { "lat": 56.1412122, "lon": 10.2020521 }
+  ],
+  "tags": {
+    "cycleway:left": "no",
+    "cycleway:right": "track",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "O1;501",
+    "sidewalk": "right",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 142484111,
+  "bounds": {
+    "minlat": 56.1392210,
+    "minlon": 10.1936097,
+    "maxlat": 56.1399133,
+    "maxlon": 10.1937321
+  },
+  "nodes": [
+    1559349721,
+    1559349694
+  ],
+  "geometry": [
+    { "lat": 56.1399133, "lon": 10.1936097 },
+    { "lat": 56.1392210, "lon": 10.1937321 }
+  ],
+  "tags": {
+    "highway": "service",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "surface": "paving_stones",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 144916850,
+  "bounds": {
+    "minlat": 56.1408801,
+    "minlon": 10.1996548,
+    "maxlat": 56.1411321,
+    "maxlon": 10.1997276
+  },
+  "nodes": [
+    117406,
+    4291052782,
+    11216040735,
+    251844574
+  ],
+  "geometry": [
+    { "lat": 56.1408801, "lon": 10.1997276 },
+    { "lat": 56.1409707, "lon": 10.1997074 },
+    { "lat": 56.1409919, "lon": 10.1997027 },
+    { "lat": 56.1411321, "lon": 10.1996548 }
+  ],
+  "tags": {
+    "highway": "residential",
+    "lanes": "2",
+    "lit": "yes",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "sidewalk": "both",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 144916851,
+  "bounds": {
+    "minlat": 56.1408033,
+    "minlon": 10.1965597,
+    "maxlat": 56.1419754,
+    "maxlon": 10.2028661
+  },
+  "nodes": [
+    124151002,
+    11216040682,
+    9813105675,
+    5296254929,
+    1251826149,
+    1583987298,
+    11216040690,
+    1251826137,
+    11421482364,
+    251844574,
+    11421482363,
+    1583987282,
+    1251826126,
+    13698664333,
+    9824234476,
+    13698664329,
+    1251826141,
+    1583987271,
+    4291052771,
+    1583987269
+  ],
+  "geometry": [
+    { "lat": 56.1419754, "lon": 10.2028661 },
+    { "lat": 56.1419423, "lon": 10.2028348 },
+    { "lat": 56.1419182, "lon": 10.2027801 },
+    { "lat": 56.1418999, "lon": 10.2027309 },
+    { "lat": 56.1416210, "lon": 10.2019753 },
+    { "lat": 56.1415634, "lon": 10.2017791 },
+    { "lat": 56.1415346, "lon": 10.2016620 },
+    { "lat": 56.1412884, "lon": 10.2004665 },
+    { "lat": 56.1411558, "lon": 10.1997779 },
+    { "lat": 56.1411321, "lon": 10.1996548 },
+    { "lat": 56.1411199, "lon": 10.1995739 },
+    { "lat": 56.1410780, "lon": 10.1992951 },
+    { "lat": 56.1410195, "lon": 10.1988330 },
+    { "lat": 56.1409328, "lon": 10.1979492 },
+    { "lat": 56.1409292, "lon": 10.1979120 },
+    { "lat": 56.1409080, "lon": 10.1977206 },
+    { "lat": 56.1408458, "lon": 10.1971604 },
+    { "lat": 56.1408107, "lon": 10.1967882 },
+    { "lat": 56.1408033, "lon": 10.1966315 },
+    { "lat": 56.1408044, "lon": 10.1965597 }
+  ],
+  "tags": {
+    "highway": "residential",
+    "lane_markings": "no",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "no",
+    "sidewalk": "right",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 318944792,
+  "bounds": {
+    "minlat": 56.1394250,
+    "minlon": 10.1812866,
+    "maxlat": 56.1394259,
+    "maxlon": 10.1815868
+  },
+  "nodes": [
+    63564753,
+    63564758
+  ],
+  "geometry": [
+    { "lat": 56.1394259, "lon": 10.1812866 },
+    { "lat": 56.1394250, "lon": 10.1815868 }
+  ],
+  "tags": {
+    "cycleway:right": "lane",
+    "foot": "use_sidepath",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 319841458,
+  "bounds": {
+    "minlat": 56.1412934,
+    "minlon": 10.2024506,
+    "maxlat": 56.1415335,
+    "maxlon": 10.2036734
+  },
+  "nodes": [
+    3263123787,
+    8150639120,
+    8150639150,
+    8150639124,
+    4206136853,
+    12043285687,
+    8150639098,
+    1583987296
+  ],
+  "geometry": [
+    { "lat": 56.1412934, "lon": 10.2024506 },
+    { "lat": 56.1413429, "lon": 10.2027079 },
+    { "lat": 56.1413591, "lon": 10.2027921 },
+    { "lat": 56.1414120, "lon": 10.2030667 },
+    { "lat": 56.1414764, "lon": 10.2034013 },
+    { "lat": 56.1414859, "lon": 10.2034459 },
+    { "lat": 56.1414983, "lon": 10.2035046 },
+    { "lat": 56.1415335, "lon": 10.2036734 }
+  ],
+  "tags": {
+    "cycleway:right": "track",
+    "highway": "secondary",
+    "lanes": "4",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "O1;501",
+    "sidewalk": "right",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "turn:lanes": "left|through|through|right",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 319841460,
+  "bounds": {
+    "minlat": 56.1416998,
+    "minlon": 10.2043868,
+    "maxlat": 56.1420322,
+    "maxlon": 10.2053688
+  },
+  "nodes": [
+    195439160,
+    4206136859,
+    84566324
+  ],
+  "geometry": [
+    { "lat": 56.1416998, "lon": 10.2043868 },
+    { "lat": 56.1418917, "lon": 10.2049865 },
+    { "lat": 56.1420322, "lon": 10.2053688 }
+  ],
+  "tags": {
+    "bicycle": "no",
+    "cycleway": "no",
+    "destination": "Filmbyen;Havn;Vandflyver",
+    "destination:symbol": "parking;ferry;airport",
+    "foot": "no",
+    "highway": "secondary",
+    "lanes": "1",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "sidewalk": "no",
+    "source:bicycle": "sign",
+    "source:foot": "sign",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 348349005,
+  "bounds": {
+    "minlat": 56.1405473,
+    "minlon": 10.1967149,
+    "maxlat": 56.1412453,
+    "maxlon": 10.2016673
+  },
+  "nodes": [
+    3544761050,
+    8150639103,
+    8491423519,
+    368356863,
+    117406,
+    3544761049,
+    11216040733,
+    118442323,
+    9824234477,
+    4291052783
+  ],
+  "geometry": [
+    { "lat": 56.1412453, "lon": 10.2016673 },
+    { "lat": 56.1410875, "lon": 10.2008834 },
+    { "lat": 56.1409151, "lon": 10.1999334 },
+    { "lat": 56.1409032, "lon": 10.1998676 },
+    { "lat": 56.1408801, "lon": 10.1997276 },
+    { "lat": 56.1408040, "lon": 10.1991898 },
+    { "lat": 56.1407565, "lon": 10.1987464 },
+    { "lat": 56.1406958, "lon": 10.1981450 },
+    { "lat": 56.1406797, "lon": 10.1979896 },
+    { "lat": 56.1405473, "lon": 10.1967149 }
+  ],
+  "tags": {
+    "cycleway:left": "no",
+    "cycleway:right": "track",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "O1;501",
+    "sidewalk": "right",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 390612734,
+  "bounds": {
+    "minlat": 56.1403191,
+    "minlon": 10.1945046,
+    "maxlat": 56.1403315,
+    "maxlon": 10.1946164
+  },
+  "nodes": [
+    3660337750,
+    4900634237
+  ],
+  "geometry": [
+    { "lat": 56.1403315, "lon": 10.1946164 },
+    { "lat": 56.1403191, "lon": 10.1945046 }
+  ],
+  "tags": {
+    "cycleway:right": "lane",
+    "foot": "use_sidepath",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "sidewalk": "separate",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 420660195,
+  "bounds": {
+    "minlat": 56.1420322,
+    "minlon": 10.2053688,
+    "maxlat": 56.1426534,
+    "maxlon": 10.2068708
+  },
+  "nodes": [
+    1834740321,
+    2399391723,
+    2399391747,
+    4206136861,
+    2399391717,
+    84566324
+  ],
+  "geometry": [
+    { "lat": 56.1426534, "lon": 10.2068708 },
+    { "lat": 56.1424314, "lon": 10.2063882 },
+    { "lat": 56.1423250, "lon": 10.2061504 },
+    { "lat": 56.1421933, "lon": 10.2058153 },
+    { "lat": 56.1421259, "lon": 10.2056370 },
+    { "lat": 56.1420322, "lon": 10.2053688 }
+  ],
+  "tags": {
+    "bicycle": "no",
+    "cycleway": "no",
+    "foot": "no",
+    "highway": "secondary",
+    "lanes": "3",
+    "lanes:backward": "1",
+    "lanes:forward": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "no",
+    "placement:forward": "left_of:1",
+    "ref": "501",
+    "sidewalk": "no",
+    "source:bicycle": "sign",
+    "source:foot": "sign",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 420660197,
+  "bounds": {
+    "minlat": 56.1415677,
+    "minlon": 10.2038372,
+    "maxlat": 56.1416998,
+    "maxlon": 10.2043868
+  },
+  "nodes": [
+    84566323,
+    8150639141,
+    195439160
+  ],
+  "geometry": [
+    { "lat": 56.1415677, "lon": 10.2038372 },
+    { "lat": 56.1416198, "lon": 10.2040582 },
+    { "lat": 56.1416998, "lon": 10.2043868 }
+  ],
+  "tags": {
+    "cycleway:left": "no",
+    "cycleway:right": "track",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "O1;501",
+    "sidewalk": "separate",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 498653805,
+  "bounds": {
+    "minlat": 56.1403428,
+    "minlon": 10.1947190,
+    "maxlat": 56.1404559,
+    "maxlon": 10.1958446
+  },
+  "nodes": [
+    4900326050,
+    9044664362,
+    4291052784,
+    4209327590
+  ],
+  "geometry": [
+    { "lat": 56.1404559, "lon": 10.1958446 },
+    { "lat": 56.1403809, "lon": 10.1950773 },
+    { "lat": 56.1403712, "lon": 10.1949767 },
+    { "lat": 56.1403428, "lon": 10.1947190 }
+  ],
+  "tags": {
+    "bicycle": "use_sidepath",
+    "cycleway": "separate",
+    "foot": "use_sidepath",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "O1;501",
+    "sidewalk": "separate",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 498745159,
+  "bounds": {
+    "minlat": 56.1401198,
+    "minlon": 10.1937812,
+    "maxlat": 56.1401847,
+    "maxlon": 10.1944052
+  },
+  "nodes": [
+    4900966138,
+    9044664366,
+    9044664346
+  ],
+  "geometry": [
+    { "lat": 56.1401198, "lon": 10.1937812 },
+    { "lat": 56.1401774, "lon": 10.1943308 },
+    { "lat": 56.1401847, "lon": 10.1944052 }
+  ],
+  "tags": {
+    "cycleway:right": "track",
+    "highway": "secondary",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "placement": "left_of:2",
+    "ref": "501",
+    "sidewalk": "right",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "turn:lanes": "none|none|right",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 498859669,
+  "bounds": {
+    "minlat": 56.1398912,
+    "minlon": 10.1904012,
+    "maxlat": 56.1399824,
+    "maxlon": 10.1912710
+  },
+  "nodes": [
+    4902037516,
+    9044674902,
+    4291052785,
+    9044674889
+  ],
+  "geometry": [
+    { "lat": 56.1399824, "lon": 10.1912710 },
+    { "lat": 56.1399230, "lon": 10.1906988 },
+    { "lat": 56.1399153, "lon": 10.1906270 },
+    { "lat": 56.1398912, "lon": 10.1904012 }
+  ],
+  "tags": {
+    "cycleway:right": "track",
+    "highway": "secondary",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "placement": "right_of:2",
+    "ref": "501",
+    "sidewalk": "right",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "turn:lanes": "left||",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 498859684,
+  "bounds": {
+    "minlat": 56.1396105,
+    "minlon": 10.1867883,
+    "maxlat": 56.1398795,
+    "maxlon": 10.1902909
+  },
+  "nodes": [
+    1559349720,
+    4291052776,
+    9044674891,
+    4902319734,
+    4902319740,
+    4902319733,
+    4902319735
+  ],
+  "geometry": [
+    { "lat": 56.1398795, "lon": 10.1902909 },
+    { "lat": 56.1398578, "lon": 10.1900880 },
+    { "lat": 56.1398191, "lon": 10.1897033 },
+    { "lat": 56.1397652, "lon": 10.1891193 },
+    { "lat": 56.1396955, "lon": 10.1883235 },
+    { "lat": 56.1396428, "lon": 10.1875033 },
+    { "lat": 56.1396105, "lon": 10.1867883 }
+  ],
+  "tags": {
+    "cycleway:right": "track",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "sidewalk": "right",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 498859690,
+  "bounds": {
+    "minlat": 56.1397629,
+    "minlon": 10.1903848,
+    "maxlat": 56.1401198,
+    "maxlon": 10.1937812
+  },
+  "nodes": [
+    1559349710,
+    4291052777,
+    10809028110,
+    3544761043,
+    13412882139,
+    84566318,
+    9044673343,
+    4900966138
+  ],
+  "geometry": [
+    { "lat": 56.1397629, "lon": 10.1903848 },
+    { "lat": 56.1397877, "lon": 10.1906247 },
+    { "lat": 56.1398117, "lon": 10.1908499 },
+    { "lat": 56.1398658, "lon": 10.1913576 },
+    { "lat": 56.1399050, "lon": 10.1917402 },
+    { "lat": 56.1399981, "lon": 10.1926484 },
+    { "lat": 56.1400133, "lon": 10.1927898 },
+    { "lat": 56.1401198, "lon": 10.1937812 }
+  ],
+  "tags": {
+    "cycleway:right": "track",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "sidewalk": "right",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 498859701,
+  "bounds": {
+    "minlat": 56.1396878,
+    "minlon": 10.1896279,
+    "maxlat": 56.1397515,
+    "maxlon": 10.1902745
+  },
+  "nodes": [
+    4902037517,
+    13412882133,
+    9044674900,
+    4291052773,
+    9044674890
+  ],
+  "geometry": [
+    { "lat": 56.1396878, "lon": 10.1896279 },
+    { "lat": 56.1397038, "lon": 10.1897957 },
+    { "lat": 56.1397231, "lon": 10.1899991 },
+    { "lat": 56.1397315, "lon": 10.1900807 },
+    { "lat": 56.1397515, "lon": 10.1902745 }
+  ],
+  "tags": {
+    "cycleway:right": "track",
+    "highway": "secondary",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "placement": "right_of:2",
+    "ref": "501",
+    "sidewalk": "right",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "turn:lanes": "left||",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 498859707,
+  "bounds": {
+    "minlat": 56.1395860,
+    "minlon": 10.1861559,
+    "maxlat": 56.1396105,
+    "maxlon": 10.1867883
+  },
+  "nodes": [
+    4902319735,
+    9554183966,
+    4902319732
+  ],
+  "geometry": [
+    { "lat": 56.1396105, "lon": 10.1867883 },
+    { "lat": 56.1395923, "lon": 10.1863188 },
+    { "lat": 56.1395860, "lon": 10.1861559 }
+  ],
+  "tags": {
+    "cycleway:right": "track",
+    "highway": "secondary",
+    "lane_markings": "yes",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "placement": "right_of:2",
+    "ref": "501",
+    "sidewalk": "right",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "turn:lanes": "left||",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 498859709,
+  "bounds": {
+    "minlat": 56.1395435,
+    "minlon": 10.1837985,
+    "maxlat": 56.1395860,
+    "maxlon": 10.1861559
+  },
+  "nodes": [
+    4902319732,
+    3544799311,
+    11842112449,
+    4902319736
+  ],
+  "geometry": [
+    { "lat": 56.1395860, "lon": 10.1861559 },
+    { "lat": 56.1395548, "lon": 10.1850241 },
+    { "lat": 56.1395494, "lon": 10.1844390 },
+    { "lat": 56.1395435, "lon": 10.1837985 }
+  ],
+  "tags": {
+    "check_date:cycleway": "2021-11-25",
+    "cycleway:right": "track",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "sidewalk": "right",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 498859714,
+  "bounds": {
+    "minlat": 56.1394593,
+    "minlon": 10.1861595,
+    "maxlat": 56.1396878,
+    "maxlon": 10.1896279
+  },
+  "nodes": [
+    1555894465,
+    3544761028,
+    84565791,
+    13412882131,
+    84565792,
+    4902037517
+  ],
+  "geometry": [
+    { "lat": 56.1394593, "lon": 10.1861595 },
+    { "lat": 56.1395064, "lon": 10.1871665 },
+    { "lat": 56.1395655, "lon": 10.1881784 },
+    { "lat": 56.1395928, "lon": 10.1885355 },
+    { "lat": 56.1396266, "lon": 10.1889790 },
+    { "lat": 56.1396878, "lon": 10.1896279 }
+  ],
+  "tags": {
+    "check_date:cycleway": "2021-11-25",
+    "cycleway:right": "track",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "sidewalk": "right",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 498859716,
+  "bounds": {
+    "minlat": 56.1394414,
+    "minlon": 10.1854340,
+    "maxlat": 56.1394593,
+    "maxlon": 10.1861595
+  },
+  "nodes": [
+    4902037519,
+    1555894465
+  ],
+  "geometry": [
+    { "lat": 56.1394414, "lon": 10.1854340 },
+    { "lat": 56.1394593, "lon": 10.1861595 }
+  ],
+  "tags": {
+    "cycleway:right": "track",
+    "highway": "secondary",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "placement": "right_of:2",
+    "ref": "501",
+    "sidewalk": "right",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "turn:lanes": "left||",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 498859727,
+  "bounds": {
+    "minlat": 56.1395422,
+    "minlon": 10.1815044,
+    "maxlat": 56.1395429,
+    "maxlon": 10.1817998
+  },
+  "nodes": [
+    1555894473,
+    1555894469
+  ],
+  "geometry": [
+    { "lat": 56.1395429, "lon": 10.1817998 },
+    { "lat": 56.1395422, "lon": 10.1815044 }
+  ],
+  "tags": {
+    "cycleway:right": "lane",
+    "foot": "use_sidepath",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 498859729,
+  "bounds": {
+    "minlat": 56.1394259,
+    "minlon": 10.1792876,
+    "maxlat": 56.1394382,
+    "maxlon": 10.1812866
+  },
+  "nodes": [
+    7797177929,
+    13516473994,
+    13516481903,
+    14203484581,
+    63564753
+  ],
+  "geometry": [
+    { "lat": 56.1394382, "lon": 10.1792876 },
+    { "lat": 56.1394275, "lon": 10.1809228 },
+    { "lat": 56.1394270, "lon": 10.1810454 },
+    { "lat": 56.1394267, "lon": 10.1811165 },
+    { "lat": 56.1394259, "lon": 10.1812866 }
+  ],
+  "tags": {
+    "cycleway:right": "track",
+    "highway": "secondary",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "shoulder": "no",
+    "sidewalk": "right",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "turn:lanes": "left|none|none",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 498859736,
+  "bounds": {
+    "minlat": 56.1395422,
+    "minlon": 10.1810163,
+    "maxlat": 56.1395426,
+    "maxlon": 10.1815044
+  },
+  "nodes": [
+    1555894469,
+    13516481904,
+    7797177933
+  ],
+  "geometry": [
+    { "lat": 56.1395422, "lon": 10.1815044 },
+    { "lat": 56.1395424, "lon": 10.1812354 },
+    { "lat": 56.1395426, "lon": 10.1810163 }
+  ],
+  "tags": {
+    "cycleway:right": "separate",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "sidewalk": "separate",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 498859742,
+  "bounds": {
+    "minlat": 56.1394250,
+    "minlon": 10.1815868,
+    "maxlat": 56.1394414,
+    "maxlon": 10.1854340
+  },
+  "nodes": [
+    63564758,
+    13516481907,
+    84565790,
+    4902037519
+  ],
+  "geometry": [
+    { "lat": 56.1394250, "lon": 10.1815868 },
+    { "lat": 56.1394258, "lon": 10.1818790 },
+    { "lat": 56.1394308, "lon": 10.1838142 },
+    { "lat": 56.1394414, "lon": 10.1854340 }
+  ],
+  "tags": {
+    "cycleway:right": "track",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "sidewalk": "right",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 498867434,
+  "bounds": {
+    "minlat": 56.1395429,
+    "minlon": 10.1817998,
+    "maxlat": 56.1395435,
+    "maxlon": 10.1837985
+  },
+  "nodes": [
+    4902319736,
+    13011603396,
+    4291060585,
+    1555894474,
+    13516481912,
+    13516481908,
+    1555894473
+  ],
+  "geometry": [
+    { "lat": 56.1395435, "lon": 10.1837985 },
+    { "lat": 56.1395434, "lon": 10.1833438 },
+    { "lat": 56.1395432, "lon": 10.1828590 },
+    { "lat": 56.1395431, "lon": 10.1824488 },
+    { "lat": 56.1395430, "lon": 10.1821922 },
+    { "lat": 56.1395430, "lon": 10.1820545 },
+    { "lat": 56.1395429, "lon": 10.1817998 }
+  ],
+  "tags": {
+    "check_date:cycleway": "2021-11-25",
+    "cycleway:right": "track",
+    "highway": "secondary",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "sidewalk": "right",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "turn:lanes": "left|none|none",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 498867438,
+  "bounds": {
+    "minlat": 56.1394382,
+    "minlon": 10.1783552,
+    "maxlat": 56.1394488,
+    "maxlon": 10.1792876
+  },
+  "nodes": [
+    84564288,
+    7797177929
+  ],
+  "geometry": [
+    { "lat": 56.1394488, "lon": 10.1783552 },
+    { "lat": 56.1394382, "lon": 10.1792876 }
+  ],
+  "tags": {
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 498905707,
+  "bounds": {
+    "minlat": 56.1404559,
+    "minlon": 10.1958446,
+    "maxlat": 56.1405473,
+    "maxlon": 10.1967149
+  },
+  "nodes": [
+    4291052783,
+    4900326050
+  ],
+  "geometry": [
+    { "lat": 56.1405473, "lon": 10.1967149 },
+    { "lat": 56.1404559, "lon": 10.1958446 }
+  ],
+  "tags": {
+    "bicycle": "use_sidepath",
+    "cycleway": "separate",
+    "foot": "use_sidepath",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "O1;501",
+    "sidewalk": "separate",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 498905708,
+  "bounds": {
+    "minlat": 56.1416400,
+    "minlon": 10.2036553,
+    "maxlat": 56.1416727,
+    "maxlon": 10.2038152
+  },
+  "nodes": [
+    117405,
+    1583987300
+  ],
+  "geometry": [
+    { "lat": 56.1416727, "lon": 10.2038152 },
+    { "lat": 56.1416400, "lon": 10.2036553 }
+  ],
+  "tags": {
+    "bicycle": "use_sidepath",
+    "cycleway": "no",
+    "destination:ref": "451;O1;15;26;E45",
+    "foot": "no",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "O1;501",
+    "sidewalk": "no",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "turn:lanes": "through|through",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 498943257,
+  "bounds": {
+    "minlat": 56.1399824,
+    "minlon": 10.1912710,
+    "maxlat": 56.1403191,
+    "maxlon": 10.1945046
+  },
+  "nodes": [
+    4900634237,
+    9044664359,
+    9044664328,
+    9044664329,
+    9044673342,
+    4902047958,
+    12043285686,
+    4902037516
+  ],
+  "geometry": [
+    { "lat": 56.1403191, "lon": 10.1945046 },
+    { "lat": 56.1403040, "lon": 10.1943672 },
+    { "lat": 56.1402926, "lon": 10.1942579 },
+    { "lat": 56.1402749, "lon": 10.1940870 },
+    { "lat": 56.1401364, "lon": 10.1927540 },
+    { "lat": 56.1401239, "lon": 10.1926329 },
+    { "lat": 56.1399958, "lon": 10.1913999 },
+    { "lat": 56.1399824, "lon": 10.1912710 }
+  ],
+  "tags": {
+    "cycleway:right": "track",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "sidewalk": "right",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 760022374,
+  "bounds": {
+    "minlat": 56.1412453,
+    "minlon": 10.2016673,
+    "maxlat": 56.1414377,
+    "maxlon": 10.2026379
+  },
+  "nodes": [
+    7099842539,
+    3544761050
+  ],
+  "geometry": [
+    { "lat": 56.1414377, "lon": 10.2026379 },
+    { "lat": 56.1412453, "lon": 10.2016673 }
+  ],
+  "tags": {
+    "cycleway:right": "track",
+    "highway": "secondary",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "placement": "right_of:1",
+    "ref": "O1;501",
+    "sidewalk": "right",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 835340627,
+  "bounds": {
+    "minlat": 56.1395426,
+    "minlon": 10.1800724,
+    "maxlat": 56.1395435,
+    "maxlon": 10.1810163
+  },
+  "nodes": [
+    7797177933,
+    4902319738
+  ],
+  "geometry": [
+    { "lat": 56.1395426, "lon": 10.1810163 },
+    { "lat": 56.1395435, "lon": 10.1800724 }
+  ],
+  "tags": {
+    "cycleway:right": "separate",
+    "highway": "secondary",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "placement": "right_of:1",
+    "ref": "501",
+    "shoulder": "no",
+    "sidewalk": "separate",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "turn:lanes": "none|none|right",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 875681422,
+  "bounds": {
+    "minlat": 56.1418706,
+    "minlon": 10.2046895,
+    "maxlat": 56.1420322,
+    "maxlon": 10.2053688
+  },
+  "nodes": [
+    84566324,
+    8150639153
+  ],
+  "geometry": [
+    { "lat": 56.1420322, "lon": 10.2053688 },
+    { "lat": 56.1418706, "lon": 10.2046895 }
+  ],
+  "tags": {
+    "bicycle": "no",
+    "cycleway": "no",
+    "destination:ref": "451;O1;15;26;E45",
+    "foot": "no",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "sidewalk": "no",
+    "source:bicycle": "sign",
+    "source:foot": "sign",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 875681427,
+  "bounds": {
+    "minlat": 56.1426534,
+    "minlon": 10.2068708,
+    "maxlat": 56.1428699,
+    "maxlon": 10.2075091
+  },
+  "nodes": [
+    1834740321,
+    4206136887,
+    1834740322,
+    4206136895
+  ],
+  "geometry": [
+    { "lat": 56.1426534, "lon": 10.2068708 },
+    { "lat": 56.1427556, "lon": 10.2071839 },
+    { "lat": 56.1428136, "lon": 10.2073423 },
+    { "lat": 56.1428699, "lon": 10.2075091 }
+  ],
+  "tags": {
+    "bicycle": "no",
+    "cycleway": "no",
+    "foot": "no",
+    "highway": "secondary",
+    "lanes": "1",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "sidewalk": "no",
+    "source:bicycle": "sign",
+    "source:foot": "sign",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 875681448,
+  "bounds": {
+    "minlat": 56.1412122,
+    "minlon": 10.2020521,
+    "maxlat": 56.1412934,
+    "maxlon": 10.2024506
+  },
+  "nodes": [
+    8150639147,
+    3263123787
+  ],
+  "geometry": [
+    { "lat": 56.1412122, "lon": 10.2020521 },
+    { "lat": 56.1412934, "lon": 10.2024506 }
+  ],
+  "tags": {
+    "cycleway:right": "track",
+    "highway": "secondary",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "placement": "right_of:1",
+    "ref": "O1;501",
+    "sidewalk": "right",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "turn:lanes": "||right",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 977471143,
+  "bounds": {
+    "minlat": 56.1402453,
+    "minlon": 10.1950195,
+    "maxlat": 56.1403319,
+    "maxlon": 10.1958514
+  },
+  "nodes": [
+    4291052778,
+    8360866910,
+    9044664338
+  ],
+  "geometry": [
+    { "lat": 56.1402453, "lon": 10.1950195 },
+    { "lat": 56.1402809, "lon": 10.1953534 },
+    { "lat": 56.1403319, "lon": 10.1958514 }
+  ],
+  "tags": {
+    "bicycle": "use_sidepath",
+    "cycleway": "separate",
+    "foot": "use_sidepath",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "O1;501",
+    "sidewalk": "separate",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 977471146,
+  "bounds": {
+    "minlat": 56.1401847,
+    "minlon": 10.1944052,
+    "maxlat": 56.1402068,
+    "maxlon": 10.1946283
+  },
+  "nodes": [
+    9044664346,
+    4291052779,
+    9044664356
+  ],
+  "geometry": [
+    { "lat": 56.1401847, "lon": 10.1944052 },
+    { "lat": 56.1401878, "lon": 10.1944366 },
+    { "lat": 56.1402068, "lon": 10.1946283 }
+  ],
+  "tags": {
+    "cycleway:right": "lane",
+    "highway": "secondary",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "placement": "left_of:2",
+    "ref": "501",
+    "sidewalk": "right",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "turn:lanes": "none|none|right",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 977471147,
+  "bounds": {
+    "minlat": 56.1402068,
+    "minlon": 10.1946283,
+    "maxlat": 56.1402191,
+    "maxlon": 10.1947530
+  },
+  "nodes": [
+    9044664356,
+    3778308403
+  ],
+  "geometry": [
+    { "lat": 56.1402068, "lon": 10.1946283 },
+    { "lat": 56.1402191, "lon": 10.1947530 }
+  ],
+  "tags": {
+    "cycleway:right": "lane",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "sidewalk": "separate",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 977472455,
+  "bounds": {
+    "minlat": 56.1397515,
+    "minlon": 10.1902745,
+    "maxlat": 56.1397629,
+    "maxlon": 10.1903848
+  },
+  "nodes": [
+    9044674890,
+    1559349710
+  ],
+  "geometry": [
+    { "lat": 56.1397515, "lon": 10.1902745 },
+    { "lat": 56.1397629, "lon": 10.1903848 }
+  ],
+  "tags": {
+    "cycleway:right": "lane",
+    "highway": "secondary",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "placement": "right_of:2",
+    "ref": "501",
+    "sidewalk": "separate",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "turn:lanes": "left||",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 977472456,
+  "bounds": {
+    "minlat": 56.1398795,
+    "minlon": 10.1902909,
+    "maxlat": 56.1398912,
+    "maxlon": 10.1904012
+  },
+  "nodes": [
+    9044674889,
+    1559349720
+  ],
+  "geometry": [
+    { "lat": 56.1398912, "lon": 10.1904012 },
+    { "lat": 56.1398795, "lon": 10.1902909 }
+  ],
+  "tags": {
+    "cycleway:right": "lane",
+    "highway": "secondary",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "placement": "right_of:2",
+    "ref": "501",
+    "sidewalk": "separate",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "turn:lanes": "left||",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 1130920347,
+  "bounds": {
+    "minlat": 56.1395404,
+    "minlon": 10.1783613,
+    "maxlat": 56.1395526,
+    "maxlon": 10.1795191
+  },
+  "nodes": [
+    4902319739,
+    117412
+  ],
+  "geometry": [
+    { "lat": 56.1395404, "lon": 10.1795191 },
+    { "lat": 56.1395526, "lon": 10.1783613 }
+  ],
+  "tags": {
+    "cycleway:right": "separate",
+    "highway": "secondary",
+    "lanes": "3",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "shoulder": "no",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "turn:lanes": "left|none|none",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 1215733605,
+  "bounds": {
+    "minlat": 56.1408044,
+    "minlon": 10.1955643,
+    "maxlat": 56.1416621,
+    "maxlon": 10.1965597
+  },
+  "nodes": [
+    1583987269,
+    1583987270,
+    1583987272,
+    1583987274,
+    1583987275,
+    1583987277,
+    1583987278,
+    1583987288,
+    1583987290,
+    1583987292,
+    1583987294,
+    1583987295,
+    1583987297,
+    1583987299,
+    11694330738,
+    1573825045
+  ],
+  "geometry": [
+    { "lat": 56.1408044, "lon": 10.1965597 },
+    { "lat": 56.1408112, "lon": 10.1964580 },
+    { "lat": 56.1408361, "lon": 10.1963664 },
+    { "lat": 56.1408599, "lon": 10.1962952 },
+    { "lat": 56.1408939, "lon": 10.1962402 },
+    { "lat": 56.1409393, "lon": 10.1961975 },
+    { "lat": 56.1409925, "lon": 10.1961670 },
+    { "lat": 56.1412941, "lon": 10.1960897 },
+    { "lat": 56.1413496, "lon": 10.1960653 },
+    { "lat": 56.1413961, "lon": 10.1960388 },
+    { "lat": 56.1414539, "lon": 10.1959839 },
+    { "lat": 56.1415072, "lon": 10.1959086 },
+    { "lat": 56.1415537, "lon": 10.1958211 },
+    { "lat": 56.1415945, "lon": 10.1957255 },
+    { "lat": 56.1416276, "lon": 10.1956465 },
+    { "lat": 56.1416621, "lon": 10.1955643 }
+  ],
+  "tags": {
+    "highway": "residential",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "no",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 1263615942,
+  "bounds": {
+    "minlat": 56.1402191,
+    "minlon": 10.1947530,
+    "maxlat": 56.1402453,
+    "maxlon": 10.1950195
+  },
+  "nodes": [
+    3778308403,
+    4291052778
+  ],
+  "geometry": [
+    { "lat": 56.1402191, "lon": 10.1947530 },
+    { "lat": 56.1402453, "lon": 10.1950195 }
+  ],
+  "tags": {
+    "bicycle": "use_sidepath",
+    "cycleway": "separate",
+    "foot": "use_sidepath",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "sidewalk": "separate",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 1469711767,
+  "bounds": {
+    "minlat": 56.1430528,
+    "minlon": 10.2082980,
+    "maxlat": 56.1431736,
+    "maxlon": 10.2089838
+  },
+  "nodes": [
+    256391300,
+    13478556306,
+    13478507000
+  ],
+  "geometry": [
+    { "lat": 56.1430528, "lon": 10.2082980 },
+    { "lat": 56.1431294, "lon": 10.2087748 },
+    { "lat": 56.1431736, "lon": 10.2089838 }
+  ],
+  "tags": {
+    "bicycle": "no",
+    "foot": "no",
+    "highway": "secondary",
+    "lanes": "1",
+    "lit": "yes",
+    "maxspeed": "50",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "sidewalk": "no",
+    "source:bicycle": "sign",
+    "source:foot": "sign",
+    "source:maxspeed": "DK:urban",
+    "surface": "asphalt",
+    "turn:lanes": "left",
+    "wikidata": "Q12326198"
+  }
+},
+{
+  "type": "way",
+  "id": 1473315068,
+  "bounds": {
+    "minlat": 56.1395404,
+    "minlon": 10.1795191,
+    "maxlat": 56.1395435,
+    "maxlon": 10.1800724
+  },
+  "nodes": [
+    4902319738,
+    4902319739
+  ],
+  "geometry": [
+    { "lat": 56.1395435, "lon": 10.1800724 },
+    { "lat": 56.1395404, "lon": 10.1795191 }
+  ],
+  "tags": {
+    "cycleway:right": "separate",
+    "highway": "secondary",
+    "lanes": "2",
+    "lit": "yes",
+    "maxspeed": "60",
+    "name": "Marselis Boulevard",
+    "name:etymology:wikidata": "Q4562013",
+    "oneway": "yes",
+    "ref": "501",
+    "shoulder": "no",
+    "source:maxspeed": "sign",
+    "surface": "asphalt",
+    "wikidata": "Q12326198"
+  }
+}
+
+  ]
+}

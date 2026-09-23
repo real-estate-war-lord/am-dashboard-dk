@@ -1414,3 +1414,33 @@ th .thn{display:inline}
 .mfbar input[type=search]{font:inherit;font-size:12.5px;padding:5px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
 .mfilters{margin:0 0 10px;padding:8px 10px;border:1px dashed var(--line);border-radius:8px;border-top:1px dashed var(--line)}
 .lk.mini.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* ---- infrastructure projects overlay ---- */
+.maplegend.infralegend{bottom:auto;top:12px;right:12px;min-width:170px}
+.maplegend .lgrow i.ilg{width:18px;height:0;flex:0 0 18px;border:0;border-top:2.5px solid;border-radius:0}
+.maplegend .lgrow.gk{gap:5px;color:var(--muted);margin-top:4px;font-size:9.5px}
+.maplegend .lgrow.gk i{border:0;border-radius:0;background:none;width:14px;flex-basis:14px}
+.maplegend .lgrow.gk i.gk-line{border-top:2.5px solid var(--muted);height:0}
+.maplegend .lgrow.gk i.gk-st{width:9px;flex-basis:9px;height:9px;border:2px solid var(--muted);border-radius:50%;background:#fff}
+.maplegend .lgrow.gk i.gk-area{height:10px;border:1px solid var(--muted);background:repeating-linear-gradient(45deg,rgba(28,107,92,.45) 0 2px,transparent 2px 5px)}
+.infralab{color:var(--ink);text-shadow:0 0 3px rgba(255,255,255,.95),0 0 6px rgba(255,255,255,.8)}
+.infralab-st b{font-size:10.5px}
+.infralab-line b{font-size:11px;letter-spacing:.01em}
+.infrapills{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0 6px}
+.lfpop .ipill{font-style:normal;font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;
+  padding:2px 6px;border:1px solid var(--line);border-radius:999px;color:var(--muted)}
+.lfpop .ipill.st-construction{color:#1C6B5C;border-color:#BBD8CF}
+.lfpop .ipill.st-decided{color:#5C5F52;border-color:#D6D8CE}
+.lfpop .ipill.st-opened{color:#8A8C81}
+/* overlay hit areas and clickable labels */
+#lfmap path.infra-shape,#lfmap path.infra-hit{cursor:pointer}
+.infralab{pointer-events:auto;cursor:pointer}
+.infralab.infralab-e{transform:translate(-100%,-50%)}
+.infralab.infralab-w{transform:translate(0,-50%)}
+/* upcoming-projects line on the area card, pipeline pills */
+.upcoming{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:5px}
+.upcoming em{font-style:normal;font-family:var(--mono);font-size:9px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+.tbl .ipill{font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;padding:2px 6px;border:1px solid var(--line);border-radius:999px;color:var(--muted);white-space:nowrap}
+.tbl .ipill.st-construction{color:#1C6B5C;border-color:#BBD8CF}
+.tag.st-construction{color:#1C6B5C;border-color:#BBD8CF}
+#prmap{height:360px;border:1px solid var(--line);border-radius:10px;background:var(--panel2)}

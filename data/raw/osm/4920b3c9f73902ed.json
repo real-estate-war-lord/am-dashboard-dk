@@ -1,0 +1,82 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-09-22T08:45:51Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "way",
+  "id": 38702592,
+  "bounds": {
+    "minlat": 55.6618457,
+    "minlon": 12.5653617,
+    "maxlat": 55.6618513,
+    "maxlon": 12.5653855
+  },
+  "nodes": [
+    458717341,
+    4196492411
+  ],
+  "geometry": [
+    { "lat": 55.6618513, "lon": 12.5653617 },
+    { "lat": 55.6618457, "lon": 12.5653855 }
+  ],
+  "tags": {
+    "adt": "14000",
+    "foot": "no",
+    "highway": "cycleway",
+    "horse": "no",
+    "lit": "yes",
+    "name": "Bryggebroen",
+    "name:etymology:wikidata": "Q2927205",
+    "surface": "asphalt"
+  }
+},
+{
+  "type": "way",
+  "id": 379073131,
+  "bounds": {
+    "minlat": 55.6611223,
+    "minlon": 12.5653713,
+    "maxlat": 55.6618894,
+    "maxlon": 12.5681929
+  },
+  "nodes": [
+    3824316108,
+    4196492411,
+    4196492412,
+    3824316109,
+    8553734006,
+    1603463540,
+    458717275,
+    3824316099,
+    3824316108
+  ],
+  "geometry": [
+    { "lat": 55.6618277, "lon": 12.5653713 },
+    { "lat": 55.6618457, "lon": 12.5653855 },
+    { "lat": 55.6618796, "lon": 12.5654128 },
+    { "lat": 55.6618894, "lon": 12.5654206 },
+    { "lat": 55.6611843, "lon": 12.5681929 },
+    { "lat": 55.6611714, "lon": 12.5681826 },
+    { "lat": 55.6611444, "lon": 12.5681610 },
+    { "lat": 55.6611223, "lon": 12.5681433 },
+    { "lat": 55.6618277, "lon": 12.5653713 }
+  ],
+  "tags": {
+    "bridge:structure": "beam",
+    "layer": "1",
+    "man_made": "bridge",
+    "name": "Bryggebroen",
+    "name:etymology:wikidata": "Q3427619;Q3351817",
+    "start_date": "2009-09-14",
+    "wikidata": "Q2927205",
+    "wikipedia": "da:Bryggebroen"
+  }
+}
+
+  ]
+}
