@@ -342,6 +342,12 @@ am-dashboard-dk/
 | 2026-09-23 | · Hvidovre Hospital (167, health) | ✅ 431 / 109 049 m² / 1977, status 6 |
 | 2026-09-23 | · Sprogcenter Hellerup, Tuborg campus (157, culture) | ✅ 416 / 25 000 m² / 1901, status 6 |
 | 2026-09-23 | · Frederiksberg Teater (147, open case) | ✅ 411, status 3, no area or year in BBR — permit 2026-09-02, age 0.1 yr, no expected completion |
+| 2026-09-23 | School quality: 5 schools re-queried one at a time from the STIL API (single-institution filter, fresh call, no cache) — FP9 grade and well-being for 2025/2026, socioøkonomisk reference for 2024/2025 (it is published a year behind) | ✅ all 20 comparisons identical to `data/processed/schools.json`, including a suppressed cell and both significance directions |
+| 2026-09-23 | · Skolen på Duevej (147007, folkeskole, Frederiksberg) | ✅ grade 8.5 = 8.5 · soc.ref. diff 0.2 = 0.2 (På niveau) · well-being 3.6 = 3.6 |
+| 2026-09-23 | · Lindevangskolen (147002, folkeskole, Frederiksberg) | ✅ grade 7.6 = 7.6 · soc.ref. diff 0.5 = 0.5 (På niveau) · well-being 3.6 = 3.6 |
+| 2026-09-23 | · Den Classenske Legatskole (101001, folkeskole, København) | ✅ grade 8.9 = 8.9 · soc.ref. diff 0.7 = 0.7 (Over niveau) · well-being 3.7 = 3.7 |
+| 2026-09-23 | · Krebs' Skole (101083, fri grundskole, København) | ✅ grade 9.3 = 9.3 · soc.ref. diff 0.8 = 0.8 (Over niveau) · well-being – = – |
+| 2026-09-23 | · Nørre Fælled Skole (101045, folkeskole, København) | ✅ grade 7.8 = 7.8 · soc.ref. diff -0.8 = -0.8 (Under niveau) · well-being 3.7 = 3.7 |
 
 ### 7b. Calculation verification (phase B, 2026-09-14)
 
@@ -428,6 +434,65 @@ dwellings. Method, code lists and caveats: [`docs/PUBLIC_BUILDINGS.md`](PUBLIC_B
   empty and no PUBLIC line appears.
 - **Extending it**: `python3 scripts/fetch_public_buildings.py --kommune <code>` (or `--all`) then
   `python3 scripts/build_public.py`; both resume, and the UI picks up whatever files exist.
+
+
+## 10. School quality (STIL)
+
+FP9 grades, the socioøkonomisk reference, elevtrivsel, elevtal and klassekvotient per school, joined onto
+the §9 Education buildings. Method, cube codes, the measured join and the discretion rules:
+[`docs/SCHOOLS.md`](SCHOOLS.md).
+
+- **API** `POST https://api.uddannelsesstatistik.dk/Api/v1/statistik`, Bearer key in `.env`
+  (`UDDSTAT_API_KEY`), paged on `side`. The cube catalogue is `POST /Api/v1/skema` — found through the
+  OpenAPI spec at `/swagger/v1/swagger.json`, documented nowhere in `/GetStarted`, and it makes guessing
+  codes unnecessary (`scripts/fetch_uddstat.py --skema`).
+- **Cubes used** (all område `GS`):
+
+  | cube | what it gives |
+  |---|---|
+  | `KARA/KARAGNS` | FP9 grade average, bundne prøver (+ the number who sat them, the aggregation weight) |
+  | `KARA/KARADM` | FP9 dansk and matematik |
+  | `TRIV/TRIVIND` | elevtrivsel — generel + faglig, social, støtte og inspiration, ro og orden |
+  | `ELEV/ELEVEX` | elevtal, total and by herkomst |
+  | `OVER/OVERSKO` | **socioøkonomisk reference** (grade, expected, difference, significance) **and** klassekvotient, per afdeling |
+  | `KARA/KARAGNS` at `[Beliggenhedskommune]` and at `[Skoleår]` alone | the kommune and Denmark benchmarks |
+
+- **⚠ `SOCR/SOCREFEX` and `SOCR/SOCREF3ÅR` are NOT used — they return 0 rows.** Both are listed by the
+  catalogue and advertise their measures and dimension members, but every detaljering tried (institution
+  level, with and without `[Fag]` / `[Prøveform]` / `[Skoleår]`, filtered and national, `tomme_rækker` both
+  ways) comes back empty; `SOCR/KVALSOC` reports no dimensions at all, and the `SOCREFSIKK` emne is named
+  *SocRef_Bag_Login*. The reference therefore comes from `OVER/OVERSKO`, which spells the verdict
+  **`Over niveau` / `Under niveau` / `På niveau`** — not the `Bedre/Dårligere end forventet` the SOCREFEX
+  dimension advertises. There is no 3-year variant, and the layer does not synthesise one.
+- **Join to BBR**: institutionsnummer → institution register coordinates → **every** building with
+  anvendelse **421** within **150 m** (campus rule — a school is one point but a median of several
+  buildings). Measured over the 364 metro grundskoler: **325 direct on 421 (89.3 %)**, **+24 on a 420/429
+  fallback at the same radius → 349 (95.9 %)**, 15 with no education building, 1 with no coordinate;
+  **1 236 school↔building links**. Widening the radius to 250 m was measured and rejected in favour of
+  widening the code set. `bbr_match` on each record says which rule fired.
+  *(The v2.3 planning note quoted 89.5 % / 97 % — those came from the intake pass that had silently
+  dropped København; see the correction box in `docs/SCHOOLS.md` §4. The figures above are the built ones.)*
+- **Aggregates** (`school_grade_avg`, `school_socref_diff`, `school_trivsel`, `pupils_per_school`, written
+  into `public_index.json` beside the §9 counts): **pupil-weighted over folkeskoler and frie grundskoler
+  that publish a value; specialskoler excluded** — their intake makes an average meaningless. Each measure
+  is weighted by **its own** denominator: grades and the reference by the pupils who sat the exams, trivsel
+  by the pupils who answered. That lands **17 of 19 municipalities within ±0.1 of STIL's own published
+  kommune figure** (against 15 when weighting everything by the total roll).
+- **Discretion**: a cell under 3 observations — under **5 pupils** for trivsel and the socioøkonomisk
+  reference — is **omitted from the response, not nulled**. A missing school can only be counted from the
+  outside, against the register. Nothing is ever filled with 0; every dash in the UI carries a tooltip
+  saying it is suppressed.
+- **Coverage** of the 364 metro grundskoler: grade average **271 (74 %)**, socioøkonomisk reference
+  **254 (70 %)**, klassekvotient **280 (77 %)**, elevtrivsel **196 (54 %)**. The gaps are mostly schools
+  with no 9th grade (0.–6. klasse) and small schools under the survey floor — not join failures.
+- **Cadence**: grades and the socioøkonomisk reference each **September** (for the school year just ended),
+  elevtrivsel each **May**, elevtal in the autumn, and the **institution register daily** — the register is
+  the volatile one, so its retrieval date is kept next to the cube retrieval date.
+- **Licence**: free reuse including commercial. Attribution **"Kilde: Uddannelsesstatistik.dk"** plus the
+  retrieval date is required wherever a number is shown, and is carried on every popup, sheet, panel and chart.
+- **Extending it**: `python3 scripts/fetch_uddstat.py --schools` then `python3 scripts/build_schools.py`
+  (or `make schools`). `build_schools.py` must run **after** `build_public.py` — it rewrites the same
+  per-kommune files and the same index.
 
 
 Sources: Danmarks Statistik API docs (https://www.dst.dk/en/Statistik/brug-statistikken/muligheder-i-statistikbanken/api) · Finans Danmark Boligmarkedsstatistikken (https://finansdanmark.dk/tal-og-data/boligstatistik/boligmarkedsstatistikken/) · Klimadatastyrelsen, DAWA lukker 1. oktober 2026 (https://www.klimadatastyrelsen.dk/om-klimadatastyrelsen/nyheder/nyhedsarkiv/2026/jul/dawa-lukker-d-1-oktober-2026) · Datafordeler transition plan (https://datafordeler.dk/vejledning/transitionsnetvaerk/) · BBR GraphQL (https://datafordeler.dk/dataoversigt/bygnings-og-boligregistret-bbr/bbr-graphql/) · boligstat.dk om husleje (https://boligstat.dk/boligstat/dokumenter/omhusleje.html) · Landsbyggefonden Huslejestatistik 2026 (https://lbf.dk/viden/statistikker/huslejestatistik/huslejestatistik-2026) · DST STRAF11 documentation (https://www.dst.dk/documentationofstatistics/c1ac7749-1e15-4d3a-8ed0-fb2d26a9fe93) · Plandata WFS (https://geoserver.plandata.dk/geoserver/wfs?request=GetCapabilities&service=WFS) · Eurostat API (https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nama_10r_3gdp?geo=DK011&unit=EUR_HAB&time=2023) · Frie geografiske data, vilkår (https://dataforsyningen.dk/asset/PDF/rettigheder_vilkaar/Vilk%C3%A5r%20for%20brug%20af%20frie%20geografiske%20data.pdf)

@@ -10,11 +10,20 @@ jobs:
   refresh:
     if: github.event_name != 'push'
     runs-on: ubuntu-latest
+    # exposed as an env var so the step below can test for it — the `secrets` context is not
+    # available in a step-level `if`, and an unset secret must skip the call, never send an empty key
+    env:
+      UDDSTAT_API_KEY: ${{ secrets.UDDSTAT_API_KEY }}
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
         with: { python-version: "3.12" }
       - run: python scripts/fetch_statbank.py
+      # School quality (STIL) only when a key is configured. Without one the committed
+      # data/processed/schools.json is left exactly as it is and the layer keeps working.
+      - name: Refresh school quality (skipped when UDDSTAT_API_KEY is unset)
+        if: ${{ env.UDDSTAT_API_KEY != '' }}
+        run: python scripts/fetch_uddstat.py --schools && python scripts/build_schools.py
       - run: python scripts/build_makro.py && python scripts/build_market.py && (python scripts/build_cph.py || true)
       - name: Commit processed data
         run: |

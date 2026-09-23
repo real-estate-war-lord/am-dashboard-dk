@@ -1458,3 +1458,12 @@ th .thn{display:inline}
 .maplegend .only{font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-left:auto;padding-left:6px;cursor:pointer}
 .maplegend .only:hover{color:var(--ink);text-decoration:underline}
 .maplegend .lgrow.gk .pubtog{display:inline-flex;align-items:center;gap:4px}
+
+/* ---- Schools (docs/SCHOOLS.md) ---- */
+.schpop { border-top: 1px solid var(--line, #E2E7E1); margin-top: 8px; padding-top: 8px; }
+.schpop .schhead { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 4px; }
+.schpop .schhead b { font-size: 13px; }
+.schsig { color: #2F6B4F; font-style: normal; font-weight: 600; font-size: 11px; }
+.lfrow .schsig { margin-left: 2px; }
+/* the schools trend is a small three-point series — keep it at its natural size, not full-bleed */
+.schchart { max-width: 660px; width: 100%; height: auto; display: block; }
