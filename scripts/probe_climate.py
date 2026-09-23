@@ -844,6 +844,200 @@ def probe_coast():
     block("8 · Coastal kommuner (from the vendored boundaries)", "\n".join(lines))
 
 
+# ---------- 9. Kystdirektoratet Kystplanlægger (horizons 2020 / 2070 / 2120) ----------
+KDI = "Kystplanlaegger_Oversvommelsesfare_2"
+KDI_PTS = [("Copenhagen Sydhavn", 55.650, 12.545),
+           ("Hvidovre Avedøre Holme", 55.625, 12.460),
+           ("Køge harbour", 55.455, 12.195)]
+KDI_WIDE = [("Esbjerg", 55.466, 8.452), ("Aalborg", 57.053, 9.923), ("Aarhus", 56.152, 10.215)]
+KDI_100YR = {"2020": 4, "2070": 13, "2120": 22}      # depth rasters, 100-year event
+KDI_FARE100 = {"2020": 3, "2070": 12, "2120": 21}    # the matching extent polygons
+
+
+def _painted(svc, layer, x, y, half=1000, size=200):
+    """share of a 2 x 2 km render that the layer paints, and one painted coordinate"""
+    r, _, _ = get(f"{MST}/{svc}/MapServer/export",
+                  {"bbox": f"{x - half},{y - half},{x + half},{y + half}", "bboxSR": 25832,
+                   "imageSR": 25832, "size": f"{size},{size}", "layers": f"show:{layer}",
+                   "format": "png32", "transparent": "true", "f": "image"})
+    if r is None or r.content[:4] != b"\x89PNG":
+        return None, None
+    try:
+        from PIL import Image
+        import numpy as np
+        a = np.array(Image.open(io.BytesIO(r.content)).convert("RGBA"))
+        m = a[:, :, 3] > 0
+        if not m.any():
+            return 0.0, None
+        ys, xs = np.nonzero(m)
+        i = len(xs) // 2
+        return 100 * m.mean(), (x - half + (xs[i] + .5) * 2 * half / size,
+                                y + half - (ys[i] + .5) * 2 * half / size)
+    except Exception:                                                  # noqa: BLE001
+        return None, None
+
+
+def _identify(svc, layer, x, y):
+    d, _, _, _ = jget(f"{MST}/{svc}/MapServer/identify",
+                      {"geometry": f"{x},{y}", "geometryType": "esriGeometryPoint", "sr": 25832,
+                       "layers": f"all:{layer}", "tolerance": 2,
+                       "mapExtent": f"{x - 250},{y - 250},{x + 250},{y + 250}",
+                       "imageDisplay": "250,250,96", "returnGeometry": "false", "f": "json"})
+    res = (d or {}).get("results", [])
+    return (res[0].get("attributes", {}) if res else {}).get("Classify.Pixel Value")
+
+
+def probe_kdi():
+    lines = []
+    svc, _, _, _ = jget(f"{MST}/{KDI}/MapServer", {"f": "json"},
+                        name="9a KDI Kystplanlægger service", note="flood hazard, 3 horizons")
+    if svc:
+        layers = svc.get("layers", [])
+        ext = svc.get("fullExtent") or {}
+        ROWS[-1] = ROWS[-1][:4] + (f"{len(layers)} layers · {svc.get('capabilities', '')}",)
+        lines.append(f"`{KDI}` · **{len(layers)} layers** · capabilities `{svc.get('capabilities')}` · "
+                     f"full extent EPSG:"
+                     f"{(ext.get('spatialReference') or {}).get('latestWkid')} "
+                     f"{ext.get('xmin', 0):,.0f}–{ext.get('xmax', 0):,.0f} E, "
+                     f"{ext.get('ymin', 0):,.0f}–{ext.get('ymax', 0):,.0f} N")
+        lines.append("")
+        lines.append("Three horizon groups × four return periods × two representations:")
+        lines.append("")
+        lines.append("| horizon | return period | extent polygon (Feature Layer) | depth raster (Raster Layer) |")
+        lines.append("|---|---|---|---|")
+        byname = {L["name"]: L["id"] for L in layers}
+        for hz in ("2020", "2070", "2120"):
+            for rp in ("50", "100", "1.000", "10.000"):
+                norm = lambda t: t.replace("-", " ").replace("  ", " ")   # noqa: E731
+                fare = next((i for n, i in byname.items()
+                             if n.startswith(f"Oversvømmelsesfare i {hz}")
+                             and f"{rp} års" in norm(n)), None)
+                dyb = next((i for n, i in byname.items()
+                            if n.startswith(f"Oversvømmelsesdybde i {hz}")
+                            and f"{rp} år" in norm(n)), None)
+                lines.append(f"| {hz} | {rp} yr | {fare if fare is not None else '—'} | "
+                             f"{dyb if dyb is not None else '—'} |")
+
+    # coverage: national or a few stretches?
+    d, _, _, _ = jget(f"{MST}/{KDI}/MapServer/3/query",
+                      {"where": "1=1", "returnCountOnly": "true", "f": "json"},
+                      name="9b KDI extent polygons", note="2020 · 100 yr")
+    meta, _, _, _ = jget(f"{MST}/{KDI}/MapServer/3", {"f": "json"})
+    if d and meta:
+        e = meta.get("extent") or {}
+        ROWS[-1] = ROWS[-1][:4] + (f"{d.get('count')} polygons",)
+        lines.append("")
+        lines.append(f"### Coverage — national, not a few stretches")
+        lines.append("")
+        lines.append(f"The 2020 · 100-year extent layer holds **{d.get('count')} polygons** spanning "
+                     f"{e.get('xmin', 0):,.0f}–{e.get('xmax', 0):,.0f} E and "
+                     f"{e.get('ymin', 0):,.0f}–{e.get('ymax', 0):,.0f} N in EPSG:25832 — the full "
+                     "width and height of Denmark, unlike `OD_fare_2024`, which only covers the "
+                     "designated flood-directive risk areas. Rendered coverage at six points, as the "
+                     "painted share of a 2 × 2 km box:")
+        lines.append("")
+        lines.append("| point | KDI 2020 | KDI 2070 | KDI 2120 | MST OD 100 yr |")
+        lines.append("|---|---|---|---|---|")
+        for label, lat, lon in KDI_PTS + KDI_WIDE:
+            x, y = wgs84_to_utm32(lon, lat)
+            cells = []
+            for hz in ("2020", "2070", "2120"):
+                pc, _ = _painted(KDI, KDI_100YR[hz], x, y)
+                cells.append("—" if pc is None else f"{pc:.1f} %")
+            pc, _ = _painted("OD_fare_2024", 21, x, y)
+            cells.append("—" if pc is None else f"{pc:.1f} %")
+            lines.append(f"| {label} | " + " | ".join(cells) + " |")
+
+    # raster or vector, and any raw-depth download route
+    lines.append("")
+    lines.append("### Raster or vector, and what can be downloaded")
+    lines.append("")
+    r, _, n = get(f"{MST}/{KDI}/MapServer/3/query",
+                  {"where": "1=1", "outFields": "*", "outSR": 4326, "f": "geojson",
+                   "resultRecordCount": 5}, name="9c KDI polygons as geojson", note="5 features")
+    gj_ok = r is not None and r.status_code == 200 and r.content[:1] == b"{"
+    if gj_ok:
+        try:
+            feats = r.json().get("features", [])
+            props = list(feats[0]["properties"]) if feats else []
+            ROWS[-1] = ROWS[-1][:4] + (f"{len(feats)} feats, {n / 1e6:.1f} MB",)
+            lines.append(f"* **Extent polygons are downloadable.** `capabilities` includes `Data`, so "
+                         f"`/3/query?f=geojson&outSR=4326` returns real geometry — 5 features came back "
+                         f"as {n / 1e6:.1f} MB, so all {d.get('count') if d else '?'} polygons are a "
+                         "large but fetchable pull, paginated with `resultOffset`. Attributes are "
+                         f"geometry bookkeeping only ({', '.join('`' + x + '`' for x in props[:6])}) — "
+                         "**no depth, no water level, no scenario field**: the horizon and return "
+                         "period live in the *layer*, not in the data.")
+        except Exception:                                              # noqa: BLE001
+            pass
+    r, _, n = get(f"{MST}/{KDI}/MapServer/export",
+                  {"bbox": "722000,6171000,724000,6173000", "bboxSR": 25832, "imageSR": 25832,
+                   "size": "200,200", "layers": "show:4", "format": "tiff", "pixelType": "F32",
+                   "f": "image"}, name="9d KDI depth as tiff", note="format=tiff asked for")
+    if r is not None:
+        got = "PNG" if r.content[:4] == b"\x89PNG" else ("TIFF" if r.content[:4] in (b"II*\x00", b"MM\x00*") else "?")
+        ROWS[-1] = ROWS[-1][:4] + (f"{got} — rendered" if got == "PNG" else got,)
+        lines.append(f"* **Depth rasters are not downloadable here.** Same MapServer limit as "
+                     f"`OD_fare_2024`: `format=tiff&pixelType=F32` comes back as {got}. There is no "
+                     "ImageServer, WCS or bulk/ZIP route on this server; the only per-pixel read is "
+                     "`/identify`, one point per request.")
+    lines.append("* Sibling services in the same folder (`Kystplanlaegger_*`, 13 of them, plus 15 "
+                 "`KDI_*`) carry the same 2020/2070/2120 structure for damage and strategy: "
+                 "`Kystplanlaegger_Oversvommelsesskade`, `Kystplanlaegger_Erosionsfare`, "
+                 "`Kystplanlaegger_Erosionsskade`, `Kystplanlaegger_Oversvommesesrisiko`, "
+                 "`Kystplanlaegger_Strategiforslag`.")
+
+    # climate basis
+    d2, _, _, _ = jget(f"{MST}/{KDI}/MapServer/info/iteminfo", {"f": "json"})
+    da = html.unescape(_strip(str((d2 or {}).get("snippet") or "")))
+    lines.append("")
+    lines.append("### Stated climate basis")
+    lines.append("")
+    if da:
+        lines.append(f"> {da}")
+        lines.append("")
+        lines.append("> *Shows flood hazard and flood depth in 2020, 2070 and 2120 for a 100-, "
+                     "1 000- and 10 000-year event.*")
+        lines.append("")
+    lines.append("That is the whole of it: the service names **three horizons — 2020, 2070 and 2120 — "
+                 "and states no scenario, no percentile and no sea-level-rise figure**. It does not "
+                 "say which RCP/SSP pathway the 2070 and 2120 layers assume, so the rise is baked in "
+                 "and unlabelled. Klimaatlas (§4), by contrast, publishes the rise itself with an "
+                 "explicit `scenarie` and `percentil` — which is why the indicators should be built on "
+                 "Klimaatlas and this service kept as the map-side illustration.")
+
+    # identify at the three named points, every horizon, against OD_fare_2024
+    lines.append("")
+    lines.append("### `/identify` depth, 100-year event (metres; the service formats in da-DK)")
+    lines.append("")
+    lines.append("| point | KDI 2020 | KDI 2070 | KDI 2120 | MST OD 100 yr | nearest painted KDI-2020 cell |")
+    lines.append("|---|---|---|---|---|---|")
+    for label, lat, lon in KDI_PTS:
+        x, y = wgs84_to_utm32(lon, lat)
+        cells = [_identify(KDI, KDI_100YR[hz], x, y) or "—" for hz in ("2020", "2070", "2120")]
+        od = _identify("OD_fare_2024", 21, x, y) or "—"
+        _, near = _painted(KDI, KDI_100YR["2020"], x, y)
+        nv = ""
+        if near:
+            v = _identify(KDI, KDI_100YR["2020"], *near)
+            dist = math.hypot(near[0] - x, near[1] - y)
+            nv = f"{v} m at {dist:,.0f} m" if v and v != "NoData" else "—"
+        ROWS.append((f"9e identify {label[:18]}", "200", "—", "—",
+                     " / ".join(str(c) for c in cells)))
+        lines.append(f"| {label} ({lat}, {lon}) | " + " | ".join(str(c) for c in cells)
+                     + f" | {od} | {nv} |")
+    lines.append("")
+    lines.append("`NoData` is a real answer — the cell is dry at that return period, not missing. "
+                 "Køge harbour shows the horizon effect cleanly, and the nearest-painted-cell column "
+                 "shows how sharp the edge is: a point can be dry while a cell 150 m away carries "
+                 "0.2 m. **A point-in-raster read is therefore not a safe property score on its own** "
+                 "— a small ring around the pin has to be sampled. `OD_fare_2024` is `NoData` at all "
+                 "three, which is the coverage difference above, not a contradiction.")
+    lines.append("")
+    lines.append("**Not built on yet** — this section is reconnaissance for a later step.")
+    block("9 · Kystdirektoratet Kystplanlægger — flood hazard at 2020 / 2070 / 2120", "\n".join(lines))
+
+
 # ---------- report ----------
 def table():
     hdr = ("name", "HTTP", "seconds", "bytes", "note")
@@ -863,13 +1057,16 @@ def md_table():
 
 
 PROBES = [("1", probe_risk), ("2", probe_hazard), ("3", probe_bulk), ("4", probe_klimaatlas),
-          ("5", probe_dhm), ("6", probe_bluespot), ("7", probe_fp), ("8", probe_coast)]
+          ("5", probe_dhm), ("6", probe_bluespot), ("7", probe_fp), ("8", probe_coast),
+          ("9", probe_kdi)]
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--only", default="", help="comma-separated probe numbers, e.g. 4,7")
     ap.add_argument("--no-write", action="store_true", help="print only, leave docs/CLIMATE_PROBE.md alone")
+    ap.add_argument("--write", action="store_true",
+                    help="with --only: write the (partial) report anyway — it replaces the file")
     a = ap.parse_args()
     load_env()
     want = {s.strip() for s in a.only.split(",") if s.strip()} or {n for n, _ in PROBES}
@@ -889,7 +1086,10 @@ def main():
         for label, ok, got, wnt in CHECKS:
             print(f"  {'PASS' if ok else 'FAIL'}  {label}: got {got}, expected {wnt}")
         print(f"  {sum(1 for c in CHECKS if c[1])}/{len(CHECKS)} pass")
-    if not a.no_write:
+    if a.only and not a.write:
+        print("\n--only: report NOT written (it would replace the full file with a partial one). "
+              "Re-run without --only, or pass --write.")
+    elif not a.no_write:
         body = [f"# Climate endpoint probe — {dt.date.today().isoformat()}", "",
                 "What every source the v2.5 climate layer would read answers today, measured by "
                 "`scripts/probe_climate.py` (read-only; re-run it to refresh this file). Everything "

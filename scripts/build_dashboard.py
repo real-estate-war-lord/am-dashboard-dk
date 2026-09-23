@@ -149,6 +149,18 @@ def main():
         for f in (PROC / "micro").glob("*.json"):
             shutil.copy(f, md / f.name)
         print(f"copied {len(list(md.glob('*.json')))} micro files → {md}")
+    # climate zones and the climate index, served as files (v2.5 — dist/climate/)
+    clim = PROC / "climate"
+    if clim.exists():
+        import shutil
+        cd = out.parent / "climate"; cd.mkdir(exist_ok=True)
+        n = 0
+        for f in clim.rglob("*.json"):
+            t = cd / f.relative_to(clim)
+            t.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(f, t)
+            n += 1
+        print(f"copied {n} climate files → {cd}")
     kommuner_lookup(out.parent)
     print(f"wrote {out} ({out.stat().st_size/1e6:.1f} MB) · {len(data['municipalities'])} municipalities · {len(data['areas'])} areas")
 

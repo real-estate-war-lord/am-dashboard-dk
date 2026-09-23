@@ -26,3 +26,11 @@ dist/public_index.json
 dist/public/
 data/raw/uddstat/
 dist/geo
+
+# v2.5 climate — raw pulls and downloaded rasters (never committed)
+data/raw/klimaatlas/
+data/raw/flood_hazard/
+data/raw/fp/
+data/raw/dhm/
+data/raw/bluespot/
+dist/climate/

@@ -1,0 +1,78 @@
+kommune_kode,kommune_navn,kystkoder,kystnavne,n_stretches,coast_m,nearest_stretch_m,aggregation
+0101,København,SJ7;SJ8,Øresunds_kyst                  ;Køge_Bugt                      ,2,115731,0,max
+0153,Brøndby,SJ8,Køge_Bugt                      ,1,2988,0,max
+0155,Dragør,SJ7;SJ8,Øresunds_kyst                  ;Køge_Bugt                      ,2,17388,0,max
+0157,Gentofte,SJ7,Øresunds_kyst                  ,1,11327,0,max
+0167,Hvidovre,SJ8,Køge_Bugt                      ,1,10279,0,max
+0173,Lyngby-Taarbæk,SJ7,Øresunds_kyst                  ,1,3645,0,max
+0183,Ishøj,SJ8,Køge_Bugt                      ,1,3735,0,max
+0185,Tårnby,SJ7;SJ8,Øresunds_kyst                  ;Køge_Bugt                      ,2,90416,0,max
+0187,Vallensbæk,SJ8,Køge_Bugt                      ,1,376,0,max
+0210,Fredensborg,SJ7,Øresunds_kyst                  ,1,11202,0,max
+0217,Helsingør,SJ4;SJ7,Nordsjællands_kyst             ;Øresunds_kyst                  ,2,31443,0,max
+0223,Hørsholm,SJ7,Øresunds_kyst                  ,1,8254,0,max
+0230,Rudersdal,SJ7,Øresunds_kyst                  ,1,7585,0,max
+0250,Frederikssund,SJ5;SJ6,Isefjord                       ;Roskilde_Fjord                 ,2,129549,0,max
+0253,Greve,SJ8,Køge_Bugt                      ,1,9763,0,max
+0259,Køge,SJ8,Køge_Bugt                      ,1,25969,0,max
+0260,Halsnæs,SJ4;SJ5;SJ6,Nordsjællands_kyst             ;Isefjord                       ;Roskilde_Fjord                 ,3,56274,0,max
+0265,Roskilde,SJ6,Roskilde_Fjord                 ,1,44801,0,max
+0269,Solrød,SJ8,Køge_Bugt                      ,1,10071,0,max
+0270,Gribskov,SJ4,Nordsjællands_kyst             ,1,30404,0,max
+0306,Odsherred,SJ3;SJ4;SJ5,Sejrø_Bugt                     ;Nordsjællands_kyst             ;Isefjord                       ,3,152354,0,max
+0316,Holbæk,SJ5,Isefjord                       ,1,93353,0,max
+0320,Faxe,SD7,Faxe_Bugt                      ,1,31818,0,max
+0326,Kalundborg,SJ2;SJ3,Storebælt_nordøst              ;Sejrø_Bugt                     ,2,178379,0,max
+0330,Slagelse,SD3;SD5;SJ1;SJ2,Storebælt_Sydvest              ;Smålandsfarvandet              ;Storebælt_nordvest_og_Odense_Fjord;Storebælt_nordøst              ,4,204402,0,max
+0336,Stevns,SD7;SJ8,Faxe_Bugt                      ;Køge_Bugt                      ,2,42204,0,max
+0350,Lejre,SJ5;SJ6,Isefjord                       ;Roskilde_Fjord                 ,2,65076,0,max
+0360,Lolland,SD4;SD5,Femern_Bælt                    ;Smålandsfarvandet              ,2,293819,0,max
+0370,Næstved,SD5;SD7,Smålandsfarvandet              ;Faxe_Bugt                      ,2,90262,0,max
+0376,Guldborgsund,SD4;SD5;SD6,Femern_Bælt                    ;Smålandsfarvandet              ;Falsters_og_Møns_Østersøkyst   ,3,306110,0,max
+0390,Vordingborg,SD5;SD6;SD7,Smålandsfarvandet              ;Falsters_og_Møns_Østersøkyst   ;Faxe_Bugt                      ,3,360413,0,max
+0400,Bornholm,SJ9,Bornholms_kyst                 ,1,149931,0,max
+0410,Middelfart,OJ6;OJ7;SD1,Lillebælt_nordlig              ;Lillebælt_central              ;Lillebælt_sydlig               ,3,112887,0,max
+0411,Christiansø,SJ9,Bornholms_kyst                 ,1,5596,0,max
+0420,Assens,SD1,Lillebælt_sydlig               ,1,97858,0,max
+0430,Faaborg-Midtfyn,SD1;SD2,Lillebælt_sydlig               ;Sydfynske_Øhav                 ,2,121651,0,max
+0440,Kerteminde,SJ1,Storebælt_nordvest_og_Odense_Fjord,1,144731,0,max
+0450,Nyborg,SD3;SJ1,Storebælt_Sydvest              ;Storebælt_nordvest_og_Odense_Fjord,2,52194,0,max
+0461,Odense,SJ1,Storebælt_nordvest_og_Odense_Fjord,1,32906,0,max
+0479,Svendborg,SD2;SD3,Sydfynske_Øhav                 ;Storebælt_Sydvest              ,2,175153,0,max
+0480,Nordfyns,OJ6;SJ1,Lillebælt_nordlig              ;Storebælt_nordvest_og_Odense_Fjord,2,143035,0,max
+0482,Langeland,SD2;SD3;SD4,Sydfynske_Øhav                 ;Storebælt_Sydvest              ;Femern_Bælt                    ,3,179150,0,max
+0492,Ærø,SD2,Sydfynske_Øhav                 ,1,114108,0,max
+0510,Haderslev,SD1,Lillebælt_sydlig               ,1,127314,0,max
+0540,Sønderborg,SD1,Lillebælt_sydlig               ,1,245070,0,max
+0550,Tønder,VH1;VH2,Vadehavskyst_sydlig            ;Vadehavskyst_central           ,2,144094,0,max
+0561,Esbjerg,VH2;VH3,Vadehavskyst_central           ;Vadehavskyst_nordlig           ,2,106508,0,max
+0563,Fanø,VH2;VH3,Vadehavskyst_central           ;Vadehavskyst_nordlig           ,2,66250,0,max
+0573,Varde,VH3;VK1,Vadehavskyst_nordlig           ;Vestkyst_central               ,2,79638,0,max
+0580,Aabenraa,SD1,Lillebælt_sydlig               ,1,106583,0,max
+0607,Fredericia,OJ6;OJ7;SD1,Lillebælt_nordlig              ;Lillebælt_central              ;Lillebælt_sydlig               ,3,44681,0,max
+0615,Horsens,OJ5;OJ6,Århus_Bugt                     ;Lillebælt_nordlig              ,2,70199,0,max
+0621,Kolding,SD1;OJ7,Lillebælt_sydlig               ;Lillebælt_central              ,2,58962,0,max
+0630,Vejle,OJ6,Lillebælt_nordlig              ,1,32092,0,max
+0661,Holstebro,VK1;LF3,Vestkyst_central               ;Limfjorden_ved_Lemvig          ,2,85400,0,max
+0665,Lemvig,VK1;VK4;LF3,Vestkyst_central               ;Vestkysten_ud_for_Limfjorden   ;Limfjorden_ved_Lemvig          ,3,136992,0,max
+0671,Struer,LF3,Limfjorden_ved_Lemvig          ,1,141962,0,max
+0706,Syddjurs,OJ4;OJ5,Djurslands_østkyst_og_Anholt   ;Århus_Bugt                     ,2,153548,0,max
+0707,Norddjurs,OJ2;OJ3;OJ4,Ålborg_Bugt                    ;Randers_Fjord_og_Mariager_Fjord;Djurslands_østkyst_og_Anholt   ,3,145323,0,max
+0727,Odder,OJ5;OJ6,Århus_Bugt                     ;Lillebælt_nordlig              ,2,90994,0,max
+0730,Randers,OJ2;OJ3,Ålborg_Bugt                    ;Randers_Fjord_og_Mariager_Fjord,2,102793,0,max
+0741,Samsø,OJ5;SJ1;SJ3,Århus_Bugt                     ;Storebælt_nordvest_og_Odense_Fjord;Sejrø_Bugt                     ,3,128349,0,max
+0751,Aarhus,OJ5,Århus_Bugt                     ,1,68307,0,max
+0760,Ringkøbing-Skjern,VK1,Vestkyst_central               ,1,223087,0,max
+0766,Hedensted,OJ6,Lillebælt_nordlig              ,1,75786,0,max
+0773,Morsø,LF2;LF3;LF4,Limfjorden_ved_Skive           ;Limfjorden_ved_Lemvig          ;Limfjorden_ved_Thisted         ,3,186564,0,max
+0779,Skive,LF2;LF3,Limfjorden_ved_Skive           ;Limfjorden_ved_Lemvig          ,2,194407,0,max
+0787,Thisted,VK4;VK5;LF3;LF4,Vestkysten_ud_for_Limfjorden   ;Skagerrakkyst_sydlige          ;Limfjorden_ved_Lemvig          ;Limfjorden_ved_Thisted         ,4,245318,0,max
+0791,Viborg,LF2,Limfjorden_ved_Skive           ,1,38904,0,max
+0810,Brønderslev,OJ1,Kattegatkyst_nordlige          ,1,14246,0,max
+0813,Frederikshavn,VK6;OJ1,Skagerrakkyst_nordlig          ;Kattegatkyst_nordlige          ,2,154998,0,max
+0820,Vesthimmerlands,LF1;LF2;LF4,Limfjord_østlig                ;Limfjorden_ved_Skive           ;Limfjorden_ved_Thisted         ,3,103937,0,max
+0825,Læsø,OJ1,Kattegatkyst_nordlige          ,1,145489,0,max
+0846,Mariagerfjord,OJ2;OJ3,Ålborg_Bugt                    ;Randers_Fjord_og_Mariager_Fjord,2,108890,0,max
+0849,Jammerbugt,VK5;VK6;LF1;LF4;LF2,Skagerrakkyst_sydlige          ;Skagerrakkyst_nordlig          ;Limfjord_østlig                ;Limfjorden_ved_Thisted         ;Limfjorden_ved_Skive           ,5,129780,0,max
+0851,Aalborg,LF1;OJ1;OJ2,Limfjord_østlig                ;Kattegatkyst_nordlige          ;Ålborg_Bugt                    ,3,212433,0,max
+0860,Hjørring,VK6,Skagerrakkyst_nordlig          ,1,60048,0,max

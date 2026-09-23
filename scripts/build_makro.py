@@ -17,6 +17,7 @@ import sys
 
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
 from statbank_common import ROOT, RAW, cfg, rows, labels, meta, area_col, muni_code, period_key  # noqa: E402
+from climate_common import calc_climate  # noqa: E402   (v2.5 climate layer)
 
 GEO = ROOT / "data" / "geo"
 EXT = ROOT / "data" / "external"
@@ -417,6 +418,8 @@ def compute(ind, year=None):
         return calc_infra_index(ind, year)
     if calc == "schools":
         return calc_schools(ind, year)
+    if calc == "climate":
+        return calc_climate(ind, year)
     if calc.startswith("rolling4q"):
         vals, p = calc_rolling4q(ind, year)
         return {srcs[0]["geo"]: (vals, p)} if p else {}

@@ -11,10 +11,14 @@ must be edited only in small, additive ways, and every edit listed here for the 
 
 | Date | File | Edit | Why |
 |---|---|---|---|
-| — | — | none yet | — |
+| 2026-09-23 | `.gitignore` | +6 lines: `data/raw/{klimaatlas,flood_hazard,fp,dhm,bluespot}/` | the new raw pulls and the 3.4 GB hazard zip must never be committed |
+| 2026-09-23 | `config/indicators.json` | +9 indicators in a new `"Climate"` group; one sentence appended to `_doc` describing `calc: climate` and `horizon` | the layer's registry entries — additive, no existing indicator touched |
+| 2026-09-23 | `scripts/build_makro.py` | +2 lines: import `calc_climate`, and one `if calc == "climate"` branch beside the existing `bbr` / `infra_index` / `public_index` / `schools` branches | the calc itself lives in the new `scripts/climate_common.py`, so this file stays a two-line diff |
+| 2026-09-23 | `scripts/build_dashboard.py` | +11 lines: copy `data/processed/climate/**.json` → `dist/climate/` | the page loads the zones on demand, exactly as it does `dist/micro/` and `dist/public/` |
 
-No shared file has been edited on this branch. Everything so far is new, climate-only files:
-`scripts/probe_climate.py`, `docs/CLIMATE_PROBE.md`, `docs/CLIMATE_BUILD_LOG.md`.
+Nothing else shared has been touched: `src/app.js`, `src/index.html`, the `Makefile`,
+`.github/workflows/refresh.yml`, `README.md`, `CHANGELOG.md` and `docs/DATA_MAP.md` are all
+untouched on this branch so far.
 
 ## Climate-only files (free to change)
 
@@ -57,3 +61,294 @@ No shared file has been edited on this branch. Everything so far is new, climate
   (Køge Bugt/København) is a single feature of 101.53 km², which does match.
 * **Coast flag is free:** 76 of 99 kommuner are coastal, 9 of the metro 19, computed from
   `data/geo/kommuner.geojson` alone. Borderline cases are listed in the probe doc.
+
+---
+
+# v2.5 build — 2026-09-23
+
+## 0a · Datafordeler credentials — not found
+
+Searched, without ever printing a value: the shell environment (`env | grep -i datafordeler` → 0
+matches); `~/.zprofile` (the only shell rc that exists — no `.zshrc`, `.zshenv`, `.bash_profile`,
+`.bashrc` or `.profile`); every `.env*` under `../am-dashboard-dk`, `../am-dashboard-dk-forecast`,
+`~/Desktop/Sweden dashboard/am-dashboard-se` and this worktree; the login keychain
+(`security find-generic-password -s datafordeler` → not found); `data/raw/bbr/fetch_log.txt`,
+`fetch.txt` and `validate.txt`; and the git history of the main repo.
+
+Every hit for the string `DATAFORDELER` is source code or documentation naming the variable —
+`scripts/fetch_bbr.py`, `scripts/fetch_dar.py`, `scripts/bbr_introspect.py`, `docs/RUNBOOK.md`
+step 8, `docs/GEO.md`. **No key or service user exists on this machine.** The four `.env` files in
+the family all carry exactly one key, `UDDSTAT_API_KEY`.
+
+Consequences, both already flagged in `docs/CLIMATE_PROBE.md`:
+
+* probe §5 (DHM WCS) stays at HTTP 401 — coverage list and the two GetCoverage timings unmeasured;
+* the Bluespot_ekstremregn tile size stays an estimate, so `cloudburst_dw_pct` is declared in the
+  registry and returns null with reason `not computed yet`.
+
+Nothing else in the layer depends on it: Klimaatlas, F&P and the Miljøstyrelsen sources are all
+open.
+
+## 0b · Kystdirektoratet Kystplanlægger — see `docs/CLIMATE_PROBE.md` §9
+
+Reconnaissance only, nothing built on it. Headlines:
+
+* `Kystplanlaegger_Oversvommelsesfare_2` publishes **3 horizons × 4 return periods × 2
+  representations** — an extent polygon (Feature Layer) and a depth raster (Raster Layer) for
+  2020 / 2070 / 2120 at 50, 100, 1 000 and 10 000 years. 27 layers in all.
+* **Coverage is national**, not a handful of stretches: extent 441 503–893 022 E, 6 049 784–
+  6 402 264 N in EPSG:25832, against `OD_fare_2024`, which only covers the designated risk areas.
+  Painted share of a 2 × 2 km box: Sydhavn 51 % / 79 % / 86 % across the three horizons, against
+  1.9 % for `OD_fare_2024`; Esbjerg 36/46/47 % against 15 %; Aalborg 31/38/49 % against 8 %.
+* **Vector yes, raster no.** `capabilities` includes `Data`, so the extent polygons come out as
+  geojson (5 features = 7.9 MB; 42 polygons for 2020 · 100 yr), but they carry no depth, level or
+  scenario — the horizon lives in the layer name. `format=tiff&pixelType=F32` returns PNG, and
+  there is no ImageServer, WCS or bulk route, so raw depth is only readable through `/identify`,
+  one point per request.
+* **Climate basis, verbatim:** *"Viser oversvømmesesfare og oversvømmelsesdybde i 2020, 2070 og
+  2120 for en 100, 1.000 og 10.000 års hændelse."* — "Shows flood hazard and flood depth in 2020,
+  2070 and 2120 for a 100-, 1 000- and 10 000-year event." That is all of it: **no scenario, no
+  percentile, no sea-level figure.** The rise is baked in and unlabelled, which is why the
+  indicators are built on Klimaatlas (explicit `scenarie` + `percentil`) and this service is kept
+  as a map-side illustration only.
+* `/identify` depth, 100-year event, metres (the service formats in da-DK):
+
+| point | KDI 2020 | KDI 2070 | KDI 2120 | MST `OD_fare_2024` 100 yr |
+|---|---|---|---|---|
+| Copenhagen Sydhavn 55.650, 12.545 | NoData | NoData | NoData | NoData |
+| Hvidovre Avedøre Holme 55.625, 12.460 | NoData | NoData | NoData | NoData |
+| Køge harbour 55.455, 12.195 | 0,122646 | 0,371910 | 0,964475 | NoData |
+
+  `NoData` is a real answer — dry at that return period, not missing. The Sydhavn point is dry
+  while a cell **150 m away** carries 0,187538 m, so a point-in-raster read is not a safe property
+  score on its own; a ring around the pin has to be sampled.
+
+## 1 · `scripts/fetch_klimaatlas.py` → `data/raw/klimaatlas/`
+
+| pull | service · layer | rows | version | seconds |
+|---|---|---|---|---|
+| `coast_values` | `VandstandStormflodKyst_latest` · 0 | 3 162 | v2025a | 1.6 |
+| `coast_stretches` | `VandstandStormflodKyst_latest` · 1 | 34 | v2025a | 1.1 |
+| `precip_values` | `NedboerKommuner_latest` · 0 | 5 586 | v2025a | 3.8 |
+
+`aarstid = 1` (annual); every `scenarie` (coast 0/119/126/245/370/585, rain 0/26/45/85), every
+`periode` 1–4 and every `percentil` 10/50/90 kept. Paginated at the services' own
+`maxRecordCount` of 2 000 with `resultOffset`. JSON + flat CSV + `meta.json` with the version
+string and fetch date. Stretch geometry in EPSG:4326.
+
+## 2 · `data/external/klimaatlas_coast_kommune.csv` (generated, committed)
+
+`scripts/build_climate_coast_map.py`. A kommune's coastline is what is left of its boundary after
+subtracting every neighbour's (60 m tolerance, EPSG:25832); over 100 m of it makes it a candidate,
+and the candidate is coastal when that coastline runs within **2 km** of a Klimaatlas stretch.
+
+**77 of 99 kommuner coastal, 22 landlocked. 43 touch more than one stretch → value = MAX.**
+
+| code | metro kommune | kystkoder | coastline | nearest stretch |
+|---|---|---|---|---|
+| 0101 | København | SJ7;SJ8 | 115 731 m | 0 m |
+| 0147 | Frederiksberg | — | 136 m | 3 782 m → landlocked |
+| 0151 | Ballerup | — | 0 m | — |
+| 0153 | Brøndby | SJ8 | 2 988 m | 0 m |
+| 0155 | Dragør | SJ7;SJ8 | 17 388 m | 0 m |
+| 0157 | Gentofte | SJ7 | 11 327 m | 0 m |
+| 0159 | Gladsaxe | — | 0 m | — |
+| 0161 | Glostrup | — | 0 m | — |
+| 0163 | Herlev | — | 0 m | — |
+| 0165 | Albertslund | — | 0 m | — |
+| 0167 | Hvidovre | SJ8 | 10 279 m | 0 m |
+| 0169 | Høje-Taastrup | — | 0 m | — |
+| 0173 | Lyngby-Taarbæk | SJ7 | 3 645 m | 0 m |
+| 0175 | Rødovre | — | 0 m | — |
+| 0183 | Ishøj | SJ8 | 3 735 m | 0 m |
+| 0185 | Tårnby | SJ7;SJ8 | 90 416 m | 0 m |
+| 0187 | **Vallensbæk** | **SJ8** | **376 m** | **0 m** |
+| 0190 | Furesø | — | 0 m | — |
+| 0230 | Rudersdal | SJ7 | 7 585 m | 0 m |
+
+København → SJ7 ✓ · Hvidovre, Brøndby, Ishøj → SJ8 ✓. **Vallensbæk decided by the 2 km rule:
+coastal.** It has only 376 m of free boundary — under the 1 km threshold the probe used for the
+coastal count — but that boundary sits *on* the SJ8 polygon (0 m). Frederiksberg is the control:
+136 m of free boundary, but the nearest stretch is 3.8 km away, so its sliver is an enclave
+artifact and it stays landlocked. This is why the 2 km rule replaced the length threshold, and why
+this map has 77 coastal kommuner where probe §8 reported 76.
+
+## 3 · `scripts/fetch_fp_claims.py` → `data/raw/fp/`
+
+| chart | version | column | rows | matched |
+|---|---|---|---|---|
+| `TUJ9b` | 4 | `komnavn`, `antal` | 98 | 98 |
+| `z0zEO` | 4 | `komnavn`, `antal skader pr 1000 indbygger` | 98 | 98 |
+
+Names trimmed and normalised with the same convention as `scripts/import_lbf.py` /
+`import_boligstat.py` (NFKC, lower-case, strip a trailing " kommune", then an `ALIASES` map).
+**98 / 98 resolved, no aliases needed beyond the inherited ones.** An unmatched name exits
+non-zero rather than dropping a kommune.
+
+## 4a · `scripts/fetch_flood_official.py --areas`
+
+**26 risk areas**, 1 309.9 km² in total, EPSG:3044 → 4326, joined to DAGI kommune polygons.
+
+> **The designation says 51, an any-touch join says 56.** Five kommuner only clip the edge of
+> Køge Bugt/København or Roskildefjord: **Rødovre 0.05 km², Albertslund 0.06, Høje-Taastrup 0.27,
+> Egedal 0.33, Brøndby 0.71**. Requiring **≥ 1 km² inside a designated area** drops exactly those
+> five and reproduces the official 51. The cut sits in a real gap in the distribution — the next
+> kommune up holds 1.82 km² — so it is not a fitted constant. The five are kept in the file as
+> `kommuner_marginal` and flagged `flood_risk_area = 0`.
+
+Largest areas: Østlig Limfjord 295.9 km², Vestlig Limfjord 259.7, Køge Bugt/København 101.5
+(14 kommuner touched, 10 designated), RandersFjord 87.9, Rømø 82.8.
+
+## 4b · The bulk hazard drop
+
+`scripts/fetch_flood_official.py --bulk` · 3 410 619 711 B, resumable, ~25 min at 2.2 MB/s.
+
+> **The Cerberus `/zip/` route wraps the file in another zip.** The stream that comes down is
+> 3 391 479 270 B — *smaller* than the listing says — because the outer archive deflates the inner
+> zip a little. A byte-count check against the listed size therefore fails on a perfectly good
+> download. The script now unwraps the single entry, checks **that** against 3 410 619 711 B
+> (exact match), and deletes the 3.4 GB wrapper.
+
+Contents — 29 entries, 7.86 GB uncompressed, 13 rasters in `Hav/` and `Vandløb/`:
+
+| raster | size |
+|---|---|
+| `Hav/Oversvømmelsesfare_hav_10000år.tif` | 680.1 MB |
+| `Vandløb/Oversvømmelsesfare_vandløb_100år.tif` | 678.4 MB |
+| `Hav/Oversvømmelsesfare_hav_1000år.tif` | 626.6 MB |
+| … | … |
+| **`Hav/Oversvømmelsesfare_hav_100år.tif`** | **551.8 MB** ← extracted |
+
+Extracted raster, from its own GeoTIFF tags:
+
+| property | value |
+|---|---|
+| size | 90 287 × 70 503 px (6.37 G pixels) |
+| pixel size | 5 m × 5 m |
+| CRS | EPSG:25832 |
+| extent | 441 585 – 893 020 E, 6 049 785 – 6 402 300 N |
+| nodata | −3.40282306073709653e+38 |
+| datatype | float32, LZW (compression 5), **tiled 128 × 128** |
+
+## 5 · `scripts/build_surge_zones.py`
+
+### Reading a 6.4 G-pixel raster with no GDAL
+
+Pillow can only decode this TIFF in one piece — 25 GB of float32. Two facts made it tractable:
+the tile index is in the header, and **371 707 of the 389 006 tiles are the identical all-nodata
+tile, compressing to exactly 875 bytes each**. Skipping every tile of that modal byte count leaves
+**17 299 tiles, 213 MB — the entire flooded extent of Denmark**. Each is decoded by wrapping its
+raw LZW bytes in a minimal one-strip TIFF header and handing that to the same libtiff Pillow
+already links. The whole raster reads in **62 s**.
+
+### Output
+
+`data/processed/climate/surge_today/<kommune>.json` — **80 files** + `index.json`.
+**1 255.2 km² flooded** at the 100-year sea level nationally; 1 196.0 km² after the zones are cut
+to kommune boundaries and cleaned.
+
+> **Two deviations from the brief, both for the size budget.** The brief asked for a 2 m
+> simplification; the source is 5 m max-pooled to 10 m, so every vertex is already a 10 m cell
+> corner and a 2 m tolerance removes nothing — it just stores the staircase, and the folder came
+> to **90.4 MB against a 60 MB budget** with six files over 3 MB. Simplifying at **8 m** (still
+> inside one cell) and filling pinholes under **2 000 m²** — the same problem as the risk areas,
+> a vectorised flood model is riddled with them — brings it to **45.8 MB, no file over 3 MB**, at
+> the cost of **+0.6 % area**. Parts under 200 m² are dropped as specified, coordinates are
+> EPSG:4326 at 6 decimals as specified.
+
+Every climate zone file carries the shared header: `hazard`, `horizon`, `depth_class` (or
+`threshold_mm`), `method`, `source`, `level_cm`, `updated`.
+
+| | |
+|---|---|
+| climate folder | 45.8 MB (limit 60 MB) |
+| largest file | 2.12 MB `surge_today/0760.json` (limit 3 MB) |
+| `risk_areas.json` | 1.24 MB, from 90 MB raw |
+| `index.json` | 113 kB |
+
+Highest Today `surge_dw_pct` (BBR boligtype 1–5, status 6, at the building's coordinate):
+
+| code | kommune | zone km² | dwellings | in the zone | % |
+|---|---|---|---|---|---|
+| 0665 | Lemvig | 39.40 | 13 510 | 1 281 | 9.48 |
+| 0440 | Kerteminde | 19.27 | 14 173 | 954 | 6.73 |
+| 0480 | Nordfyns | 42.00 | 18 170 | 1 083 | 5.96 |
+| 0615 | Horsens | 9.10 | 49 620 | 2 596 | 5.23 |
+| 0250 | Frederikssund | 17.36 | 27 785 | 1 314 | 4.73 |
+| 0482 | Langeland | 22.59 | 11 486 | 538 | 4.68 |
+| 0155 | Dragør | 2.36 | 7 222 | 309 | 4.28 |
+| 0326 | Kalundborg | 34.65 | 34 566 | 1 473 | 4.26 |
+| 0760 | Ringkøbing-Skjern | 103.28 | 40 190 | 1 662 | 4.14 |
+| 0390 | Vordingborg | 39.85 | 30 185 | 1 233 | 4.08 |
+
+## 6 · `config/indicators.json` — group "Climate"
+
+Nine indicators, all `level: kommune`, `direction: lower_better`, `calc: climate`, each with
+`note` and `source`. `horizon: ["today","2050","2100"]` on the seven where it applies;
+`weather_claims_1000` and `flood_risk_area` carry none.
+
+`sealevel_cm` · `surge100_cm` · `surge_freq_x` · `rain100_1h_mm` · `cloudbursts_yr` ·
+`weather_claims_1000` · `flood_risk_area` · `surge_dw_pct` · `cloudburst_dw_pct`
+
+Mapping, as specified: today = scenarie 0 / periode 1 · 2050 = periode 3 · 2100 = periode 4 ·
+sea scenarie 245, rain 45 · percentil 50 · absolutaendring 1. `range` carries p10/p90 at the same
+scenario plus the low/high scenarios (sea 126/585, rain 26/85). Coastal indicators are null for
+landlocked kommuner with `reason: "not coastal"`; nothing computed yet is null with
+`reason: "not computed yet"`. Postal codes and quarters inherit the kommune figure with `°`,
+which they get for free from `level: kommune`.
+
+**All three horizons live in `data/processed/climate/index.json`; `makro.json` carries the Today
+value.** The horizon pill (`hz=`) is app-side work and is deliberately not in this step — no line
+of `src/app.js` has been touched on this branch.
+
+## 7 · Tests — `tests/test_climate.py`, 25 tests, all pass
+
+| check | expected | got |
+|---|---|---|
+| SJ7 historic `Stormfl100Aarsh` | 156.85 | 156.85 ✓ |
+| SJ7 SSP2-4.5 p50 `Middelvandstand` 2050 / 2100 | 24.89 / 39.44 | 24.89 / 39.44 ✓ |
+| SJ7 SSP2-4.5 p50 `Stormfl100Aarsh` 2050 / 2100 | 181.74 / 196.29 | 181.74 / 196.29 ✓ |
+| komkode 101 RCP4.5 p50 `Time100Aarsh` 2050 / 2100 | 51.31 / 52.73 | 51.31 / 52.73 ✓ |
+| F&P rows | 98 | 98 ✓ |
+| risk areas | 26 | 26 ✓ |
+| designated kommuner | 51 | 51 ✓ |
+| coastal stretches | 34 | 34 ✓ |
+
+Plus: the historic baseline is 0 cm and the frequency multiplier is 1; future surge = historic
+surge + sea-level rise (an internal-consistency check on Klimaatlas itself); every registry entry
+has the right group, level, direction, note, source and horizons; landlocked kommuner are null
+with a reason; København takes the MAX of SJ7 and SJ8; Vallensbæk is coastal on SJ8.
+
+`make test` overall: **37 Python tests + 15 JS tests, all pass.**
+
+## 8 · `make validate && make build`
+
+`make validate` → exit 0, **no `✗` lines**. `make build` → exit 0, **no `⚠`**.
+`dist/index.html` 4.4 MB · 99 municipalities · 606 areas · 53 indicators ·
+83 climate files copied to `dist/climate/`.
+`data/processed/cph.json` was again rewritten with a new `fetched` stamp only, and reverted.
+
+### Check table — every Climate indicator, Today / 2050 / 2100
+
+| area | Sea level cm | Surge100 cm | Surge freq × | Rain100 mm/h | Cloudbursts/yr | Claims/1000 | Risk area | Surge dw % | Cloudburst dw % | zone km² | reason |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| København (0101) | 0 / 26.1 / 41.3 | 158.9 / 185 / 200.2 | 1 / 15.4 / 45.9 | 44.5 / 51.3 / 52.7 | 0.33 / 0.42 / 0.42 | 11 | 1 | 0.17 / — / — | — / — / — | 1.921 |  |
+| Frederiksberg (0147) | — / — / — | — / — / — | — / — / — | 44.4 / 51.3 / 52.7 | 0.33 / 0.42 / 0.42 | 19 | 0 | — / — / — | — / — / — | 0 | not coastal |
+| Hvidovre (0167) | 0 / 26.1 / 41.3 | 158.9 / 185 / 200.2 | 1 / 15.4 / 45.9 | 44.4 / 51.4 / 52.1 | 0.33 / 0.42 / 0.42 | 17 | 1 | 1.28 / — / — | — / — / — | 0.638 |  |
+| Brøndby (0153) | 0 / 26.1 / 41.3 | 158.9 / 185 / 200.2 | 1 / 15.4 / 45.9 | 44.1 / 51.3 / 52.4 | 0.33 / 0.42 / 0.42 | 11 | 0 | 0 / — / — | — / — / — | 0.094 |  |
+| Køge (0259) | 0 / 26.1 / 41.3 | 158.9 / 185 / 200.2 | 1 / 15.4 / 45.9 | 44.1 / 52.8 / 53.3 | 0.33 / 0.44 / 0.44 | 24 | 1 | 2.02 / — / — | — / — / — | 3.64 |  |
+| Roskilde (0265) | 0 / 25.4 / 40.3 | 205.9 / 231.3 / 246.2 | 1 / 3.1 / 5.9 | 43.6 / 52.5 / 53.8 | 0.32 / 0.43 / 0.44 | 17 | 1 | 0.66 / — / — | — / — / — | 3.364 |  |
+| Aarhus (0751) | 0 / 25 / 39.9 | 160.9 / 185.9 / 200.8 | 1 / 8.6 / 25.2 | 45 / 53.3 / 56.1 | 0.33 / 0.44 / 0.45 | 19 | 1 | 0.17 / — / — | — / — / — | 2.801 |  |
+| Odense (0461) | 0 / 27.9 / 44.1 | 170.1 / 198 / 214.2 | 1 / 9.1 / 22.8 | 44.6 / 50.3 / 56.3 | 0.33 / 0.4 / 0.48 | 25 | 1 | 0.16 / — / — | — / — / — | 11.548 |  |
+| Esbjerg (0561) | 0 / 31.5 / 49.4 | 488.4 / 519.9 / 537.8 | 1 / 3.9 / 6.7 | 45.8 / 56.3 / 59.2 | 0.33 / 0.47 / 0.49 | 46 | 1 | 0.12 / — / — | — / — / — | 21.924 |  |
+| Vejle (0630) | 0 / 27.7 / 43.7 | 171.1 / 198.8 / 214.8 | 1 / 9.4 / 25.2 | 46 / 56.4 / 58.9 | 0.34 / 0.47 / 0.47 | 24 | 1 | 4.07 / — / — | — / — / — | 5.822 |  |
+| Herning (0657) | — / — / — | — / — / — | — / — / — | 45.7 / 56 / 60.5 | 0.32 / 0.47 / 0.48 | 26 | 0 | — / — / — | — / — / — | 0 | not coastal |
+| **Denmark (mean of kommuner)** | 0.00 / 27.12 / 42.87 | 194.62 / 221.60 / 237.27 | 1.00 / 12.50 / 36.12 | 44.65 / 52.61 / 55.67 | 0.33 / 0.43 / 0.45 | 29.1 | 0.5 | 1.50 / — / — | — / — / — | 1,196.0 | 80 kommuner with a zone |
+
+Reading it: sea level is 0 today by definition and the surge level is what actually matters —
+Esbjerg's 488 cm is the North Sea tide plus surge, against 159 cm in Øresund. The frequency
+multiplier is the sharpest number on the page: **today's 1-in-100-year level would be reached
+about 15 times as often by 2050 and 46 times as often by 2100 in Øresund**. Frederiksberg and
+Herning show the landlocked case — no sea figures at all, but full rain figures. Brøndby is the
+marginal risk-area case: it touches Køge Bugt/København with 0.71 km², under the 1 km² rule, so
+`flood_risk_area = 0` while Køge next door is 1.

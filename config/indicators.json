@@ -1,5 +1,5 @@
 {
- "_doc": "Indicator registry for the Danish makro view. `db` = '' (Statistics Denmark), 's20' (Finans Danmark) or 's30' (Copenhagen). `level` = finest geography the indicator natively exists at. `calc` describes the post-processing in build_makro.py. `hue` = RGB target for the choropleth ramp (paper #EFF2EE → hue). `pull` names a raw file when one table is fetched with several selections. `SUM` = omit the variable so the API returns its total. `TODO:word` = placeholder; validate_config.py lists codes whose label contains the word. `direction` = 'higher_better' | 'lower_better' — which end of the scale is favourable (ranking and good/bad colouring). `note` = glossary text for the indicator's details. `chip` = true puts the indicator in the quick-pick chip row. Rolling-quarter calcs (Safety): `rolling4q_per_1000_pop` = sum of the numerator over the latest 4 quarters ÷ FOLK1A population at the same end quarter × 1000; `rolling4q_per_1000_dwellings` = same sum ÷ BOL101 dwellings of the latest year × 1000; `rolling4q_yoy_pct` = latest 4Q sum vs the 4 quarters before, %. For the yearly history each calendar year is filed as its Q1–Q4 sum (÷ population at Q4); the live value is the rolling 4Q ending at the latest quarter. A `select` value may be a list of codes (rows matching any of them are summed). `history_from` = first year of the yearly history (Charts axis; default: history_years back from the latest year); `map_from` = first year offered by the map/table year selector, and the start of the quarterly rolling series; `breaks` = series breaks drawn in Charts, [{at: '2013K3' | '2023', text}]. `note_short` = the one caveat worth repeating in a map popup (the full `note` stays in the ⓘ details). `calc: infra_index` reads data/processed/infra_index.json (scripts/build_infra.py) instead of a StatBank pull. `calc: public_index` reads data/processed/public_index.json (scripts/build_public.py).",
+ "_doc": "Indicator registry for the Danish makro view. `db` = '' (Statistics Denmark), 's20' (Finans Danmark) or 's30' (Copenhagen). `level` = finest geography the indicator natively exists at. `calc` describes the post-processing in build_makro.py. `hue` = RGB target for the choropleth ramp (paper #EFF2EE → hue). `pull` names a raw file when one table is fetched with several selections. `SUM` = omit the variable so the API returns its total. `TODO:word` = placeholder; validate_config.py lists codes whose label contains the word. `direction` = 'higher_better' | 'lower_better' — which end of the scale is favourable (ranking and good/bad colouring). `note` = glossary text for the indicator's details. `chip` = true puts the indicator in the quick-pick chip row. Rolling-quarter calcs (Safety): `rolling4q_per_1000_pop` = sum of the numerator over the latest 4 quarters ÷ FOLK1A population at the same end quarter × 1000; `rolling4q_per_1000_dwellings` = same sum ÷ BOL101 dwellings of the latest year × 1000; `rolling4q_yoy_pct` = latest 4Q sum vs the 4 quarters before, %. For the yearly history each calendar year is filed as its Q1–Q4 sum (÷ population at Q4); the live value is the rolling 4Q ending at the latest quarter. A `select` value may be a list of codes (rows matching any of them are summed). `history_from` = first year of the yearly history (Charts axis; default: history_years back from the latest year); `map_from` = first year offered by the map/table year selector, and the start of the quarterly rolling series; `breaks` = series breaks drawn in Charts, [{at: '2013K3' | '2023', text}]. `note_short` = the one caveat worth repeating in a map popup (the full `note` stays in the ⓘ details). `calc: infra_index` reads data/processed/infra_index.json (scripts/build_infra.py) instead of a StatBank pull. `calc: public_index` reads data/processed/public_index.json (scripts/build_public.py). `calc: climate` reads data/processed/climate/index.json (scripts/build_climate.py) instead of a StatBank pull; `horizon` lists the time horizons the indicator carries there (the makro build surfaces `today`).",
  "indicators": [
   {
    "key": "growth",
@@ -2100,6 +2100,275 @@
    ],
    "calc": "schools",
    "source": "Uddannelsesstatistik.dk (STIL) — GS cubes KARA/KARAGNS (grades), OVER/OVERSKO (socioøkonomisk reference, klassekvotient), TRIV/TRIVIND (trivsel), ELEV/ELEVEX (elevtal); STIL institutionsregister for location and type. Kilde: Uddannelsesstatistik.dk — see docs/SCHOOLS.md"
+  },
+  {
+   "key": "sealevel_cm",
+   "label": "Mean sea level rise",
+   "short": "Sea level",
+   "unit": "cm",
+   "desc": "Rise in mean sea level off the kommune's coast against the 1981–2010 baseline.",
+   "level": "kommune",
+   "hue": [
+    24,
+    86,
+    132
+   ],
+   "group": "Climate",
+   "direction": "lower_better",
+   "horizon": [
+    "today",
+    "2050",
+    "2100"
+   ],
+   "sources": [
+    {
+     "db": "climate",
+     "table": "climate_index",
+     "geo": "kommune"
+    }
+   ],
+   "calc": "climate",
+   "fmt": "int",
+   "source": "DMI Klimaatlas v2025a (services9.arcgis.com/qH1Ysxh3VVYXbkQU) — percentile 50, absolute change; Today = observed baseline (scenarie 0, periode 1), 2050 = periode 3, 2100 = periode 4; sea scenario SSP2-4.5 per coastal stretch, mapped to kommuner via data/external/klimaatlas_coast_kommune.csv (max across stretches) · Middelvandstand",
+   "note": "Today is the baseline by definition, so it reads 0 cm; the indicator only says something at 2050 and 2100. Klimaatlas publishes this per coastal stretch, not per kommune. A kommune that touches more than one stretch takes the highest of them — the conservative reading. Landlocked kommuner have no value at all, not a zero. Postal codes and quarters show their kommune's figure (°)."
+  },
+  {
+   "key": "surge100_cm",
+   "label": "100-year storm surge",
+   "short": "Surge 100 yr",
+   "unit": "cm above normal",
+   "desc": "Water level of the 100-year storm surge — the level exceeded on average once a century.",
+   "level": "kommune",
+   "hue": [
+    16,
+    64,
+    120
+   ],
+   "group": "Climate",
+   "direction": "lower_better",
+   "horizon": [
+    "today",
+    "2050",
+    "2100"
+   ],
+   "sources": [
+    {
+     "db": "climate",
+     "table": "climate_index",
+     "geo": "kommune"
+    }
+   ],
+   "calc": "climate",
+   "fmt": "int",
+   "source": "DMI Klimaatlas v2025a (services9.arcgis.com/qH1Ysxh3VVYXbkQU) — percentile 50, absolute change; Today = observed baseline (scenarie 0, periode 1), 2050 = periode 3, 2100 = periode 4; sea scenario SSP2-4.5 per coastal stretch, mapped to kommuner via data/external/klimaatlas_coast_kommune.csv (max across stretches) · Stormfl100Aarsh",
+   "note": "The level itself, not the depth on land: how far above normal water the sea reaches in a 1-in-100-year event. Klimaatlas publishes this per coastal stretch, not per kommune. A kommune that touches more than one stretch takes the highest of them — the conservative reading. Landlocked kommuner have no value at all, not a zero. Postal codes and quarters show their kommune's figure (°)."
+  },
+  {
+   "key": "surge_freq_x",
+   "label": "Storm surge frequency multiplier",
+   "short": "Surge × more often",
+   "unit": "× today",
+   "desc": "How many times more often today's 100-year surge level is reached.",
+   "level": "kommune",
+   "hue": [
+    120,
+    48,
+    96
+   ],
+   "group": "Climate",
+   "direction": "lower_better",
+   "horizon": [
+    "today",
+    "2050",
+    "2100"
+   ],
+   "sources": [
+    {
+     "db": "climate",
+     "table": "climate_index",
+     "geo": "kommune"
+    }
+   ],
+   "calc": "climate",
+   "fmt": "idx",
+   "source": "DMI Klimaatlas v2025a (services9.arcgis.com/qH1Ysxh3VVYXbkQU) — percentile 50, absolute change; Today = observed baseline (scenarie 0, periode 1), 2050 = periode 3, 2100 = periode 4; sea scenario SSP2-4.5 per coastal stretch, mapped to kommuner via data/external/klimaatlas_coast_kommune.csv (max across stretches) · StormflNuvaerende100Aarsh",
+   "note": "Today is 1 by definition. A value of 8 at 2050 means the level that is a 1-in-100-year event now would be reached roughly eight times as often. Klimaatlas publishes this per coastal stretch, not per kommune. A kommune that touches more than one stretch takes the highest of them — the conservative reading. Landlocked kommuner have no value at all, not a zero. Postal codes and quarters show their kommune's figure (°)."
+  },
+  {
+   "key": "rain100_1h_mm",
+   "label": "100-year hourly rainfall",
+   "short": "Rain 100 yr",
+   "unit": "mm / hour",
+   "desc": "Rainfall in the most intense hour of a 1-in-100-year event.",
+   "level": "kommune",
+   "hue": [
+    40,
+    96,
+    152
+   ],
+   "group": "Climate",
+   "direction": "lower_better",
+   "horizon": [
+    "today",
+    "2050",
+    "2100"
+   ],
+   "sources": [
+    {
+     "db": "climate",
+     "table": "climate_index",
+     "geo": "kommune"
+    }
+   ],
+   "calc": "climate",
+   "fmt": "int",
+   "source": "DMI Klimaatlas v2025a (services9.arcgis.com/qH1Ysxh3VVYXbkQU) — percentile 50, absolute change; Today = observed baseline (scenarie 0, periode 1), 2050 = periode 3, 2100 = periode 4; rain scenario RCP4.5, published per kommune · Time100Aarsh",
+   "note": "Published per kommune, so every kommune has a value, coastal or not. This is the cloudburst design figure drainage is sized against."
+  },
+  {
+   "key": "cloudbursts_yr",
+   "label": "Cloudbursts per year",
+   "short": "Cloudbursts",
+   "unit": "events / yr",
+   "desc": "Expected number of cloudbursts a year (over 15 mm in 30 minutes).",
+   "level": "kommune",
+   "hue": [
+    64,
+    104,
+    160
+   ],
+   "group": "Climate",
+   "direction": "lower_better",
+   "horizon": [
+    "today",
+    "2050",
+    "2100"
+   ],
+   "sources": [
+    {
+     "db": "climate",
+     "table": "climate_index",
+     "geo": "kommune"
+    }
+   ],
+   "calc": "climate",
+   "fmt": "dec2",
+   "source": "DMI Klimaatlas v2025a (services9.arcgis.com/qH1Ysxh3VVYXbkQU) — percentile 50, absolute change; Today = observed baseline (scenarie 0, periode 1), 2050 = periode 3, 2100 = periode 4; rain scenario RCP4.5, published per kommune · Skybrud",
+   "note": "A cloudburst is DMI's definition: more than 15 mm of rain in 30 minutes. Fractions are normal — 0.33 a year is one cloudburst every three years."
+  },
+  {
+   "key": "weather_claims_1000",
+   "label": "Weather damage claims",
+   "short": "Claims",
+   "unit": "claims / 1 000 inhabitants",
+   "desc": "Insurance claims for weather damage per 1 000 inhabitants, 2023–2025.",
+   "level": "kommune",
+   "hue": [
+    132,
+    72,
+    48
+   ],
+   "group": "Climate",
+   "direction": "lower_better",
+   "sources": [
+    {
+     "db": "climate",
+     "table": "climate_index",
+     "geo": "kommune"
+    }
+   ],
+   "calc": "climate",
+   "fmt": "int",
+   "source": "Forsikring & Pension, weather-damage claims per kommune 2023–2025 (datawrapper.dwcdn.net/TUJ9b, /z0zEO)",
+   "note": "Realised damage, not modelled risk — what was actually claimed and paid. It reflects what is insured and what people report, so a kommune with more insured property will tend to show more claims."
+  },
+  {
+   "key": "flood_risk_area",
+   "label": "In a designated flood risk area",
+   "short": "Risk area",
+   "unit": "yes / no",
+   "desc": "Whether part of the kommune lies in a risk area designated under the EU Floods Directive.",
+   "level": "kommune",
+   "hue": [
+    140,
+    56,
+    56
+   ],
+   "group": "Climate",
+   "direction": "lower_better",
+   "sources": [
+    {
+     "db": "climate",
+     "table": "climate_index",
+     "geo": "kommune"
+    }
+   ],
+   "calc": "climate",
+   "fmt": "int",
+   "source": "Miljøstyrelsen OD_risikoomraader_2024 (gisportal.mst.dk), joined to DAGI kommune boundaries",
+   "note": "The 26 risk areas designated for the 2022–2027 cycle (plantrin 1, published 2024). A kommune counts when it holds at least 1 km² of an area; five kommuner that only clip an edge are excluded, which reproduces the designation's own count of 51."
+  },
+  {
+   "key": "surge_dw_pct",
+   "label": "Dwellings in the surge zone",
+   "short": "Dwellings at surge risk",
+   "unit": "% of dwellings",
+   "desc": "Share of the kommune's dwellings inside the Today 100-year storm-surge zone.",
+   "level": "kommune",
+   "hue": [
+    20,
+    72,
+    128
+   ],
+   "group": "Climate",
+   "direction": "lower_better",
+   "horizon": [
+    "today",
+    "2050",
+    "2100"
+   ],
+   "sources": [
+    {
+     "db": "climate",
+     "table": "climate_index",
+     "geo": "kommune"
+    }
+   ],
+   "calc": "climate",
+   "fmt": "pct1",
+   "source": "Miljøstyrelsen OD_fare_2024 sea 100-year depth raster × BBR via Datafordeler",
+   "note": "BBR dwellings (boligtype 1–5, status 6) whose building point falls inside the modelled 100-year sea flood extent. Today only for now; the 2050 and 2100 horizons are declared and filled once the future-horizon rasters are processed."
+  },
+  {
+   "key": "cloudburst_dw_pct",
+   "label": "Dwellings in the cloudburst zone",
+   "short": "Dwellings at rain risk",
+   "unit": "% of dwellings",
+   "desc": "Share of the kommune's dwellings inside the modelled cloudburst flooding zone.",
+   "level": "kommune",
+   "hue": [
+    48,
+    88,
+    144
+   ],
+   "group": "Climate",
+   "direction": "lower_better",
+   "horizon": [
+    "today",
+    "2050",
+    "2100"
+   ],
+   "sources": [
+    {
+     "db": "climate",
+     "table": "climate_index",
+     "geo": "kommune"
+    }
+   ],
+   "calc": "climate",
+   "fmt": "pct1",
+   "source": "DHM/Bluespot_ekstremregn (Datafordeler) × BBR — pending credentials",
+   "note": "Declared but not computed yet: it needs the DHM bluespot raster, which is behind a Datafordeler login the repo does not currently hold (docs/CLIMATE_PROBE.md §5–6)."
   }
  ],
  "macro": [

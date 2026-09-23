@@ -16,34 +16,41 @@ What every source the v2.5 climate layer would read answers today, measured by `
 | name | HTTP | seconds | bytes | note |
 |---|---|---|---|---|
 | 1a MST risk MapServer | 200 | 0.11 | 17,757 | 42 layers |
-| 1b risk layer 33 (4326) | 200 | 4.16 | 11,381,076 | 1 features |
-| 1c risk layer 33 (25832) | 200 | 1.09 | 4,877,985 | 101.53 km² |
-| 2a MST hazard MapServer | 200 | 0.10 | 5,093 | 15 layers |
-| 2b hazard layer 21 | 200 | 0.17 | 2,241 | Hav_Fare_100år |
-| 2b2 layer 21 metadata XML | 200 | 0.20 | 5,655 | H100_DK_KOR.tif |
-| 2c hazard /exportImage | 400 | 0.11 | 655 | 400 Error: Invalid URL ArcGIS REST Framework |
-| 2c hazard /export | 200 | 0.17 | 2,133 | PNG RGBA uint8 — rendered, not raw |
-| 2d hazard /identify | 200 | 0.10 | 156 | {'Classify.Pixel Value': '1.612748', 'Classify.Cla |
-| 3a MST bulk folder page | 200 | 0.20 | 7,105 | Cerberus Web Client · csrftoken yes |
-| 3b bulk get_dir (listing) | 200 | 0.09 | 2,387 | 8 entries |
+| 1b risk layer 33 (4326) | 200 | 7.87 | 11,381,076 | 1 features |
+| 1c risk layer 33 (25832) | 200 | 1.25 | 4,877,985 | 101.53 km² |
+| 2a MST hazard MapServer | 200 | 0.11 | 5,093 | 15 layers |
+| 2b hazard layer 21 | 200 | 0.15 | 2,241 | Hav_Fare_100år |
+| 2b2 layer 21 metadata XML | 200 | 0.13 | 5,655 | H100_DK_KOR.tif |
+| 2c hazard /exportImage | 400 | 0.10 | 655 | 400 Error: Invalid URL ArcGIS REST Framework |
+| 2c hazard /export | 200 | 0.12 | 2,133 | PNG RGBA uint8 — rendered, not raw |
+| 2d hazard /identify | 200 | 0.14 | 156 | {'Classify.Pixel Value': '1.612748', 'Classify.Cla |
+| 3a MST bulk folder page | 200 | 0.10 | 7,105 | Cerberus Web Client · csrftoken yes |
+| 3b bulk get_dir (listing) | 200 | 0.10 | 2,387 | 8 entries |
 | 3c bulk zip/Farveskala.zip | 206 | 0.03 | 2,048 | real ZIP bytes |
-| 4a Klimaatlas coast service | 200 | 0.41 | 3,290 | 2 layers / 0 tables |
-| 4b coast SJ7 p50 | 200 | 0.24 | 12,051 | 16 rows |
-| 4c precip kom 101 p50 | 200 | 0.20 | 15,404 | 10 rows |
-| 4d distinct kystkode | 200 | 0.21 | 1,525 | 34 stretches |
-| 5a DHM WCS GetCapabilities | 401 | 0.17 | 0 | NO API KEY in .env |
-| 6 Datafordeler selfservice | 200 | 0.11 | 2,134 | selfservice.datafordeler.dk |
-| 6 Datafordeler API root | 401 | 0.11 | 0 | api.datafordeler.dk |
-| 6 Datafordeler DHM Fildownload (Raster)  | 200 | 0.12 | 34,237 | datafordeler.dk |
+| 4a Klimaatlas coast service | 200 | 0.34 | 3,290 | 2 layers / 0 tables |
+| 4b coast SJ7 p50 | 200 | 0.27 | 12,051 | 16 rows |
+| 4c precip kom 101 p50 | 200 | 0.35 | 15,404 | 10 rows |
+| 4d distinct kystkode | 200 | 0.56 | 1,525 | 34 stretches |
+| 5a DHM WCS GetCapabilities | 401 | 0.13 | 0 | NO API KEY in .env |
+| 6 Datafordeler selfservice | 200 | 0.18 | 2,134 | selfservice.datafordeler.dk |
+| 6 Datafordeler API root | 401 | 1.13 | 0 | api.datafordeler.dk |
+| 6 Datafordeler DHM Fildownload (Raster)  | 200 | 0.17 | 34,237 | datafordeler.dk |
 | 6 Dataforsyningen download (legacy) | ERR | 0.00 | 0 | host does not resolve |
-| 6 Dataforsyningen FTP (legacy) | ERR | 0.02 | 0 | connection refused / no route |
+| 6 Dataforsyningen FTP (legacy) | ERR | 0.03 | 0 | connection refused / no route |
 | 6 Kortforsyningen FTP (legacy) | ERR | 0.00 | 0 | host does not resolve |
-| 6 Dataforsyningen API (legacy) | 404 | 0.16 | 604 | api.dataforsyningen.dk |
-| 7a F&P TUJ9b index | 200 | 0.26 | 239 | follow to latest version |
-| 7b F&P TUJ9b dataset.csv | 200 | 0.07 | 1,566 | v4 · 98 data rows |
-| 7a F&P z0zEO index | 200 | 0.07 | 239 | follow to latest version |
+| 6 Dataforsyningen API (legacy) | 404 | 0.11 | 604 | api.dataforsyningen.dk |
+| 7a F&P TUJ9b index | 200 | 0.10 | 239 | follow to latest version |
+| 7b F&P TUJ9b dataset.csv | 200 | 0.11 | 1,566 | v4 · 98 data rows |
+| 7a F&P z0zEO index | 200 | 0.26 | 239 | follow to latest version |
 | 7b F&P z0zEO dataset.csv | 200 | 0.09 | 1,433 | v4 · 98 data rows |
-| 8 coastal kommuner (local) | — | 2.53 | 0 | 76/99 coastal |
+| 8 coastal kommuner (local) | — | 2.61 | 0 | 76/99 coastal |
+| 9a KDI Kystplanlægger service | 200 | 0.10 | 8,533 | 27 layers · Map,Query,Data |
+| 9b KDI extent polygons | 200 | 0.15 | 12 | 42 polygons |
+| 9c KDI polygons as geojson | 200 | 4.38 | 7,897,845 | 5 feats, 7.9 MB |
+| 9d KDI depth as tiff | 200 | 0.30 | 1,326 | PNG — rendered |
+| 9e identify Copenhagen Sydhavn | 200 | — | — | NoData / NoData / NoData |
+| 9e identify Hvidovre Avedøre H | 200 | — | — | NoData / NoData / NoData |
+| 9e identify Køge harbour | 200 | — | — | 0.122646 / 0.371910 / 0.964475 |
 
 ## Expected values
 
@@ -342,4 +349,64 @@ Of the 19 metro kommuner (`scripts/fetch_bbr.py: METRO`), **9 are coastal**; lan
 Borderline (under 4 km of free boundary — check these by eye before using the flag as a filter): Frederiksberg 0.1 km, Vallensbæk 0.4 km, Brøndby 3.0 km, Lyngby-Taarbæk 3.6 km, Ishøj 3.7 km.
 
 Longest coastlines: Vordingborg 360 km, Guldborgsund 306 km, Lolland 294 km, Thisted 245 km, Sønderborg 245 km, Ringkøbing-Skjern 223 km, Aalborg 212 km, Slagelse 204 km, Skive 194 km, Morsø 187 km
+
+## 9 · Kystdirektoratet Kystplanlægger — flood hazard at 2020 / 2070 / 2120
+
+`Kystplanlaegger_Oversvommelsesfare_2` · **27 layers** · capabilities `Map,Query,Data` · full extent EPSG:25832 441,000–894,000 E, 6,049,000–6,403,000 N
+
+Three horizon groups × four return periods × two representations:
+
+| horizon | return period | extent polygon (Feature Layer) | depth raster (Raster Layer) |
+|---|---|---|---|
+| 2020 | 50 yr | 1 | 2 |
+| 2020 | 100 yr | 3 | 4 |
+| 2020 | 1.000 yr | 5 | 6 |
+| 2020 | 10.000 yr | 7 | 8 |
+| 2070 | 50 yr | 10 | 11 |
+| 2070 | 100 yr | 12 | 13 |
+| 2070 | 1.000 yr | 14 | 15 |
+| 2070 | 10.000 yr | 16 | 17 |
+| 2120 | 50 yr | 19 | 20 |
+| 2120 | 100 yr | 21 | 22 |
+| 2120 | 1.000 yr | 23 | 24 |
+| 2120 | 10.000 yr | 25 | 26 |
+
+### Coverage — national, not a few stretches
+
+The 2020 · 100-year extent layer holds **42 polygons** spanning 441,503–893,022 E and 6,049,784–6,402,264 N in EPSG:25832 — the full width and height of Denmark, unlike `OD_fare_2024`, which only covers the designated flood-directive risk areas. Rendered coverage at six points, as the painted share of a 2 × 2 km box:
+
+| point | KDI 2020 | KDI 2070 | KDI 2120 | MST OD 100 yr |
+|---|---|---|---|---|
+| Copenhagen Sydhavn | 51.4 % | 78.8 % | 85.5 % | 1.9 % |
+| Hvidovre Avedøre Holme | 33.1 % | 39.2 % | 43.8 % | 0.0 % |
+| Køge harbour | 43.0 % | 59.4 % | 67.2 % | 8.8 % |
+| Esbjerg | 36.2 % | 45.8 % | 47.4 % | 15.4 % |
+| Aalborg | 30.5 % | 38.4 % | 49.2 % | 7.9 % |
+| Aarhus | 38.3 % | 50.1 % | 59.9 % | 1.7 % |
+
+### Raster or vector, and what can be downloaded
+
+* **Extent polygons are downloadable.** `capabilities` includes `Data`, so `/3/query?f=geojson&outSR=4326` returns real geometry — 5 features came back as 7.9 MB, so all 42 polygons are a large but fetchable pull, paginated with `resultOffset`. Attributes are geometry bookkeeping only (`OBJECTID`, `Id`, `Shape_Leng`, `InPoly_FID`, `SimPgnFlag`, `MaxSimpTol`) — **no depth, no water level, no scenario field**: the horizon and return period live in the *layer*, not in the data.
+* **Depth rasters are not downloadable here.** Same MapServer limit as `OD_fare_2024`: `format=tiff&pixelType=F32` comes back as PNG. There is no ImageServer, WCS or bulk/ZIP route on this server; the only per-pixel read is `/identify`, one point per request.
+* Sibling services in the same folder (`Kystplanlaegger_*`, 13 of them, plus 15 `KDI_*`) carry the same 2020/2070/2120 structure for damage and strategy: `Kystplanlaegger_Oversvommelsesskade`, `Kystplanlaegger_Erosionsfare`, `Kystplanlaegger_Erosionsskade`, `Kystplanlaegger_Oversvommesesrisiko`, `Kystplanlaegger_Strategiforslag`.
+
+### Stated climate basis
+
+> Viser oversvømmesesfare og oversvømmelsesdybde i 2020, 2070 og 2120 for en 100, 1.000 og 10.000 års hændelse.
+
+> *Shows flood hazard and flood depth in 2020, 2070 and 2120 for a 100-, 1 000- and 10 000-year event.*
+
+That is the whole of it: the service names **three horizons — 2020, 2070 and 2120 — and states no scenario, no percentile and no sea-level-rise figure**. It does not say which RCP/SSP pathway the 2070 and 2120 layers assume, so the rise is baked in and unlabelled. Klimaatlas (§4), by contrast, publishes the rise itself with an explicit `scenarie` and `percentil` — which is why the indicators should be built on Klimaatlas and this service kept as the map-side illustration.
+
+### `/identify` depth, 100-year event (metres; the service formats in da-DK)
+
+| point | KDI 2020 | KDI 2070 | KDI 2120 | MST OD 100 yr | nearest painted KDI-2020 cell |
+|---|---|---|---|---|---|
+| Copenhagen Sydhavn (55.65, 12.545) | NoData | NoData | NoData | NoData | 0.187538 m at 156 m |
+| Hvidovre Avedøre Holme (55.625, 12.46) | NoData | NoData | NoData | NoData | 0.431653 m at 663 m |
+| Køge harbour (55.455, 12.195) | 0.122646 | 0.371910 | 0.964475 | NoData | 0.378921 m at 1,020 m |
+
+`NoData` is a real answer — the cell is dry at that return period, not missing. Køge harbour shows the horizon effect cleanly, and the nearest-painted-cell column shows how sharp the edge is: a point can be dry while a cell 150 m away carries 0.2 m. **A point-in-raster read is therefore not a safe property score on its own** — a small ring around the pin has to be sampled. `OD_fare_2024` is `NoData` at all three, which is the coverage difference above, not a contradiction.
+
+**Not built on yet** — this section is reconnaissance for a later step.
 
