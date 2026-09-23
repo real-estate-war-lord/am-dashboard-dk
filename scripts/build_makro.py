@@ -335,6 +335,68 @@ def infra_index():
     return _INFRA_IDX or None
 
 
+_FORECAST = None
+_NET_DWELL = None
+
+
+def forecast_doc():
+    """data/processed/forecast.json from scripts/build_forecast.py, or None."""
+    global _FORECAST
+    if _FORECAST is None:
+        p = ROOT / "data" / "processed" / "forecast.json"
+        _FORECAST = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
+    return _FORECAST or None
+
+
+_FORECAST_VALS = None
+
+
+def forecast_values():
+    """{kommune: {fc_*: value}} — the Outlook arithmetic, computed once.
+
+    indicators() is imported from scripts/build_forecast.py rather than reimplemented,
+    so a municipal figure and a Copenhagen one cannot drift apart in how they are
+    derived (docs/FORECAST.md §3, §8)."""
+    global _FORECAST_VALS
+    if _FORECAST_VALS is None:
+        doc = forecast_doc()
+        if not doc:
+            _FORECAST_VALS = {}
+        else:
+            sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+            from build_forecast import indicators as fc_indicators  # noqa: PLC0415
+            _FORECAST_VALS = fc_indicators(doc)
+    return _FORECAST_VALS
+
+
+def net_dwellings():
+    """data/processed/net_dwellings.json from scripts/build_net_dwellings.py, or None."""
+    global _NET_DWELL
+    if _NET_DWELL is None:
+        p = ROOT / "data" / "processed" / "net_dwellings.json"
+        _NET_DWELL = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
+    return _NET_DWELL or None
+
+
+def proj_mid(meta, offset=5):
+    """The 5-year mark of a projection window. forecast.json records first_year and
+    last_year; the mid year is first_year + the same offset indicators() uses."""
+    return meta.get("mid_year") or str(int(meta["first_year"]) + offset)
+
+
+def proj_end(meta, key):
+    return proj_mid(meta) if key in FIVE_YEAR_KEYS else meta["last_year"]
+
+
+def proj_period(doc, key):
+    """The one line the year selector shows for an Outlook indicator."""
+    m = doc["meta"]
+    return f"Projection {m['first_year']}\u2192{proj_end(m, key)} \u00b7 DST {m['vintage']}"
+
+
+FIVE_YEAR_KEYS = {"fc_growth_5y", "fc_pop_rate_5y"}
+
+
 def public_index():
     """data/processed/public_index.json from scripts/build_public.py, or None."""
     global _PUBLIC_IDX
@@ -411,6 +473,23 @@ def compute(ind, year=None):
         per = f"BBR {b['meta']['built']}"
         return {"kommune": ({k: v.get(ind["key"]) for k, v in b["kommune"].items()}, per),
                 "postnr": ({k: v.get(ind["key"]) for k, v in b["postnr"].items()}, per)}
+    if calc == "forecast":
+        doc = forecast_doc()
+        if year or not doc:
+            return {}   # one vintage, not a per-year history — same rule as `bbr`
+        vals = forecast_values()
+        per = proj_period(doc, ind["key"])
+        return {"kommune": ({k: v.get(ind["key"]) for k, v in vals.items()
+                             if v.get(ind["key"]) is not None}, per)}
+    if calc == "net_dwellings":
+        nd = net_dwellings()
+        if year or not nd:
+            return {}   # measured snapshot over one window, no history
+        m = nd["meta"]
+        per = m.get("label_years") or f"{m.get('year_start','')}\u2013{m.get('year_end','')}"
+        fld = ind["field"]
+        return {"kommune": ({k: v.get(fld) for k, v in nd["kommuner"].items()
+                             if v.get(fld) is not None}, per)}
     if calc == "public_index":
         return calc_public_index(ind, year)
     if calc == "infra_index":
@@ -475,6 +554,24 @@ def main():
         code = muni_code(r[col])
         if r["TID"] == p and code.isdigit() and int(code) >= 101 and all(r[k] in TOTAL_CODES for k in dims(r) if k != col):
             munis[code] = {"code": code, "name": geo_names.get(code) or names.get(r[col], code), "region": geo_region.get(code, ""), "pop": r["INDHOLD"], "asof": {"pop": p}}
+    # Population by year, actual and projected, for the area-page chart. The actual series is
+    # FOLK1A's own Q1 cell per year; the projection is forecast.json's `total`, DST's published
+    # ALDER=TOT. They are two different series and the chart draws them as such — solid to the
+    # last observed year, dashed after it (docs/FORECAST.md §5.6). Never spliced into one line.
+    for r in folk:
+        code = muni_code(r[col])
+        if code not in munis or not str(r["TID"]).endswith("K1"):
+            continue
+        if not all(r[k] in TOTAL_CODES for k in dims(r) if k != col):
+            continue
+        munis[code].setdefault("pop_hist", {})[str(r["TID"])[:4]] = r["INDHOLD"]
+    fcd = forecast_doc()
+    if fcd:
+        for code, series in fcd["kommuner"].items():
+            if code in munis:
+                munis[code]["fc_pop"] = {y: v["total"] for y, v in series.items()}
+                munis[code]["fc_groups"] = {y: {g: v[g] for g in fcd["meta"]["groups"] if g in v}
+                                            for y, v in series.items()}
     # postal-code areas from geometry
     areas = {}
     pn_geo = load_geo("postnumre")
@@ -591,12 +688,20 @@ def main():
                     for a in areas.values():
                         if (a.get("pop") or 0) < MIN_POP_GROWTH:
                             a.pop("growth", None)
-        indicators_out.append({k: ind[k] for k in ("key", "label", "short", "unit", "level", "hue", "group", "direction", "note", "note_short", "chip") if k in ind} |
+        indicators_out.append({k: ind[k] for k in ("key", "label", "short", "unit", "level", "hue", "group", "direction", "note", "note_short", "chip",
+                                                   "scale", "center", "hue_pos", "hue_neg", "field") if k in ind} |
                               {"fmt": ind.get("fmt", "pct1"), "desc": ind.get("desc", ""), "source": ind.get("source", ""),
                                "warn": ind.get("warn", ""), "table_only": ind.get("table_only", False), "asof": asof,
                                "hist_asof": hist_asof,
                                "tables": list(dict.fromkeys(f"{s.get('db') or 'dst'}/{s['table']}" for s in ind["sources"] if s.get("db", "") in ("", "s20", "s30")))} |
                               {k: ind[k] for k in ("history_from", "map_from", "breaks") if k in ind})
+        # the Outlook layer is one vintage, so the year selector shows its window instead of a year list
+        if ind["calc"] == "forecast" and forecast_doc():
+            fm = forecast_doc()["meta"]
+            indicators_out[-1]["proj"] = {"from": fm["first_year"], "to": proj_end(fm, ind["key"]),
+                                          "vintage": str(fm["vintage"]), "publisher": "DST", "table": fm["table"]}
+        if ind["calc"] == "net_dwellings" and net_dwellings():
+            indicators_out[-1]["window"] = net_dwellings()["meta"].get("label_years", "")
         # quarterly rolling series (municipalities + Denmark), from `map_from` Q1; one array per indicator aligned to q_periods
         if ind["calc"].startswith("rolling4q"):
             ser = rolling4q_series(ind, f"{ind.get('map_from', years[0])}K1")
@@ -619,7 +724,7 @@ def main():
     for ind in c["indicators"]:
         for s in ind["sources"]:
             key = (s.get("db", ""), s.get("table", ""))
-            if key in seen or s.get("db") in ("boligstat", "lbf", "bbr", "infra", "public", "schools"):
+            if key in seen or s.get("db") in ("boligstat", "lbf", "bbr", "infra", "public", "schools", "forecast", "net_dwellings"):
                 continue
             seen.add(key)
             m = meta(*key)
@@ -629,6 +734,26 @@ def main():
     if bbr:
         sources.append({"key": "bbr", "label": f"BBR via Datafordeler — housing stock ({len(bbr['meta']['municipalities'])} municipalities, {bbr['meta']['dwellings']:,} dwellings)".replace(",", " "),
                         "tables": "BBR_Enhed, BBR_Bygning (GraphQL v3)", "asof": bbr["meta"]["built"], "url": "https://datafordeler.dk/dataoversigt/bygnings-og-boligregistret-bbr/bbr-graphql/", "licence": "free (Klimadatastyrelsen)"})
+    fc = forecast_doc()
+    if fc:
+        fm = fc["meta"]
+        sources.append({"key": "forecast",
+                        "label": f"Danmarks Statistik {fm['table']} / {fm['national_table']} \u2014 municipal population projection, {fm['vintage']} vintage",
+                        "tables": f"{fm['table']} (per municipality, by age) \u00b7 {fm['national_table']} (national control total) \u00b7 projection {fm['first_year']}\u2013{fm['last_year']}",
+                        "asof": fm.get("updated", "")[:10], "fetched": fm.get("fetched", ""),
+                        "url": f"https://api.statbank.dk/v1/tableinfo/{fm['table']}",
+                        "licence": fm.get("licence", "free reuse with attribution")})
+    nd = net_dwellings()
+    if nd:
+        nm = nd["meta"]
+        tabs = nm.get("tables") or {}
+        asof = max([(t or {}).get("updated", "")[:10] for t in tabs.values()] or [""]) if isinstance(tabs, dict) else ""
+        sources.append({"key": "net_dwellings",
+                        "label": f"Danmarks Statistik BOL101 + FOLK1A \u2014 net dwelling additions {nm.get('label_years','')}",
+                        "tables": f"BOL101 (dwelling stock, 1 January {nm.get('label_years','').replace('\u2013', ' and ')}) \u00b7 FOLK1A (population, {nm.get('pop_period','')})",
+                        "asof": asof, "fetched": nm.get("fetched", ""),
+                        "url": "https://api.statbank.dk/v1/tableinfo/BOL101",
+                        "licence": nm.get("licence", "free reuse with attribution")})
     px = public_index()
     if px:
         sources.append({"key": "public", "label": f"Public buildings — BBR via Datafordeler (pilot: {', '.join(px['kommuner'])})",

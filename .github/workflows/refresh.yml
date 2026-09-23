@@ -24,7 +24,20 @@ jobs:
       - name: Refresh school quality (skipped when UDDSTAT_API_KEY is unset)
         if: ${{ env.UDDSTAT_API_KEY != '' }}
         run: python scripts/fetch_uddstat.py --schools && python scripts/build_schools.py
+      # Population outlook: DST's municipal projection, Københavns Kommune's district projection,
+      # and the measured net dwelling additions. Each is a fresh pull; the backtest depends on KK
+      # continuing to serve superseded vintages, so it is allowed to fail without failing the run.
+      # scripts/build_housing_gap.py is deliberately absent — it needs a fitted household-size
+      # trend, which the hard-data rule forbids in the UI (docs/FORECAST.md §0, §7).
+      - name: Refresh the population outlook
+        run: |
+          python scripts/build_forecast.py
+          python scripts/build_net_dwellings.py
+          python scripts/build_cph_forecast.py
+          python scripts/build_cph_backtest.py || echo "backtest skipped (superseded KK vintages unavailable)"
       - run: python scripts/build_makro.py && python scripts/build_market.py && (python scripts/build_cph.py || true)
+      - name: Validate the outlook layer
+        run: python scripts/validate_forecast.py
       - name: Commit processed data
         run: |
           git config user.name "github-actions"; git config user.email "actions@github.com"

@@ -269,9 +269,16 @@ def audit(doc: dict) -> list[str]:
       · a key the registry expects from indicators() that indicators() does not return
     """
     fails = []
-    reg = json.loads(CFG.read_text(encoding="utf-8")).get("forecast", {}).get("indicators", [])
+    cfg = json.loads(CFG.read_text(encoding="utf-8"))
+    # Phase A staged these under a top-level `forecast` key so build_makro.py would not choke on
+    # the unknown calc; Phase B moved them into indicators[] (Outlook) and Housing stock. Read
+    # whichever exists, so the audit follows the entries instead of a location.
+    staged = cfg.get("forecast", {}).get("indicators", [])
+    live = [i for i in cfg.get("indicators", []) if i.get("calc") in ("forecast", "net_dwellings")]
+    reg = staged or live
+    where = "`forecast` key (Phase A staging)" if staged else "indicators[] (Outlook + Housing stock)"
     keys = [i["key"] for i in reg]
-    print(f"0. registry audit — config/indicators.json `forecast` key, "
+    print(f"0. registry audit — config/indicators.json {where}, "
           f"{len(keys)} indicators, hard-data rule\n")
     w = max((len(k) for k in set(keys) | set(AUDIT)), default=14)
     for k in keys:
@@ -700,6 +707,15 @@ def ui_inventory() -> None:
           f"{', '.join(excluded)} (§9)")
 
 
+# Keys that pass the hard-data rule but are excluded on judgement (docs/FORECAST.md §9.7) plus
+# everything from the housing gap (§7). None of these may be registered, built into makro.json /
+# cph.json, or rendered — validate() asserts the first, and the release sweep asserts the rest.
+RESEARCH_ONLY = {"fc_netmig_5y", "fc_netmig_5y_per1000", "fc_netmig", "fc_netmig_per1000",
+                 "fc_netmig_gap", "fc_netmig_gap_per1000", "fc_netmig_reconciles",
+                 "bt_mape", "bt_bias", "bt_medape", "bt_mae", "bt_baseline_mape", "bt_n",
+                 "fc_hh_gap", "fc_hh_gap_rel", "fc_hh_gap_per1000"}
+
+
 def audit_cph(registry_keys: list[str]) -> list[str]:
     """Check 0b — the Copenhagen-only keys, which are audited but stay out of the registry.
 
@@ -723,7 +739,10 @@ def audit_cph(registry_keys: list[str]) -> list[str]:
             print(f"   · {k:<{w}}  {table:<19}  {arith.splitlines()[0][:52]}   "
                   f"(file not built, skipped)")
             continue
-        ok = k in have and not assumption and k not in registry_keys
+        # Phase B registers the ten shared fc_* keys under the `cph` key on purpose (§8 note 1);
+        # what must never appear anywhere in the registry are the research-only keys.
+        leaked = k in registry_keys and k in RESEARCH_ONLY
+        ok = k in have and not assumption and not leaked
         mark = "✓" if ok else "✗"
         print(f"   {mark} {'UI' if ui else '  '} {k:<{w}}  {table:<19}  {arith}")
         if assumption:
@@ -732,9 +751,9 @@ def audit_cph(registry_keys: list[str]) -> list[str]:
         if k not in have:
             print(f"     {'':<{w}}  ✗ not produced in {tag}")
             fails.append("registry audit")
-        if k in registry_keys:
-            print(f"     {'':<{w}}  ✗ has leaked into config/indicators.json — Copenhagen-"
-                  f"only keys stay out of the registry in Phase A")
+        if leaked:
+            print(f"     {'':<{w}}  ✗ has leaked into config/indicators.json — this key is "
+                  f"research only and must never be registered, built or rendered")
             fails.append("registry audit")
     for tag, path in (("cph", CPH), ("backtest", CBT)):
         have = produced[tag]

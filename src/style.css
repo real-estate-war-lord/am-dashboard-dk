@@ -1469,6 +1469,30 @@ th .thn{display:inline}
 /* every category stays listed, so an off one needs a way back: greyed, struck through, hollow swatch */
 .maplegend .lgrow.gk.allhidden{color:var(--ink);margin-top:5px;white-space:normal;line-height:1.35}
 .maplegend .lgrow.gk.allhidden .only{margin-left:0;padding-left:0;color:var(--ink);text-decoration:underline}
+/* ---- Population outlook (docs/FORECAST.md) ---- */
+/* a projection is labelled as one everywhere it appears */
+.tag.proj{border-color:#5A3C96;color:#5A3C96}
+.projwin{font-family:var(--mono);font-size:10.5px;color:var(--ink2);background:var(--panel2);
+  border:1px solid var(--line);border-radius:7px;padding:5px 10px;white-space:nowrap;align-self:center}
+.projmark{font-size:9px;fill:var(--muted);letter-spacing:.06em}
+.olline{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;margin-top:5px;
+  font-family:var(--mono);font-size:10.5px;color:var(--ink2)}
+.olline b{font-size:12px}
+.olline em{font-style:normal;margin-left:auto;font-size:9px;letter-spacing:.06em;text-transform:uppercase}
+.olboth{margin-top:6px;border-top:1px solid var(--line2);padding-top:5px}
+.olboth .olrow{display:flex;justify-content:space-between;gap:10px;font-family:var(--mono);font-size:10.5px;padding:1px 0}
+.olboth .olsrc{font-weight:600}
+.olages{margin-top:10px}
+/* the centre of a diverging legend is a boundary, not just another class edge */
+.maplegend .lgrow.lgmid{position:relative}
+.maplegend .lgrow.lgmid i{box-shadow:0 0 0 1px var(--ink2)}
+.maplegend .lgctr{font-style:normal;margin-left:auto;font-family:var(--mono);font-size:8.5px;color:var(--muted)}
+/* the outlook tiles sit in a row like the headline row, not in a stacked column */
+.card.outlook .hl{margin-top:10px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:0}
+@media (max-width:1250px){.card.outlook .hl{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:820px){.card.outlook .hl{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.card.outlook .hl .hlc{border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.card.outlook .olages .mstrip-k{margin-top:4px}
 /* ---- Services overlay (docs/SERVICES.md) ---- */
 .maplegend.serviceslegend{min-width:180px;pointer-events:auto}
 /* the category rows are the filter, same interaction as the public-buildings legend */
