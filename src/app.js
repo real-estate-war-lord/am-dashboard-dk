@@ -2593,7 +2593,9 @@ function srvLegendHtml() {
      reader who switched Bus on at zoom 13 sees nothing and is told nothing. */
   const hints = Object.entries(SRV_CAT).filter(([k]) => srvCatOn(k) && z < srvCatZoom(k))
     .map(([, c]) => c.label)
-    .concat(Object.entries(SRV_TGROUP)
+    /* …but only once: below Transport's own floor the category is already named, and
+       adding "rail & metro stops, bus stops" after it just says the same thing twice */
+    .concat(z < srvCatZoom("transport") ? [] : Object.entries(SRV_TGROUP)
       .filter(([g, t]) => SF.cats.has("transport") && SF.tmodes.has(g) && z < t.zoom)
       .map(([, t]) => t.label + " stops"));
   return `<div class="lgtitle">Services<span>OSM &amp; Rejseplanen ${esc((SRV && SRV.asof) || "")}

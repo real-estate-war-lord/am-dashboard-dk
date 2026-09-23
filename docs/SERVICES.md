@@ -1,6 +1,7 @@
 # Services layer — groceries, food, pharmacies, transport stops
 
-**Status:** v2.x · pipeline **and** map overlay · national coverage
+**Status:** **frozen on `v2.x-services`, ready to integrate** · pipeline **and** map overlay · national coverage
+**Scope:** points only. There are deliberately **no area-level service indicators** (§10).
 **Scripts:** `scripts/fetch_services.py` → `scripts/build_services.py`
 **Output:** `data/processed/services/<kommune>.json` (committed) + `index.json`
 **Counts:** [`SERVICES_COUNTS.md`](SERVICES_COUNTS.md) · **why these sources:** [`SERVICES_PROBE.md`](SERVICES_PROBE.md)
@@ -226,6 +227,22 @@ third-party runtime dependency for a problem the zoom floors already solve. If t
 floors are ever loosened, revisit that: the legend already reports the drawn count and
 says *at the drawing ceiling* past `SRV_MAX_MARKERS`.
 
+### Rendering and the map pane
+
+The layer draws into **its own Leaflet pane, `srvpane`, at `z-index: 450`** — above the
+choropleth polygons (`overlayPane`, 400) and below the labels and popups
+(`markerPane`, 600).
+
+That pane is not cosmetic. Leaflet creates a canvas renderer's element when the
+renderer is constructed, and `LF.canvas` is built at map init, *before* the area
+polygons exist. On the default pane the services canvas therefore ends up underneath
+them, and the choropleth's semi-transparent fill washes every dot out — visibly grey
+over a dark quintile and correct just off it, which is how the bug was found. Both the
+canvas dots and the SVG station circles are pinned to `srvpane`.
+
+**Any other overlay that adds a pane must pick a different z-index** — see
+[`INTEGRATION_services.md`](INTEGRATION_services.md).
+
 ### Loading
 
 Per-kommune files are fetched **only for municipalities whose `index.json` bbox meets
@@ -240,11 +257,23 @@ Both licences appear wherever the points do: each popup carries its own source l
 the map footer gains a **Services:** line while the layer is on, and Market › Sources
 has a *Services layer* table listing both sources with their licences.
 
-## 9. Caveats to repeat wherever these numbers are shown
+## 9. Known limitations
 
-- **OSM completeness is not uniform.** Copenhagen is densely mapped; rural Jutland is
-  thinner. Zero groceries in a rural postal code may mean "none mapped", not "none".
-  This is the layer's biggest weakness and it is not measurable from inside the data.
+Repeat these wherever the layer's numbers are shown.
+
+- **OSM completeness is not uniform, and the data cannot tell you where it is thin.**
+  Copenhagen is densely mapped; rural Jutland is not. Zero groceries in a rural postal
+  code may mean *none mapped*, not *none there*. This is the layer's biggest weakness,
+  it is not measurable from inside the dataset, and it is the main reason §10 rules out
+  area-level indicators for now.
+- **The GTFS feed has no station hierarchy, so the clustering is ours, not the
+  source's.** All 36 383 stops carry `location_type=0` and an empty `parent_station`.
+  Grouping platforms into stations is our rule (§5), not a published structure — a
+  different rule would give different station counts, and the merge is only as good as
+  the stop names Rejseplanen happens to use.
+- **Flextur (`route_type` 715, 3 077 stops) and ferry (`4`, 30 stops) are excluded.**
+  Flextur is demand-responsive — not a stop you can walk to and wait at. Ferry simply
+  was not one of the modes asked for; one line in `ROUTE_TYPE` brings it back.
 - **A stop is not a service level.** The layer says a bus stops here, not how often.
   `stop_times` has the frequencies if that is ever wanted.
 - **212 points were dropped** for falling outside every Danish municipality polygon —
@@ -254,3 +283,21 @@ has a *Services layer* table listing both sources with their licences.
   places a resident walks into. See [`SERVICES_PROBE.md`](SERVICES_PROBE.md) §5.
 - **Overpass is deliberately not used at runtime.** It returned confident wrong zeros
   during the probe. Everything here comes from a versioned file, not a live API.
+
+## 10. Scope, and what is deliberately not here
+
+**Points only.** The layer draws and lists individual places. There are **no area-level
+service indicators** — no "supermarkets per 1 000 inhabitants" in the indicator
+registry, no PUBLIC-style line on the area card, nothing in the choropleth. That is a
+decision, not an omission: OSM density varies enough between Copenhagen and rural
+Jutland (§9) that a per-area rate would rank mapping effort as much as it ranks
+service provision, and the caveat would have to be louder than the number.
+
+The per-kommune files and `index.json` counts are nevertheless already shaped for it,
+so the decision is reversible without a refetch.
+
+**The Analysis sheet can use this as it stands.** `data/processed/services/<kommune>.json`
+plus `index.json`'s bboxes are exactly what a *Nearby services* section on
+`#analysis?a=<lat>,<lon>` would read — the same per-kommune fetch and the same
+`featDistM`/`anKomsNear` helpers the public-buildings and schools cards already use
+([`ANALYSIS.md`](ANALYSIS.md) §4). Nothing in this branch builds that section.

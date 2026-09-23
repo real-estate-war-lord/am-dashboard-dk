@@ -49,6 +49,12 @@ Paste a Google Maps link — or a plain `55.67610, 12.56830` — into the box on
 
 ![Analysis sheet — a test property in 2450 København SV with the infra and public-building overlays on the mini map](docs/screenshot-analysis.jpg)
 
+### Services — shops, food, pharmacies and transport stops
+
+*On branch `v2.x-services`, not yet merged.* A third map overlay beside *Infra projects* and *Public buildings*: **44 181 points across all 99 municipalities** — groceries, restaurants/cafés/bars/takeaway, pharmacies, and every metro, S-train, rail, light-rail and bus stop in the national timetable. Shops and eating places come from the **Geofabrik OpenStreetMap extract** (nodes *and* building polygons — 46 % of Danish supermarkets are mapped as a polygon, so a node-only read loses half of them); stops come from **Rejseplanen's static GTFS**, with the modes resolved through `stops → stop_times → trips → routes` because `stops.txt` does not carry them, and platforms clustered into stations by name and mode because the feed ships no station hierarchy at all. The legend doubles as the filter — Groceries · Food & drink · Pharmacy · Transport, the last split into *Rail & metro* and *Bus* — and the filter travels in the URL. Performance is the shape of the thing: each category has a zoom floor (rail & metro from 10, groceries and pharmacies from 13, food and buses from 14) with a *"Zoom in to see …"* hint below it, only the viewport is drawn, and per-municipality files load only for bounding boxes actually in view. Worst case measured — zoom 14 over Nørrebro with every category on — is 3 346 markers rebuilt in 15.6 ms, so there is no clustering library and no CDN dependency. **Coverage is national, but OpenStreetMap density is not uniform: an empty rural postal code may mean "nothing mapped", not "nothing there"**, which is why there are no area-level service indicators. Method, licences and caveats: [`docs/SERVICES.md`](docs/SERVICES.md); how the sources were chosen: [`docs/SERVICES_PROBE.md`](docs/SERVICES_PROBE.md).
+
+![Services overlay — Nørrebro at zoom 15 with groceries, food & drink, pharmacies and transport stops over the growth choropleth](docs/screenshot-services.jpg)
+
 ## Data sources (all free, no key unless noted)
 
 | layer | source | tables |
@@ -99,6 +105,7 @@ Every push to `main` rebuilds and deploys to GitHub Pages; on the 3rd of each mo
 | [`docs/BUILD_PLAN.md`](docs/BUILD_PLAN.md) | phases done and the roadmap |
 | [`docs/SCHOOLS.md`](docs/SCHOOLS.md) | school quality — cube codes, the BBR join, discretion rules, cadence |
 | [`docs/ANALYSIS.md`](docs/ANALYSIS.md) | the test-property pin and the Analysis sheet — link formats, kommune resolution, distances, coverage, privacy |
+| [`docs/SERVICES.md`](docs/SERVICES.md) | the services layer — sources, categories, zoom floors, clustering rules, refresh |
 | [`docs/GEO.md`](docs/GEO.md) | boundary pipeline |
 | [`CHANGELOG.md`](CHANGELOG.md) | what changed in which version |
 
@@ -117,6 +124,7 @@ The UI is a port of a Finnish asset-management dashboard's market section: same 
 - Copenhagen quarters (kvarterer) use Københavns Kommune's own statbank (`s30`); unemployment there exists only per district (bydel) and is repeated on each quarter of the district.
 - Copenhagen quarter crime and safety figures come from the city's own annual survey (police figures for the previous calendar year), so they are not comparable with the national crime indicators.
 - The public-buildings layer covers the Copenhagen metro set only, and BBR is owner-reported: floor area, use and status are as reported, not as surveyed. An open building case is not a construction schedule.
+- The services layer is as complete as OpenStreetMap is in that place, and that varies: Copenhagen is densely mapped, rural Jutland is not. Transport stops are the live timetable, so a stop is where you can catch something, not how often.
 - The Analysis sheet's distances are to mapped geometry, not walking routes, and its infra list is the curated layer — an existing station that is not a project in it will not appear. Short `maps.app.goo.gl` links cannot be resolved in a browser; paste the long URL.
 - The infrastructure layer is a curated list, not a register: it holds the projects named in `docs/INFRA.md` and nothing else, and ten of its geometries are schematic corridors drawn by hand.
 - Crime figures are reported offences by place of offence, per municipality only; they exclude the traffic law, break in 2007 and on 1 July 2013 (sexual offences), and DST writes suppressed cells as 0, so a zero on a small island may be suppressed.
@@ -124,5 +132,10 @@ The UI is a port of a Finnish asset-management dashboard's market section: same 
 ## Licence and attribution
 
 Code: MIT. Data: each source's own terms (all permit reuse with attribution). When you reuse the data or the map, credit: *Danmarks Statistik (incl. crime statistics STRAF11/STRAF22) · Indeholder data fra Klimadatastyrelsen (BBR, DAR) · Københavns Kommune, Tryghedsundersøgelsen / Københavns Politi · Plan- og Landdistriktsstyrelsen (Fingerplan 2019) · Transportministeriet (Anlægsstatus) · the regions, Movia and Bygningsstyrelsen for their own projects · © OpenStreetMap contributors (ODbL) · Finans Danmark, Boligmarkedsstatistikken · Social- og Boligstyrelsen, boligstat.dk · Landsbyggefonden · Indeholder data fra Klimadatastyrelsen (DAGI) · Danmarks Nationalbank · Kilde: Uddannelsesstatistik.dk (Børne- og Undervisningsministeriet / STIL), retrieved 2026-09-23 · Institutionsregisteret, STIL.*
+
+The services layer adds two of its own, carried on every popup, in the map footer while the layer is on, and in Market › Sources:
+
+- **© OpenStreetMap contributors, ODbL** — shops, eating places and pharmacies (Denmark extract processed by Geofabrik GmbH)
+- **Rejseplanen, CC BY 4.0** — metro, S-train, rail, light-rail and bus stops
 
 To cite: *AM Dashboard — Denmark Edition, v1.0 (2026), https://github.com/real-estate-war-lord/am-dashboard-dk.*
