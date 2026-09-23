@@ -364,7 +364,7 @@ split into their own per-kommune file.
 ## 9. Reproducing
 
 ```bash
-python3 -m pip install requests osmium          # neither is currently a project dependency
+python3 -m pip install -r requirements-services.txt        # osmium (+ shapely)
 python3 scripts/probe_services.py --only geofabrik --pbf   # 495 MB download, 87 s scan
 python3 scripts/probe_services.py --only gtfs,smiley       # 55 MB + 60 MB
 python3 scripts/probe_services.py --only overpass          # flaky, see §2
@@ -374,7 +374,13 @@ python3 scripts/probe_services.py --only cross             # the §6 comparisons
 Downloads land in `data/raw/probe/` (gitignored) and are reused on a second run. The
 merged findings are written to `data/raw/probe/probe_results.json`.
 
-**`requests` is not used anywhere else in this repository** — every other script uses
-stdlib `urllib.request`. If any of this graduates into the pipeline it should be ported
-to `urllib`, or `requests` added as a declared dependency, rather than leaving one script
-that silently needs a package the CI does not install.
+The probe originally used `requests`; it has since been ported to stdlib
+`urllib.request` like every other script here, so the only extra dependency is `osmium`
+for the `--pbf` scan.
+
+## 10. What was built from this
+
+The layer itself: [`SERVICES.md`](SERVICES.md), with the resulting counts in
+[`SERVICES_COUNTS.md`](SERVICES_COUNTS.md). The recommendations in §7 were followed as
+written — OSM extract for groceries/food/pharmacies, GTFS for stops, national coverage —
+and the build reproduces this document's kommune 101 grocery figure of 513 exactly.

@@ -23,6 +23,7 @@ Usage
   python3 scripts/probe_services.py --pbf                # + download & scan the Geofabrik extract
 
 Downloads are cached under data/raw/probe/ (gitignored) so a re-run is cheap.
+Stdlib only apart from osmium (requirements-services.txt) for the --pbf scan.
 """
 import argparse
 import collections
@@ -33,10 +34,11 @@ import pathlib
 import re
 import sys
 import time
+import urllib.error
+import urllib.parse
+import urllib.request
 import xml.etree.ElementTree as ET
 import zipfile
-
-import requests
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 CACHE = ROOT / "data" / "raw" / "probe"
@@ -98,16 +100,49 @@ def log(*a):
     print(*a, flush=True)
 
 
+class HTTPError(Exception):
+    """A non-2xx response, carrying the status so callers can branch on it."""
+
+    def __init__(self, status, body=b""):
+        super().__init__(f"HTTP {status}")
+        self.status = status
+        self.body = body
+
+
+def http(url, data=None, timeout=180, method=None):
+    """GET, or POST when `data` is a dict of form fields. Returns bytes.
+
+    stdlib urllib, like every other script in this repository — the probe used
+    `requests` while it was throwaway; nothing here needs it.
+    """
+    body = urllib.parse.urlencode(data).encode() if data else None
+    req = urllib.request.Request(url, data=body, headers=UA,
+                                 method=method or ("POST" if body else "GET"))
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return r.read(), r.status, dict(r.headers)
+    except urllib.error.HTTPError as e:
+        raise HTTPError(e.code, e.read()[:2000]) from None
+
+
+def http_head(url, timeout=60):
+    """HEAD, following redirects, returning the headers."""
+    req = urllib.request.Request(url, headers=UA, method="HEAD")
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            return r.status, dict(r.headers)
+    except urllib.error.HTTPError as e:
+        return e.code, dict(e.headers or {})
+
+
 def fetch(url, dest=None, timeout=180):
     """GET with a local cache, so a re-run does not re-download 60 MB."""
     if dest is not None and dest.exists() and dest.stat().st_size > 0:
         log(f"  · cached {dest.name} ({dest.stat().st_size/1e6:.1f} MB)")
         return dest.read_bytes()
     t0 = time.time()
-    r = requests.get(url, headers=UA, timeout=timeout)
-    r.raise_for_status()
-    body = r.content
-    log(f"  · {url.split('/')[2]} {r.status_code} {len(body)/1e6:.1f} MB in {time.time()-t0:.1f}s")
+    body, status, _ = http(url, timeout=timeout)
+    log(f"  · {url.split('/')[2]} {status} {len(body)/1e6:.1f} MB in {time.time()-t0:.1f}s")
     if dest is not None:
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_bytes(body)
@@ -116,12 +151,13 @@ def fetch(url, dest=None, timeout=180):
 
 def head(url):
     """Size and last-modified without downloading."""
-    r = requests.head(url, headers=UA, timeout=60, allow_redirects=True)
-    return {"status": r.status_code,
-            "bytes": int(r.headers.get("content-length") or 0),
-            "content_type": r.headers.get("content-type", ""),
-            "last_modified": r.headers.get("last-modified", ""),
-            "needs_auth": r.status_code in (401, 403)}
+    status, h = http_head(url)
+    h = {k.lower(): v for k, v in h.items()}
+    return {"status": status,
+            "bytes": int(h.get("content-length") or 0),
+            "content_type": h.get("content-type", ""),
+            "last_modified": h.get("last-modified", ""),
+            "needs_auth": status in (401, 403)}
 
 
 # ---------------------------------------------------------------- a. Overpass
@@ -149,13 +185,15 @@ def overpass(query, label="", want=None, rounds=3, timeout=60):
             host = url.split("/")[2]
             try:
                 t0 = time.time()
-                r = requests.post(url, data={"data": query}, headers=UA, timeout=timeout)
-                if r.status_code in (429, 502, 503, 504):
-                    last = f"{host} → HTTP {r.status_code}"
-                    log(f"  · {label}: {last}")
-                    continue
-                r.raise_for_status()
-                js = r.json()
+                try:
+                    raw, _, _ = http(url, data={"data": query}, timeout=timeout)
+                except HTTPError as he:
+                    if he.status in (429, 502, 503, 504):
+                        last = f"{host} → HTTP {he.status}"
+                        log(f"  · {label}: {last}")
+                        continue
+                    raise
+                js = json.loads(raw)
                 if want is not None and not want(js):
                     last = (f"{host} → 200 but no usable result "
                             f"({len(js.get('elements', []))} elements)")
@@ -224,10 +262,10 @@ def confirm_zero(query, key, value, first_mirror):
     for url in others:
         host = url.split("/")[2]
         try:
-            r = requests.post(url, data={"data": query}, headers=UA, timeout=60)
-            if r.status_code != 200:
+            raw, status, _ = http(url, data={"data": query}, timeout=60)
+            if status != 200:
                 continue
-            js = r.json()
+            js = json.loads(raw)
             counts = [int(e["tags"]["total"]) for e in js.get("elements", [])
                       if e.get("type") == "count"]
             if len(counts) < 2:
@@ -339,12 +377,14 @@ def scan_pbf(pbf=None):
     if not dest.exists():
         log("  · downloading the Denmark extract (~495 MB)…")
         t0 = time.time()
-        with requests.get(GEOFABRIK_PBF, headers=UA, timeout=2400, stream=True) as r:
-            r.raise_for_status()
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            with open(dest, "wb") as fh:
-                for chunk in r.iter_content(1 << 20):
-                    fh.write(chunk)
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        req = urllib.request.Request(GEOFABRIK_PBF, headers=UA)
+        with urllib.request.urlopen(req, timeout=2400) as r, open(dest, "wb") as fh:
+            while True:
+                chunk = r.read(1 << 20)
+                if not chunk:
+                    break
+                fh.write(chunk)
         log(f"  · downloaded {dest.stat().st_size/1e6:.0f} MB in {time.time()-t0:.0f}s")
 
     wanted = {(k, v) for _, k, v in TAGS}

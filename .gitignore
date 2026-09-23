@@ -29,3 +29,4 @@ dist/geo
 
 # services-layer probe downloads (never committed)
 data/raw/probe/
+data/raw/services/
