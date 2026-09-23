@@ -135,21 +135,32 @@ def national_pct(kom: dict, field: str, y0: str, y1: str) -> float | None:
     return None if not a else (b - a) / a * 100
 
 
-def indicators(doc: dict, mid_offset: int = 5) -> dict[str, dict[str, float | int | None]]:
-    """Outlook values per kommune: {code: {"fc_growth": %, ..., "fc_abs": persons}}.
+def indicators(doc: dict, mid_offset: int = 5,
+               ref: dict | None = None) -> dict[str, dict[str, float | int | None]]:
+    """Outlook values per area: {code: {"fc_growth": %, ..., "fc_abs": persons}}.
 
     Every percentage is the change from the vintage year to the last year of the window,
     except fc_growth_5y and fc_pop_rate_5y, which stop `mid_offset` years in. fc_abs and
-    fc_20_34_abs are persons, not rates; fc_20_34_rel is percentage points against Denmark;
-    fc_pop_rate_5y is persons per 1 000 inhabitants per year, the unit that makes the
-    projection directly readable beside the measured building pace (hist_net_dwell).
+    fc_20_34_abs are persons, not rates; fc_20_34_rel is percentage points against the
+    baseline; fc_pop_rate_5y is persons per 1 000 inhabitants per year, the unit that makes
+    the projection directly readable beside the measured building pace (hist_net_dwell).
+
+    `ref` is the series fc_20_34_rel is measured against — {year: {field: n}}. Left None it
+    is Σ of the areas in `doc`, which is the right baseline when they partition the whole:
+    the 98 kommuner *are* Denmark. build_cph_forecast.py passes the KK city series instead,
+    because its 93 OMRKK codes are four nested levels of one city and summing them would
+    count every resident four times.
     """
     kom, meta = doc["kommuner"], doc["meta"]
     y0, y1 = meta["first_year"], meta["last_year"]
     ymid = str(int(y0) + mid_offset)
-    # Denmark's 20–34 cohort shrinks in this vintage, so the absolute fc_20_34 map is
-    # almost uniformly negative and unreadable. fc_20_34_rel re-centres it on Denmark.
-    nat_20_34 = national_pct(kom, "a20_34", y0, y1)
+    # The 20–34 cohort shrinks almost everywhere in this vintage, so the absolute fc_20_34
+    # map is nearly uniformly negative and unreadable. fc_20_34_rel re-centres it.
+    if ref is None:
+        nat_20_34 = national_pct(kom, "a20_34", y0, y1)
+    else:
+        a, b = ref[y0]["a20_34"], ref[y1]["a20_34"]
+        nat_20_34 = None if not a else (b - a) / a * 100
     out = {}
     for code, series in kom.items():
         def raw(field, end):

@@ -55,12 +55,14 @@ import urllib.request
 
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
 from build_forecast import indicators, national_pct  # noqa: E402
+from statbank_common import latest_raw, period_key  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 CFG = ROOT / "config" / "indicators.json"
 SRC = ROOT / "data" / "processed" / "forecast.json"
 NET = ROOT / "data" / "processed" / "net_dwellings.json"
 GAP = ROOT / "data" / "processed" / "housing_gap.json"
+CPH = ROOT / "data" / "processed" / "cph_forecast.json"
 HOUSING_RAW = ROOT / "data" / "raw" / "forecast" / "housing"
 FORECAST_RAW = ROOT / "data" / "raw" / "forecast" / "dst"
 API = "https://api.statbank.dk/v1"
@@ -102,6 +104,17 @@ AUDIT = {
 # indicators() returns these and only these; hist_net_dwell comes from the other build.
 FROM_FORECAST_JSON = {k for k in AUDIT if k.startswith("fc_")}
 FROM_NET_DWELLINGS = {"hist_net_dwell"}
+
+# ---- check 9: how far the Copenhagen levels may miss the city total ----------------
+# KK rounds every published cell independently, so a sum of N of them drifts from the
+# published total by a few persons and the drift grows with N. Measured on the 2026
+# vintage: Σ 68 kvarterer is within 5 of the city in the worst year (2038), Σ 11 bydele
+# within 2, and Σ kvarterer of one bydel within 2. The tolerances are set just above
+# those, not at them, so ordinary rounding does not fail the check — and far below the
+# smallest kvarter (Metropolzonen, 2 882 people in 2026), so a dropped or misparented
+# area still cannot hide inside the slack. Raise these only with a note saying why.
+TOL_CITY = 10       # Σ all kvarterer (68 cells) vs the published city total
+TOL_BYDEL = 5       # Σ the kvarterer of one bydel (≤10 cells) vs that bydel's own value
 
 
 def folk1a_latest() -> tuple[str, dict[str, int]]:
@@ -215,6 +228,138 @@ def audit(doc: dict) -> list[str]:
     if not fails:
         print(f"\n   ✓ {len(keys)} of {len(keys)} indicators are published figures or plain "
               f"arithmetic on them — 0 assumptions")
+    return fails
+
+
+def kkbef1_latest() -> tuple[str, dict[str, int]]:
+    """Observed population per OMRKK district at the newest KKBEF1 period.
+
+    93 districts × 1 period with every other variable eliminated — a trivial request, so it
+    is pulled live rather than depending on a cached selection. Falls back to the repo's own
+    `KKBEF1_pop` pull when one is on disk, which makes the check work offline.
+    """
+    cached = latest_raw("s30", "KKBEF1", "KKBEF1_pop")
+    if cached:
+        rs = read_csv(cached)
+        period = max((r["TID"] for r in rs), key=period_key)
+        return period, {r["OMRKK"]: int(r["INDHOLD"]) for r in rs if r["TID"] == period}
+    info = json.load(urllib.request.urlopen(urllib.request.Request(
+        f"{API}/s30/tableinfo/KKBEF1?lang=en&format=JSON", headers=UA), timeout=120))
+    period = [v for v in info["variables"] if v["id"] == "Tid"][-1]["values"][-1]["id"]
+    body = {"table": "KKBEF1", "format": "CSV", "delimiter": "Semicolon", "lang": "en",
+            "valuePresentation": "Code",
+            "variables": [{"code": "OMRKK", "values": ["*"]}, {"code": "Tid", "values": [period]}]}
+    req = urllib.request.Request(f"{API}/s30/data", data=json.dumps(body).encode("utf-8"),
+                                 headers=UA, method="POST")
+    text = urllib.request.urlopen(req, timeout=300).read().decode("utf-8-sig")
+    return period, {r["OMRKK"]: int(r["INDHOLD"])
+                    for r in csv.DictReader(io.StringIO(text), delimiter=";")}
+
+
+def copenhagen(kom: dict, years: list[str], dst_table: str, top: int) -> list[str]:
+    """Check 9 — the Copenhagen kvarter forecast (KK KKFR).
+
+    Four parts. The first three are identities that must hold inside KK's own run and are
+    hard failures; the last two are cross-source comparisons that are *information*, because
+    a difference there is a real difference between two published runs, not a bug:
+
+      a. coverage        67 kvarterer × every year, nothing missing
+      b. additivity      Σ kvarterer (with the unallocated bucket) = the city total, ±2
+      c. additivity      Σ kvarterer of each bydel = that bydel's own value, ±2 — which also
+                         proves the kvarter → lokaludvalg → bydel mapping, since a wrong
+                         parent would move people between bydele
+      d. base year       KKFR's first year vs the newest observed KKBEF1, per kvarter
+      e. 🚫 KK vs DST    the city total against DST's kommune 101, per year — the splicing
+                         rule (docs/FORECAST.md §4) made numeric
+    """
+    if not CPH.exists():
+        print(f"\n9. Copenhagen kvarter forecast — {CPH.relative_to(ROOT)} not built, "
+              f"skipped (run scripts/build_cph_forecast.py)")
+        return []
+    fails = []
+    c = json.loads(CPH.read_text(encoding="utf-8"))
+    cmeta, area, names = c["meta"], c["omrkk"], c["short_names"]
+    cy, city = cmeta["years"], cmeta["relative_baseline"]
+    unalloc = cmeta["unallocated"]
+    kvart = cmeta["levels"]["kvarter"]
+    bydele = cmeta["levels"]["bydel"]
+    drawn = [k for k in kvart if k != unalloc["kvarter"]]
+    print(f"\n9. Copenhagen kvarter forecast — {cmeta['db']}/{cmeta['table']} vintage "
+          f"{cmeta['vintage']} (updated {cmeta['updated']}) · {cy[0]}–{cy[-1]}")
+
+    # ---- a. coverage ----
+    holes = [(k, y) for k in kvart for y in cy
+             if any(area.get(k, {}).get(y, {}).get(f) is None for f in FIELDS)]
+    ok = len(drawn) == 67 and len(cy) == 15 and not holes
+    print(f"   {'✓' if ok else '✗'} {len(drawn)} kvarterer (+{len(kvart) - len(drawn)} "
+          f"unallocated) × {len(cy)} years, {len(holes)} missing")
+    if not ok:
+        print(f"     expected 67 × 15; {holes[:3]}")
+        fails.append("cph coverage")
+
+    # ---- b & c. the levels have to re-sum ----
+    def worst_gap(codes, want):
+        return max(((abs(sum(area[k][y]["total"] for k in codes) - want(y)), y) for y in cy),
+                   default=(0, cy[0]))
+
+    gap, gy = worst_gap(kvart, lambda y: area[city][y]["total"])
+    ok = gap <= TOL_CITY
+    print(f"   {'✓' if ok else '✗'} Σ kvarterer (incl. the unallocated bucket) = the city "
+          f"total — worst {gap} persons ({gy}), tolerance ±{TOL_CITY}")
+    if not ok:
+        fails.append("cph additivity")
+    gap, gy = worst_gap(cmeta["levels"]["lokaludvalg"], lambda y: area[city][y]["total"])
+    ok = gap <= TOL_CITY
+    print(f"   {'✓' if ok else '✗'} Σ lokaludvalg = the city total — worst {gap} persons "
+          f"({gy}), tolerance ±{TOL_CITY}")
+    if not ok:
+        fails.append("cph additivity")
+    bad_bydel, worst_b = [], 0
+    for b in bydele:
+        kids = [k for k in kvart if cmeta["hierarchy"].get(k, {}).get("bydel") == b]
+        gap = max((abs(sum(area[k][y]["total"] for k in kids) - area[b][y]["total"])
+                   for y in cy), default=10 ** 9)
+        worst_b = max(worst_b, gap if kids else 0)
+        if gap > TOL_BYDEL or not kids:
+            bad_bydel.append((b, names.get(b, ""), gap, len(kids)))
+    print(f"   {'✓' if not bad_bydel else '✗'} Σ kvarterer of each bydel = that bydel, "
+          f"{len(bydele) - len(bad_bydel)}/{len(bydele)} within ±{TOL_BYDEL} (worst "
+          f"{worst_b}) — this is also what proves the kvarter → lokaludvalg → bydel mapping")
+    if bad_bydel:
+        for b, nm, w, n_ in bad_bydel:
+            print(f"     ✗ {b} {nm}: off by {w:,} over {n_} kvarterer".replace(",", " "))
+        fails.append("cph additivity")
+
+    # ---- d. the base year against the observed population ----
+    print(f"   base year {cy[0]} vs the newest observed KKBEF1 — {top if top < 6 else 5} "
+          f"largest deviations (information only)")
+    try:
+        period, actual = kkbef1_latest()
+    except Exception as e:  # noqa: BLE001
+        print(f"     ⚠ could not read KKBEF1: {e}")
+    else:
+        rows_ = [(abs((area[k][cy[0]]["total"] - actual[k]) / actual[k] * 100), k)
+                 for k in drawn if actual.get(k)]
+        print(f"     observed period {period}; KKFR's base is 1 January {cy[0]}, so part of "
+              f"each gap is real change since then")
+        for _, k in sorted(rows_, reverse=True)[:5]:
+            p_, a_ = area[k][cy[0]]["total"], actual[k]
+            print(f"     {k} {names.get(k, ''):<34} forecast {p_:>7,}  observed {a_:>7,}  "
+                  f"{p_ - a_:+6,}  {(p_ - a_) / a_ * 100:+.2f} %".replace(",", " "))
+        print(f"     ({len(rows_)} of {len(drawn)} kvarterer matched in KKBEF1)")
+
+    # ---- e. the splicing rule, made numeric ----
+    print(f"   🚫 KK city total vs DST {dst_table} kommune 101 — never splice these "
+          f"(information only)")
+    overlap = [y for y in cy if y in years]
+    for y in (overlap[0], overlap[len(overlap) // 3], overlap[-1]):
+        kk, dst = area[city][y]["total"], kom["101"][y]["total"]
+        print(f"     {y}  KK {kk:>9,}  DST {dst:>9,}  {kk - dst:+7,}  "
+              f"{(kk - dst) / dst * 100:+.2f} %".replace(",", " "))
+    widest = max(overlap, key=lambda y: abs(area[city][y]["total"] - kom["101"][y]["total"]))
+    kk, dst = area[city][widest]["total"], kom["101"][widest]["total"]
+    print(f"     widest {widest}: {kk - dst:+,} ({(kk - dst) / dst * 100:+.2f} %) over "
+          f"{len(overlap)} shared years".replace(",", " "))
     return fails
 
 
@@ -542,6 +687,9 @@ def main():
             for s_ in bt["spearman"].values():
                 print(f"     {s_['population_input']:<22} old {s_['old']:+.3f}  "
                       f"new {s_['new']:+.3f}  → {s_['new'] - s_['old']:+.3f}")
+
+    # ---- 9. the Copenhagen kvarter forecast ----
+    fails += copenhagen(kom, years, meta["table"], args.top)
 
     print()
     if fails:
