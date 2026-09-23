@@ -1,0 +1,1150 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-09-22T08:45:51Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 286704050,
+  "lat": 55.6567552,
+  "lon": 12.3567167,
+  "tags": {
+    "amenity": "library",
+    "check_date": "2025-06-03",
+    "name": "Hovedbiblioteket Albertslund",
+    "toilets:wheelchair": "yes",
+    "wheelchair": "yes",
+    "wheelchair:description": "[Good parking at Bibliotekstorvet. Very good entry. Very good toilet. Very good wheelchair spaces. 2012 tbasen.dk/rating]",
+    "wikidata": "Q12300888",
+    "wikipedia": "da:Albertslund Bibliotek"
+  }
+},
+{
+  "type": "node",
+  "id": 1753796731,
+  "lat": 55.6577034,
+  "lon": 12.3399796,
+  "tags": {
+    "amenity": "library",
+    "name": "Bibliotek og Medborgercenter Hedemarken",
+    "phone": "+45 43687095",
+    "website": "https://albertslundbibliotek.dk/",
+    "wheelchair": "yes",
+    "wheelchair:description": "p Parking 100 m away. i i Access meeting room. i Toilet armrest. i i View. 2012 tbasen.dk/rating.",
+    "wikidata": "Q21098049"
+  }
+},
+{
+  "type": "node",
+  "id": 2189272909,
+  "lat": 55.6520366,
+  "lon": 12.3553338,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Lykkebo"
+  }
+},
+{
+  "type": "node",
+  "id": 2554141967,
+  "lat": 55.6747758,
+  "lon": 12.3544389,
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "94618",
+    "name": "Børnehuset Kastanjen",
+    "ref:DK:cvr": "66137112",
+    "ref:DK:cvr:pnummer": "1017329215"
+  }
+},
+{
+  "type": "node",
+  "id": 2554222099,
+  "lat": 55.6728051,
+  "lon": 12.3892316,
+  "tags": {
+    "amenity": "hospital",
+    "emergency": "yes",
+    "healthcare": "hospital",
+    "name": "Psykiatrisk akutmodtagelse"
+  }
+},
+{
+  "type": "node",
+  "id": 2555411654,
+  "lat": 55.6706912,
+  "lon": 12.3897974,
+  "tags": {
+    "amenity": "clinic",
+    "check_date": "2025-05-05",
+    "emergency": "yes",
+    "healthcare": "clinic",
+    "internet_access": "wlan",
+    "internet_access:fee": "no",
+    "name": "Akutklinik",
+    "opening_hours": "Mo-Su 09:00-21:00",
+    "source": "Glostrup Hospital",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 3936117871,
+  "lat": 55.6544414,
+  "lon": 12.3608788,
+  "tags": {
+    "amenity": "school",
+    "check_date": "2026-08-12",
+    "name": "Kirkebækskolen"
+  }
+},
+{
+  "type": "node",
+  "id": 4386467743,
+  "lat": 55.6709688,
+  "lon": 12.3921440,
+  "tags": {
+    "amenity": "clinic",
+    "fvst:navnelbnr": "95163",
+    "healthcare": "clinic",
+    "name": "Børne- og ungdomspsykiatrisk Center Region Hovedstaden Afsnit",
+    "ref:DK:cvr": "29190623",
+    "ref:DK:cvr:pnummer": "1010567048"
+  }
+},
+{
+  "type": "node",
+  "id": 4535428008,
+  "lat": 55.6709877,
+  "lon": 12.3918802,
+  "tags": {
+    "amenity": "clinic",
+    "department": "psyciatric",
+    "healthcare": "clinic",
+    "name": "Psykiatrisk Center Glostrup",
+    "ref": "81"
+  }
+},
+{
+  "type": "node",
+  "id": 5940703186,
+  "lat": 55.6618484,
+  "lon": 12.3987720,
+  "tags": {
+    "amenity": "doctors",
+    "check_date": "2024-11-27",
+    "healthcare": "doctor",
+    "healthcare:speciality": "optometry",
+    "name": "Øjenlægerne Glostrup Centrum",
+    "website": "https://www.ojenlaegerne.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 7124533914,
+  "lat": 55.6507758,
+  "lon": 12.3589559,
+  "tags": {
+    "amenity": "library",
+    "name": "Pilehaveskolen"
+  }
+},
+{
+  "type": "node",
+  "id": 7233746222,
+  "lat": 55.6709802,
+  "lon": 12.3920454,
+  "tags": {
+    "amenity": "hospital",
+    "fvst:navnelbnr": "95164",
+    "healthcare": "hospital",
+    "name": "Børne- og Ungdomspsykiatrisk Center Afs. B203",
+    "ref:DK:cvr": "29190623",
+    "ref:DK:cvr:pnummer": "1010567048"
+  }
+},
+{
+  "type": "node",
+  "id": 7277910911,
+  "lat": 55.6709923,
+  "lon": 12.3919831,
+  "tags": {
+    "amenity": "hospital",
+    "fvst:navnelbnr": "96185",
+    "healthcare": "hospital",
+    "name": "Børne- og Ungdomspykiatrisk Center Afs. B290",
+    "ref:DK:cvr": "29190623",
+    "ref:DK:cvr:pnummer": "1010567048"
+  }
+},
+{
+  "type": "node",
+  "id": 7286483764,
+  "lat": 55.6709711,
+  "lon": 12.3919804,
+  "tags": {
+    "amenity": "hospital",
+    "fvst:navnelbnr": "93569",
+    "healthcare": "hospital",
+    "name": "Børne- og Ungdomspykiatrisk Center Afs. 29A",
+    "ref:DK:cvr": "29190623",
+    "ref:DK:cvr:pnummer": "1010567048"
+  }
+},
+{
+  "type": "node",
+  "id": 8804670350,
+  "lat": 55.6570926,
+  "lon": 12.3558279,
+  "tags": {
+    "amenity": "theatre",
+    "check_date": "2024-08-13",
+    "fvst:navnelbnr": "92633",
+    "name": "MusikTeatret Albertslund",
+    "ref:DK:cvr": "66137112",
+    "ref:DK:cvr:pnummer": "1003266218",
+    "website": "https://mute.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 12828276594,
+  "lat": 55.6562642,
+  "lon": 12.3525660,
+  "tags": {
+    "amenity": "school",
+    "fvst:navnelbnr": "1415859",
+    "name": "FGU Vestegnen",
+    "ref:DK:cvr": "39816431",
+    "ref:DK:cvr:pnummer": "1024946335"
+  }
+},
+{
+  "type": "node",
+  "id": 13737888192,
+  "lat": 55.6434048,
+  "lon": 12.3271357,
+  "tags": {
+    "alt_name": "Grønhøj",
+    "amenity": "kindergarten",
+    "check_date": "2026-04-17",
+    "name": "Daginstitutionen Grønhøj",
+    "opening_hours": "Mo-Fr 06:45-17:15",
+    "operator": "Høje-Taastrup Kommune",
+    "phone": "+45 21 43 35 45",
+    "website": "https://groenhoej.htk.dk"
+  }
+},
+{
+  "type": "node",
+  "id": 13742814069,
+  "lat": 55.6519809,
+  "lon": 12.3132874,
+  "tags": {
+    "amenity": "school",
+    "check_date": "2026-04-19",
+    "name": "Linie 10",
+    "operator": "Høje-Taastrup Kommune",
+    "phone": "+45 43 35 38 80",
+    "website": "https://unghtk.dk/linie10"
+  }
+},
+{
+  "type": "node",
+  "id": 13927078616,
+  "lat": 55.6614487,
+  "lon": 12.3985232,
+  "tags": {
+    "amenity": "clinic",
+    "healthcare": "clinic",
+    "name": "Stationslægerne"
+  }
+},
+{
+  "type": "way",
+  "id": 26171126,
+  "center": {
+    "lat": 55.6427007,
+    "lon": 12.3201753
+  },
+  "nodes": [
+    286585921,
+    286585922,
+    286585923,
+    286585924,
+    286585921
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Mølleholmskolen",
+    "phone": "+45 43 35 23 00",
+    "website": "https://moelleholmskolen.htk.dk",
+    "wikidata": "Q122926391"
+  }
+},
+{
+  "type": "way",
+  "id": 26406349,
+  "center": {
+    "lat": 55.6880859,
+    "lon": 12.3714867
+  },
+  "nodes": [
+    277855841,
+    289302831,
+    1634680405,
+    289302832,
+    289302834,
+    277855841
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Albertslund lille skole"
+  }
+},
+{
+  "type": "way",
+  "id": 26588028,
+  "center": {
+    "lat": 55.6757664,
+    "lon": 12.3642280
+  },
+  "nodes": [
+    291580912,
+    291580913,
+    291580914,
+    291580915,
+    291580916,
+    291580917,
+    291580872,
+    291580918,
+    291580912
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Herstedøster Skole",
+    "name:etymology:wikidata": "Q12316698",
+    "wikidata": "Q12316700"
+  }
+},
+{
+  "type": "way",
+  "id": 91797298,
+  "center": {
+    "lat": 55.6884057,
+    "lon": 12.3667876
+  },
+  "nodes": [
+    1066725058,
+    1066724955,
+    1066724887,
+    1066724916,
+    1066724860,
+    1066724902,
+    1066724992,
+    1066725020,
+    1066725058
+  ],
+  "tags": {
+    "alt_name": "Skovhjælperne Østsjælland",
+    "amenity": "school",
+    "building": "yes",
+    "education": "nature_school",
+    "fvst:name": "Skovhjælperne Østsjælland",
+    "fvst:navnelbnr": "95216",
+    "name": "Naturskolen i Vestskoven",
+    "ref:DK:cvr": "27805108",
+    "ref:DK:cvr:pnummer": "1010695402",
+    "website": "https://www.naturskolen.albertslund.dk/om-naturskolen/personale/naturcenterets-personale/skovhjaelperne/"
+  }
+},
+{
+  "type": "way",
+  "id": 131910202,
+  "center": {
+    "lat": 55.6497258,
+    "lon": 12.4015651
+  },
+  "nodes": [
+    1451164795,
+    1451164803,
+    1451164811,
+    286743322,
+    286743325,
+    1451164816,
+    1451164809,
+    1451164800,
+    1451164813,
+    1451164802,
+    1451164814,
+    1451164795
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Brøndbyvester Skole, Krogagervej",
+    "name:etymology:wikidata": "Q979259"
+  }
+},
+{
+  "type": "way",
+  "id": 132738588,
+  "center": {
+    "lat": 55.6636806,
+    "lon": 12.3940313
+  },
+  "nodes": [
+    1460313091,
+    13928321953,
+    13928321954,
+    13928321955,
+    13928321952,
+    1460313098,
+    13928321951,
+    13928321950,
+    1460313094,
+    13928321957,
+    1460313096,
+    13928321956,
+    1460313091
+  ],
+  "tags": {
+    "amenity": "library",
+    "building": "yes",
+    "name": "Glostrup Bibliotek",
+    "note": "open Mo-So 09:00-22:00 but without service",
+    "opening_hours": "Mo-Th 10:00-19:00; Fr 10:00-17:00; Sa 10:00-14:00",
+    "phone": "+45 43236820",
+    "website": "https://www.glostrupbib.dk/",
+    "wikidata": "Q21098039"
+  }
+},
+{
+  "type": "way",
+  "id": 157204996,
+  "center": {
+    "lat": 55.6475881,
+    "lon": 12.3590224
+  },
+  "nodes": [
+    1694242452,
+    11813195500,
+    11813195498,
+    11813195499,
+    11813195497,
+    11813195496,
+    11813195495,
+    11813195494,
+    11813195493,
+    1694242442,
+    11813195492,
+    11813195491,
+    11813195490,
+    11813195489,
+    11813195488,
+    11813195487,
+    1694242450,
+    11813195486,
+    11813195485,
+    1694242453,
+    11813195501,
+    11813195502,
+    1694242452
+  ],
+  "tags": {
+    "amenity": "clinic",
+    "building": "yes",
+    "healthcare": "clinic",
+    "name": "Sundhedshus Nordmarken"
+  }
+},
+{
+  "type": "way",
+  "id": 160466784,
+  "center": {
+    "lat": 55.6960805,
+    "lon": 12.3451525
+  },
+  "nodes": [
+    1725245109,
+    1725245108,
+    1725245107,
+    1725245105,
+    1725245100,
+    1725245103,
+    1725245091,
+    1725245088,
+    1725245101,
+    1786496009,
+    1725245102,
+    1725245109
+  ],
+  "tags": {
+    "alt_name": "Petersborggård",
+    "amenity": "kindergarten",
+    "name": "Naturbørnehaven Æbleskoven",
+    "website": "https://trygge.dk/natur/"
+  }
+},
+{
+  "type": "way",
+  "id": 174972166,
+  "center": {
+    "lat": 55.6699147,
+    "lon": 12.4008072
+  },
+  "nodes": [
+    1856129952,
+    1856129953,
+    1856129955,
+    12794160616,
+    1856129950,
+    1856129948,
+    1856129952
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-09-13",
+    "email": "info@bh-solvangen.dk",
+    "name": "Børnehaven Solvangen",
+    "operator": "private",
+    "phone": "+45 43 96 19 63",
+    "preschool": "yes",
+    "website": "http://www.bh-solvangen.dk",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 316521622,
+  "center": {
+    "lat": 55.6696015,
+    "lon": 12.3862355
+  },
+  "nodes": [
+    3226447193,
+    3226447196,
+    3226447182,
+    3226447180,
+    3226447176,
+    3226447179,
+    3226447173,
+    3226447171,
+    3226447169,
+    3226447161,
+    3226447189,
+    3226447197,
+    3226447193
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "building": "yes",
+    "name": "Perlen"
+  }
+},
+{
+  "type": "way",
+  "id": 371573748,
+  "center": {
+    "lat": 55.6740084,
+    "lon": 12.3407282
+  },
+  "nodes": [
+    3751337100,
+    3751337101,
+    3869690369,
+    3869690370,
+    3869690371,
+    3869690372,
+    3869690373,
+    3869690374,
+    3751337107,
+    3751337108,
+    3751337100
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Søndergaard"
+  }
+},
+{
+  "type": "way",
+  "id": 407745036,
+  "center": {
+    "lat": 55.6797431,
+    "lon": 12.3762244
+  },
+  "nodes": [
+    4097798887,
+    4097799211,
+    4097799210,
+    4097798884,
+    4097798887
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnhuset Rosenly"
+  }
+},
+{
+  "type": "way",
+  "id": 464479560,
+  "center": {
+    "lat": 55.6693427,
+    "lon": 12.3417449
+  },
+  "nodes": [
+    4595798301,
+    8815036212,
+    8815036213,
+    8815036214,
+    4595798300,
+    3869690425,
+    4595798299,
+    8815036210,
+    8815036211,
+    8634517334,
+    8634517335,
+    276243340,
+    8634517336,
+    8815036209,
+    3867636765,
+    3867636767,
+    8634517337,
+    4595798298,
+    8815036208,
+    4595798297,
+    8815036207,
+    8815036206,
+    4595798296,
+    3867636772,
+    1638160679,
+    8815039520,
+    393724866,
+    8815039518,
+    8815039519,
+    8815036215,
+    8815036216,
+    8815039517,
+    4595798293,
+    4595798301
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Herstedvester Skole",
+    "name:etymology:wikidata": "Q12316697",
+    "url": "https://herstedvesterskole.aula.dk/",
+    "wikidata": "Q12316696"
+  }
+},
+{
+  "type": "way",
+  "id": 531236013,
+  "center": {
+    "lat": 55.6779550,
+    "lon": 12.3994437
+  },
+  "nodes": [
+    3435456613,
+    3435456614,
+    3435456615,
+    3435456616,
+    287721212,
+    5157028197,
+    5157028196,
+    287721213,
+    287721214,
+    287721215,
+    412479687,
+    3435456611,
+    3435456612,
+    3435456613
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Nordvangskolen",
+    "phone": "+4543964390",
+    "website": "http://glostrupskole.dk/",
+    "wikidata": "Q122925165"
+  }
+},
+{
+  "type": "way",
+  "id": 543578848,
+  "center": {
+    "lat": 55.6463188,
+    "lon": 12.3426887
+  },
+  "nodes": [
+    5254797027,
+    5254797026,
+    5254797025,
+    5254797024,
+    5254797023,
+    5254797022,
+    5254797021,
+    5254796920,
+    5254796919,
+    5254796918,
+    5254796917,
+    5254797027
+  ],
+  "tags": {
+    "amenity": "theatre",
+    "name": "Høgsbjerget",
+    "theatre:type": "amphi"
+  }
+},
+{
+  "type": "way",
+  "id": 550456472,
+  "center": {
+    "lat": 55.6791244,
+    "lon": 12.3417629
+  },
+  "nodes": [
+    5316660342,
+    5316660341,
+    5316660340,
+    5316660339,
+    5316660338,
+    5316660337,
+    3867902305,
+    5316660336,
+    4823524993,
+    5316660343,
+    5316660342
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "123621",
+    "name": "Ved Vejen",
+    "ref:DK:cvr": "66137112",
+    "ref:DK:cvr:pnummer": "1016582774",
+    "website": "https://vedvejen.albertslund.dk/"
+  }
+},
+{
+  "type": "way",
+  "id": 594105483,
+  "center": {
+    "lat": 55.6543910,
+    "lon": 12.3854324
+  },
+  "nodes": [
+    5665988091,
+    5083117773,
+    11939901421,
+    5083117774,
+    1710553826,
+    5665988091
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2023-07-18",
+    "name": "Børnehuset Vesterled"
+  }
+},
+{
+  "type": "way",
+  "id": 605466990,
+  "center": {
+    "lat": 55.6667428,
+    "lon": 12.3772909
+  },
+  "nodes": [
+    5742661422,
+    5742661421,
+    5742660220,
+    5742660219,
+    5742660218,
+    5742660217,
+    5742660216,
+    5742661422
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Vestervangskolen",
+    "phone": "+4543207000",
+    "source": "http://glostrupskole.dk/",
+    "website": "http://glostrupskole.dk/",
+    "wikidata": "Q122925167"
+  }
+},
+{
+  "type": "way",
+  "id": 932700506,
+  "center": {
+    "lat": 55.6552415,
+    "lon": 12.3989849
+  },
+  "nodes": [
+    8645796612,
+    3253353279,
+    8645796611,
+    8645796610,
+    8645796609,
+    8645796608,
+    8645796607,
+    8645796606,
+    8645796605,
+    8645796604,
+    8645796603,
+    8645796602,
+    8645796601,
+    8645796600,
+    8645796599,
+    8645796598,
+    8645796597,
+    8645796575,
+    8645796596,
+    8645796595,
+    8645796594,
+    8645796585,
+    8645796578,
+    8645796579,
+    8645796580,
+    8645796576,
+    8645796577,
+    8645796583,
+    8645796582,
+    8645796581,
+    8645796584,
+    8645796586,
+    8645796593,
+    8645796587,
+    8645796588,
+    8645796589,
+    8645796590,
+    8645796591,
+    8645796592,
+    8645796612
+  ],
+  "tags": {
+    "amenity": "school",
+    "fee": "yes",
+    "name": "Park Allé Privatskole",
+    "phone": "+45 29 89 82 92",
+    "source": "survey",
+    "website": "https://parkalleprivatskole.dk/"
+  }
+},
+{
+  "type": "way",
+  "id": 945624604,
+  "center": {
+    "lat": 55.6421780,
+    "lon": 12.3113835
+  },
+  "nodes": [
+    4591261107,
+    4591261104,
+    4591261105,
+    4591261098,
+    4591261099,
+    8754188198,
+    8754188197,
+    8754188196,
+    8754188195,
+    4591261096,
+    4591261097,
+    4591261106,
+    4591261107
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-04-16",
+    "fvst:navnelbnr": "93903",
+    "name": "Børnehuset Blåkilde",
+    "opening_hours": "Mo-Fr 06:30-17:00",
+    "operator": "Høje-Taastrup Kommune",
+    "operator:type": "council",
+    "phone": "+45 43 35 30 40",
+    "preschool": "no",
+    "ref:DK:cvr": "19501817",
+    "ref:DK:cvr:pnummer": "1018745387",
+    "website": "https://blaakilde.htk.dk"
+  }
+},
+{
+  "type": "way",
+  "id": 1066014583,
+  "center": {
+    "lat": 55.6585286,
+    "lon": 12.3998121
+  },
+  "nodes": [
+    9789511308,
+    9789511309,
+    9789511310,
+    9789511311,
+    9789511312,
+    9789511308
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "education": "kindergarten",
+    "name": "Børnehuset Kirkebjerg"
+  }
+},
+{
+  "type": "way",
+  "id": 1145449380,
+  "center": {
+    "lat": 55.6699650,
+    "lon": 12.3297059
+  },
+  "nodes": [
+    1637175516,
+    1637175319,
+    10659766097,
+    1637175281,
+    10659766098,
+    1637175331,
+    1637175469,
+    1637175516
+  ],
+  "tags": {
+    "amenity": "school",
+    "grades": "0-9",
+    "name": "Egelundskolen",
+    "operator": "Albertslund Kommune",
+    "operator:type": "government",
+    "website": "https://egelundskolen.aula.dk/",
+    "wikidata": "Q12309437"
+  }
+},
+{
+  "type": "way",
+  "id": 1272150406,
+  "center": {
+    "lat": 55.6506896,
+    "lon": 12.3585977
+  },
+  "nodes": [
+    11813234180,
+    11813234179,
+    11813234178,
+    11813234177,
+    11813234176,
+    11813234175,
+    11813234174,
+    11813234173,
+    11813234180
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Pilehaveskolen",
+    "name:etymology:wikidata": "Q12340493",
+    "wikidata": "Q122928795"
+  }
+},
+{
+  "type": "way",
+  "id": 1325588002,
+  "center": {
+    "lat": 55.6631625,
+    "lon": 12.3858505
+  },
+  "nodes": [
+    12265602298,
+    12265602297,
+    12265602295,
+    12265602294,
+    12265602298
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Rosenåen"
+  }
+},
+{
+  "type": "way",
+  "id": 1356119748,
+  "center": {
+    "lat": 55.6598740,
+    "lon": 12.3416838
+  },
+  "nodes": [
+    12550860385,
+    12550860384,
+    12550860383,
+    12550860382,
+    12550860381,
+    12550860380,
+    12550860379,
+    12550860378,
+    12550860385
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Herstedlund Skole",
+    "website": "https://herstedlundskole.dk/",
+    "wikidata": "Q12316694",
+    "wikipedia": "da:Herstedlund Skole"
+  }
+},
+{
+  "type": "way",
+  "id": 1501078450,
+  "center": {
+    "lat": 55.6513864,
+    "lon": 12.3131455
+  },
+  "nodes": [
+    13742814071,
+    13742814072,
+    13742814073,
+    13742814074,
+    13742814075,
+    13742814076,
+    13742814077,
+    13742814078,
+    13742814079,
+    13742814080,
+    13742814081,
+    13742814082,
+    13742814083,
+    13742814071
+  ],
+  "tags": {
+    "amenity": "school",
+    "landuse": "education",
+    "name": "Parkskolen"
+  }
+},
+{
+  "type": "way",
+  "id": 1517558647,
+  "center": {
+    "lat": 55.6607501,
+    "lon": 12.3713249
+  },
+  "nodes": [
+    13852792221,
+    13852792222,
+    13852792223,
+    13852792224,
+    13852792221
+  ],
+  "tags": {
+    "amenity": "school",
+    "education": "school",
+    "name": "Unity Skolen",
+    "operator": "Unity Skolen",
+    "operator:type": "private",
+    "website": "https://unityskolen.dk"
+  }
+},
+{
+  "type": "way",
+  "id": 1530511603,
+  "center": {
+    "lat": 55.6571980,
+    "lon": 12.3389491
+  },
+  "nodes": [
+    13949041351,
+    13949041352,
+    13949041353,
+    13949041354,
+    13949041355,
+    13949041351
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "education": "kindergarten",
+    "name": "https://api.dataforsyningen.dk/wms/MatGaeldendeOgForeloebigWMS_DAF?token=06d8ff3a098d8123038a2ca1c15e29e9&FORMAT=image/png&TRANSPARENT=TRUE&VERSION=1.3.0&SERVICE=WMS&REQUEST=GetMap&LAYERS=Jordstykke_Gaeldende&STYLES=&CRS={proj}&WIDTH={width}&HEIGHT={heigh",
+    "preschool": "yes",
+    "website": "https://lindegaarden.aula.dk/om-institutionen/velkommen-til-lindegaarden"
+  }
+},
+{
+  "type": "way",
+  "id": 1551065620,
+  "center": {
+    "lat": 55.6798595,
+    "lon": 12.3413506
+  },
+  "nodes": [
+    14107489200,
+    14107540301,
+    14107540302,
+    14107540303,
+    14107489200
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "91310",
+    "name": "Børnehuset Baunegaard",
+    "ref:DK:cvr": "66137112",
+    "ref:DK:cvr:pnummer": "1003266486",
+    "website": "https://baunegaard.albertslund.dk/"
+  }
+},
+{
+  "type": "way",
+  "id": 1554260107,
+  "center": {
+    "lat": 55.6844146,
+    "lon": 12.3113121
+  },
+  "nodes": [
+    2778048742,
+    2778048722,
+    2778048694,
+    2778048701,
+    2778048733,
+    2778048742
+  ],
+  "tags": {
+    "amenity": "theatre",
+    "lit": "no",
+    "name": "Kroppedal Udendørs Foredragsområde",
+    "operator": "Kroppedal Museum",
+    "theatre:type": "amphi"
+  }
+},
+{
+  "type": "relation",
+  "id": 2032968,
+  "center": {
+    "lat": 55.6701513,
+    "lon": 12.3296640
+  },
+  "members": [
+    {
+      "type": "way",
+      "ref": 150852821,
+      "role": "outer"
+    },
+    {
+      "type": "way",
+      "ref": 150852860,
+      "role": "inner"
+    },
+    {
+      "type": "way",
+      "ref": 150852840,
+      "role": "inner"
+    },
+    {
+      "type": "way",
+      "ref": 150852833,
+      "role": "inner"
+    }
+  ],
+  "tags": {
+    "amenity": "school",
+    "building": "yes",
+    "name": "Egelundskolen",
+    "type": "multipolygon",
+    "wikidata": "Q12309437"
+  }
+}
+
+  ]
+}

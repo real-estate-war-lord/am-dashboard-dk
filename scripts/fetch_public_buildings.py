@@ -17,8 +17,11 @@ stamdataBygning) → BBR_BBRSag. Of the cases found for a building we keep the n
 (no sag010FuldfoerelseAfByggeri, status not 9 Afsluttet / 14 Henlagt).
 
 Usage:
-  python3 scripts/fetch_public_buildings.py --kommune 0101,0147      # pilot
-  python3 scripts/fetch_public_buildings.py --kommune 0147 --measure # only print the case-coverage measurement
+  python3 scripts/fetch_public_buildings.py --kommune 0101,0147      # named municipalities
+  python3 scripts/fetch_public_buildings.py --metro                  # Copenhagen + 18 suburban municipalities
+  python3 scripts/fetch_public_buildings.py --all                    # every municipality
+  python3 scripts/fetch_public_buildings.py --kommune 0147 --measure # print the case-coverage measurement only
+Finished municipalities are skipped unless --refresh is given, so a run can be resumed.
 """
 import argparse
 import collections
@@ -26,6 +29,8 @@ import datetime as dt
 import json
 import pathlib
 import sys
+import time
+from concurrent.futures import ThreadPoolExecutor
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import fetch_bbr as fb  # noqa: E402
@@ -43,6 +48,19 @@ SAG_FIELDS = ("id_lokalId status kommunekode sag001Byggesagsnummer sag012Byggesa
               "sag003Byggetilladelsesdato sag004ForventetPaabegyndelsesdato sag005Paabegyndelsesdato "
               "sag009ForventetFuldfoertDato sag010FuldfoerelseAfByggeri sag008FaerdigtBygningsareal sag019Bygherreforhold")
 CASE_CLOSED = {"9", "14"}        # Afsluttet, Henlagt
+RECENT_CUT = (dt.date.today() - dt.timedelta(days=3 * 365 + 1)).isoformat()   # permit this new = a recent case
+
+
+def byname(code):
+    """Municipality name for the log line, from the vendored boundaries."""
+    global _NAMES
+    if _NAMES is None:
+        p = ROOT / "data" / "geo" / "kommuner.geojson"
+        _NAMES = {f["properties"]["kode"]: f["properties"]["navn"] for f in json.loads(p.read_text(encoding="utf-8"))["features"]} if p.exists() else {}
+    return _NAMES.get(code, code)
+
+
+_NAMES = None
 
 
 def now():
@@ -101,6 +119,12 @@ def cases_for(building_ids):
             if b in set(building_ids):
                 by_building[b].append(s)
     return by_building, links, cases
+
+
+def is_recent(case):
+    """A case counts as recent while its permit — or, failing that, its case date — is within RECENT_CUT."""
+    d = (case or {}).get("sag003Byggetilladelsesdato") or (case or {}).get("sag002Byggesagsdato")
+    return bool(d) and d[:10] >= RECENT_CUT
 
 
 def open_case(cases):
@@ -178,6 +202,7 @@ def geocode(buildings):
 
 def run(kommune, measure_only=False):
     RAW.mkdir(parents=True, exist_ok=True)
+    t0 = time.time()
     bygs = buildings(kommune)
     pending = [b for b in bygs if b["status"] in ("2", "3")]
     by_building, links, cases = cases_for([b["id_lokalId"] for b in pending]) if pending else ({}, [], {})
@@ -197,30 +222,57 @@ def run(kommune, measure_only=False):
             "pending": len(pending), "with_any_case": with_any, "with_open_case": with_open,
             "with_expected_completion": with_eta, "with_permit_date": with_permit,
             "link_rows": len(links), "cases": len(cases),
+            "seconds": round(time.time() - t0),
+            "recent_cases": sum(1 for b in pending if is_recent(open_case(by_building.get(b["id_lokalId"], [])))),
             "no_bbr_coordinate": sum(1 for b in pending if not (b.get("byg404Koordinat") or {}).get("wkt")),
             "geocoded_via_dar": sum(1 for b in pending if geo.get(b["id_lokalId"], {}).get("wkt"))}
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--kommune", required=True, help="0147 or 0101,0147")
+    ap.add_argument("--kommune", help="0147 or 0101,0147")
+    ap.add_argument("--metro", action="store_true", help="Copenhagen + 18 suburban municipalities (fetch_bbr.METRO)")
+    ap.add_argument("--all", action="store_true", help="every municipality")
     ap.add_argument("--measure", action="store_true", help="print the case-coverage measurement only, write nothing")
+    ap.add_argument("--refresh", action="store_true", help="refetch municipalities that already have a file")
+    ap.add_argument("--workers", type=int, default=3, help="municipalities fetched in parallel; 3–4 is polite")
     args = ap.parse_args()
     fb.load_env()
+    if args.kommune:
+        codes = [k.strip() for k in args.kommune.split(",")]
+    elif args.metro:
+        codes = list(fb.METRO)
+    elif args.all:
+        codes = [f"{c:04d}" for c in fb.all_kommuner()] if hasattr(fb, "all_kommuner") else sorted(
+            {f["properties"]["kode"] for f in json.loads((ROOT / "data" / "geo" / "kommuner.geojson").read_text(encoding="utf-8"))["features"]})
+    else:
+        ap.error("give --kommune, --metro or --all")
+    todo = [k for k in codes if args.measure or args.refresh or not (RAW / f"{k}_bygning.jsonl").exists()]
+    skipped = len(codes) - len(todo)
+    if skipped:
+        print(f"{skipped} municipalities already fetched — skipping (use --refresh to redo them)")
     tot = collections.Counter()
-    for k in args.kommune.split(","):
-        r = run(k.strip(), args.measure)
-        print(f"{r['kommune']}: {r['buildings']} buildings (410–449) · existing {r['existing']} · planned {r['planned']} · under construction {r['under_construction']}")
+    results = {}
+    if args.workers > 1 and len(todo) > 1:
+        with ThreadPoolExecutor(max_workers=args.workers) as ex:
+            for k, r in zip(todo, ex.map(lambda k: run(k, args.measure), todo)):
+                results[k] = r
+    else:
+        for k in todo:
+            results[k] = run(k, args.measure)
+    for k in todo:
+        r = results[k]
+        print(f"{r['kommune']} {(byname(r['kommune']) + ':'):18} {r['buildings']:>5} buildings · existing {r['existing']:>5} · open cases {r['pending']:>4} (recent {r['recent_cases']:>3})")
         print(f"    of the {r['pending']} open-case buildings: {r['with_any_case']} have a case row, "
               f"{r['with_open_case']} an open case, {r['with_expected_completion']} an expected completion date (sag009), "
               f"{r['with_permit_date']} a permit date (sag003)")
         if not args.measure:
             print(f"    coordinates: {r['pending'] - r['no_bbr_coordinate']} from BBR · {r['geocoded_via_dar']} geocoded via DAR "
-                  f"· {r['no_bbr_coordinate'] - r['geocoded_via_dar']} still without a point")
+                  f"· {r['no_bbr_coordinate'] - r['geocoded_via_dar']} still without a point · {r['seconds']} s")
         for key, v in r.items():
             if isinstance(v, int):
                 tot[key] += v
-    if len(args.kommune.split(",")) > 1:
+    if len(todo) > 1:
         print(f"\npilot total: {tot['pending']} planned/under-construction · {tot['with_expected_completion']} with an expected completion date "
               f"({(tot['with_expected_completion'] / tot['pending'] * 100 if tot['pending'] else 0):.0f} %) · "
               f"{tot['with_permit_date']} with a permit date ({(tot['with_permit_date'] / tot['pending'] * 100 if tot['pending'] else 0):.0f} %)")

@@ -1,0 +1,1486 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-09-22T08:45:51Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 290194490,
+  "lat": 55.6263879,
+  "lon": 12.3815992,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Sydstjernen"
+  }
+},
+{
+  "type": "node",
+  "id": 916814362,
+  "lat": 55.6136683,
+  "lon": 12.3560840,
+  "tags": {
+    "amenity": "library",
+    "facebook": "https://www.facebook.com/pages/Ish%C3%B8j-Bibliotek/286976584715006",
+    "internet_access": "wlan",
+    "level": "0",
+    "name": "Ishøj Bibliotek",
+    "name:etymology:wikidata": "Q3196979",
+    "opening_hours": "Mo-Th 10:00-19:00; Fr 10:00-17:00; Sa 10:00-15:00",
+    "phone": "+45 43 57 71 71",
+    "ref:isil": "DK-718300",
+    "website": "https://www.ishojbib.dk/bibliotek/ishojbibliotek",
+    "wikidata": "Q21098723"
+  }
+},
+{
+  "type": "node",
+  "id": 3278432166,
+  "lat": 55.6241784,
+  "lon": 12.3967352,
+  "tags": {
+    "amenity": "school",
+    "fee": "yes",
+    "name": "Gideonskolen",
+    "religion": "christian",
+    "website": "https://www.gideonskolen.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 3404320549,
+  "lat": 55.6260800,
+  "lon": 12.3820300,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Daginstitutionen Stien"
+  }
+},
+{
+  "type": "node",
+  "id": 3404342066,
+  "lat": 55.6260200,
+  "lon": 12.3812100,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Daginstitutionen Sommerfuglen"
+  }
+},
+{
+  "type": "node",
+  "id": 4679178761,
+  "lat": 55.6233450,
+  "lon": 12.3013340,
+  "tags": {
+    "amenity": "school",
+    "check_date": "2026-02-05",
+    "fvst:navnelbnr": "95783",
+    "name": "Ishøjgård",
+    "ref:DK:cvr": "11931316",
+    "ref:DK:cvr:pnummer": "1003760162",
+    "website": "https://ishøjgård.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 6761841207,
+  "lat": 55.6107260,
+  "lon": 12.3151400,
+  "tags": {
+    "amenity": "school",
+    "name": "Fgu-Vestegnen Ishøj"
+  }
+},
+{
+  "type": "node",
+  "id": 10722325855,
+  "lat": 55.6162416,
+  "lon": 12.3631744,
+  "tags": {
+    "amenity": "school",
+    "branch": "Vejlebrovej",
+    "fvst:navnelbnr": "1272227",
+    "name": "NEXT",
+    "ref:DK:cvr": "43479946",
+    "ref:DK:cvr:pnummer": "1028753795"
+  }
+},
+{
+  "type": "node",
+  "id": 13725389798,
+  "lat": 55.6397362,
+  "lon": 12.2912160,
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-04-12",
+    "fvst:navnelbnr": "566987",
+    "name": "Kogletræet",
+    "opening_hours": "Mo-Fr 06:45-17:00",
+    "operator": "Høje-Taastrup Kommune",
+    "operator:type": "government",
+    "phone": "+45 43 35 34 00",
+    "ref:DK:cvr": "19501817",
+    "ref:DK:cvr:pnummer": "1003269291",
+    "website": "https://kogletraet.htk.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 13725939569,
+  "lat": 55.6395976,
+  "lon": 12.2895860,
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-04-12",
+    "name": "Eventyrhuset",
+    "operator": "Høje-Taastrup Kommune",
+    "operator:type": "government",
+    "phone": "+45 43 35 31 73",
+    "website": "https://eventyrhuset.htk.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 13730742114,
+  "lat": 55.6420527,
+  "lon": 12.2879377,
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-04-14",
+    "name": "Lindetræet",
+    "operator": "Høje-Taastrup Kommune",
+    "phone": "+45 43 35 31 40",
+    "website": "https://lindetraet.htk.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 13730742115,
+  "lat": 55.6419850,
+  "lon": 12.2889178,
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-04-14",
+    "name": "Sankt Georgsgårdens Vuggestue",
+    "phone": "+45 43 35 31 10",
+    "website": "https://georgsgaarden.htk.dk"
+  }
+},
+{
+  "type": "node",
+  "id": 13733141340,
+  "lat": 55.6425120,
+  "lon": 12.2920690,
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-04-15",
+    "name": "Lindetræet Afdeling 2",
+    "operator": "Høje-Taastrup Kommune",
+    "phone": "+45 43 35 31 40",
+    "website": "https://lindetraet.htk.dk"
+  }
+},
+{
+  "type": "node",
+  "id": 13733141342,
+  "lat": 55.6417726,
+  "lon": 12.2944544,
+  "tags": {
+    "amenity": "school",
+    "check_date": "2026-04-15",
+    "name": "Basen Vest",
+    "phone": "+45 38 14 01 23",
+    "school": "special_education_needs",
+    "website": "https://www.basen.dk/ny-elev/skoleafdelingerne/basen-vest/"
+  }
+},
+{
+  "type": "node",
+  "id": 13734228545,
+  "lat": 55.6386569,
+  "lon": 12.3010858,
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-04-16",
+    "name": "Idrætsbørnehaven Budstikken",
+    "opening_hours": "Mo-Th 06:30-17:00; Fr 06:30-16:30",
+    "operator": "S/I Børnehaven Budstikken",
+    "phone": "+45 28 53 27 27",
+    "website": "https://ibhb.dk"
+  }
+},
+{
+  "type": "node",
+  "id": 13737455300,
+  "lat": 55.6430843,
+  "lon": 12.3069765,
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-04-17",
+    "name": "Børnehuset Drømmekilden",
+    "opening_hours": "Mo-Fr 06:30-17:00",
+    "operator": "Høje-Taastrup Kommune",
+    "phone": "+45 43 35 34 20",
+    "website": "https://droemmekilden.htk.dk"
+  }
+},
+{
+  "type": "node",
+  "id": 13737888174,
+  "lat": 55.6434955,
+  "lon": 12.3076321,
+  "tags": {
+    "amenity": "library",
+    "check_date": "2026-04-17",
+    "library:type": "archive",
+    "name": "Byhistorisk Samling og Arkiv",
+    "opening_hours": "Tu,Th 12:00-16:00; Sa[1] 11:00-14:00",
+    "operator": "Kroppedal Museum",
+    "phone": "+45 43 35 36 10",
+    "website": "https://kroppedal.dk/blaakildegaard/"
+  }
+},
+{
+  "type": "node",
+  "id": 13737888192,
+  "lat": 55.6434048,
+  "lon": 12.3271357,
+  "tags": {
+    "alt_name": "Grønhøj",
+    "amenity": "kindergarten",
+    "check_date": "2026-04-17",
+    "name": "Daginstitutionen Grønhøj",
+    "opening_hours": "Mo-Fr 06:45-17:15",
+    "operator": "Høje-Taastrup Kommune",
+    "phone": "+45 21 43 35 45",
+    "website": "https://groenhoej.htk.dk"
+  }
+},
+{
+  "type": "node",
+  "id": 13852780348,
+  "lat": 55.6408714,
+  "lon": 12.2640062,
+  "tags": {
+    "amenity": "school",
+    "education": "school",
+    "name": "Høje Taastrup Privatskole",
+    "operator": "Høje Taastrup Privatskole",
+    "operator:type": "private",
+    "website": "https://www.htps.dk"
+  }
+},
+{
+  "type": "way",
+  "id": 26171126,
+  "center": {
+    "lat": 55.6427007,
+    "lon": 12.3201753
+  },
+  "nodes": [
+    286585921,
+    286585922,
+    286585923,
+    286585924,
+    286585921
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Mølleholmskolen",
+    "phone": "+45 43 35 23 00",
+    "website": "https://moelleholmskolen.htk.dk",
+    "wikidata": "Q122926391"
+  }
+},
+{
+  "type": "way",
+  "id": 26363834,
+  "center": {
+    "lat": 55.6264154,
+    "lon": 12.3995066
+  },
+  "nodes": [
+    288843264,
+    8117585732,
+    288843438,
+    12995420470,
+    12995420469,
+    288843264
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Brøndby Strand Skole",
+    "old_name": "Søholtskolen",
+    "wikidata": "Q12304550"
+  }
+},
+{
+  "type": "way",
+  "id": 26477789,
+  "center": {
+    "lat": 55.6257755,
+    "lon": 12.3817185
+  },
+  "nodes": [
+    290184252,
+    290182379,
+    290184253,
+    290182381,
+    290184254,
+    290182383,
+    290184252
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Sommerfuglen",
+    "preschool": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 26518223,
+  "center": {
+    "lat": 55.6215783,
+    "lon": 12.3886775
+  },
+  "nodes": [
+    290645839,
+    290645841,
+    2422703820,
+    290645842,
+    290645843,
+    290645844,
+    6149777131,
+    290645839
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Egholmskolen",
+    "website": "https://egholmskolen.skoleporten.dk/",
+    "wikidata": "Q122928794"
+  }
+},
+{
+  "type": "way",
+  "id": 26556209,
+  "center": {
+    "lat": 55.6187822,
+    "lon": 12.3625555
+  },
+  "nodes": [
+    291091282,
+    291091283,
+    291091284,
+    291091285,
+    291091282
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Gildbroskolen",
+    "wikidata": "Q122928808"
+  }
+},
+{
+  "type": "way",
+  "id": 26783317,
+  "center": {
+    "lat": 55.5976449,
+    "lon": 12.3315992
+  },
+  "nodes": [
+    2055187553,
+    2055187552,
+    293780663,
+    293780664,
+    2055187558,
+    2055187555,
+    2055187553
+  ],
+  "tags": {
+    "amenity": "library",
+    "building": "yes",
+    "email": "greve@grevebib.dk",
+    "internet_access": "wlan",
+    "internet_access:fee": "no",
+    "internet_access:ssid": "Publnet",
+    "name": "Greve Bibliotek",
+    "phone": "+45 43958000",
+    "ref:isil": "DK-725300",
+    "wikidata": "Q21106808"
+  }
+},
+{
+  "type": "way",
+  "id": 27183583,
+  "center": {
+    "lat": 55.6149330,
+    "lon": 12.3354938
+  },
+  "nodes": [
+    298272229,
+    298272487,
+    298272488,
+    287153448,
+    298272229
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Vibeholmskolen",
+    "name:etymology:wikidata": "Q131416667",
+    "wikidata": "Q122928807"
+  }
+},
+{
+  "type": "way",
+  "id": 28669851,
+  "center": {
+    "lat": 55.5946060,
+    "lon": 12.3322494
+  },
+  "nodes": [
+    315069409,
+    315069514,
+    315069515,
+    315069266,
+    315069267,
+    315069409
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Arenaskolen",
+    "operator": "Greve Kommune",
+    "operator:type": "government",
+    "operator:wikidata": "Q504977",
+    "website": "https://arenaskolen.aula.dk/",
+    "wikidata": "Q122958595"
+  }
+},
+{
+  "type": "way",
+  "id": 124069745,
+  "center": {
+    "lat": 55.6383466,
+    "lon": 12.2734844
+  },
+  "nodes": [
+    1381799009,
+    1381799055,
+    1381799007,
+    1381799036,
+    1381799064,
+    1381799052,
+    1381799021,
+    1381799030,
+    1381799034,
+    1381799028,
+    1381799054,
+    1381799016,
+    1381799010,
+    1381799019,
+    1381799013,
+    1381799026,
+    1381799022,
+    1381799051,
+    1381799009
+  ],
+  "tags": {
+    "amenity": "school",
+    "check_date": "2026-04-26",
+    "name": "Torstorp Skole",
+    "operator": "Høje-Taastrup Kommune",
+    "phone": "+45 43 35 22 20",
+    "website": "https://torstorpskole.htk.dk"
+  }
+},
+{
+  "type": "way",
+  "id": 195015942,
+  "center": {
+    "lat": 55.5982457,
+    "lon": 12.3323627
+  },
+  "nodes": [
+    2055187559,
+    2055187560,
+    8646416688,
+    8646416687,
+    8646416686,
+    8646416685,
+    8646416684,
+    8646416683,
+    293780665,
+    8646416682,
+    8646416681,
+    8646416678,
+    8646416677,
+    8646416676,
+    8646416675,
+    8646416680,
+    8646416679,
+    293780667,
+    3922722265,
+    2055187556,
+    2055187559
+  ],
+  "tags": {
+    "amenity": "theatre",
+    "building": "yes",
+    "check_date": "2025-12-16",
+    "fvst:navnelbnr": "574711",
+    "name": "Portalen, Greve Teater- & Musikhus",
+    "ref:DK:cvr": "33861346",
+    "ref:DK:cvr:pnummer": "1020961534",
+    "website": "https://portalen.dk/"
+  }
+},
+{
+  "type": "way",
+  "id": 208529895,
+  "center": {
+    "lat": 55.6324279,
+    "lon": 12.3704471
+  },
+  "nodes": [
+    2188192893,
+    13893196919,
+    13893196920,
+    8113328091,
+    8113328095,
+    2188192891,
+    370914303,
+    2188192916,
+    2188192899,
+    2188192888,
+    2188192915,
+    2188192913,
+    2188192914,
+    2188192908,
+    3466686203,
+    3466686207,
+    3466686204,
+    3466686205,
+    2188192896,
+    2188192919,
+    2188192911,
+    2188192909,
+    2188192890,
+    2188192893
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Vallensbæk Skole",
+    "name:etymology:wikidata": "Q12340493",
+    "wikidata": "Q122928796"
+  }
+},
+{
+  "type": "way",
+  "id": 327141914,
+  "center": {
+    "lat": 55.6256933,
+    "lon": 12.2961108
+  },
+  "nodes": [
+    3338635603,
+    3338635647,
+    3338635651,
+    9925791495,
+    3338635693,
+    9925791496,
+    9925791497,
+    9925791498,
+    3922824408,
+    9632336767,
+    3338635779,
+    3338635859,
+    3338635841,
+    3338635764,
+    3338635705,
+    9632370625,
+    3338635604,
+    278414248,
+    9925791474,
+    9925791473,
+    9925791472,
+    9925791461,
+    3338635603
+  ],
+  "tags": {
+    "amenity": "school",
+    "check_date": "2024-11-09",
+    "name": "Ishøj Skole",
+    "name:etymology:wikidata": "Q3196979",
+    "website": "https://ishojskole.aula.dk/"
+  }
+},
+{
+  "type": "way",
+  "id": 330279682,
+  "center": {
+    "lat": 55.6075831,
+    "lon": 12.3443632
+  },
+  "nodes": [
+    3372374237,
+    3372374287,
+    3372374288,
+    3372374285,
+    3372374220,
+    3372374202,
+    3372374204,
+    3372374237
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Strandgårdskolen",
+    "wikidata": "Q122928809"
+  }
+},
+{
+  "type": "way",
+  "id": 330285172,
+  "center": {
+    "lat": 55.6083500,
+    "lon": 12.3465926
+  },
+  "nodes": [
+    3372460295,
+    3372460297,
+    3372460300,
+    3372460302,
+    3372460304,
+    3372460306,
+    3372460308,
+    3372460309,
+    3372460307,
+    3372460305,
+    3372460303,
+    3372460301,
+    3372460299,
+    3372460298,
+    3372460296,
+    3372460294,
+    3372460295
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "layer": "1",
+    "name": "Firkløveren"
+  }
+},
+{
+  "type": "way",
+  "id": 330699478,
+  "center": {
+    "lat": 55.6099400,
+    "lon": 12.3496404
+  },
+  "nodes": [
+    3376935993,
+    3376935995,
+    3376935998,
+    3376935994,
+    3376935996,
+    3376935979,
+    3376935974,
+    3376935976,
+    3376935975,
+    3376935978,
+    3376935982,
+    3376935985,
+    3376935993
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "education": "kindergarten",
+    "fvst:navnelbnr": "91786",
+    "name": "Femkanten",
+    "ref:DK:cvr": "11931316",
+    "ref:DK:cvr:pnummer": "1003272941"
+  }
+},
+{
+  "type": "way",
+  "id": 378366277,
+  "center": {
+    "lat": 55.6242098,
+    "lon": 12.3873870
+  },
+  "nodes": [
+    3817790350,
+    3817790351,
+    5738576632,
+    5738576633,
+    918381394,
+    3817790353,
+    3817790350
+  ],
+  "tags": {
+    "amenity": "library",
+    "building": "yes",
+    "name": "Vallensbæk Bibliotek",
+    "opening_hours": "Mo-Th 10:00-19:00; Fr 12:00-17:00; Sa 10:00-15:00",
+    "phone": "+45 47974700",
+    "ref:isil": "DK-718700",
+    "website": "https://integrabib.dk/vallensbaek/",
+    "wikidata": "Q21098727"
+  }
+},
+{
+  "type": "way",
+  "id": 443784838,
+  "center": {
+    "lat": 55.6114386,
+    "lon": 12.3694953
+  },
+  "nodes": [
+    4413236932,
+    4413236933,
+    4413236934,
+    4413236937,
+    4413236932
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Ådalens Privatskole"
+  }
+},
+{
+  "type": "way",
+  "id": 589457344,
+  "center": {
+    "lat": 55.6242453,
+    "lon": 12.3980113
+  },
+  "nodes": [
+    5628693886,
+    5628693885,
+    5628693884,
+    3278424457,
+    2280832581,
+    5628693883,
+    5628693882,
+    5628693881,
+    5628693880,
+    5628693879,
+    5628693878,
+    5628693877,
+    5628693876,
+    5628693875,
+    5628693886
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehuset Uglebo"
+  }
+},
+{
+  "type": "way",
+  "id": 589457357,
+  "center": {
+    "lat": 55.6275572,
+    "lon": 12.3997221
+  },
+  "nodes": [
+    5628694036,
+    5628694035,
+    5628694034,
+    5628694033,
+    5628694032,
+    5628694031,
+    5628694030,
+    290459089,
+    5628694028,
+    5628694027,
+    5628694026,
+    5628694059,
+    5628694025,
+    5628694036
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Påfuglen"
+  }
+},
+{
+  "type": "way",
+  "id": 676754421,
+  "center": {
+    "lat": 55.6050123,
+    "lon": 12.3336835
+  },
+  "nodes": [
+    6337372638,
+    6337372606,
+    6337372605,
+    6337372604,
+    6337372603,
+    6337372602,
+    6337372601,
+    3544719746,
+    6337372600,
+    6337372636,
+    6337372638
+  ],
+  "tags": {
+    "amenity": "school",
+    "grades": "0-9",
+    "name": "Hundige Lille Skole",
+    "religion": "none",
+    "website": "https://hundige-ls.skoleporten.dk/sp"
+  }
+},
+{
+  "type": "way",
+  "id": 676754424,
+  "center": {
+    "lat": 55.6047892,
+    "lon": 12.3355886
+  },
+  "nodes": [
+    6337372637,
+    5728151783,
+    6337372611,
+    6337372612,
+    6337372613,
+    6337372634,
+    6337372635,
+    6337372600,
+    6337372636,
+    6337372638,
+    6337372637
+  ],
+  "tags": {
+    "amenity": "school",
+    "grades": "0-9",
+    "name": "Greve Privatskole",
+    "religion": "none",
+    "website": "https://greve-privatskole.skoleporten.dk/sp",
+    "wikidata": "Q104458469"
+  }
+},
+{
+  "type": "way",
+  "id": 721757000,
+  "center": {
+    "lat": 55.5989084,
+    "lon": 12.3380851
+  },
+  "nodes": [
+    6770637009,
+    6770637010,
+    6770637016,
+    6770637017,
+    6770637018,
+    6770637019,
+    6770637020,
+    6770637009
+  ],
+  "tags": {
+    "amenity": "school",
+    "fvst:navnelbnr": "91853",
+    "name": "Kernehuset",
+    "operator": "Greve Kommune",
+    "operator:type": "government",
+    "operator:wikidata": "Q504977",
+    "ref:DK:cvr": "44023911",
+    "ref:DK:cvr:pnummer": "1003428928"
+  }
+},
+{
+  "type": "way",
+  "id": 809091936,
+  "center": {
+    "lat": 55.6170867,
+    "lon": 12.3663689
+  },
+  "nodes": [
+    7565491985,
+    7565456784,
+    7565456772,
+    7565456770,
+    7565491985
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Trækronernes Vuggestue"
+  }
+},
+{
+  "type": "way",
+  "id": 809091937,
+  "center": {
+    "lat": 55.6164555,
+    "lon": 12.3665745
+  },
+  "nodes": [
+    7565456784,
+    291078265,
+    7565456783,
+    7565456782,
+    7565456781,
+    7565456780,
+    7565456779,
+    7565456773,
+    7565456769,
+    7565456771,
+    7565456770,
+    7565456772,
+    7565456784
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Vejlebroskolen",
+    "name:etymology:wikidata": "Q131416479",
+    "wikidata": "Q122928810"
+  }
+},
+{
+  "type": "way",
+  "id": 809091938,
+  "center": {
+    "lat": 55.6173499,
+    "lon": 12.3672286
+  },
+  "nodes": [
+    7565456770,
+    7565456771,
+    7565456769,
+    7565456773,
+    7565456778,
+    7565456777,
+    7565456776,
+    3460256551,
+    7565456775,
+    7565456774,
+    7565491985,
+    7565456770
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Trækronernes Musik- Og Bevægelseshus"
+  }
+},
+{
+  "type": "way",
+  "id": 931301370,
+  "center": {
+    "lat": 55.6442809,
+    "lon": 12.2980982
+  },
+  "nodes": [
+    8634413315,
+    4081971586,
+    4081971585,
+    7908296367,
+    7908296364,
+    4081971584,
+    4081971581,
+    8634413314,
+    8634413313,
+    8634413312,
+    8634413311,
+    4081965505,
+    6749204088,
+    2126217686,
+    8634413310,
+    8634413309,
+    8634413308,
+    8634413307,
+    8634413306,
+    8634413305,
+    8634413304,
+    318494650,
+    8634413303,
+    8634413302,
+    8634413301,
+    8634413300,
+    8634413297,
+    8634413296,
+    8634413298,
+    8634413299,
+    8634413315
+  ],
+  "tags": {
+    "amenity": "school",
+    "check_date": "2026-04-17",
+    "name": "Borgerskolen",
+    "operator": "Høje-Taastrup Kommune",
+    "phone": "+45 43 35 21 00",
+    "website": "https://borgerskolen.htk.dk",
+    "wikidata": "Q122926390"
+  }
+},
+{
+  "type": "way",
+  "id": 932774065,
+  "center": {
+    "lat": 55.6164486,
+    "lon": 12.3628013
+  },
+  "nodes": [
+    8646473537,
+    8646473536,
+    14145158187,
+    8522466034,
+    291135983,
+    291135982,
+    8646473534,
+    8646473533,
+    8646473526,
+    291135992,
+    8646473529,
+    8646473532,
+    8646473522,
+    8646473523,
+    8646473524,
+    8646473525,
+    8646473531,
+    8646473527,
+    8646473528,
+    8646473530,
+    8646473537
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "NEXT Sydkysten Gymnasium",
+    "old_name": "CPH West",
+    "website": "https://www.nextkbh.dk/gymnasier/",
+    "wikidata": "Q54093699"
+  }
+},
+{
+  "type": "way",
+  "id": 944549940,
+  "center": {
+    "lat": 55.6417032,
+    "lon": 12.3100295
+  },
+  "nodes": [
+    8741884576,
+    8741884573,
+    8741884572,
+    8741884571,
+    8741884570,
+    8741884569,
+    8741884568,
+    8741884567,
+    8741884566,
+    8741884565,
+    8741884564,
+    8741884563,
+    8741884562,
+    8741884577,
+    8741884576
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-04-16",
+    "fvst:navnelbnr": "919963",
+    "name": "Daginstitutionen KIldehuset",
+    "opening_hours": "Mo-Th 06:30-17:00; Fr 06:30-16:30",
+    "phone": "+45 43 35 31 50",
+    "preschool": "no",
+    "ref:DK:cvr": "19501817",
+    "ref:DK:cvr:pnummer": "1003269503",
+    "website": "https://kildehuset.htk.dk"
+  }
+},
+{
+  "type": "way",
+  "id": 945624604,
+  "center": {
+    "lat": 55.6421780,
+    "lon": 12.3113835
+  },
+  "nodes": [
+    4591261107,
+    4591261104,
+    4591261105,
+    4591261098,
+    4591261099,
+    8754188198,
+    8754188197,
+    8754188196,
+    8754188195,
+    4591261096,
+    4591261097,
+    4591261106,
+    4591261107
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-04-16",
+    "fvst:navnelbnr": "93903",
+    "name": "Børnehuset Blåkilde",
+    "opening_hours": "Mo-Fr 06:30-17:00",
+    "operator": "Høje-Taastrup Kommune",
+    "operator:type": "council",
+    "phone": "+45 43 35 30 40",
+    "preschool": "no",
+    "ref:DK:cvr": "19501817",
+    "ref:DK:cvr:pnummer": "1018745387",
+    "website": "https://blaakilde.htk.dk"
+  }
+},
+{
+  "type": "way",
+  "id": 972873898,
+  "center": {
+    "lat": 55.6015980,
+    "lon": 12.3202534
+  },
+  "nodes": [
+    9004452864,
+    9004452865,
+    9004452866,
+    9004452867,
+    9004452868,
+    9004452864
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "110296",
+    "name": "Lunas Ark",
+    "operator": "Greve Kommune",
+    "operator:type": "public",
+    "ref:DK:cvr": "44023911",
+    "ref:DK:cvr:pnummer": "1018016210"
+  }
+},
+{
+  "type": "way",
+  "id": 972875391,
+  "center": {
+    "lat": 55.6005611,
+    "lon": 12.3323775
+  },
+  "nodes": [
+    9004499026,
+    9004499027,
+    9004499028,
+    9004499029,
+    9004499030,
+    9004499031,
+    9004499032,
+    9004499033,
+    9004499034,
+    9004499035,
+    9004499026
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "education": "kindergarten",
+    "name": "Nova",
+    "operator": "Greve Kommune",
+    "operator:type": "government",
+    "operator:wikidata": "Q504977"
+  }
+},
+{
+  "type": "way",
+  "id": 972877167,
+  "center": {
+    "lat": 55.6058543,
+    "lon": 12.3185787
+  },
+  "nodes": [
+    9004500936,
+    9004500937,
+    9004500938,
+    9004500939,
+    9004500940,
+    9004500936
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Sandrøjel",
+    "operator:type": "private_non_profit"
+  }
+},
+{
+  "type": "way",
+  "id": 972881410,
+  "center": {
+    "lat": 55.6032494,
+    "lon": 12.3075549
+  },
+  "nodes": [
+    9004540831,
+    9004540832,
+    9004540833,
+    9005272585,
+    9004540834,
+    9004540831
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "1236895",
+    "name": "Tjørnelyhuset",
+    "operator:type": "private_non_profit",
+    "ref:DK:cvr": "27109101",
+    "ref:DK:cvr:pnummer": "1003041406"
+  }
+},
+{
+  "type": "way",
+  "id": 972882347,
+  "center": {
+    "lat": 55.6056890,
+    "lon": 12.3283525
+  },
+  "nodes": [
+    9004556313,
+    9004556314,
+    9004556315,
+    9004556316,
+    9004556313
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Toftegården",
+    "operator": "Greve Kommune",
+    "operator:type": "public"
+  }
+},
+{
+  "type": "way",
+  "id": 972887462,
+  "center": {
+    "lat": 55.5979757,
+    "lon": 12.2398193
+  },
+  "nodes": [
+    9004591311,
+    9004591312,
+    9004591313,
+    9004591314,
+    9004591315,
+    9004591316,
+    9004591311
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Vesterbo",
+    "operator": "Greve Kommune",
+    "operator:type": "public"
+  }
+},
+{
+  "type": "way",
+  "id": 973536988,
+  "center": {
+    "lat": 55.6015706,
+    "lon": 12.3329034
+  },
+  "nodes": [
+    9010268348,
+    9010268349,
+    9010268350,
+    9010268351,
+    4483771146,
+    4483771149,
+    4483771151,
+    4483771150,
+    4483771181,
+    4483771193,
+    4483771195,
+    9010268352,
+    9010268353,
+    9010268354,
+    9010268355,
+    9010268356,
+    9010268357,
+    9010268358,
+    4483771176,
+    4483771164,
+    9010268359,
+    9010268348
+  ],
+  "tags": {
+    "amenity": "school",
+    "grades": "0-10",
+    "name": "Bugtskolen",
+    "operator": "Greve Kommune",
+    "operator:type": "government",
+    "operator:wikidata": "Q504977",
+    "religion": "none",
+    "website": "https://www.bugtskolen.aula.dk/om-skolen/vores-malgruppe"
+  }
+},
+{
+  "type": "way",
+  "id": 973538489,
+  "center": {
+    "lat": 55.5954754,
+    "lon": 12.2538167
+  },
+  "nodes": [
+    9010287233,
+    5265904695,
+    9010287232,
+    9010287234,
+    9010287235,
+    9010287236,
+    9010287237,
+    9010283884,
+    9010283879,
+    9010287233
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Kirkemosegaard",
+    "operator": "Greve Kommune",
+    "operator:type": "public",
+    "website": "https://kirkemosegaard.aula.dk/"
+  }
+},
+{
+  "type": "way",
+  "id": 1387001031,
+  "center": {
+    "lat": 55.6147427,
+    "lon": 12.3601113
+  },
+  "nodes": [
+    12839939628,
+    12839939629,
+    12839939630,
+    9459719151,
+    12839939628
+  ],
+  "tags": {
+    "amenity": "doctors",
+    "healthcare": "doctor",
+    "indoor": "room",
+    "level": "1",
+    "name": "Lægerne i Brohuset",
+    "room": "doctor"
+  }
+},
+{
+  "type": "way",
+  "id": 1504072079,
+  "center": {
+    "lat": 55.6390138,
+    "lon": 12.2709989
+  },
+  "nodes": [
+    13764073012,
+    13764073013,
+    13764073014,
+    13764073021,
+    13764073023,
+    13764073022,
+    13764073020,
+    13764073015,
+    13764073016,
+    13764073017,
+    13764073018,
+    13764073019,
+    13764073012
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-04-26",
+    "name": "Daginstitutionen Klatretræet",
+    "opening_hours": "Mo-Fr 06:15-17:00; PH off",
+    "operator": "Høje-Taastrup Kommune",
+    "phone": "+45 43 35 33 40",
+    "website": "https://klatretraet.htk.dk"
+  }
+},
+{
+  "type": "way",
+  "id": 1504072088,
+  "center": {
+    "lat": 55.6389679,
+    "lon": 12.2764476
+  },
+  "nodes": [
+    13764073051,
+    13764073052,
+    13764073053,
+    13764073054,
+    13764073051
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-04-26",
+    "name": "Daginstitutionen Junglehuset",
+    "opening_hours": "Mo-Th 06:15-17:00; Fr 06:30-16:30; PH off",
+    "operator": "Høje-Taastrup Kommune",
+    "phone": "+45 43 35 31 14",
+    "website": "https://junglehuset.htk.dk"
+  }
+},
+{
+  "type": "way",
+  "id": 1504151394,
+  "center": {
+    "lat": 55.6373730,
+    "lon": 12.2707249
+  },
+  "nodes": [
+    13764583961,
+    13764583962,
+    13764583963,
+    13764583964,
+    13764583965,
+    13764583966,
+    13764583967,
+    13764583968,
+    13764583969,
+    13764583970,
+    13764583971,
+    13764583961
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-04-26",
+    "name": "Daginstitutionen Æblehaven",
+    "operator": "Høje-Taastrup Kommune",
+    "phone": "+45 43 35 33 55",
+    "website": "https://aeblehaven.htk.dk"
+  }
+},
+{
+  "type": "way",
+  "id": 1504151405,
+  "center": {
+    "lat": 55.6370275,
+    "lon": 12.2747392
+  },
+  "nodes": [
+    13764624708,
+    13764624709,
+    13764624710,
+    13764624711,
+    13764624712,
+    13764624713,
+    13764624714,
+    13764624715,
+    13764624716,
+    13764624717,
+    13764624718,
+    13764624719,
+    13764624708
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-04-26",
+    "fvst:navnelbnr": "921582",
+    "name": "Daginstitutionen Nøddekrattet",
+    "operator": "Høje-Taastrup Kommune",
+    "phone": "+45 43 35 33 22",
+    "ref:DK:cvr": "19501817",
+    "ref:DK:cvr:pnummer": "1004354557",
+    "website": "https://noeddekrattet.htk.dk"
+  }
+}
+
+  ]
+}

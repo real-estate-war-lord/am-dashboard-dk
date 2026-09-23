@@ -1,0 +1,1948 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-09-22T08:45:51Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 287815871,
+  "lat": 55.7497225,
+  "lon": 12.3192583,
+  "tags": {
+    "amenity": "library",
+    "check_date": "2025-08-27",
+    "name": "Måløv Bibliotek",
+    "opening_hours": "Mo-Th 13:00-19:00; Fr 11:00-17:00; Sa 10:00-14:00",
+    "phone": "+45 44772060",
+    "ref:isil": "DK-715102",
+    "website": "https://bib.ballerup.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 340776592,
+  "lat": 55.7834916,
+  "lon": 12.3712705,
+  "tags": {
+    "amenity": "library",
+    "check_date": "2025-04-26",
+    "name": "Værløse Bibliotek",
+    "opening_hours": "Mo-Th 08:00-20:00; Fr 08:00-18:00; Sa-Su 09:00-16:00",
+    "operator": "Furesø Kommune",
+    "operator:type": "government",
+    "phone": "+45 72354635",
+    "ref:isil": "DK-719000",
+    "service_times": "Mo, Th 14:00-18:00; Tu, Fr 10:00-14:00; We, Sa-Su off",
+    "website": "https://www.furesoebibliotekerne.dk/",
+    "wheelchair": "yes",
+    "wikidata": "Q12341366"
+  }
+},
+{
+  "type": "node",
+  "id": 719365100,
+  "lat": 55.7832867,
+  "lon": 12.3714080,
+  "tags": {
+    "amenity": "theatre",
+    "check_date": "2024-03-07",
+    "name": "Galaksen",
+    "website": "https://www.galaksen.dk/",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 934853806,
+  "lat": 55.7647657,
+  "lon": 12.4018313,
+  "tags": {
+    "amenity": "library",
+    "name": "Hareskov Bibliotek",
+    "opening_hours": "Mo-Th 14:00-17:30;Sa 10:00-14:00",
+    "phone": "+45 72354670",
+    "ref:isil": "DK-719002",
+    "website": "https://www.furesoebibliotekerne.dk/web/arena/hareskov-bibliotek",
+    "wikidata": "Q12315716",
+    "wikipedia": "da:Hareskov Bibliotek"
+  }
+},
+{
+  "type": "node",
+  "id": 934858129,
+  "lat": 55.8139003,
+  "lon": 12.3776311,
+  "tags": {
+    "amenity": "library",
+    "check_date": "2025-09-27",
+    "name": "Farum Bibliotek",
+    "name:etymology:wikidata": "Q3554742",
+    "opening_hours": "Mo-Th 10:00-19:00;Fr 14:00-19:00;Sa 10:00-14:00",
+    "phone": "+45 72354585",
+    "ref:isil": "DK-719001",
+    "website": "https://www.furesoebibliotekerne.dk/web/arena",
+    "wheelchair": "yes",
+    "wikidata": "Q21098729"
+  }
+},
+{
+  "type": "node",
+  "id": 1617998544,
+  "lat": 55.7559646,
+  "lon": 12.3883958,
+  "tags": {
+    "amenity": "school",
+    "name": "Lilleafdelingen"
+  }
+},
+{
+  "type": "node",
+  "id": 1617998546,
+  "lat": 55.7562891,
+  "lon": 12.3884385,
+  "tags": {
+    "amenity": "school",
+    "name": "Storeafdelingen"
+  }
+},
+{
+  "type": "node",
+  "id": 2508538619,
+  "lat": 55.8102147,
+  "lon": 12.3659332,
+  "tags": {
+    "amenity": "doctors",
+    "healthcare": "doctor",
+    "name": "Ældrelægen"
+  }
+},
+{
+  "type": "node",
+  "id": 2877365539,
+  "lat": 55.8087387,
+  "lon": 12.3608971,
+  "tags": {
+    "amenity": "doctors",
+    "healthcare": "doctor",
+    "healthcare:speciality": "general",
+    "name": "Lægehuset",
+    "website": "https://www.laegehuset80a.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 3292324254,
+  "lat": 55.8416819,
+  "lon": 12.4275158,
+  "tags": {
+    "amenity": "theatre",
+    "name": "MantziusLive",
+    "note": "Cultural center with concerts, plays and other entertainment.",
+    "website": "https://mantzius.rudersdal.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 3404342019,
+  "lat": 55.7626700,
+  "lon": 12.3910900,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehuset Bøgely"
+  }
+},
+{
+  "type": "node",
+  "id": 6434723810,
+  "lat": 55.8405219,
+  "lon": 12.4317258,
+  "tags": {
+    "amenity": "doctors",
+    "healthcare": "doctor",
+    "name": "Birkerød Gynækologiske Klinik",
+    "website": "https://www.majklinik.dk/?id=1"
+  }
+},
+{
+  "type": "node",
+  "id": 6434723811,
+  "lat": 55.8404942,
+  "lon": 12.4317305,
+  "tags": {
+    "amenity": "doctors",
+    "healthcare": "doctor",
+    "name": "Øre, næse, halsklinikken Birkerød",
+    "website": "http://www.xn--rensehalsklinikkenbirkerd-4fc69bza.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 6466472150,
+  "lat": 55.8432546,
+  "lon": 12.4326150,
+  "tags": {
+    "amenity": "doctors",
+    "healthcare": "doctor",
+    "name": "Lægerne Dupont og Johansen"
+  }
+},
+{
+  "type": "node",
+  "id": 6466472151,
+  "lat": 55.8432147,
+  "lon": 12.4327398,
+  "tags": {
+    "amenity": "doctors",
+    "healthcare": "doctor",
+    "name": "Læge Peter Søndergaard"
+  }
+},
+{
+  "type": "node",
+  "id": 6466472152,
+  "lat": 55.8431002,
+  "lon": 12.4325909,
+  "tags": {
+    "amenity": "doctors",
+    "healthcare": "doctor",
+    "name": "Læge Jan Andersen"
+  }
+},
+{
+  "type": "node",
+  "id": 6466472157,
+  "lat": 55.8420151,
+  "lon": 12.4329767,
+  "tags": {
+    "amenity": "doctors",
+    "healthcare": "doctor",
+    "name": "Læge Anders Peter Winther"
+  }
+},
+{
+  "type": "node",
+  "id": 6466472159,
+  "lat": 55.8418787,
+  "lon": 12.4325471,
+  "tags": {
+    "amenity": "doctors",
+    "healthcare": "doctor",
+    "name": "Lægerne Mygind Øgaard og Jørgensen"
+  }
+},
+{
+  "type": "node",
+  "id": 6466472160,
+  "lat": 55.8407564,
+  "lon": 12.4315383,
+  "tags": {
+    "amenity": "doctors",
+    "healthcare": "doctor",
+    "name": "Læge Lars Ditlev Andersen"
+  }
+},
+{
+  "type": "node",
+  "id": 6466472161,
+  "lat": 55.8404614,
+  "lon": 12.4317345,
+  "tags": {
+    "amenity": "doctors",
+    "healthcare": "doctor",
+    "name": "Læge Jesper Stjernholm Micheelsen"
+  }
+},
+{
+  "type": "node",
+  "id": 6466472163,
+  "lat": 55.8408757,
+  "lon": 12.4304993,
+  "tags": {
+    "amenity": "doctors",
+    "healthcare": "doctor",
+    "name": "Læge Susanne Garne"
+  }
+},
+{
+  "type": "node",
+  "id": 6755405997,
+  "lat": 55.7892909,
+  "lon": 12.3763347,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Nørreskov Børnehus"
+  }
+},
+{
+  "type": "node",
+  "id": 8623072284,
+  "lat": 55.8170691,
+  "lon": 12.3769157,
+  "tags": {
+    "amenity": "clinic",
+    "healthcare": "clinic",
+    "name": "Sygeplejeklinikken"
+  }
+},
+{
+  "type": "node",
+  "id": 9867035938,
+  "lat": 55.7489246,
+  "lon": 12.3801327,
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2025-08-26",
+    "name": "Børnehuset Valhalla i Byen",
+    "website": "https://boernehuset-valhalla.aula.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 11245345718,
+  "lat": 55.7838316,
+  "lon": 12.3727862,
+  "tags": {
+    "amenity": "doctors",
+    "check_date": "2023-10-07",
+    "healthcare": "doctor",
+    "healthcare:speciality": "gynaecology",
+    "name": "Furesø Gynækologi",
+    "phone": "+45 24 40 33 30",
+    "ref:DK:cvr": "36281197",
+    "website": "https://www.gynfuresoe.dk"
+  }
+},
+{
+  "type": "node",
+  "id": 13899930807,
+  "lat": 55.8147525,
+  "lon": 12.3773157,
+  "tags": {
+    "amenity": "hospital",
+    "healthcare": "hospital",
+    "name": "CPH Privathospital",
+    "phone": "+45 70218000",
+    "website": "https://cph-privathospital.dk/"
+  }
+},
+{
+  "type": "way",
+  "id": 4788276,
+  "center": {
+    "lat": 55.8146596,
+    "lon": 12.3875240
+  },
+  "nodes": [
+    30689107,
+    30689113,
+    30689108,
+    30689109,
+    30689110,
+    9576983857,
+    30689114,
+    30689107
+  ],
+  "tags": {
+    "amenity": "school",
+    "check_date": "2025-09-27",
+    "name": "Marie Kruses Skole",
+    "name:etymology:wikidata": "Q12326079",
+    "website": "https://mks.dk/",
+    "wikidata": "Q12326080"
+  }
+},
+{
+  "type": "way",
+  "id": 26275806,
+  "center": {
+    "lat": 55.7512459,
+    "lon": 12.3211499
+  },
+  "nodes": [
+    287814830,
+    5970453947,
+    5970453944,
+    5970453940,
+    5970453941,
+    287814831,
+    5970541534,
+    287814832,
+    5970541536,
+    5970541537,
+    281061639,
+    287814834,
+    5970453665,
+    287814830
+  ],
+  "tags": {
+    "amenity": "school",
+    "branch": "Måløv",
+    "contact:website": "http://maaloevhoejskole.dk/",
+    "name": "Måløvhøj Skole",
+    "wikidata": "Q122926084"
+  }
+},
+{
+  "type": "way",
+  "id": 40701693,
+  "center": {
+    "lat": 55.7589055,
+    "lon": 12.4324948
+  },
+  "nodes": [
+    494383025,
+    494383031,
+    494383038,
+    494383045,
+    494383053,
+    494383061,
+    1879679659,
+    494383069,
+    14192018847,
+    494383025
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Skovbrynet Skole",
+    "old_name": "Værebro Skole",
+    "wikidata": "Q31193473"
+  }
+},
+{
+  "type": "way",
+  "id": 95164023,
+  "center": {
+    "lat": 55.7492699,
+    "lon": 12.3820451
+  },
+  "nodes": [
+    1103960563,
+    1103960547,
+    1103960404,
+    1103960593,
+    1103960375,
+    1103960418,
+    1103960420,
+    1103960464,
+    1103960563
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "building": "yes",
+    "check_date": "2025-02-06",
+    "name": "Børnehaven Nordpolen",
+    "toilets:wheelchair": "yes",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 127448219,
+  "center": {
+    "lat": 55.7484604,
+    "lon": 12.3795186
+  },
+  "nodes": [
+    1103960666,
+    1103960410,
+    1103960545,
+    1103960557,
+    1103960657,
+    5463210798,
+    1103960541,
+    2990824136,
+    1103960590,
+    1103960643,
+    1103960603,
+    1103960617,
+    1103960653,
+    1103960405,
+    1103960429,
+    1103960448,
+    1103960611,
+    1103960633,
+    1103960509,
+    1103960368,
+    1103960529,
+    1103960706,
+    1103960461,
+    1103960720,
+    1103960735,
+    1103960451,
+    1103960355,
+    1103960374,
+    1103960364,
+    1103960531,
+    1103960527,
+    1103960520,
+    1103960718,
+    1103960699,
+    1103960584,
+    1103960666
+  ],
+  "tags": {
+    "amenity": "school",
+    "branch": "Øst",
+    "check_date": "2025-12-02",
+    "name": "Skovvejens Skole",
+    "old_name": "Egebjergskolen",
+    "wikidata": "Q12309425"
+  }
+},
+{
+  "type": "way",
+  "id": 152198070,
+  "center": {
+    "lat": 55.8275678,
+    "lon": 12.4278194
+  },
+  "nodes": [
+    1650333485,
+    1650333467,
+    1650333463,
+    1650333459,
+    1650333485
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "building": "school",
+    "check_date": "2026-08-26",
+    "check_date:opening_hours": "2026-08-26",
+    "email": "smedebakken@rudersdal.dk",
+    "name": "Børnehuset Smedebakken",
+    "nursery": "yes",
+    "opening_hours": "Mo-Th 07:00-17:00; Fr 07:00-16:00; Sa-Su off",
+    "phone": "+45 46 11 58 80",
+    "preschool": "yes",
+    "ref:DK:cvr": "29188378",
+    "ref:DK:cvr:pnummer": "1024022591",
+    "website": "https://rudersdal.dk/boernehuset-smedebakken"
+  }
+},
+{
+  "type": "way",
+  "id": 164051739,
+  "center": {
+    "lat": 55.8405580,
+    "lon": 12.4272489
+  },
+  "nodes": [
+    1757136087,
+    1757136090,
+    1757136049,
+    1757136038,
+    1757136095,
+    1757136060,
+    1757136093,
+    1757136097,
+    1757136050,
+    1757136036,
+    1757136044,
+    1971295524,
+    1757136046,
+    1971295522,
+    1757136057,
+    13831909570,
+    1757136059,
+    1757136063,
+    1757136061,
+    1757136054,
+    6446511224,
+    1757136052,
+    1757136018,
+    1757136040,
+    1757136023,
+    1757136065,
+    1757136062,
+    1757136051,
+    1757136055,
+    1757136099,
+    1802657264,
+    1757136042,
+    1757136087
+  ],
+  "tags": {
+    "amenity": "library",
+    "building": "yes",
+    "name": "Birkerød Bibliotek",
+    "opening_hours": "Mo-Th 10:00-19:00; Fr 10:00-18:00; Sa 10:00-14:00",
+    "wikidata": "Q21098752"
+  }
+},
+{
+  "type": "way",
+  "id": 189068897,
+  "center": {
+    "lat": 55.7486389,
+    "lon": 12.3395356
+  },
+  "nodes": [
+    4553758117,
+    1997187004,
+    1997187038,
+    1997187009,
+    1997187023,
+    1997187010,
+    1997187029,
+    1997187007,
+    1997187026,
+    1997187031,
+    1997187035,
+    1997187019,
+    1997187012,
+    1997187036,
+    1996120151,
+    4553758117
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "building": "kindergarten",
+    "check_date": "2025-09-30",
+    "fvst:navnelbnr": "97286",
+    "name": "Børnehuset Stjernehøj",
+    "ref:DK:cvr": "58271713",
+    "ref:DK:cvr:pnummer": "1021652306",
+    "website": "https://ballerup.inst.dk/Foresides/IntraForeside.aspx?Location=IP.30"
+  }
+},
+{
+  "type": "way",
+  "id": 222875832,
+  "center": {
+    "lat": 55.7815753,
+    "lon": 12.3858773
+  },
+  "nodes": [
+    2318201859,
+    5267336508,
+    5267336515,
+    5267336514,
+    5267336513,
+    5267336512,
+    2318201848,
+    2318201840,
+    2318201861,
+    2318201855,
+    8477093167,
+    2318201846,
+    2318201832,
+    2318201843,
+    2318201853,
+    2318201859
+  ],
+  "tags": {
+    "amenity": "school",
+    "branch": "Lillestjernen",
+    "name": "Syvstjerneskolen",
+    "wikidata": "Q122972643"
+  }
+},
+{
+  "type": "way",
+  "id": 225348362,
+  "center": {
+    "lat": 55.7563626,
+    "lon": 12.3432846
+  },
+  "nodes": [
+    2341360742,
+    2341360740,
+    2341360708,
+    2341360702,
+    2341360698,
+    2341360690,
+    9733486982,
+    2341360640,
+    2341360651,
+    2341360652,
+    2341360643,
+    2341360647,
+    2341360742
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "building": "yes",
+    "fvst:name": "Foodchoices",
+    "historic": "building",
+    "name": "Villa Blide",
+    "operator": "Ballerup Kommune",
+    "start_date": "1912"
+  }
+},
+{
+  "type": "way",
+  "id": 293910100,
+  "center": {
+    "lat": 55.8283464,
+    "lon": 12.4283573
+  },
+  "nodes": [
+    2974858980,
+    2974858981,
+    2974858982,
+    2974858983,
+    2974858984,
+    2974858985,
+    2974858986,
+    2974858987,
+    2974858988,
+    2974858989,
+    2974858990,
+    2974858991,
+    3316950960,
+    2974858992,
+    2974858993,
+    2974858994,
+    2974858980
+  ],
+  "tags": {
+    "amenity": "school",
+    "branch": "Bistrup",
+    "check_date": "2026-08-26",
+    "email": "soeholmskolen@rudersdal.dk",
+    "name": "Søholmskolen, afdeling Bistrup",
+    "old_name": "Bistrupskolen",
+    "phone": "+45 46 11 48 20",
+    "ref:DK:cvr": "29188378",
+    "ref:DK:cvr:pnummer": "1003276510",
+    "website": "https://soeholm-skolen.aula.dk/",
+    "wikidata": "Q122932892"
+  }
+},
+{
+  "type": "way",
+  "id": 319419744,
+  "center": {
+    "lat": 55.7605797,
+    "lon": 12.3316913
+  },
+  "nodes": [
+    8750190783,
+    1405354794,
+    3258356404,
+    3258356405,
+    8750190785,
+    8750190786,
+    8750190784,
+    3258356407,
+    8750190783
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Krudthuset",
+    "website": "http://www.krudthuset.furesoe.dk/"
+  }
+},
+{
+  "type": "way",
+  "id": 322425108,
+  "center": {
+    "lat": 55.8127876,
+    "lon": 12.3566457
+  },
+  "nodes": [
+    3291922098,
+    3291922101,
+    3291922102,
+    3291922094,
+    3291922093,
+    3291922091,
+    3291922090,
+    3291922098
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Solvangskolen",
+    "wikidata": "Q122972639"
+  }
+},
+{
+  "type": "way",
+  "id": 325349840,
+  "center": {
+    "lat": 55.8223601,
+    "lon": 12.3897887
+  },
+  "nodes": [
+    3320197955,
+    3320197956,
+    3320197959,
+    3320197960,
+    3320197961,
+    3320197964,
+    3320197965,
+    3320197966,
+    3320197971,
+    3320197972,
+    3320197969,
+    3320197970,
+    3320197967,
+    3320197968,
+    3320197963,
+    3320197962,
+    3320197957,
+    3320197958,
+    3320197951,
+    3320197950,
+    3320197948,
+    3320197943,
+    3320197941,
+    3320197952,
+    3320197949,
+    3320197953,
+    3320197954,
+    3320197955
+  ],
+  "tags": {
+    "amenity": "school",
+    "check_date": "2026-08-04",
+    "name": "Lyngholmskolen",
+    "wikidata": "Q12325270"
+  }
+},
+{
+  "type": "way",
+  "id": 325349841,
+  "center": {
+    "lat": 55.8155448,
+    "lon": 12.3955505
+  },
+  "nodes": [
+    3320197634,
+    3320197649,
+    3320197638,
+    3320197633,
+    3320197632,
+    3320197630,
+    3320197634
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Stavnsholtskolen",
+    "name:etymology:wikidata": "Q12336957",
+    "wikidata": "Q122972640"
+  }
+},
+{
+  "type": "way",
+  "id": 331297860,
+  "center": {
+    "lat": 55.7504719,
+    "lon": 12.3965524
+  },
+  "nodes": [
+    3383564534,
+    3383564535,
+    3383564536,
+    3383564537,
+    3383564538,
+    3383564534
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børneinstitutionen Troldemosen"
+  }
+},
+{
+  "type": "way",
+  "id": 331472972,
+  "center": {
+    "lat": 55.7649039,
+    "lon": 12.4029694
+  },
+  "nodes": [
+    3385499020,
+    8582141002,
+    8582141001,
+    3385499010,
+    3385499019,
+    3385499006,
+    3385499028,
+    3385499057,
+    8582141010,
+    8582141009,
+    8582141008,
+    8582141007,
+    8582141005,
+    8582141006,
+    8582141004,
+    8582141003,
+    3385499020
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Hareskov Skole",
+    "wikidata": "Q122972636"
+  }
+},
+{
+  "type": "way",
+  "id": 331544508,
+  "center": {
+    "lat": 55.7775139,
+    "lon": 12.3817868
+  },
+  "nodes": [
+    3386142187,
+    3386142191,
+    3386142190,
+    3386142293,
+    3386142189,
+    3386142178,
+    3386142171,
+    3386142160,
+    3386142156,
+    3386142153,
+    3386142151,
+    3386142148,
+    3386142149,
+    3386142150,
+    3386142152,
+    3386142155,
+    3386142157,
+    3386142164,
+    3386142176,
+    3386142177,
+    3386142185,
+    3386142187
+  ],
+  "tags": {
+    "amenity": "school",
+    "branch": "Skovløbervangen",
+    "name": "Syvstjerneskolen",
+    "wikidata": "Q122972645"
+  }
+},
+{
+  "type": "way",
+  "id": 333013273,
+  "center": {
+    "lat": 55.7857762,
+    "lon": 12.3688710
+  },
+  "nodes": [
+    3401278489,
+    3401278488,
+    3401278486,
+    3401278487,
+    4348859348,
+    3401278490,
+    3401278491,
+    3401278489
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Lille Værløse Skole",
+    "wikidata": "Q122972641"
+  }
+},
+{
+  "type": "way",
+  "id": 341752608,
+  "center": {
+    "lat": 55.8161350,
+    "lon": 12.3763946
+  },
+  "nodes": [
+    3488558797,
+    3488558798,
+    3488558809,
+    3488558808,
+    3488558804,
+    3488558806,
+    3488558810,
+    3638251573,
+    3488558811,
+    3488558807,
+    3488558805,
+    3488558803,
+    3488558802,
+    3488558801,
+    3488558799,
+    3488557891,
+    3488557887,
+    3488557886,
+    3488557888,
+    3488558793,
+    3488558800,
+    3488558796,
+    3488558794,
+    3488557890,
+    3488557892,
+    3488558795,
+    3488558797
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Kernehuset"
+  }
+},
+{
+  "type": "way",
+  "id": 347411727,
+  "center": {
+    "lat": 55.8077800,
+    "lon": 12.3551706
+  },
+  "nodes": [
+    3537381603,
+    3537381624,
+    3537381619,
+    3537381604,
+    3537381603
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Lille Bjørn",
+    "operator": "Rudolph Steiner",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 347658137,
+  "center": {
+    "lat": 55.8075045,
+    "lon": 12.3602576
+  },
+  "nodes": [
+    3538995219,
+    3538995221,
+    3538995222,
+    3538995220,
+    3538995217,
+    3538995218,
+    3538995219
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehaven Skomagerbakken",
+    "website": "https://www.skomagerbakken.dk/"
+  }
+},
+{
+  "type": "way",
+  "id": 347658142,
+  "center": {
+    "lat": 55.8087939,
+    "lon": 12.3515316
+  },
+  "nodes": [
+    3538995257,
+    3538995251,
+    3538995250,
+    3538995249,
+    3538995252,
+    3538995259,
+    3538995257
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Røde Sol"
+  }
+},
+{
+  "type": "way",
+  "id": 359193234,
+  "center": {
+    "lat": 55.7824374,
+    "lon": 12.3867986
+  },
+  "nodes": [
+    3639490500,
+    5267336510,
+    5267336509,
+    3639490501,
+    3639490508,
+    3639490534,
+    3639490532,
+    3639490524,
+    3639490521,
+    3639490500
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "max_age": "5",
+    "min_age": "0",
+    "name": "Børnehuset Egetræet (Skovstjernen)",
+    "operator": "Furesø Kommune"
+  }
+},
+{
+  "type": "way",
+  "id": 426266489,
+  "center": {
+    "lat": 55.8403984,
+    "lon": 12.4338259
+  },
+  "nodes": [
+    4255716843,
+    4255716789,
+    4255716765,
+    4255716782,
+    4255716786,
+    4255716785,
+    4255716814,
+    4255716843
+  ],
+  "tags": {
+    "amenity": "school",
+    "branch": "Toftevang",
+    "name": "Søholmskolen",
+    "old_name": "Toftevangskolen",
+    "wikidata": "Q122932894"
+  }
+},
+{
+  "type": "way",
+  "id": 435606382,
+  "center": {
+    "lat": 55.8017697,
+    "lon": 12.3874599
+  },
+  "nodes": [
+    4335096667,
+    4335096670,
+    4335096668,
+    4335096666,
+    4335096665,
+    4335096664,
+    450662324,
+    8666740066,
+    4335096667
+  ],
+  "tags": {
+    "amenity": "school",
+    "building": "yes",
+    "education": "nature_school",
+    "name": "Fiskebæk Naturskole",
+    "website": "http://www.fiskebaeknaturskole.dk/"
+  }
+},
+{
+  "type": "way",
+  "id": 459560997,
+  "center": {
+    "lat": 55.7555329,
+    "lon": 12.3458019
+  },
+  "nodes": [
+    4553773490,
+    4553773491,
+    14063463107,
+    4553773492,
+    4553773493,
+    4553773494,
+    4436751803,
+    4436749300,
+    4553773490
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Ballerup Ny Skole",
+    "name:etymology:wikidata": "Q28143",
+    "website": "https://ballerupnyskole.dk/"
+  }
+},
+{
+  "type": "way",
+  "id": 465112226,
+  "center": {
+    "lat": 55.8144681,
+    "lon": 12.3527268
+  },
+  "nodes": [
+    4601146726,
+    4601146725,
+    4601146724,
+    4601146723,
+    4601146722,
+    4601146721,
+    4601146720,
+    4601146719,
+    4601146726
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "1116358",
+    "name": "Idrætten",
+    "ref:DK:cvr": "34609063",
+    "ref:DK:cvr:pnummer": "1017778435"
+  }
+},
+{
+  "type": "way",
+  "id": 465112230,
+  "center": {
+    "lat": 55.8155972,
+    "lon": 12.3562284
+  },
+  "nodes": [
+    4601146739,
+    4601146738,
+    4601146737,
+    4601146736,
+    4601146735,
+    4601146734,
+    4601146739
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehusene"
+  }
+},
+{
+  "type": "way",
+  "id": 465112231,
+  "center": {
+    "lat": 55.8159562,
+    "lon": 12.3550001
+  },
+  "nodes": [
+    4601146746,
+    4601146745,
+    4601146744,
+    4601146743,
+    4601146742,
+    4601146741,
+    4601146740,
+    4601146746
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Valhalla"
+  }
+},
+{
+  "type": "way",
+  "id": 466132843,
+  "center": {
+    "lat": 55.8256743,
+    "lon": 12.4262145
+  },
+  "nodes": [
+    4610048171,
+    4610048170,
+    4610048169,
+    4610048168,
+    4610048167,
+    4610048166,
+    4610048165,
+    4610048164,
+    4610048163,
+    4610048171
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Fredsholm"
+  }
+},
+{
+  "type": "way",
+  "id": 468089572,
+  "center": {
+    "lat": 55.7543755,
+    "lon": 12.3274951
+  },
+  "nodes": [
+    4626443529,
+    4626443526,
+    4626443531,
+    4626443528,
+    4626443525,
+    4626443527,
+    4626443530,
+    4626443532,
+    4626443529
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2023-09-20",
+    "fvst:navnelbnr": "96455",
+    "name": "Børnehuset Kærlodden",
+    "ref:DK:cvr": "58271713",
+    "ref:DK:cvr:pnummer": "1003260877"
+  }
+},
+{
+  "type": "way",
+  "id": 488683255,
+  "center": {
+    "lat": 55.7842735,
+    "lon": 12.3537660
+  },
+  "nodes": [
+    4809768688,
+    5264048489,
+    4809768687,
+    4809768686,
+    5264048490,
+    4809768685,
+    4809768684,
+    5264048486,
+    5264048487,
+    4809768683,
+    5264048488,
+    4809768682,
+    4809768681,
+    4809768680,
+    4809768688
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Søndersøskolen",
+    "wikidata": "Q122972637"
+  }
+},
+{
+  "type": "way",
+  "id": 490066015,
+  "center": {
+    "lat": 55.7498412,
+    "lon": 12.3336888
+  },
+  "nodes": [
+    1997245997,
+    7825337006,
+    4822538782,
+    7825337025,
+    7825337021,
+    1990007288,
+    1990020262,
+    1990007284,
+    350232417,
+    4822538781,
+    350232414,
+    7825304780,
+    350232407,
+    12908139264,
+    12908139266,
+    12908139265,
+    12908139267,
+    350232395,
+    1997245997
+  ],
+  "tags": {
+    "amenity": "school",
+    "branch": "Østerhøj",
+    "name": "Måløvhøj Skole",
+    "old_name": "Østerhøjskolen",
+    "wikidata": "Q122926087"
+  }
+},
+{
+  "type": "way",
+  "id": 544942503,
+  "center": {
+    "lat": 55.7790498,
+    "lon": 12.3813989
+  },
+  "nodes": [
+    5267336440,
+    5267336439,
+    5267336438,
+    5267336437,
+    5267336436,
+    5267336435,
+    5267336434,
+    5267336433,
+    5267336432,
+    5267336431,
+    5267336430,
+    5267336429,
+    5267336428,
+    5267336427,
+    5267336426,
+    4555624373,
+    5267336424,
+    5267336423,
+    5267336422,
+    5267336421,
+    5267336440
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2025-08-24",
+    "fvst:navnelbnr": "90957",
+    "max_age": "6",
+    "min_age": "0",
+    "name": "Børnehuset Birkedal",
+    "nursery": "yes",
+    "opening_hours": "Mo-Fr 06:45-16:30",
+    "operator": "Furesø Kommune",
+    "operator:type": "government",
+    "phone": "+4572165750",
+    "preschool": "no",
+    "ref:DK:cvr": "29188327",
+    "ref:DK:cvr:pnummer": "1006085060",
+    "website": "https://www.furesoe.dk/borger/dagtilbud-skole-og-unge/dagtilbud/kommunale-dagtilbud/integrerede-institutioner/boernehuset-birkedal"
+  }
+},
+{
+  "type": "way",
+  "id": 578215368,
+  "center": {
+    "lat": 55.7606525,
+    "lon": 12.3393810
+  },
+  "nodes": [
+    5541041126,
+    5541041125,
+    5541041124,
+    5541041123,
+    5541041122,
+    5541041121,
+    5541040520,
+    5541040519,
+    5541040518,
+    5541040517,
+    5541040516,
+    5541040515,
+    5541040514,
+    5541040513,
+    5541040512,
+    5541040511,
+    5541041126
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Egeskolen",
+    "wikidata": "Q122972638"
+  }
+},
+{
+  "type": "way",
+  "id": 664084733,
+  "center": {
+    "lat": 55.8432203,
+    "lon": 12.4291675
+  },
+  "nodes": [
+    6215735716,
+    6215735715,
+    6215735714,
+    6215735713,
+    6215735712,
+    6215735711,
+    6215735710,
+    6215735709,
+    6215735708,
+    6215735716
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Birkerød Private Skole",
+    "name:etymology:wikidata": "Q865630",
+    "wikidata": "Q12303546"
+  }
+},
+{
+  "type": "way",
+  "id": 687598835,
+  "center": {
+    "lat": 55.8090651,
+    "lon": 12.3593278
+  },
+  "nodes": [
+    6445736310,
+    6445736309,
+    6445736308,
+    6445736307,
+    6445736306,
+    6445736305,
+    6445736299,
+    6445736304,
+    6445736303,
+    6445736302,
+    6445736301,
+    6445736300,
+    6445736310
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "email": "post@fugl-sang.dk",
+    "max_age": "10",
+    "min_age": "6",
+    "name": "Fritidshjemmet Fuglsang",
+    "operator": "Fritidshjemmet Fuglsang",
+    "ownership": "private_nonprofit",
+    "phone": "+45 44955210",
+    "website": "https://fuglsang.iportalen.dk"
+  }
+},
+{
+  "type": "way",
+  "id": 699657786,
+  "center": {
+    "lat": 55.7500507,
+    "lon": 12.3785910
+  },
+  "nodes": [
+    6570205326,
+    9430942842,
+    9430942841,
+    6570205325,
+    6570115718,
+    6570205324,
+    9430942843,
+    9430942844,
+    9430942840,
+    9430942845,
+    9430942846,
+    9430942847,
+    9430942848,
+    9430942849,
+    6570205326
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "95457",
+    "name": "Børnehuset Ved Skoven",
+    "ref:DK:cvr": "58271713",
+    "ref:DK:cvr:pnummer": "1017318345"
+  }
+},
+{
+  "type": "way",
+  "id": 699657790,
+  "center": {
+    "lat": 55.7534352,
+    "lon": 12.3770467
+  },
+  "nodes": [
+    6570205333,
+    2454989313,
+    2454989296,
+    2454989289,
+    2454989284,
+    2454989276,
+    9430942851,
+    6570115717,
+    6570205333
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehuset Valhalla i Skoven"
+  }
+},
+{
+  "type": "way",
+  "id": 743258895,
+  "center": {
+    "lat": 55.7587520,
+    "lon": 12.4026153
+  },
+  "nodes": [
+    6957202329,
+    6957202328,
+    6957202327,
+    6957202326,
+    6957202325,
+    9072153332,
+    9072153333,
+    6957202329
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "904546",
+    "name": "Hareskov Børnehus",
+    "ref:DK:cvr": "29188327",
+    "ref:DK:cvr:pnummer": "1015434410"
+  }
+},
+{
+  "type": "way",
+  "id": 888083468,
+  "center": {
+    "lat": 55.8259642,
+    "lon": 12.3416913
+  },
+  "nodes": [
+    8256875723,
+    8256875722,
+    8256875721,
+    8256875720,
+    8256875719,
+    8256875718,
+    8256875717,
+    8256867116,
+    8256867115,
+    8256875723
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "764316",
+    "name": "Farum Nordby Børnehus",
+    "operator": "Fuersø Kommune",
+    "ref:DK:cvr": "29188327",
+    "ref:DK:cvr:pnummer": "1003276741"
+  }
+},
+{
+  "type": "way",
+  "id": 913566490,
+  "center": {
+    "lat": 55.8251204,
+    "lon": 12.4222974
+  },
+  "nodes": [
+    8486412144,
+    8486412143,
+    8486412142,
+    8486412141,
+    8486412144
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehuset Bistrup Have"
+  }
+},
+{
+  "type": "way",
+  "id": 934245809,
+  "center": {
+    "lat": 55.8408622,
+    "lon": 12.4142979
+  },
+  "nodes": [
+    8658738387,
+    8658738378,
+    1674542933,
+    8658738374,
+    8658738383,
+    8658738377,
+    8658738384,
+    8658738385,
+    8658738375,
+    8658738376,
+    8814378040,
+    8814378039,
+    8814378038,
+    8814378037,
+    8814378036,
+    8814378041,
+    8658738386,
+    8658738393,
+    8814378042,
+    8658738392,
+    8658738391,
+    8658738390,
+    8658738389,
+    8658738388,
+    8658738382,
+    8658738379,
+    8658738380,
+    8658738381,
+    8658738387
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Birkerød Skole",
+    "name:etymology:wikidata": "Q865630",
+    "note": "Parkvejskolen og Kajerødskolen blev lagt sammen i 2012 til Birkerød Skole. Den gamle Kajerødskole lukkede.",
+    "wikidata": "Q122932883"
+  }
+},
+{
+  "type": "way",
+  "id": 1081253698,
+  "center": {
+    "lat": 55.7818657,
+    "lon": 12.3886088
+  },
+  "nodes": [
+    9910370396,
+    9910370395,
+    9910370394,
+    9910370393,
+    9910370392,
+    9910370391,
+    9910370396
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "max_age": "5",
+    "min_age": "0",
+    "name": "Børnehuset Egetræet (Kolle Kolle)",
+    "operator": "Furesø Kommune"
+  }
+},
+{
+  "type": "way",
+  "id": 1195547662,
+  "center": {
+    "lat": 55.8267845,
+    "lon": 12.3430605
+  },
+  "nodes": [
+    11096605399,
+    11096605398,
+    11096605397,
+    11096605396,
+    11096605395,
+    11096605394,
+    11096605393,
+    11096605399
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Farum Lilleskole",
+    "name:etymology:wikidata": "Q3554742"
+  }
+},
+{
+  "type": "way",
+  "id": 1229900750,
+  "center": {
+    "lat": 55.7781758,
+    "lon": 12.3236789
+  },
+  "nodes": [
+    11405455467,
+    11405455466,
+    11405455465,
+    11405455467
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Jordbærhaven"
+  }
+},
+{
+  "type": "way",
+  "id": 1241392529,
+  "center": {
+    "lat": 55.7872908,
+    "lon": 12.3198263
+  },
+  "nodes": [
+    11534193932,
+    11534193931,
+    11534193930,
+    11534193929,
+    11534193928,
+    11534193927,
+    11534193926,
+    11534193925,
+    11534193924,
+    11534193923,
+    11534193922,
+    11534193921,
+    11534193932
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "90955",
+    "max_age": "6",
+    "min_age": "0",
+    "name": "Børnehuset Kirke Værløse",
+    "operator": "Furesø Kommune",
+    "ref:DK:cvr": "29188327",
+    "ref:DK:cvr:pnummer": "1003274087",
+    "website": "https://www.furesoe.dk/borger/dagtilbud-skole-og-unge/dagtilbud/boernehuset-kirke-vaerloese/"
+  }
+},
+{
+  "type": "way",
+  "id": 1391394687,
+  "center": {
+    "lat": 55.7826209,
+    "lon": 12.3500657
+  },
+  "nodes": [
+    12879284605,
+    12879284603,
+    12879202400,
+    12879202399,
+    12879202398,
+    12879284601,
+    12879284602,
+    12879284604,
+    12879284605
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "building": "yes",
+    "max_age": "6",
+    "name": "Søndersøpavillonen",
+    "operator": "Furesø Kommune"
+  }
+},
+{
+  "type": "way",
+  "id": 1460007956,
+  "center": {
+    "lat": 55.7835572,
+    "lon": 12.3461464
+  },
+  "nodes": [
+    13390363983,
+    13390363985,
+    3882940794,
+    5264049145,
+    5911394206,
+    5911419057,
+    5911364232,
+    5911387417,
+    13390363983
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "max_age": "6",
+    "min_age": "0",
+    "name": "Børnehuset Solbjerg",
+    "operator": "Furesø Kommune"
+  }
+},
+{
+  "type": "way",
+  "id": 1460008459,
+  "center": {
+    "lat": 55.7806075,
+    "lon": 12.3456794
+  },
+  "nodes": [
+    13390398812,
+    13390398808,
+    13390398809,
+    1979962506,
+    287808647,
+    1979962527,
+    13390398811,
+    13390398810,
+    13390398812
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "90956",
+    "max_age": "6",
+    "min_age": "0",
+    "name": "Dalgårdens Børnehus",
+    "operator": "Furesø Kommune",
+    "ref:DK:cvr": "29188327",
+    "ref:DK:cvr:pnummer": "1003274105"
+  }
+},
+{
+  "type": "way",
+  "id": 1460009235,
+  "center": {
+    "lat": 55.7834768,
+    "lon": 12.3470285
+  },
+  "nodes": [
+    5264049145,
+    3882940788,
+    3882940802,
+    13390363984,
+    13390363982,
+    13390363983,
+    5911387417,
+    5911419057,
+    5911394206,
+    5264049145
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "97401",
+    "max_age": "6",
+    "min_age": "0",
+    "name": "Børnehuset Søndersø",
+    "operator": "Furesø Kommune",
+    "ref:DK:cvr": "29188327",
+    "ref:DK:cvr:pnummer": "1003274233"
+  }
+},
+{
+  "type": "way",
+  "id": 1460010472,
+  "center": {
+    "lat": 55.7891269,
+    "lon": 12.3609032
+  },
+  "nodes": [
+    13390421164,
+    13390421163,
+    13390421162,
+    13390421161,
+    13390421160,
+    13390421154,
+    13390421159,
+    13390421158,
+    13390421157,
+    13390421156,
+    13390421155,
+    13390421164
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "90640",
+    "max_age": "6",
+    "min_age": "0",
+    "name": "Espebo Børnecenter",
+    "operator": "Furesø Kommune",
+    "ref:DK:cvr": "69525415",
+    "ref:DK:cvr:pnummer": "1006746800"
+  }
+},
+{
+  "type": "way",
+  "id": 1460011129,
+  "center": {
+    "lat": 55.7875841,
+    "lon": 12.3689331
+  },
+  "nodes": [
+    13390429421,
+    13390429420,
+    13390429419,
+    13390429418,
+    13390429413,
+    13390429417,
+    13390429416,
+    13390429415,
+    13390429414,
+    13390429421
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "90636",
+    "max_age": "6",
+    "min_age": "0",
+    "name": "Ryet Børnehus",
+    "ref:DK:cvr": "29188327",
+    "ref:DK:cvr:pnummer": "1006471666"
+  }
+},
+{
+  "type": "way",
+  "id": 1527247353,
+  "center": {
+    "lat": 55.8394833,
+    "lon": 12.4060626
+  },
+  "nodes": [
+    8447290706,
+    13917710569,
+    13917710570,
+    13917710571,
+    13917710572,
+    4059783094,
+    4059783091,
+    8447290707,
+    8447290706
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "education": "kindergarten",
+    "name": "Børnehuset Pilegården",
+    "phone": "+45 46 11 47 85"
+  }
+}
+
+  ]
+}

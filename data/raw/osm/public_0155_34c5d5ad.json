@@ -1,0 +1,507 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-09-22T08:45:51Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 855187425,
+  "lat": 55.5931218,
+  "lon": 12.6707608,
+  "tags": {
+    "amenity": "library",
+    "name": "Dragør Bibliotek",
+    "opening_hours": "Mo,We,Fr 09:00-16:00; Tu,Th 09:00-19:00; Sa 10:00-14:00",
+    "phone": "+45 32890490",
+    "ref:isil": "DK-715500",
+    "service_times": "Mo, We, Fr 11:00-16:00; Tu, Th 11:00-19:00; Sa 11:00-14:00",
+    "website": "https://www.drabib.dk/",
+    "wikidata": "Q21098000"
+  }
+},
+{
+  "type": "node",
+  "id": 916429936,
+  "lat": 55.5941531,
+  "lon": 12.6395606,
+  "tags": {
+    "amenity": "library",
+    "changing_table": "no",
+    "name": "Biblioteket i Hollænderhallen",
+    "name:etymology:wikidata": "Q130257445",
+    "opening_hours": "Mo 14:00-20:00; We 14:00-20:00; Fr 14:00-17:00; Sa 11:00-14:00",
+    "phone": "+45 32890340",
+    "ref:isil": "DK-715501",
+    "website": "https://www.dragoer.dk/page4190.aspx",
+    "wikidata": "Q21098003"
+  }
+},
+{
+  "type": "node",
+  "id": 3661310394,
+  "lat": 55.6033268,
+  "lon": 12.5863624,
+  "tags": {
+    "amenity": "library",
+    "name": "Vestamager Bibliotek",
+    "opening_hours": "Mo-Fr 09:00-19:00; Sa 09:00-16:00",
+    "phone": "+45 32535499",
+    "ref:isil": "DK-718502",
+    "website": "https://taarnbybib.dk/da/VestamagerBibliotek",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 26560695,
+  "center": {
+    "lat": 55.5985784,
+    "lon": 12.6597596
+  },
+  "nodes": [
+    291163408,
+    291163447,
+    291163446,
+    1893395859,
+    291163448,
+    291163408
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Dragør Skole Nord",
+    "name:etymology:wikidata": "Q1255278",
+    "old_name": "Nordstrandskolen",
+    "wikidata": "Q12329232"
+  }
+},
+{
+  "type": "way",
+  "id": 26560770,
+  "center": {
+    "lat": 55.5953059,
+    "lon": 12.6376172
+  },
+  "nodes": [
+    30562397,
+    291162973,
+    291163913,
+    3711529502,
+    9383906477,
+    291162971,
+    3711529501,
+    2930898205,
+    30562379,
+    2930898243,
+    30562397
+  ],
+  "tags": {
+    "amenity": "school",
+    "branch": "Kirkevej",
+    "name": "Store Magleby Skole",
+    "name:etymology:wikidata": "Q4994799",
+    "wikidata": "Q122925831"
+  }
+},
+{
+  "type": "way",
+  "id": 26560981,
+  "center": {
+    "lat": 55.5934455,
+    "lon": 12.6695465
+  },
+  "nodes": [
+    291165605,
+    1505077858,
+    1505077850,
+    291165621,
+    291165607,
+    291165608,
+    3703759682,
+    3703759683,
+    3703759681,
+    291165623,
+    291165605
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Dragør Skole",
+    "name:etymology:wikidata": "Q1255278",
+    "old_name": "Dragør Skole Syd",
+    "phone": "+45 32890430",
+    "url": "http://www.dragoerskole.dk/",
+    "wikidata": "Q122925832"
+  }
+},
+{
+  "type": "way",
+  "id": 85334399,
+  "center": {
+    "lat": 55.6052353,
+    "lon": 12.5873810
+  },
+  "nodes": [
+    989308970,
+    1474030277,
+    1474030290,
+    989308907,
+    989309124,
+    989309045,
+    989309089,
+    989309024,
+    989308857,
+    989309138,
+    989309144,
+    989308941,
+    989308860,
+    989308924,
+    989308855,
+    989309062,
+    989308977,
+    989308991,
+    989308934,
+    989309128,
+    989309075,
+    989309035,
+    989308972,
+    989309167,
+    989309111,
+    989309119,
+    989309039,
+    989308900,
+    989309173,
+    989308888,
+    989309163,
+    989309028,
+    989308945,
+    989308953,
+    989308895,
+    989309096,
+    989308970
+  ],
+  "tags": {
+    "amenity": "school",
+    "bbr:husnummer": "0a3f507e-0e25-32b8-e044-0003ba298018",
+    "building": "yes",
+    "building:levels": "1",
+    "building:material": "brick",
+    "name": "Skelgårdsskolen",
+    "roof:colour": "slategray",
+    "roof:levels": "0",
+    "roof:material": "tar_paper",
+    "roof:shape": "flat",
+    "start_date": "1971",
+    "wikidata": "Q122936793"
+  }
+},
+{
+  "type": "way",
+  "id": 292997155,
+  "center": {
+    "lat": 55.6024129,
+    "lon": 12.5808120
+  },
+  "nodes": [
+    2965547506,
+    2965547512,
+    2965547507,
+    2965547521,
+    2965547506
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Vuggestuen Ugandavej"
+  }
+},
+{
+  "type": "way",
+  "id": 292997158,
+  "center": {
+    "lat": 55.6080171,
+    "lon": 12.5848544
+  },
+  "nodes": [
+    2965547514,
+    2965547509,
+    2965547522,
+    2965547519,
+    2965547527,
+    2965547514
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehuset Tømmergrunden",
+    "website": "https://www.taarnby.dk/borger/familie-boern-og-unge/dagtilbud/boernehuse-integrerede-daginstitutioner/boernehuset-toemmergrunden/"
+  }
+},
+{
+  "type": "way",
+  "id": 293814118,
+  "center": {
+    "lat": 55.6037248,
+    "lon": 12.5829758
+  },
+  "nodes": [
+    2973987278,
+    2973987294,
+    2973987300,
+    2973987272,
+    2973987278
+  ],
+  "tags": {
+    "amenity": "doctors",
+    "building": "yes",
+    "healthcare": "doctor",
+    "name": "Lægerne Kongelundsvej 434"
+  }
+},
+{
+  "type": "way",
+  "id": 346555809,
+  "center": {
+    "lat": 55.6013687,
+    "lon": 12.5754702
+  },
+  "nodes": [
+    3530617220,
+    3530617221,
+    3530617222,
+    3530617223,
+    3530617224,
+    3530617225,
+    3530617220
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehaven ved Fælleden"
+  }
+},
+{
+  "type": "way",
+  "id": 367451597,
+  "center": {
+    "lat": 55.5955556,
+    "lon": 12.6415177
+  },
+  "nodes": [
+    3713729062,
+    3713729063,
+    3713729064,
+    3713729065,
+    3713729066,
+    3713729062
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Kirkevejens fritidshjem"
+  }
+},
+{
+  "type": "way",
+  "id": 370141843,
+  "center": {
+    "lat": 55.5664905,
+    "lon": 12.5771155
+  },
+  "nodes": [
+    3738668564,
+    3738668565,
+    3738668566,
+    3738668567,
+    3738668568,
+    3738668564
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Kongeriget",
+    "note": "udflytterfællesskabet Rosenlundsvej"
+  }
+},
+{
+  "type": "way",
+  "id": 443547649,
+  "center": {
+    "lat": 55.6096102,
+    "lon": 12.5955486
+  },
+  "nodes": [
+    7260030683,
+    7260030682,
+    4411134984,
+    4411134987,
+    4411134980,
+    4709968660,
+    4411138150,
+    7260056991,
+    4411134988,
+    7260030684,
+    7260056987,
+    4411136695,
+    4411136691,
+    7260030683
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "SFO Munken",
+    "official_name": "SFO Munken/Ingstrup",
+    "operator": "Pilegårdsskolen - Tårnby Kommune",
+    "operator:type": "public",
+    "preschool": "no",
+    "website": "https://pg.aula.dk/sfo/sfo-munkeningstrup"
+  }
+},
+{
+  "type": "way",
+  "id": 443547971,
+  "center": {
+    "lat": 55.6096879,
+    "lon": 12.5964151
+  },
+  "nodes": [
+    4411136695,
+    7260056990,
+    7260056993,
+    4411138148,
+    11235897859,
+    4411138149,
+    4411138150,
+    4411134988,
+    7260030684,
+    7260056987,
+    4411136695
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehuset",
+    "official_name": "Børnehuset Munkebjergvej 121",
+    "operator": "Tårnby Kommune",
+    "operator:type": "public",
+    "preschool": "yes",
+    "website": "https://www.taarnby.dk/borger/born-unge-og-familie/dagtilbud-0-6-ar/bornehuse/munkebjergvej-121/"
+  }
+},
+{
+  "type": "way",
+  "id": 494218797,
+  "center": {
+    "lat": 55.5755477,
+    "lon": 12.6189449
+  },
+  "nodes": [
+    446026117,
+    4860079954,
+    7552499018,
+    7552499017,
+    4860079953,
+    7552499020,
+    7552499019,
+    446026117
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Sølyst"
+  }
+},
+{
+  "type": "way",
+  "id": 812761072,
+  "center": {
+    "lat": 55.5933762,
+    "lon": 12.6383262
+  },
+  "nodes": [
+    7591530227,
+    7591530226,
+    7591530225,
+    7591530224,
+    7591530223,
+    7591530227
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Kornblomsten"
+  }
+},
+{
+  "type": "way",
+  "id": 812783211,
+  "center": {
+    "lat": 55.5953500,
+    "lon": 12.6701511
+  },
+  "nodes": [
+    3138222653,
+    3714288833,
+    3138222849,
+    3138222871,
+    3138222669,
+    3138222666,
+    3138222653
+  ],
+  "tags": {
+    "amenity": "doctors",
+    "building": "yes",
+    "name": "Lægerne Charlotte Syversen, Søren Clausen, Jens Bertelsen"
+  }
+},
+{
+  "type": "way",
+  "id": 1056645621,
+  "center": {
+    "lat": 55.6065769,
+    "lon": 12.5982296
+  },
+  "nodes": [
+    9709387946,
+    9709387945,
+    9709387944,
+    9895478282,
+    9709387943,
+    9709387946
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "113031",
+    "name": "Børnehuset Tornholms Ager",
+    "official_name": "Børnehuset Tornholms Ager 2",
+    "operator": "Tårnby Kommune",
+    "operator:type": "public",
+    "preschool": "yes",
+    "ref:DK:cvr": "20310413",
+    "ref:DK:cvr:pnummer": "1011122449",
+    "website": "https://www.taarnby.dk/borger/born-unge-og-familie/dagtilbud-0-6-ar/bornehuse/tornholms-ager-2/"
+  }
+},
+{
+  "type": "way",
+  "id": 1417506720,
+  "center": {
+    "lat": 55.6056345,
+    "lon": 12.5910073
+  },
+  "nodes": [
+    13026360075,
+    13026371911,
+    13026360042,
+    13026360058,
+    13026360088,
+    13026360079,
+    13026360034,
+    13026360075
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehuset Tømmerup Haveby",
+    "operator": "Tårnby Kommune",
+    "operator:type": "public",
+    "ref:DK:cvr": "20310413",
+    "ref:DK:cvr:nummer": "1007808204",
+    "website": "https://www.taarnby.dk/borger/born-unge-og-familie/dagtilbud-0-6-ar/bornehuse/tommerup-haveby/"
+  }
+}
+
+  ]
+}

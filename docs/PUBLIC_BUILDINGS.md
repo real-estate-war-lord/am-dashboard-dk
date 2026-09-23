@@ -1,6 +1,6 @@
 # Public buildings layer (BBR)
 
-**Status:** v2.2 · pilot on København (101) and Frederiksberg (147)
+**Status:** v2.2 · Copenhagen metro set — København and the 18 contiguous suburban municipalities
 **Output:** `data/processed/public/<kommune>.json` (loaded on demand, like the Buildings layer) and
 `data/processed/public_index.json` (counts per municipality, postal code and Copenhagen quarter).
 
@@ -69,11 +69,11 @@ Consequences in the layer:
 
 - `byg404Koordinat` (EPSG:25832 → WGS84) where BBR has it — every existing building, 17 % of the cases.
 - Otherwise the building's `husnummer` → `DAR_Husnummer` → `DAR_Adressepunkt.position`, which also
-  gives the street address and postal code. In the pilot this placed the remaining 240 cases, so
-  **290 / 290 have a point**.
+  gives the street address and postal code. Across the metro set this placed every open-case building
+  BBR had not placed, so **all of them have a point**.
 - Names are optional and come from OpenStreetMap (`amenity=school|kindergarten|university|college|
   hospital|clinic|doctors|library|theatre|museum` with a `name`) when a named feature lies within
-  **60 m**: 998 of 3,294 pilot buildings got one. Otherwise the popup shows the address.
+  **60 m**: 2 243 of 7 517 buildings in the metro set got one (§4b). Otherwise the popup shows the address.
   Attribution: **© OpenStreetMap contributors (ODbL)**.
 - Placement into postal codes and Copenhagen quarters is point-in-polygon, as in the BBR Micro layer.
 
@@ -85,7 +85,56 @@ Consequences in the layer:
 | `public_recent_cases_n` | public buildings with an open case whose permit is ≤ 3 years old |
 
 Both sit in the *Growth signals* group, are hidden from the chip row, and carry the pilot-coverage
-caveat: only municipalities whose BBR pull has been run have values.
+caveat: only municipalities whose BBR pull has been run have values (§4b).
+
+## 4b. Coverage — Copenhagen metro set, 23 September 2026
+
+`--metro` covers København and the 18 contiguous suburban municipalities (the same list the BBR
+dwellings layer uses). **7 517 buildings** in 19 municipalities: 6 769 existing, 257 recent open
+cases (permit ≤ 3 years) and 491 stale ones. Fetch took 58 s with 3 workers; every open-case building
+without a BBR coordinate was placed through DAR, so all of them are mappable.
+
+| municipality | existing | recent cases | stale cases | named from OSM |
+|---|---|---|---|---|
+| København (101) | 2 542 | 97 | 152 | 847 (30 %) |
+| Frederiksberg (147) | 462 | 18 | 23 | 151 (30 %) |
+| Ballerup (151) | 287 | 12 | 11 | 100 (32 %) |
+| Brøndby (153) | 157 | 6 | 3 | 63 (38 %) |
+| Dragør (155) | 93 | 0 | 3 | 31 (32 %) |
+| Gentofte (157) | 349 | 6 | 15 | 113 (31 %) |
+| Gladsaxe (159) | 267 | 19 | 19 | 93 (30 %) |
+| Glostrup (161) | 194 | 9 | 58 | 82 (31 %) |
+| Herlev (163) | 149 | 9 | 21 | 68 (38 %) |
+| Albertslund (165) | 162 | 6 | 14 | 31 (17 %) |
+| Hvidovre (167) | 261 | 10 | 1 | 77 (28 %) |
+| Høje-Taastrup (169) | 276 | 14 | 8 | 102 (34 %) |
+| Lyngby-Taarbæk (173) | 513 | 22 | 40 | 115 (20 %) |
+| Rødovre (175) | 150 | 4 | 15 | 45 (27 %) |
+| Ishøj (183) | 125 | 2 | 12 | 46 (33 %) |
+| Tårnby (185) | 205 | 4 | 11 | 81 (37 %) |
+| Vallensbæk (187) | 58 | 1 | 4 | 13 (21 %) |
+| Furesø (190) | 221 | 8 | 65 | 100 (34 %) |
+| Rudersdal (230) | 298 | 10 | 16 | 85 (26 %) |
+| **total** | **6 769** | **257** | **491** | **2 243 (30 %)** |
+
+OSM name match by category: education 1 158/2 687 (43 %), institutions 712/2 740 (26 %), health
+135/616 (22 %), culture 238/1 474 (16 %). A building without a match shows its address instead.
+
+Municipalities outside this set have no file: their indicators are empty and no PUBLIC line appears on
+their area card. Adding one is `fetch_public_buildings.py --kommune <code>` then `build_public.py`.
+
+### Drawing density
+
+Copenhagen alone holds 2 542 existing public buildings, so the map thins them by zoom:
+
+| zoom | drawn |
+|---|---|
+| < 9 | recent open cases only (257 in the metro set) |
+| 9–12 | open cases + existing buildings ≥ 1 000 m² (2 080) |
+| ≥ 13 | everything (7 026) |
+
+The legend says which rule is in force. Per-municipality files load for whatever is in the viewport and
+stay cached for the session.
 
 ## 5. Refresh
 

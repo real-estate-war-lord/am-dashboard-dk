@@ -1264,7 +1264,8 @@ function lfInit() {
   LF.map = map;
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, className: "basemap",
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · Boundaries: DAGI, Klimadatastyrelsen' }).addTo(map);
-  map.on("moveend", () => { const c = map.getCenter(); LF.center = [c.lat, c.lng]; LF.zoom = map.getZoom(); });
+  map.on("moveend", () => { const c = map.getCenter(); LF.center = [c.lat, c.lng]; LF.zoom = map.getZoom();
+    if (MK.pub) { pubLoadVisible(); lfPublicLabels(); } });
   /* Leaflet stops click propagation inside popups, so page links in popups are wired here */
   map.on("popupopen", ev => { const el = ev.popup.getElement(); if (!el) return;
     el.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => go(b.dataset.go)));
@@ -1272,8 +1273,8 @@ function lfInit() {
     el.querySelectorAll("details").forEach(d => d.addEventListener("toggle", () => { const pp = ev.popup; if (pp._updateLayout) { pp._updateLayout(); pp._updatePosition(); pp._adjustPan(); } })); });
   map.on("zoomend", () => {
     /* rebuild polygons only when the display level changes — rebuilding on every pan would kill open popups */
-    lfInfraLabels(); lfPublicLabels(); setPublicLegend();
-    if (LF.pubG && !MK.muni) lfPublicLayers();   /* national ↔ zoomed-in changes which public rows are drawn */
+    lfInfraLabels();
+    if (MK.pub) lfPublicLayers();                /* the zoom rule changes which public rows are drawn */
     if (microMode()) { (LF.microMarks || []).forEach(m => m.setRadius(microRadius(m._dw))); return; }
     const z = map.getZoom(), fine = !!MK.muni || z >= MICRO_ZOOM, lvl = (fine ? "micro" : z < 8 ? "national" : "macro") + (cphMode() ? "-cph" : "") + (MK.muni || "");
     if (lvl !== LF.level) lfLayers(); else if (fine) lfLabels();
@@ -1556,10 +1557,26 @@ function pubAll() {
   return keys.flatMap(k => (PUB_FILES[k] || {}).buildings || [])
     .filter(b => pubCatOn(b.cat) && pubKindOn(b.kind) && (b.kind === "existing" || b.recent));
 }
+/* density rule — Copenhagen alone has 2.500 public buildings, so the national view would be a blob:
+   < 9 open cases only · 9–12 open cases + buildings ≥ 1.000 m² · ≥ 13 everything */
+const PUB_BIG_M2 = 1000;
+function pubZoom() { return LF.map ? LF.map.getZoom() : 7; }
 function pubRows() {
-  const rows = pubAll();
-  const wide = !MK.muni && (!LF.map || LF.map.getZoom() < 11);
-  return wide ? rows.filter(b => b.kind === "case") : rows;
+  const rows = pubAll(), z = pubZoom();
+  if (z < 9) return rows.filter(b => b.kind === "case");
+  if (z < 13) return rows.filter(b => b.kind === "case" || (b.m2 || 0) >= PUB_BIG_M2);
+  return rows;
+}
+/* load the per-municipality file for everything in view, and keep it for the session */
+function pubLoadVisible() {
+  if (!LF.map || !MK.pub || !PUB) return;
+  if (MK.muni) { pubLoad(MK.muni); return; }
+  if (!LF.muniBounds) {
+    LF.muniBounds = {};
+    PUB.kommuner.forEach(k => { const b = boundsOf(muniAreas(k)); if (b) LF.muniBounds[k] = b; });
+  }
+  const view = LF.map.getBounds();
+  PUB.kommuner.forEach(k => { const b = LF.muniBounds[k]; if (b && view.intersects(b)) pubLoad(k); });
 }
 function pubPopup(b) {
   const c = pubCat(b), row = (l, v) => v == null || v === "" ? "" : `<span class="lfrow"><span>${esc(l)}</span><b>${v}</b></span>`;
@@ -1582,8 +1599,7 @@ function pubPopup(b) {
 function lfPublicLayers() {
   ["pubG", "pubHitG", "pubLabG"].forEach(k => { if (LF[k]) { LF.map.removeLayer(LF[k]); LF[k] = null; } });
   if (!LF.map || !MK.pub || !PUB) return;
-  if (MK.muni && pubAvail(MK.muni)) pubLoad(MK.muni);
-  else PUB.kommuner.forEach(pubLoad);
+  pubLoadVisible();
   const rows = pubRows(), marks = [], hits = [];
   rows.forEach(b => {
     const c = pubCat(b), existing = b.kind === "existing";
@@ -1630,7 +1646,9 @@ function setPublicLegend() {
   el.innerHTML = `<div class="lgtitle">Public buildings<span>BBR ${esc(PUB.built)} · ${PUB.kommuner.length} municipalities${filtered ? ` · <b class="only" data-puball>All</b>` : ""}</span></div>
     ${Object.entries(PUB_CAT).map(([k, c]) => catRow(k, c)).join("")}
     ${kindRow}
-    <div class="lgnote">${nf(n - cases, 0)} existing · ${nf(cases, 0)} open cases (permit ≤ ${PUB.recent_years} yr) drawn${MK.muni ? "" : " · zoom in for the existing stock"}</div>`;
+    <div class="lgnote">${nf(n - cases, 0)} existing · ${nf(cases, 0)} open cases (permit ≤ ${PUB.recent_years} yr) drawn${
+      pubZoom() < 9 ? " · open cases only — zoom in for the stock"
+      : pubZoom() < 13 ? ` · showing large buildings (≥ ${nf(PUB_BIG_M2, 0)} m²) — zoom in for all` : ""}</div>`;
 }
 /* the PUBLIC line on an area card */
 function publicLine(level, code) {
