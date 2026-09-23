@@ -156,6 +156,20 @@ Placement: point-in-polygon (shapely) into `data/geo/postnumre.geojson` and `cph
 
 Not in BBR: rents, migration, population — those stay with DST/boligstat. Unoccupied share is owner-reported and lags; DST BOL101 BEBO=2000 (municipality) is the reference vacancy figure.
 
+### 3.4b Public buildings — BBR anvendelse 410–449 (v2.2, pilot)
+
+The same register as §3.4, sliced by building use instead of dwellings: schools, daycare, health and
+culture buildings (`byg021BygningensAnvendelse` 410–449) as **existing stock** (status 6) and as
+**open building cases** (status 2/3 joined through `BBR_Sagsniveau` to `BBR_BBRSag`). Coordinates come
+from `byg404Koordinat`, and from DAR (`husnummer` → `DAR_Adressepunkt`) for the 83 % of open-case
+buildings BBR has not placed; names from OpenStreetMap within 60 m.
+
+Measured 2026-09-23 on the pilot (København + Frederiksberg, 290 open cases): **1 of 290** carried an
+expected completion date, 91 % a permit date, median permit age 4.1 years in København. That is why the
+layer speaks of *open building cases* rather than planned or ongoing construction, draws only cases with
+a permit ≤ 3 years old, and ships no forward-looking "planned buildings" indicator. Full method,
+code lists and caveats: [`docs/PUBLIC_BUILDINGS.md`](PUBLIC_BUILDINGS.md).
+
 ### 3.5 Copenhagen detail — sub-database `s30`
 
 `https://api.statbank.dk/v1/s30/tables` → 48 tables. **Implemented in v1.2 as a third map level: 67 quarters (kvarterer).** The area variable is `OMRKK`: `1000` = city total, `1001–1010` = 10 districts (bydele), `2001–2012` = local committees (lokaludvalg), `20101–21211` = kvarterer (code `2LLxx` → lokaludvalg `20LL` → bydel, mapping in `scripts/build_cph.py`). Polygons: `wfs-kbhkort.kk.dk/k101` layers `kvarter` and `bydel` (CC BY 4.0, `scripts/fetch_geo_cph.py`); the WFS `kvarternr` equals the statbank code one-to-one.
@@ -322,6 +336,12 @@ am-dashboard-dk/
 | 2026-09-23 | `nordhavnstunnel` re-read in Anlægsstatus 1H 2026 p. 34 | ✅ "Nordhavnstunnel 4.495,2 … 2028" = CSV 4 495,2 / 2028 |
 | 2026-09-23 | `nyt-hospital-nordsjaelland` re-read in the Q2 2026 quarterly report (Region H) | ✅ opening: "Ultimo sep. 2027 · 1. patient" = CSV 2027. ⚠ the budget 7.992 mio. kr. (PL25E2) is **not** restated in that report — it comes from the Q3 2025 report; `source_doc` now cites both |
 | 2026-09-23 | `hilleroedmotorvejen-forlaengelse` re-read in Anlægsstatus 1H 2026 p. 34 | ✅ "Udvidelse af Hillerødmotorvejens forlængelse til motorvej 1.614,7 … 2027" = CSV 1 614,7 / 2027 |
+| 2026-09-23 | Public buildings: 5 records re-queried one by one from BBR (GraphQL, `id_lokalId`) — code / m² / year built | ✅ all five identical to the built files |
+| 2026-09-23 | · Københavns Professionshøjskole, Campus (101, education) | ✅ 429 / 71 159 m² / 2018, status 6 |
+| 2026-09-23 | · Langbjergskolen (153, institutions) | ✅ 441 / 13 498 m² / 1970, status 6 |
+| 2026-09-23 | · Hvidovre Hospital (167, health) | ✅ 431 / 109 049 m² / 1977, status 6 |
+| 2026-09-23 | · Sprogcenter Hellerup, Tuborg campus (157, culture) | ✅ 416 / 25 000 m² / 1901, status 6 |
+| 2026-09-23 | · Frederiksberg Teater (147, open case) | ✅ 411, status 3, no area or year in BBR — permit 2026-09-02, age 0.1 yr, no expected completion |
 
 ### 7b. Calculation verification (phase B, 2026-09-14)
 
@@ -384,6 +404,30 @@ projects serve each municipality, postal code and quarter).
 42x — schools, institutions, hospitals, offices of public administration) plus buildings under
 construction or with an open building case. The BBR schema for building cases has to be verified
 first — the fields and their coverage are not confirmed yet.
+
+
+## 9. Public buildings (BBR)
+
+Schools, daycare, health and culture buildings from the same register as §3.4, sliced by use instead of
+dwellings. Method, code lists and caveats: [`docs/PUBLIC_BUILDINGS.md`](PUBLIC_BUILDINGS.md).
+
+- **Codes** `byg021BygningensAnvendelse` **410–449**, grouped into education (42x), institutions (44x),
+  health (43x), culture (41x). The exact code and its official label stay on every record.
+- **Existing** = status **6 Opført**. Statuses 9/10/11/13/14 are closed versions of re-coded buildings and
+  are never counted.
+- **Open building case** = status 2/3 joined through `BBR_Sagsniveau` to `BBR_BBRSag`, drawn only while the
+  permit (`sag003`, else `sag002`) is **three years old or less**; older ones are counted in the area panel
+  but never mapped.
+- **Why there is no "planned buildings" layer:** measured 2026-09-23 on 290 open cases — **1** carried an
+  expected completion date, 91 % a permit date, and the median permit in København was **4.1 years** old.
+  BBR status 3 mostly means a case was never closed, so the layer reports case activity, not a pipeline.
+- **Coordinates**: `byg404Koordinat`, and DAR (`husnummer` → `DAR_Adressepunkt`) for the 83 % of open-case
+  buildings BBR has not placed. **Names**: OpenStreetMap within 60 m, 30 % of the metro set.
+- **Coverage**: the Copenhagen metro set — København and the 18 contiguous suburban municipalities,
+  7 517 buildings (6 769 existing, 257 recent open cases, 491 stale). Everywhere else the indicators are
+  empty and no PUBLIC line appears.
+- **Extending it**: `python3 scripts/fetch_public_buildings.py --kommune <code>` (or `--all`) then
+  `python3 scripts/build_public.py`; both resume, and the UI picks up whatever files exist.
 
 
 Sources: Danmarks Statistik API docs (https://www.dst.dk/en/Statistik/brug-statistikken/muligheder-i-statistikbanken/api) · Finans Danmark Boligmarkedsstatistikken (https://finansdanmark.dk/tal-og-data/boligstatistik/boligmarkedsstatistikken/) · Klimadatastyrelsen, DAWA lukker 1. oktober 2026 (https://www.klimadatastyrelsen.dk/om-klimadatastyrelsen/nyheder/nyhedsarkiv/2026/jul/dawa-lukker-d-1-oktober-2026) · Datafordeler transition plan (https://datafordeler.dk/vejledning/transitionsnetvaerk/) · BBR GraphQL (https://datafordeler.dk/dataoversigt/bygnings-og-boligregistret-bbr/bbr-graphql/) · boligstat.dk om husleje (https://boligstat.dk/boligstat/dokumenter/omhusleje.html) · Landsbyggefonden Huslejestatistik 2026 (https://lbf.dk/viden/statistikker/huslejestatistik/huslejestatistik-2026) · DST STRAF11 documentation (https://www.dst.dk/documentationofstatistics/c1ac7749-1e15-4d3a-8ed0-fb2d26a9fe93) · Plandata WFS (https://geoserver.plandata.dk/geoserver/wfs?request=GetCapabilities&service=WFS) · Eurostat API (https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nama_10r_3gdp?geo=DK011&unit=EUR_HAB&time=2023) · Frie geografiske data, vilkår (https://dataforsyningen.dk/asset/PDF/rettigheder_vilkaar/Vilk%C3%A5r%20for%20brug%20af%20frie%20geografiske%20data.pdf)

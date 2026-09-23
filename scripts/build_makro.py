@@ -322,6 +322,8 @@ def load_bbr():
 
 
 _INFRA_IDX = None
+_PUBLIC_IDX = None
+POP = {}          # {geo: {code: population}} — set by main() so per-capita calcs can use it
 
 
 def infra_index():
@@ -331,6 +333,39 @@ def infra_index():
         p = ROOT / "data" / "processed" / "infra_index.json"
         _INFRA_IDX = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
     return _INFRA_IDX or None
+
+
+def public_index():
+    """data/processed/public_index.json from scripts/build_public.py, or None."""
+    global _PUBLIC_IDX
+    if _PUBLIC_IDX is None:
+        p = ROOT / "data" / "processed" / "public_index.json"
+        _PUBLIC_IDX = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
+    return _PUBLIC_IDX or None
+
+
+def calc_public_index(ind, year=None):
+    """Counts and floor area from the public-buildings layer — a snapshot, so no history.
+    Only municipalities whose BBR pull has been run have values (pilot: 101, 147)."""
+    ix = public_index()
+    if year or not ix:
+        return {}
+    per = f"BBR {ix['built']}"
+    out = {}
+    for geo in ("kommune", "postnr"):
+        vals = {}
+        for k, v in ix["areas"].items():
+            if not k.startswith(geo + ":"):
+                continue
+            code = k.split(":", 1)[1]
+            if ind["key"] == "public_recent_cases_n":
+                vals[code] = len(v.get("recent_cases") or [])
+            else:
+                pop = (POP.get(geo) or {}).get(code)
+                if pop:
+                    vals[code] = v.get("m2_existing", 0) / pop * 1000
+        out[geo] = (vals, per)
+    return out
 
 
 def calc_infra_index(ind, year=None):
@@ -359,6 +394,8 @@ def compute(ind, year=None):
         per = f"BBR {b['meta']['built']}"
         return {"kommune": ({k: v.get(ind["key"]) for k, v in b["kommune"].items()}, per),
                 "postnr": ({k: v.get(ind["key"]) for k, v in b["postnr"].items()}, per)}
+    if calc == "public_index":
+        return calc_public_index(ind, year)
     if calc == "infra_index":
         return calc_infra_index(ind, year)
     if calc.startswith("rolling4q"):
@@ -453,6 +490,8 @@ def main():
         pass
     MIN_POP_GROWTH = 300  # growth % on tiny postal codes is noise
 
+    POP["kommune"] = {c: m.get("pop") for c, m in munis.items()}
+    POP["postnr"] = {nr: a.get("pop") for nr, a in areas.items()}
     indicators_out = []
     global CURRENT_YEAR
     n_hist = int(c.get("history_years", 4))
@@ -561,7 +600,7 @@ def main():
     for ind in c["indicators"]:
         for s in ind["sources"]:
             key = (s.get("db", ""), s.get("table", ""))
-            if key in seen or s.get("db") in ("boligstat", "lbf", "bbr", "infra"):
+            if key in seen or s.get("db") in ("boligstat", "lbf", "bbr", "infra", "public"):
                 continue
             seen.add(key)
             m = meta(*key)
@@ -571,6 +610,13 @@ def main():
     if bbr:
         sources.append({"key": "bbr", "label": f"BBR via Datafordeler — housing stock ({len(bbr['meta']['municipalities'])} municipalities, {bbr['meta']['dwellings']:,} dwellings)".replace(",", " "),
                         "tables": "BBR_Enhed, BBR_Bygning (GraphQL v3)", "asof": bbr["meta"]["built"], "url": "https://datafordeler.dk/dataoversigt/bygnings-og-boligregistret-bbr/bbr-graphql/", "licence": "free (Klimadatastyrelsen)"})
+    px = public_index()
+    if px:
+        sources.append({"key": "public", "label": f"Public buildings — BBR via Datafordeler (pilot: {', '.join(px['kommuner'])})",
+                        "tables": "BBR_Bygning anvendelse 410–449 status 2/3/6 · BBR_BBRSag via BBR_Sagsniveau · DAR for addresses",
+                        "asof": px["built"], "fetched": px["built"],
+                        "url": "https://github.com/real-estate-war-lord/am-dashboard-dk/blob/main/docs/PUBLIC_BUILDINGS.md",
+                        "licence": "free (Klimadatastyrelsen)"})
     ix = infra_index()
     if ix:
         sources.append({"key": "infra", "label": f"Infrastructure projects — curated layer ({len(ix['areas'])} areas with projects)",

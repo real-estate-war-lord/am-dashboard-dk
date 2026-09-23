@@ -1,0 +1,2018 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-09-23T07:29:50Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 290194490,
+  "lat": 55.6263879,
+  "lon": 12.3815992,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Sydstjernen"
+  }
+},
+{
+  "type": "node",
+  "id": 448285693,
+  "lat": 55.6700978,
+  "lon": 12.4506967,
+  "tags": {
+    "amenity": "school",
+    "check_date": "2026-07-15",
+    "name": "Skolen ved Milestedet"
+  }
+},
+{
+  "type": "node",
+  "id": 915564881,
+  "lat": 55.6700945,
+  "lon": 12.4508518,
+  "tags": {
+    "amenity": "library",
+    "name": "Tremilen",
+    "opening_hours": "Mo-Th 09:00-14:00",
+    "phone": "+45 36378430",
+    "ref:isil": "DK-717502",
+    "website": "https://www.rdb.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 924890149,
+  "lat": 55.6528556,
+  "lon": 12.4082637,
+  "tags": {
+    "amenity": "library",
+    "name": "Brøndbyvester Bibliotek",
+    "opening_hours": "Mo 10:00-17:00; Tu 10:00-14:00; We,Th 10:00-17:00; Fr 10:00-16:00; Sa 10:00-14:00",
+    "phone": "+45 43282060",
+    "ref:isil": "DK-715301",
+    "website": "https://www.brondby-bibliotekerne.dk/",
+    "wikidata": "Q21097993"
+  }
+},
+{
+  "type": "node",
+  "id": 1307251854,
+  "lat": 55.6232655,
+  "lon": 12.4233315,
+  "tags": {
+    "amenity": "library",
+    "name": "Kulturhuset Brønden",
+    "opening_hours": "Sa 10:00-14:00; Mo-Th 09:00-17:00; Fr 09:00-16:00",
+    "phone": "+45 43282000",
+    "ref:isil": "DK-715302",
+    "source": "local knowledge",
+    "website": "https://www.brondby-bibliotekerne.dk/",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 1451182640,
+  "lat": 55.6527699,
+  "lon": 12.4091388,
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-05-25",
+    "name": "Børnehuset Glentebo",
+    "phone": "+45 43283684"
+  }
+},
+{
+  "type": "node",
+  "id": 1451182641,
+  "lat": 55.6522856,
+  "lon": 12.4088813,
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-05-23",
+    "name": "Børnehuset Hvidtjørnen",
+    "phone": "+45 43 28 62 40",
+    "website": "https://www.brondby.dk/borger/dagtilbud-og-skole/dagtilbud-i-brondby/bornehuset-hvidtjornen"
+  }
+},
+{
+  "type": "node",
+  "id": 1451182642,
+  "lat": 55.6519533,
+  "lon": 12.4091254,
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-05-25",
+    "fvst:navnelbnr": "95522",
+    "name": "Børnehuset Fuglemosen",
+    "phone": "+45 43 28 61 10",
+    "ref:DK:cvr": "65113015",
+    "ref:DK:cvr:pnummer": "1003261216"
+  }
+},
+{
+  "type": "node",
+  "id": 1455276873,
+  "lat": 55.6554549,
+  "lon": 12.4071282,
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-07-13",
+    "fvst:navnelbnr": "92702",
+    "name": "Børnehuset Myretuen",
+    "ref:DK:cvr": "65113015",
+    "ref:DK:cvr:pnummer": "1003261757"
+  }
+},
+{
+  "type": "node",
+  "id": 1655605874,
+  "lat": 55.6791303,
+  "lon": 12.4149322,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Daginstitutionen Hvissingegården, afd. Broager"
+  }
+},
+{
+  "type": "node",
+  "id": 1655607553,
+  "lat": 55.6787946,
+  "lon": 12.4150556,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Daginstitutionen Hvissingegården, afd. Spurvebo"
+  }
+},
+{
+  "type": "node",
+  "id": 1655614591,
+  "lat": 55.6784347,
+  "lon": 12.4155625,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Daginstitutionen Hvissingegården, afd. Gården"
+  }
+},
+{
+  "type": "node",
+  "id": 1777420031,
+  "lat": 55.6576304,
+  "lon": 12.4382500,
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2024-06-27",
+    "fvst:navnelbnr": "93438",
+    "name": "Børnehuset Højstensgård",
+    "ref:DK:cvr": "65113015",
+    "ref:DK:cvr:pnummer": "1003261125"
+  }
+},
+{
+  "type": "node",
+  "id": 1777420032,
+  "lat": 55.6596277,
+  "lon": 12.4395964,
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "92701",
+    "name": "Børnehuset Brøndbygård",
+    "ref:DK:cvr": "65113015",
+    "ref:DK:cvr:pnummer": "1003261691"
+  }
+},
+{
+  "type": "node",
+  "id": 1777425876,
+  "lat": 55.6695218,
+  "lon": 12.4441991,
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "92655",
+    "name": "Børnehuset Brumbassen",
+    "ref:DK:cvr": "65113015",
+    "ref:DK:cvr:pnummer": "1003261538"
+  }
+},
+{
+  "type": "node",
+  "id": 1777425878,
+  "lat": 55.6590951,
+  "lon": 12.4304340,
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2024-06-27",
+    "fvst:navnelbnr": "94635",
+    "name": "Børnehuset Kærdammen",
+    "ref:DK:cvr": "65113015",
+    "ref:DK:cvr:pnummer": "1003261496"
+  }
+},
+{
+  "type": "node",
+  "id": 2104836939,
+  "lat": 55.6509471,
+  "lon": 12.4188799,
+  "tags": {
+    "alt_name": "Social- og Sundhedsuddannelses Centret",
+    "amenity": "school",
+    "isced:level": "5",
+    "name": "Sosu C",
+    "website": "https://sosuc.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 2351420503,
+  "lat": 55.6201228,
+  "lon": 12.4297349,
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "93314",
+    "name": "Børnehuset Strandbo",
+    "operator": "Brøndby Kommune",
+    "ref:DK:cvr": "65113015",
+    "ref:DK:cvr:pnummer": "1003261654"
+  }
+},
+{
+  "type": "node",
+  "id": 2372620684,
+  "lat": 55.6289421,
+  "lon": 12.4076326,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Dyregården Søholt",
+    "note": "childcare"
+  }
+},
+{
+  "type": "node",
+  "id": 2506312752,
+  "lat": 55.6632299,
+  "lon": 12.4574235,
+  "tags": {
+    "amenity": "doctors",
+    "healthcare": "doctor",
+    "healthcare:speciality": "general;family",
+    "name": "Lægehuset Rebæk Søpark",
+    "opening_hours": "\"Henvendelse kun efter forudgaende aftaler\"",
+    "phone": "+45 36 75 91 35",
+    "source": "http://www.laegerem.dk",
+    "website": "http://www.laegerem.dk",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2554222099,
+  "lat": 55.6728051,
+  "lon": 12.3892316,
+  "tags": {
+    "amenity": "hospital",
+    "emergency": "yes",
+    "healthcare": "hospital",
+    "name": "Psykiatrisk akutmodtagelse"
+  }
+},
+{
+  "type": "node",
+  "id": 2555411654,
+  "lat": 55.6706912,
+  "lon": 12.3897974,
+  "tags": {
+    "amenity": "clinic",
+    "check_date": "2025-05-05",
+    "emergency": "yes",
+    "healthcare": "clinic",
+    "internet_access": "wlan",
+    "internet_access:fee": "no",
+    "name": "Akutklinik",
+    "opening_hours": "Mo-Su 09:00-21:00",
+    "source": "Glostrup Hospital",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 2894233483,
+  "lat": 55.6220047,
+  "lon": 12.4318645,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehuset Blæksprutten"
+  }
+},
+{
+  "type": "node",
+  "id": 2923750821,
+  "lat": 55.6674861,
+  "lon": 12.4396407,
+  "tags": {
+    "amenity": "library",
+    "name": "Kilden",
+    "wikidata": "Q21097990"
+  }
+},
+{
+  "type": "node",
+  "id": 3278432166,
+  "lat": 55.6241784,
+  "lon": 12.3967352,
+  "tags": {
+    "amenity": "school",
+    "fee": "yes",
+    "name": "Gideonskolen",
+    "religion": "christian",
+    "website": "https://www.gideonskolen.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 3313465519,
+  "lat": 55.6663518,
+  "lon": 12.4057849,
+  "tags": {
+    "amenity": "doctors",
+    "check_date:opening_hours": "2023-08-11",
+    "healthcare": "doctor",
+    "name": "Thomas Brander",
+    "opening_hours:signed": "no",
+    "wheelchair": "no"
+  }
+},
+{
+  "type": "node",
+  "id": 3404320549,
+  "lat": 55.6260800,
+  "lon": 12.3820300,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Daginstitutionen Stien"
+  }
+},
+{
+  "type": "node",
+  "id": 3404342066,
+  "lat": 55.6260200,
+  "lon": 12.3812100,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Daginstitutionen Sommerfuglen"
+  }
+},
+{
+  "type": "node",
+  "id": 4052262990,
+  "lat": 55.6274402,
+  "lon": 12.4514732,
+  "tags": {
+    "amenity": "library",
+    "name": "Avedøre Bibliotek",
+    "opening_hours": "Mo-Fr 10:00-18:00;Sa-Su 10:00-14:00",
+    "phone": "+45 36343600",
+    "ref:isil": "DK-716701",
+    "source": "http://hvidovrebib.dk",
+    "wikidata": "Q21098055"
+  }
+},
+{
+  "type": "node",
+  "id": 4386467743,
+  "lat": 55.6709688,
+  "lon": 12.3921440,
+  "tags": {
+    "amenity": "clinic",
+    "fvst:navnelbnr": "95163",
+    "healthcare": "clinic",
+    "name": "Børne- og ungdomspsykiatrisk Center Region Hovedstaden Afsnit",
+    "ref:DK:cvr": "29190623",
+    "ref:DK:cvr:pnummer": "1010567048"
+  }
+},
+{
+  "type": "node",
+  "id": 4413859981,
+  "lat": 55.6227380,
+  "lon": 12.4355919,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehuset Nattergalen",
+    "operator": "Brøndby Kommune",
+    "source": "survey"
+  }
+},
+{
+  "type": "node",
+  "id": 4413859982,
+  "lat": 55.6253245,
+  "lon": 12.4071548,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehuset Mejsely",
+    "operator": "Brøndby Kommune",
+    "source": "survey"
+  }
+},
+{
+  "type": "node",
+  "id": 4413859984,
+  "lat": 55.6256880,
+  "lon": 12.4112103,
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "93959",
+    "name": "Børnehuset Lærkebo",
+    "operator": "Brøndby Kommune",
+    "ref:DK:cvr": "65113015",
+    "ref:DK:cvr:pnummer": "1003261836",
+    "source": "survey"
+  }
+},
+{
+  "type": "node",
+  "id": 4535428008,
+  "lat": 55.6709877,
+  "lon": 12.3918802,
+  "tags": {
+    "amenity": "clinic",
+    "department": "psyciatric",
+    "healthcare": "clinic",
+    "name": "Psykiatrisk Center Glostrup",
+    "ref": "81"
+  }
+},
+{
+  "type": "node",
+  "id": 4842387610,
+  "lat": 55.6795331,
+  "lon": 12.4574692,
+  "tags": {
+    "amenity": "clinic",
+    "health_facility:type": "medical_clinic",
+    "health_speciality": "ophthalmology",
+    "healthcare": "clinic",
+    "level": "1",
+    "name": "Copenhagen Eye Clinic",
+    "phone": "+45 70254004",
+    "website": "http://c-eye.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 4885708839,
+  "lat": 55.6719386,
+  "lon": 12.4632303,
+  "tags": {
+    "amenity": "clinic",
+    "check_date": "2025-11-22",
+    "healthcare": "clinic",
+    "name": "Speciallægeklinikken Centralen",
+    "source": "Kaart Ground Survey 2017"
+  }
+},
+{
+  "type": "node",
+  "id": 4919383728,
+  "lat": 55.6661420,
+  "lon": 12.4338061,
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-01-04",
+    "fvst:navnelbnr": "663021",
+    "name": "Børnehuset Nordstjernen",
+    "operator": "Brøndby Kommune",
+    "ref:DK:cvr": "65113015",
+    "ref:DK:cvr:pnummer": "1003261113",
+    "website": "https://www.brondby.dk/nordstjernen"
+  }
+},
+{
+  "type": "node",
+  "id": 4919383729,
+  "lat": 55.6647484,
+  "lon": 12.4305717,
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-01-04",
+    "fvst:navnelbnr": "94843",
+    "name": "Børnehuset Stolpebo",
+    "operator": "Brøndby Kommune",
+    "ref:DK:cvr": "65113015",
+    "ref:DK:cvr:pnummer": "1003261368",
+    "website": "https://www.brondby.dk/stolpebo"
+  }
+},
+{
+  "type": "node",
+  "id": 5940703186,
+  "lat": 55.6618484,
+  "lon": 12.3987720,
+  "tags": {
+    "amenity": "doctors",
+    "check_date": "2024-11-27",
+    "healthcare": "doctor",
+    "healthcare:speciality": "optometry",
+    "name": "Øjenlægerne Glostrup Centrum",
+    "website": "https://www.ojenlaegerne.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 7233746222,
+  "lat": 55.6709802,
+  "lon": 12.3920454,
+  "tags": {
+    "amenity": "hospital",
+    "fvst:navnelbnr": "95164",
+    "healthcare": "hospital",
+    "name": "Børne- og Ungdomspsykiatrisk Center Afs. B203",
+    "ref:DK:cvr": "29190623",
+    "ref:DK:cvr:pnummer": "1010567048"
+  }
+},
+{
+  "type": "node",
+  "id": 7277910911,
+  "lat": 55.6709923,
+  "lon": 12.3919831,
+  "tags": {
+    "amenity": "hospital",
+    "fvst:navnelbnr": "96185",
+    "healthcare": "hospital",
+    "name": "Børne- og Ungdomspykiatrisk Center Afs. B290",
+    "ref:DK:cvr": "29190623",
+    "ref:DK:cvr:pnummer": "1010567048"
+  }
+},
+{
+  "type": "node",
+  "id": 7286483764,
+  "lat": 55.6709711,
+  "lon": 12.3919804,
+  "tags": {
+    "amenity": "hospital",
+    "fvst:navnelbnr": "93569",
+    "healthcare": "hospital",
+    "name": "Børne- og Ungdomspykiatrisk Center Afs. 29A",
+    "ref:DK:cvr": "29190623",
+    "ref:DK:cvr:pnummer": "1010567048"
+  }
+},
+{
+  "type": "node",
+  "id": 10738149742,
+  "lat": 55.6324046,
+  "lon": 12.4494932,
+  "tags": {
+    "amenity": "school",
+    "education": "school",
+    "fvst:navnelbnr": "914050",
+    "name": "Afdeling hvidovre FGU Vestegnen",
+    "ref:DK:cvr": "39816431",
+    "ref:DK:cvr:pnummer": "1024946130"
+  }
+},
+{
+  "type": "node",
+  "id": 11597393454,
+  "lat": 55.6657928,
+  "lon": 12.4364822,
+  "tags": {
+    "amenity": "doctors",
+    "healthcare": "doctor",
+    "healthcare:speciality": "general",
+    "name": "Familielægerne Brøndby",
+    "phone": "+45 32 22 11 10",
+    "website": "https://xn--familielgernebrndby-sxb99a.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 11597393456,
+  "lat": 55.6657837,
+  "lon": 12.4362690,
+  "tags": {
+    "amenity": "doctors",
+    "healthcare": "doctor",
+    "healthcare:speciality": "general",
+    "name": "Brøndby Lægeklinik",
+    "phone": "+45 78 77 24 95",
+    "website": "https://laegeshaziamir.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 13131029121,
+  "lat": 55.6632548,
+  "lon": 12.4586047,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Skatte Kisten"
+  }
+},
+{
+  "type": "node",
+  "id": 13469079942,
+  "lat": 55.6622489,
+  "lon": 12.4153240,
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "1509993",
+    "name": "Rosenåen afd. Violen",
+    "ref:DK:cvr": "65120119",
+    "ref:DK:cvr:pnummer": "1020693009",
+    "website": "https://dagtilbud.glostrup.dk/dagtilbud/rosenaaen"
+  }
+},
+{
+  "type": "node",
+  "id": 13576569258,
+  "lat": 55.6657292,
+  "lon": 12.4542220,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Solsikke Huset"
+  }
+},
+{
+  "type": "node",
+  "id": 13576570807,
+  "lat": 55.6675564,
+  "lon": 12.4516711,
+  "tags": {
+    "amenity": "clinic",
+    "healthcare": "clinic",
+    "name": "Sunhedshuset Rødovre Syd",
+    "note": "CVR is 30312570",
+    "phone": "+4536473020",
+    "toilets": "yes",
+    "toilets:disposal": "flush",
+    "toilets:fee": "no",
+    "toilets:handwashing": "yes",
+    "toilets:handwashing:soap": "yes",
+    "toilets:paper_supplied": "yes",
+    "toilets:position": "seated",
+    "toilets:unisex": "yes",
+    "toilets:wheelchair": "yes",
+    "website": "https://sundhedshuset.nu/",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 13810887228,
+  "lat": 55.6461491,
+  "lon": 12.4289926,
+  "tags": {
+    "amenity": "school",
+    "education": "nature_school",
+    "name": "Naturskolen"
+  }
+},
+{
+  "type": "node",
+  "id": 13927078616,
+  "lat": 55.6614487,
+  "lon": 12.3985232,
+  "tags": {
+    "amenity": "clinic",
+    "healthcare": "clinic",
+    "name": "Stationslægerne"
+  }
+},
+{
+  "type": "node",
+  "id": 14172960806,
+  "lat": 55.6724931,
+  "lon": 12.4126847,
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-08-14",
+    "education": "kindergarten",
+    "name": "Daginstitutionen Essedalen"
+  }
+},
+{
+  "type": "way",
+  "id": 25605254,
+  "center": {
+    "lat": 55.6488083,
+    "lon": 12.4669496
+  },
+  "nodes": [
+    279090264,
+    279090265,
+    279090266,
+    279090267,
+    279090268,
+    279090270,
+    279090272,
+    279090273,
+    279090264
+  ],
+  "tags": {
+    "amenity": "hospital",
+    "check_date": "2026-08-05",
+    "emergency": "yes",
+    "healthcare": "hospital",
+    "name": "Hvidovre Hospital",
+    "wheelchair": "yes",
+    "wikidata": "Q3374772",
+    "wikipedia": "da:Hvidovre Hospital"
+  }
+},
+{
+  "type": "way",
+  "id": 26169680,
+  "center": {
+    "lat": 55.6202734,
+    "lon": 12.4086429
+  },
+  "nodes": [
+    286568947,
+    286568948,
+    286568949,
+    286568951,
+    5372362067,
+    286568952,
+    286568953,
+    286568954,
+    286568957,
+    286568958,
+    286568947
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Brøndby Strand Skole",
+    "website": "https://brondbystrandskole.skoleporten.dk/sp"
+  }
+},
+{
+  "type": "way",
+  "id": 26363834,
+  "center": {
+    "lat": 55.6264154,
+    "lon": 12.3995066
+  },
+  "nodes": [
+    288843264,
+    8117585732,
+    288843438,
+    12995420470,
+    12995420469,
+    288843264
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Brøndby Strand Skole",
+    "old_name": "Søholtskolen",
+    "wikidata": "Q12304550"
+  }
+},
+{
+  "type": "way",
+  "id": 26392570,
+  "center": {
+    "lat": 55.6640419,
+    "lon": 12.4290385
+  },
+  "nodes": [
+    289135081,
+    289135348,
+    289135083,
+    289135349,
+    289135347,
+    289135081
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Nørregård"
+  }
+},
+{
+  "type": "way",
+  "id": 26477789,
+  "center": {
+    "lat": 55.6257755,
+    "lon": 12.3817185
+  },
+  "nodes": [
+    290184252,
+    290182379,
+    290184253,
+    290182381,
+    290184254,
+    290182383,
+    290184252
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Sommerfuglen",
+    "preschool": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 26490224,
+  "center": {
+    "lat": 55.6286672,
+    "lon": 12.4527633
+  },
+  "nodes": [
+    290332053,
+    290332054,
+    290332141,
+    290332056,
+    290332142,
+    290332053
+  ],
+  "tags": {
+    "amenity": "school",
+    "education": "school",
+    "name": "Hvidovre Gymnasium & HF",
+    "wikidata": "Q20017937",
+    "wikipedia": "da:Hvidovre Gymnasium"
+  }
+},
+{
+  "type": "way",
+  "id": 26496129,
+  "center": {
+    "lat": 55.6275126,
+    "lon": 12.4479871
+  },
+  "nodes": [
+    290393210,
+    290394285,
+    290393212,
+    290394286,
+    290393210
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "education": "kindergarten",
+    "name": "Enghøj"
+  }
+},
+{
+  "type": "way",
+  "id": 26518223,
+  "center": {
+    "lat": 55.6215783,
+    "lon": 12.3886775
+  },
+  "nodes": [
+    290645839,
+    290645841,
+    2422703820,
+    290645842,
+    290645843,
+    290645844,
+    6149777131,
+    290645839
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Egholmskolen",
+    "website": "https://egholmskolen.skoleporten.dk/",
+    "wikidata": "Q122928794"
+  }
+},
+{
+  "type": "way",
+  "id": 26807718,
+  "center": {
+    "lat": 55.6615666,
+    "lon": 12.4474275
+  },
+  "nodes": [
+    294077919,
+    294077920,
+    294077921,
+    294077922,
+    294077919
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Brøndbyøster Skole",
+    "name:etymology:wikidata": "Q10437136",
+    "wikidata": "Q122924370"
+  }
+},
+{
+  "type": "way",
+  "id": 32459358,
+  "center": {
+    "lat": 55.6494825,
+    "lon": 12.4407327
+  },
+  "nodes": [
+    364902082,
+    364902084,
+    364902085,
+    1354230575,
+    10845436913,
+    303879650,
+    9214731132,
+    303879651,
+    364902089,
+    364902082
+  ],
+  "tags": {
+    "amenity": "hospital",
+    "emergency": "yes",
+    "healthcare": "psychotherapist",
+    "name": "Psykiatrisk Center Glostrup (afdeling Hvidovre)",
+    "opening_hours": "Mo-Fr 08:00-16:00"
+  }
+},
+{
+  "type": "way",
+  "id": 118635518,
+  "center": {
+    "lat": 55.6598927,
+    "lon": 12.4422464
+  },
+  "nodes": [
+    1333894571,
+    1333894420,
+    1333894504,
+    1333894548,
+    1333894544,
+    1333894580,
+    1333894593,
+    1333894462,
+    1333894502,
+    1333894571
+  ],
+  "tags": {
+    "amenity": "college",
+    "name": "Politiskolen Uddannelsescenter Øst",
+    "wikidata": "Q11995989"
+  }
+},
+{
+  "type": "way",
+  "id": 120877588,
+  "center": {
+    "lat": 55.6320310,
+    "lon": 12.4554713
+  },
+  "nodes": [
+    1354252998,
+    1354253027,
+    1354252991,
+    1354252979,
+    1354252997,
+    1354253012,
+    1354252934,
+    1354253043,
+    4011897949,
+    1354253091,
+    4011897921,
+    4011897821,
+    4011897824,
+    1354252968,
+    1354252998
+  ],
+  "tags": {
+    "amenity": "school",
+    "education": "school",
+    "name": "Avedøre Skole",
+    "name:etymology:wikidata": "Q4827976",
+    "wikidata": "Q122932955"
+  }
+},
+{
+  "type": "way",
+  "id": 131910202,
+  "center": {
+    "lat": 55.6497258,
+    "lon": 12.4015651
+  },
+  "nodes": [
+    1451164795,
+    1451164803,
+    1451164811,
+    286743322,
+    286743325,
+    1451164816,
+    1451164809,
+    1451164800,
+    1451164813,
+    1451164802,
+    1451164814,
+    1451164795
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Brøndbyvester Skole, Krogagervej",
+    "name:etymology:wikidata": "Q979259"
+  }
+},
+{
+  "type": "way",
+  "id": 132738588,
+  "center": {
+    "lat": 55.6636806,
+    "lon": 12.3940313
+  },
+  "nodes": [
+    1460313091,
+    13928321953,
+    13928321954,
+    13928321955,
+    13928321952,
+    1460313098,
+    13928321951,
+    13928321950,
+    1460313094,
+    13928321957,
+    1460313096,
+    13928321956,
+    1460313091
+  ],
+  "tags": {
+    "amenity": "library",
+    "building": "yes",
+    "name": "Glostrup Bibliotek",
+    "note": "open Mo-So 09:00-22:00 but without service",
+    "opening_hours": "Mo-Th 10:00-19:00; Fr 10:00-17:00; Sa 10:00-14:00",
+    "phone": "+45 43236820",
+    "website": "https://www.glostrupbib.dk/",
+    "wikidata": "Q21098039"
+  }
+},
+{
+  "type": "way",
+  "id": 147990988,
+  "center": {
+    "lat": 55.6769054,
+    "lon": 12.4505112
+  },
+  "nodes": [
+    1611018366,
+    1611018372,
+    4238069573,
+    1611018373,
+    1611018382,
+    1611018380,
+    1611018376,
+    1611018375,
+    1611018368,
+    1611018367,
+    1611018364,
+    1611018365,
+    1611018366
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Valhøj Skole",
+    "name:etymology:wikidata": "Q12343682",
+    "wheelchair": "no",
+    "wikidata": "Q122928709"
+  }
+},
+{
+  "type": "way",
+  "id": 158390552,
+  "center": {
+    "lat": 55.6548504,
+    "lon": 12.4334986
+  },
+  "nodes": [
+    1705994953,
+    1705994952,
+    1705994978,
+    1705994986,
+    1705994970,
+    1289310522,
+    1289310856,
+    1705994985,
+    1705994962,
+    1705994979,
+    1705994982,
+    1705994953
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2023-04-19",
+    "name": "Børnehuset Hyldebakkegård"
+  }
+},
+{
+  "type": "way",
+  "id": 160536117,
+  "center": {
+    "lat": 55.6621286,
+    "lon": 12.4047229
+  },
+  "nodes": [
+    1725898871,
+    1725898893,
+    1725898831,
+    1725898866,
+    1725898871
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-08-06",
+    "name": "Daginstitutionen Rosenåen, afdeling Anemonen"
+  }
+},
+{
+  "type": "way",
+  "id": 166439539,
+  "center": {
+    "lat": 55.6665456,
+    "lon": 12.4500522
+  },
+  "nodes": [
+    1778868636,
+    11504278971,
+    1778868639,
+    11504278975,
+    11504278970,
+    1778868658,
+    1778868685,
+    1778868636
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehuset Villa Kulla",
+    "website": "https://rk-bhvillakulla.aula.dk/"
+  }
+},
+{
+  "type": "way",
+  "id": 166816186,
+  "center": {
+    "lat": 55.6690177,
+    "lon": 12.4424221
+  },
+  "nodes": [
+    1431113094,
+    1431113096,
+    1431113079,
+    1431113084,
+    1431113085,
+    1431113098,
+    1431190789,
+    1431113108,
+    1431113103,
+    1782480099,
+    1431113094
+  ],
+  "tags": {
+    "alt_name": "Uddannelsescentret Nygård",
+    "amenity": "school",
+    "name": "UCN 10. klasseskolen",
+    "old_name": "Nygårdsskolen",
+    "wikidata": "Q12340090"
+  }
+},
+{
+  "type": "way",
+  "id": 174972166,
+  "center": {
+    "lat": 55.6699147,
+    "lon": 12.4008072
+  },
+  "nodes": [
+    1856129952,
+    1856129953,
+    1856129955,
+    12794160616,
+    1856129950,
+    1856129948,
+    1856129952
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-09-13",
+    "email": "info@bh-solvangen.dk",
+    "name": "Børnehaven Solvangen",
+    "operator": "private",
+    "phone": "+45 43 96 19 63",
+    "preschool": "yes",
+    "website": "http://www.bh-solvangen.dk",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 253495496,
+  "center": {
+    "lat": 55.6763831,
+    "lon": 12.4588142
+  },
+  "nodes": [
+    7842550554,
+    7842550553,
+    2594191819,
+    2594191802,
+    2594191804,
+    2594191808,
+    2594191805,
+    2594191811,
+    2594191812,
+    2594191815,
+    7842550552,
+    7842550551,
+    7842550550,
+    7842550549,
+    4429808995,
+    7842550547,
+    7842550548,
+    2594191821,
+    7842550554
+  ],
+  "tags": {
+    "amenity": "school",
+    "building": "yes",
+    "email": "pf@frb-privatskole.dk",
+    "name": "Frederiksberg Privatskole",
+    "opening_hours": "Mo-Fr 07:00-17:00",
+    "phone": "+45 36 72 44 80",
+    "website": "https://frb-privatskole.dk/"
+  }
+},
+{
+  "type": "way",
+  "id": 316521622,
+  "center": {
+    "lat": 55.6696015,
+    "lon": 12.3862355
+  },
+  "nodes": [
+    3226447193,
+    3226447196,
+    3226447182,
+    3226447180,
+    3226447176,
+    3226447179,
+    3226447173,
+    3226447171,
+    3226447169,
+    3226447161,
+    3226447189,
+    3226447197,
+    3226447193
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "building": "yes",
+    "name": "Perlen"
+  }
+},
+{
+  "type": "way",
+  "id": 378366277,
+  "center": {
+    "lat": 55.6242098,
+    "lon": 12.3873870
+  },
+  "nodes": [
+    3817790350,
+    3817790351,
+    5738576632,
+    5738576633,
+    918381394,
+    3817790353,
+    3817790350
+  ],
+  "tags": {
+    "amenity": "library",
+    "building": "yes",
+    "name": "Vallensbæk Bibliotek",
+    "opening_hours": "Mo-Th 10:00-19:00; Fr 12:00-17:00; Sa 10:00-15:00",
+    "phone": "+45 47974700",
+    "ref:isil": "DK-718700",
+    "website": "https://integrabib.dk/vallensbaek/",
+    "wikidata": "Q21098727"
+  }
+},
+{
+  "type": "way",
+  "id": 396663631,
+  "center": {
+    "lat": 55.6688211,
+    "lon": 12.4571200
+  },
+  "nodes": [
+    3994876460,
+    3994876462,
+    3994876461,
+    3994876478,
+    3994876480,
+    3994876491,
+    3994876492,
+    3994876497,
+    3994876496,
+    3994876495,
+    3994876494,
+    3994876486,
+    3994876459,
+    3994876460
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Hendriksholm Skole",
+    "name:etymology:wikidata": "Q12316205",
+    "wikidata": "Q122928706"
+  }
+},
+{
+  "type": "way",
+  "id": 396663632,
+  "center": {
+    "lat": 55.6665183,
+    "lon": 12.4570308
+  },
+  "nodes": [
+    3994875806,
+    3994875801,
+    3994875800,
+    3994875803,
+    3994875802,
+    3994875805,
+    3994875808,
+    3994875814,
+    3994876459,
+    3994876460,
+    3994875806
+  ],
+  "tags": {
+    "amenity": "college",
+    "check_date": "2026-05-12",
+    "name": "Rødovre Gymnasium",
+    "wikidata": "Q12334148",
+    "wikipedia": "da:Rødovre Gymnasium"
+  }
+},
+{
+  "type": "way",
+  "id": 398430941,
+  "center": {
+    "lat": 55.6235351,
+    "lon": 12.4576251
+  },
+  "nodes": [
+    4011897500,
+    4011897514,
+    4011897525,
+    4011897516,
+    4011897511,
+    4011897501,
+    4011897502,
+    4011897494,
+    4011897498,
+    4011897507,
+    4011897513,
+    4011897495,
+    4011897486,
+    4011897491,
+    4011897487,
+    4011897481,
+    4011897476,
+    3404342020,
+    4011897475,
+    4011897458,
+    4011897449,
+    4011897459,
+    4011897464,
+    4011897472,
+    4011897470,
+    4011897493,
+    4011897497,
+    4011897506,
+    4011897500
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "building": "yes",
+    "education": "kindergarten",
+    "name": "Børnehuset Humlebien"
+  }
+},
+{
+  "type": "way",
+  "id": 407745036,
+  "center": {
+    "lat": 55.6797431,
+    "lon": 12.3762244
+  },
+  "nodes": [
+    4097798887,
+    4097799211,
+    4097799210,
+    4097798884,
+    4097798887
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnhuset Rosenly"
+  }
+},
+{
+  "type": "way",
+  "id": 453537464,
+  "center": {
+    "lat": 55.6219346,
+    "lon": 12.4129179
+  },
+  "nodes": [
+    4502591925,
+    4502595031,
+    4502591924,
+    4502595032,
+    4502591923,
+    4502595034,
+    4502595033,
+    5372356165,
+    5372356158,
+    4502591925
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "91028",
+    "name": "Børnehuset Silergård",
+    "ref:DK:cvr": "65113015",
+    "ref:DK:cvr:pnummer": "1003261290"
+  }
+},
+{
+  "type": "way",
+  "id": 531236013,
+  "center": {
+    "lat": 55.6779550,
+    "lon": 12.3994437
+  },
+  "nodes": [
+    3435456613,
+    3435456614,
+    3435456615,
+    3435456616,
+    287721212,
+    5157028197,
+    5157028196,
+    287721213,
+    287721214,
+    287721215,
+    412479687,
+    3435456611,
+    3435456612,
+    3435456613
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Nordvangskolen",
+    "phone": "+4543964390",
+    "website": "http://glostrupskole.dk/",
+    "wikidata": "Q122925165"
+  }
+},
+{
+  "type": "way",
+  "id": 557805935,
+  "center": {
+    "lat": 55.6272785,
+    "lon": 12.4261111
+  },
+  "nodes": [
+    5379369755,
+    5379369745,
+    5379369746,
+    5379369754,
+    5379369753,
+    5379369752,
+    5379369751,
+    5379369750,
+    5379369749,
+    1307207741,
+    5379369748,
+    5379369747,
+    5379369755
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-05-09",
+    "name": "Børnehuset Svanen"
+  }
+},
+{
+  "type": "way",
+  "id": 589457344,
+  "center": {
+    "lat": 55.6242453,
+    "lon": 12.3980113
+  },
+  "nodes": [
+    5628693886,
+    5628693885,
+    5628693884,
+    3278424457,
+    2280832581,
+    5628693883,
+    5628693882,
+    5628693881,
+    5628693880,
+    5628693879,
+    5628693878,
+    5628693877,
+    5628693876,
+    5628693875,
+    5628693886
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehuset Uglebo"
+  }
+},
+{
+  "type": "way",
+  "id": 589457357,
+  "center": {
+    "lat": 55.6275572,
+    "lon": 12.3997221
+  },
+  "nodes": [
+    5628694036,
+    5628694035,
+    5628694034,
+    5628694033,
+    5628694032,
+    5628694031,
+    5628694030,
+    290459089,
+    5628694028,
+    5628694027,
+    5628694026,
+    5628694059,
+    5628694025,
+    5628694036
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Påfuglen"
+  }
+},
+{
+  "type": "way",
+  "id": 594105483,
+  "center": {
+    "lat": 55.6543910,
+    "lon": 12.3854324
+  },
+  "nodes": [
+    5665988091,
+    5083117773,
+    11939901421,
+    5083117774,
+    1710553826,
+    5665988091
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2023-07-18",
+    "name": "Børnehuset Vesterled"
+  }
+},
+{
+  "type": "way",
+  "id": 605466990,
+  "center": {
+    "lat": 55.6667428,
+    "lon": 12.3772909
+  },
+  "nodes": [
+    5742661422,
+    5742661421,
+    5742660220,
+    5742660219,
+    5742660218,
+    5742660217,
+    5742660216,
+    5742661422
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Vestervangskolen",
+    "phone": "+4543207000",
+    "source": "http://glostrupskole.dk/",
+    "website": "http://glostrupskole.dk/",
+    "wikidata": "Q122925167"
+  }
+},
+{
+  "type": "way",
+  "id": 667922784,
+  "center": {
+    "lat": 55.6228438,
+    "lon": 12.4350766
+  },
+  "nodes": [
+    6254245471,
+    6254245472,
+    6254245473,
+    6254245474,
+    6254245475,
+    6254245476,
+    6254245477,
+    6254245471
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Langbjergskolen"
+  }
+},
+{
+  "type": "way",
+  "id": 683920291,
+  "center": {
+    "lat": 55.6795215,
+    "lon": 12.4432542
+  },
+  "nodes": [
+    4341697144,
+    4341697143,
+    4341082233,
+    4341082234,
+    4341082223,
+    4341082236,
+    8760376582,
+    4341082231,
+    6406656818,
+    6406656817,
+    4341695724,
+    4341695714,
+    4341695431,
+    4341695432,
+    3269132524,
+    14169218562,
+    3269132530,
+    6406656816,
+    4341697144
+  ],
+  "tags": {
+    "amenity": "school",
+    "check_date": "2026-03-21",
+    "name": "Skovmoseskolen"
+  }
+},
+{
+  "type": "way",
+  "id": 683920292,
+  "center": {
+    "lat": 55.6788442,
+    "lon": 12.4420756
+  },
+  "nodes": [
+    6406656827,
+    6406656826,
+    6406656825,
+    6406656824,
+    6406656823,
+    6406656827
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2024-03-02",
+    "education": "kindergarten",
+    "fvst:navnelbnr": "110736",
+    "name": "Børnehuset Græshoppen",
+    "ref:DK:cvr": "65307316",
+    "ref:DK:cvr:pnummer": "1015411429"
+  }
+},
+{
+  "type": "way",
+  "id": 684914074,
+  "center": {
+    "lat": 55.6458476,
+    "lon": 12.4132768
+  },
+  "nodes": [
+    1388558778,
+    6417385408,
+    6417385407,
+    6417385406,
+    1388558778
+  ],
+  "tags": {
+    "amenity": "school",
+    "education": "school",
+    "name": "Brøndbyvester Skole, Tornehøj",
+    "name:etymology:wikidata": "Q979259",
+    "wikidata": "Q122924371"
+  }
+},
+{
+  "type": "way",
+  "id": 684921723,
+  "center": {
+    "lat": 55.6660033,
+    "lon": 12.4068381
+  },
+  "nodes": [
+    6417455045,
+    6417455012,
+    6417455044,
+    3620374296,
+    6417455043,
+    6417455042,
+    6417455040,
+    6417455041,
+    6417455045
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Søndervangskolen",
+    "source": "http://glostrupskole.dk/",
+    "wikidata": "Q122925166"
+  }
+},
+{
+  "type": "way",
+  "id": 799555455,
+  "center": {
+    "lat": 55.6459898,
+    "lon": 12.4635876
+  },
+  "nodes": [
+    7477821063,
+    7477821062,
+    7477821061,
+    7477821060,
+    7476890385,
+    7477821063
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Valnødden",
+    "website": "https://boernehusetvalnoedden.aula.dk/"
+  }
+},
+{
+  "type": "way",
+  "id": 908653656,
+  "center": {
+    "lat": 55.6682558,
+    "lon": 12.4441043
+  },
+  "nodes": [
+    8437106291,
+    8437106292,
+    1782469709,
+    1782469713,
+    1782469711,
+    1782469722,
+    1782469697,
+    8437106291
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-07-12",
+    "name": "Højkær Byggelegeplads",
+    "opening_hours": "Mo-Fr 09:00-17:00; Sa-Su 10:00-14:00",
+    "operator": "Brøndby Kommune"
+  }
+},
+{
+  "type": "way",
+  "id": 911831222,
+  "center": {
+    "lat": 55.6767968,
+    "lon": 12.4394193
+  },
+  "nodes": [
+    8467150441,
+    8467150438,
+    8467150439,
+    8467150440,
+    8467150441
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "911664",
+    "name": "Børnehuset Espelunden",
+    "ref:DK:cvr": "65307316",
+    "ref:DK:cvr:pnummer": "1023242636"
+  }
+},
+{
+  "type": "way",
+  "id": 931330683,
+  "center": {
+    "lat": 55.6513882,
+    "lon": 12.4154544
+  },
+  "nodes": [
+    8634682283,
+    8634682282,
+    5082647920,
+    1591487625,
+    8634682281,
+    5082647904,
+    8634682280,
+    8634682269,
+    8634682268,
+    8634682267,
+    5082647905,
+    8634682279,
+    10666275030,
+    8634682270,
+    8634682278,
+    8634682277,
+    8634682276,
+    10666275031,
+    5082647906,
+    8634682275,
+    8634682274,
+    8634682273,
+    1337968071,
+    8634682271,
+    1591487643,
+    8634682283
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Brøndby Idrætsefterskole",
+    "name:etymology:wikidata": "Q116040074",
+    "wikidata": "Q123381391"
+  }
+},
+{
+  "type": "way",
+  "id": 932700506,
+  "center": {
+    "lat": 55.6552415,
+    "lon": 12.3989849
+  },
+  "nodes": [
+    8645796612,
+    3253353279,
+    8645796611,
+    8645796610,
+    8645796609,
+    8645796608,
+    8645796607,
+    8645796606,
+    8645796605,
+    8645796604,
+    8645796603,
+    8645796602,
+    8645796601,
+    8645796600,
+    8645796599,
+    8645796598,
+    8645796597,
+    8645796575,
+    8645796596,
+    8645796595,
+    8645796594,
+    8645796585,
+    8645796578,
+    8645796579,
+    8645796580,
+    8645796576,
+    8645796577,
+    8645796583,
+    8645796582,
+    8645796581,
+    8645796584,
+    8645796586,
+    8645796593,
+    8645796587,
+    8645796588,
+    8645796589,
+    8645796590,
+    8645796591,
+    8645796592,
+    8645796612
+  ],
+  "tags": {
+    "amenity": "school",
+    "fee": "yes",
+    "name": "Park Allé Privatskole",
+    "phone": "+45 29 89 82 92",
+    "source": "survey",
+    "website": "https://parkalleprivatskole.dk/"
+  }
+},
+{
+  "type": "way",
+  "id": 1066014583,
+  "center": {
+    "lat": 55.6585286,
+    "lon": 12.3998121
+  },
+  "nodes": [
+    9789511308,
+    9789511309,
+    9789511310,
+    9789511311,
+    9789511312,
+    9789511308
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "education": "kindergarten",
+    "name": "Børnehuset Kirkebjerg"
+  }
+},
+{
+  "type": "way",
+  "id": 1199464136,
+  "center": {
+    "lat": 55.6466137,
+    "lon": 12.4634595
+  },
+  "nodes": [
+    11125044769,
+    11125044770,
+    11125044771,
+    11125044772,
+    11125044769
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Vanddråben",
+    "website": "https://eventyrhaven-kk.aula.dk/"
+  }
+},
+{
+  "type": "way",
+  "id": 1325588002,
+  "center": {
+    "lat": 55.6631625,
+    "lon": 12.3858505
+  },
+  "nodes": [
+    12265602298,
+    12265602297,
+    12265602295,
+    12265602294,
+    12265602298
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Rosenåen"
+  }
+},
+{
+  "type": "way",
+  "id": 1467536834,
+  "center": {
+    "lat": 55.6348306,
+    "lon": 12.4629414
+  },
+  "nodes": [
+    13459906752,
+    13459906753,
+    13459906754,
+    13459906755,
+    13459906752
+  ],
+  "tags": {
+    "amenity": "school",
+    "education": "school",
+    "name": "Fritidshjemmet Ærtebjerg"
+  }
+},
+{
+  "type": "relation",
+  "id": 10781459,
+  "center": {
+    "lat": 55.6255144,
+    "lon": 12.4639452
+  },
+  "members": [
+    {
+      "type": "way",
+      "ref": 452246311,
+      "role": "outer"
+    },
+    {
+      "type": "way",
+      "ref": 778001660,
+      "role": "outer"
+    }
+  ],
+  "tags": {
+    "amenity": "school",
+    "education": "school",
+    "name": "Frydenhøjskolen",
+    "name:etymology:wikidata": "Q130236405",
+    "operator": "Hvidovre Kommune",
+    "type": "multipolygon",
+    "wikidata": "Q122932956"
+  }
+}
+
+  ]
+}

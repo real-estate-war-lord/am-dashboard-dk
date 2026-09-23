@@ -1,0 +1,2076 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-09-22T08:45:51Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 287815871,
+  "lat": 55.7497225,
+  "lon": 12.3192583,
+  "tags": {
+    "amenity": "library",
+    "check_date": "2025-08-27",
+    "name": "Måløv Bibliotek",
+    "opening_hours": "Mo-Th 13:00-19:00; Fr 11:00-17:00; Sa 10:00-14:00",
+    "phone": "+45 44772060",
+    "ref:isil": "DK-715102",
+    "website": "https://bib.ballerup.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 918680312,
+  "lat": 55.7426102,
+  "lon": 12.4221897,
+  "tags": {
+    "amenity": "library",
+    "name": "Hjortespring Bibliotek",
+    "opening_hours": "Mo-We 13:00-19:00; Th 10:00-19:00; Fr 13:00-17:00; Sa 10:00-14:00",
+    "phone": "+45 44525690",
+    "ref:isil": "DK-716301",
+    "website": "https://www.herlevbibliotek.dk/",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 934853806,
+  "lat": 55.7647657,
+  "lon": 12.4018313,
+  "tags": {
+    "amenity": "library",
+    "name": "Hareskov Bibliotek",
+    "opening_hours": "Mo-Th 14:00-17:30;Sa 10:00-14:00",
+    "phone": "+45 72354670",
+    "ref:isil": "DK-719002",
+    "website": "https://www.furesoebibliotekerne.dk/web/arena/hareskov-bibliotek",
+    "wikidata": "Q12315716",
+    "wikipedia": "da:Hareskov Bibliotek"
+  }
+},
+{
+  "type": "node",
+  "id": 1617998544,
+  "lat": 55.7559646,
+  "lon": 12.3883958,
+  "tags": {
+    "amenity": "school",
+    "name": "Lilleafdelingen"
+  }
+},
+{
+  "type": "node",
+  "id": 1617998546,
+  "lat": 55.7562891,
+  "lon": 12.3884385,
+  "tags": {
+    "amenity": "school",
+    "name": "Storeafdelingen"
+  }
+},
+{
+  "type": "node",
+  "id": 1704405640,
+  "lat": 55.7212452,
+  "lon": 12.3979053,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehaven Vildanden"
+  }
+},
+{
+  "type": "node",
+  "id": 3404320546,
+  "lat": 55.7310700,
+  "lon": 12.3970200,
+  "tags": {
+    "alt_name": "DTU Ballerup Campus",
+    "amenity": "school",
+    "check_date": "2024-11-11",
+    "email": "ihk@ihk.dk",
+    "name": "DTU Diplom",
+    "phone": "+45 4480 5088",
+    "website": "http://www.diplom.dtu.dk/",
+    "wikidata": "Q4662636"
+  }
+},
+{
+  "type": "node",
+  "id": 3404342019,
+  "lat": 55.7626700,
+  "lon": 12.3910900,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehuset Bøgely"
+  }
+},
+{
+  "type": "node",
+  "id": 4432470658,
+  "lat": 55.7230360,
+  "lon": 12.3587338,
+  "tags": {
+    "amenity": "school",
+    "description": "Hvad er Skolen for Recovery? Skolen for Recovery tilbyder kurser med henblik på at støtte den enkelte med at blive ekspert i sin egen recovery",
+    "email": "skolen-for-recovery@regionh.dk",
+    "internet_access": "wlan",
+    "internet_access:ssid": "RegHGaest",
+    "level": "0",
+    "name": "Skolen for Recovery",
+    "operator": "Region H Psykiatri",
+    "operator:type": "government",
+    "phone": "+45 23 60 08 96",
+    "website": "https://www.psykiatri-regionh.dk/Kvalitet-og-udvikling/skolen-for-recovery/Sider/default.aspx",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 4673697078,
+  "lat": 55.7150977,
+  "lon": 12.4231831,
+  "tags": {
+    "amenity": "school",
+    "fvst:navnelbnr": "97311",
+    "name": "Uddannelsescentret for Kollektiv Trafik",
+    "ref:DK:cvr": "21620378",
+    "ref:DK:cvr:pnummer": "1005072786"
+  }
+},
+{
+  "type": "node",
+  "id": 8221484541,
+  "lat": 55.7164970,
+  "lon": 12.4000471,
+  "tags": {
+    "amenity": "school",
+    "check_date": "2025-08-26",
+    "name": "Kasperskolen",
+    "start_date": "2019-07-02",
+    "website": "https://kasperskolen.dk",
+    "wikidata": "Q12321527",
+    "wikipedia": "da:Kasperskolen"
+  }
+},
+{
+  "type": "node",
+  "id": 9014594273,
+  "lat": 55.7211959,
+  "lon": 12.4143463,
+  "tags": {
+    "amenity": "school",
+    "name": "Ordblindeinstituttet",
+    "website": "https://oi.dk"
+  }
+},
+{
+  "type": "node",
+  "id": 9867035938,
+  "lat": 55.7489246,
+  "lon": 12.3801327,
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2025-08-26",
+    "name": "Børnehuset Valhalla i Byen",
+    "website": "https://boernehuset-valhalla.aula.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 13010050307,
+  "lat": 55.7316682,
+  "lon": 12.3044240,
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "97656",
+    "name": "Fritidsklubben Springbrættet",
+    "ref:DK:cvr": "29188386",
+    "ref:DK:cvr:pnummer": "1007520227",
+    "website": "https://klub-springbraettet.aula.dk/om-springbraettet/"
+  }
+},
+{
+  "type": "node",
+  "id": 13260924208,
+  "lat": 55.7273805,
+  "lon": 12.4001292,
+  "tags": {
+    "amenity": "hospital",
+    "healthcare": "hospital",
+    "name": "Anicura Skovlunde Dyrehospital",
+    "operator": "Anicura",
+    "operator:type": "private"
+  }
+},
+{
+  "type": "node",
+  "id": 13810931945,
+  "lat": 55.7383387,
+  "lon": 12.3172281,
+  "tags": {
+    "amenity": "school",
+    "education": "nature_school",
+    "name": "DOF Smørum Naturskole"
+  }
+},
+{
+  "type": "way",
+  "id": 25700603,
+  "center": {
+    "lat": 55.7358723,
+    "lon": 12.3823080
+  },
+  "nodes": [
+    471353174,
+    338999564,
+    11355745428,
+    11355745430,
+    11355745429,
+    338999563,
+    11355745427,
+    11355745426,
+    338999562,
+    338999561,
+    11355745418,
+    338999560,
+    11355745417,
+    11355745420,
+    338999558,
+    11355745416,
+    338999557,
+    11355745415,
+    338999556,
+    11355745414,
+    338999555,
+    11355745413,
+    338999554,
+    11355745412,
+    338999553,
+    11355745411,
+    338999552,
+    11355745419,
+    338999551,
+    338999550,
+    471352204,
+    471352717,
+    471352685,
+    471352571,
+    471352570,
+    471352486,
+    471352441,
+    471352435,
+    1410585168,
+    280196989,
+    280196920,
+    1410342482,
+    1410342458,
+    4390323524,
+    4390323528,
+    1410342496,
+    4390323541,
+    4390323548,
+    4390323553,
+    4390323560,
+    4390323561,
+    4390323567,
+    4390323571,
+    4390323577,
+    1410342483,
+    4390323587,
+    280196922,
+    4390333711,
+    280196984,
+    280196910,
+    471353174
+  ],
+  "tags": {
+    "amenity": "college",
+    "check_date": "2026-08-12",
+    "name": "Borupgaard Gymnasium",
+    "old_name": "Borupgaard Amtsgymnasium",
+    "website": "https://www.borupgaard-gym.dk/",
+    "wikidata": "Q12304204",
+    "wikipedia": "da:Borupgaard Gymnasium"
+  }
+},
+{
+  "type": "way",
+  "id": 26275806,
+  "center": {
+    "lat": 55.7512459,
+    "lon": 12.3211499
+  },
+  "nodes": [
+    287814830,
+    5970453947,
+    5970453944,
+    5970453940,
+    5970453941,
+    287814831,
+    5970541534,
+    287814832,
+    5970541536,
+    5970541537,
+    281061639,
+    287814834,
+    5970453665,
+    287814830
+  ],
+  "tags": {
+    "amenity": "school",
+    "branch": "Måløv",
+    "contact:website": "http://maaloevhoejskole.dk/",
+    "name": "Måløvhøj Skole",
+    "wikidata": "Q122926084"
+  }
+},
+{
+  "type": "way",
+  "id": 26276151,
+  "center": {
+    "lat": 55.7325310,
+    "lon": 12.3423444
+  },
+  "nodes": [
+    287820469,
+    287820470,
+    287820471,
+    287820472,
+    287820473,
+    287820474,
+    287820475,
+    287820476,
+    287820477,
+    287820478,
+    287820479,
+    287820480,
+    287820481,
+    287820482,
+    287820483,
+    287820484,
+    287820485,
+    287820486,
+    287820487,
+    287820488,
+    287820469
+  ],
+  "tags": {
+    "amenity": "school",
+    "building": "yes",
+    "name": "Technical Education Copenhagen",
+    "short_name": "TEC",
+    "website": "https://www.tec.dk/"
+  }
+},
+{
+  "type": "way",
+  "id": 26582022,
+  "center": {
+    "lat": 55.7148757,
+    "lon": 12.4016819
+  },
+  "nodes": [
+    291503108,
+    291503110,
+    12969248530,
+    291502554,
+    291502703,
+    291502716,
+    12969248543,
+    291502715,
+    291503117,
+    291503204,
+    291503205,
+    291502250,
+    12795938370,
+    12795938371,
+    13713277334,
+    13713277333,
+    13713277336,
+    13713277335,
+    291503108
+  ],
+  "tags": {
+    "amenity": "school",
+    "brand": "Rosenlund",
+    "name": "Skovlunde Skole",
+    "name:etymology:wikidata": "Q3373689",
+    "old_name": "Rosenlundskolen",
+    "wikidata": "Q122926082"
+  }
+},
+{
+  "type": "way",
+  "id": 26582110,
+  "center": {
+    "lat": 55.7218932,
+    "lon": 12.4097758
+  },
+  "nodes": [
+    291504536,
+    12795993172,
+    12795993173,
+    1683765721,
+    291504537,
+    291504538,
+    12799693994,
+    291504540,
+    291504541,
+    6176031030,
+    12799697806,
+    291504536
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2023-05-01",
+    "fvst:navnelbnr": "721722",
+    "name": "Børnehuset Himmel og Hav",
+    "ref:DK:cvr": "58271713",
+    "ref:DK:cvr:pnummer": "1022845132"
+  }
+},
+{
+  "type": "way",
+  "id": 32436435,
+  "center": {
+    "lat": 55.7218994,
+    "lon": 12.3607502
+  },
+  "nodes": [
+    364727313,
+    364727317,
+    364727320,
+    1672685838,
+    364727324,
+    364727329,
+    364727330,
+    1672685847,
+    1672685849,
+    364727332,
+    1672685842,
+    364727336,
+    1672685845,
+    364727313
+  ],
+  "tags": {
+    "amenity": "hospital",
+    "check_date": "2025-05-14",
+    "healthcare": "hospital",
+    "name": "Psykiatrisk Center Ballerup"
+  }
+},
+{
+  "type": "way",
+  "id": 95164023,
+  "center": {
+    "lat": 55.7492699,
+    "lon": 12.3820451
+  },
+  "nodes": [
+    1103960563,
+    1103960547,
+    1103960404,
+    1103960593,
+    1103960375,
+    1103960418,
+    1103960420,
+    1103960464,
+    1103960563
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "building": "yes",
+    "check_date": "2025-02-06",
+    "name": "Børnehaven Nordpolen",
+    "toilets:wheelchair": "yes",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 101892389,
+  "center": {
+    "lat": 55.7322938,
+    "lon": 12.4252616
+  },
+  "nodes": [
+    5698659369,
+    1176309805,
+    5698659350,
+    1176309808,
+    1176309769,
+    1589924535,
+    1176309773,
+    1176309777,
+    1176309781,
+    1176309795,
+    5698659342,
+    5698659341,
+    1176309799,
+    1588933199,
+    1588933201,
+    1589875272,
+    1589924640,
+    1589924606,
+    1589924709,
+    1589924749,
+    1589924587,
+    5698659376,
+    5698659377,
+    1589924577,
+    1589924748,
+    5698657300,
+    1589924545,
+    5698659368,
+    5698659369
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Lindehøjskole"
+  }
+},
+{
+  "type": "way",
+  "id": 127448219,
+  "center": {
+    "lat": 55.7484604,
+    "lon": 12.3795186
+  },
+  "nodes": [
+    1103960666,
+    1103960410,
+    1103960545,
+    1103960557,
+    1103960657,
+    5463210798,
+    1103960541,
+    2990824136,
+    1103960590,
+    1103960643,
+    1103960603,
+    1103960617,
+    1103960653,
+    1103960405,
+    1103960429,
+    1103960448,
+    1103960611,
+    1103960633,
+    1103960509,
+    1103960368,
+    1103960529,
+    1103960706,
+    1103960461,
+    1103960720,
+    1103960735,
+    1103960451,
+    1103960355,
+    1103960374,
+    1103960364,
+    1103960531,
+    1103960527,
+    1103960520,
+    1103960718,
+    1103960699,
+    1103960584,
+    1103960666
+  ],
+  "tags": {
+    "amenity": "school",
+    "branch": "Øst",
+    "check_date": "2025-12-02",
+    "name": "Skovvejens Skole",
+    "old_name": "Egebjergskolen",
+    "wikidata": "Q12309425"
+  }
+},
+{
+  "type": "way",
+  "id": 145618060,
+  "center": {
+    "lat": 55.7310114,
+    "lon": 12.4176032
+  },
+  "nodes": [
+    1589974238,
+    1589974234,
+    1589974225,
+    1589974296,
+    5706654773,
+    5706654772,
+    1589974257,
+    5706654774,
+    1589974238
+  ],
+  "tags": {
+    "amenity": "school",
+    "building": "apartments",
+    "name": "Herlev Ungdomsskole",
+    "name:etymology:wikidata": "Q3646715"
+  }
+},
+{
+  "type": "way",
+  "id": 145618616,
+  "center": {
+    "lat": 55.7306255,
+    "lon": 12.4170613
+  },
+  "nodes": [
+    1589980453,
+    5706654813,
+    5706654814,
+    5706654815,
+    5706654816,
+    5706654817,
+    1589980440,
+    1589980405,
+    1589980455,
+    1589980361,
+    1589980466,
+    5706654818,
+    1589980429,
+    1589980370,
+    1589980417,
+    5706654819,
+    5706654820,
+    1589980409,
+    1589980358,
+    1589980387,
+    1589980453
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "building": "kindergarten",
+    "name": "Børneinstitutionen Højsletten"
+  }
+},
+{
+  "type": "way",
+  "id": 145669323,
+  "center": {
+    "lat": 55.7335520,
+    "lon": 12.4202014
+  },
+  "nodes": [
+    1590396121,
+    1590396144,
+    1590396126,
+    1590396115,
+    1590396121
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "building": "kindergarten",
+    "fvst:navnelbnr": "91796",
+    "name": "Børneinstitutionen Lindehøj",
+    "ref:DK:cvr": "24199738",
+    "ref:DK:cvr:pnummer": "1006400401"
+  }
+},
+{
+  "type": "way",
+  "id": 151282888,
+  "center": {
+    "lat": 55.7256886,
+    "lon": 12.3438487
+  },
+  "nodes": [
+    1641023146,
+    1641022962,
+    1641023033,
+    1641023249,
+    1641023146
+  ],
+  "tags": {
+    "amenity": "school",
+    "building": "yes",
+    "name": "Grantofteskolen",
+    "toilets:wheelchair": "yes",
+    "wheelchair": "yes",
+    "wikidata": "Q122926081"
+  }
+},
+{
+  "type": "way",
+  "id": 151519728,
+  "center": {
+    "lat": 55.7315394,
+    "lon": 12.3082680
+  },
+  "nodes": [
+    5395669001,
+    5395668999,
+    1643326089,
+    1802660338,
+    1643326206,
+    1643326075,
+    5395668998,
+    5395669000,
+    5395669001
+  ],
+  "tags": {
+    "amenity": "library",
+    "building": "yes",
+    "name": "Smørum Bibliotek",
+    "wikidata": "Q21106789"
+  }
+},
+{
+  "type": "way",
+  "id": 152504929,
+  "center": {
+    "lat": 55.7332296,
+    "lon": 12.3034525
+  },
+  "nodes": [
+    1653230178,
+    1653230159,
+    1653230205,
+    1653230192,
+    1653230203,
+    1653230209,
+    1653230211,
+    1653230167,
+    1653230176,
+    1653230165,
+    1653230221,
+    1653230161,
+    1653230186,
+    1653230153,
+    1653230174,
+    1653230178
+  ],
+  "tags": {
+    "amenity": "doctors",
+    "building": "yes",
+    "healthcare": "doctor",
+    "healthcare:speciality": "general",
+    "name": "Lægehuset i Smørum"
+  }
+},
+{
+  "type": "way",
+  "id": 153224865,
+  "center": {
+    "lat": 55.7387016,
+    "lon": 12.2937038
+  },
+  "nodes": [
+    1659349433,
+    1659349476,
+    1659349465,
+    1659349473,
+    1659349364,
+    1659349321,
+    1659349327,
+    1659349416,
+    1659349428,
+    1659349472,
+    1659349413,
+    9547344881,
+    9547344880,
+    9547344879,
+    9547344878,
+    1659349437,
+    1659349430,
+    1659349323,
+    1659349451,
+    1659349325,
+    1659349433
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "building": "yes",
+    "fvst:navnelbnr": "555525",
+    "name": "Børnehuset Mælkebøtten",
+    "ref:DK:cvr": "29188386",
+    "ref:DK:cvr:pnummer": "1003269540"
+  }
+},
+{
+  "type": "way",
+  "id": 153224867,
+  "center": {
+    "lat": 55.7383021,
+    "lon": 12.2942550
+  },
+  "nodes": [
+    1659349454,
+    1648856692,
+    1648856712,
+    1648856801,
+    1648856730,
+    1648856778,
+    1659349331,
+    1659349466,
+    1659349454
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "769116",
+    "name": "Børnehuset Stangkær",
+    "ref:DK:cvr": "29188386",
+    "ref:DK:cvr:pnummer": "1003269655"
+  }
+},
+{
+  "type": "way",
+  "id": 153229761,
+  "center": {
+    "lat": 55.7407135,
+    "lon": 12.2910046
+  },
+  "nodes": [
+    1659393248,
+    1659393281,
+    1659393134,
+    1659393185,
+    1659393190,
+    1659393212,
+    1659393248
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Lille Solsikken"
+  }
+},
+{
+  "type": "way",
+  "id": 153679998,
+  "center": {
+    "lat": 55.7365944,
+    "lon": 12.3076273
+  },
+  "nodes": [
+    1663115340,
+    1663115348,
+    3323672527,
+    1663115369,
+    1663115346,
+    1663115318,
+    3323672519,
+    3323672521,
+    3323672522,
+    3323672528,
+    1663115340
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "966639",
+    "name": "Børnehuset Åkandehaven",
+    "ref:DK:cvr": "29188386",
+    "ref:DK:cvr:pnummer": "1003269928"
+  }
+},
+{
+  "type": "way",
+  "id": 155612403,
+  "center": {
+    "lat": 55.7188120,
+    "lon": 12.4043941
+  },
+  "nodes": [
+    1680114165,
+    1680114161,
+    1680114099,
+    1680114182,
+    1680114165
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "building": "yes",
+    "check_date": "2025-01-16",
+    "name": "Ellekilde Fritidscenter",
+    "toilets:wheelchair": "yes",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 155618386,
+  "center": {
+    "lat": 55.7185130,
+    "lon": 12.4011050
+  },
+  "nodes": [
+    1680197233,
+    1680197361,
+    1680197509,
+    1680197378,
+    1680197174,
+    1680197251,
+    1680197502,
+    1680197493,
+    1680197309,
+    1680197413,
+    1680197248,
+    1680197206,
+    1680197202,
+    1680197562,
+    1680197233
+  ],
+  "tags": {
+    "amenity": "library",
+    "building": "yes",
+    "check_date": "2023-07-31",
+    "name": "Skovlunde Kulturhus",
+    "opening_hours": "Mo-Su 10:00-22:00",
+    "phone": "+45 44772577",
+    "ref:isil": "DK-715101",
+    "toilets:wheelchair": "yes",
+    "website": "https://bib.ballerup.dk/bibliotek/skovlunde",
+    "wheelchair": "yes",
+    "wikidata": "Q21097983"
+  }
+},
+{
+  "type": "way",
+  "id": 156044004,
+  "center": {
+    "lat": 55.7175295,
+    "lon": 12.4045568
+  },
+  "nodes": [
+    1683544374,
+    1683544333,
+    1683544339,
+    1683544380,
+    1683544374
+  ],
+  "tags": {
+    "amenity": "theatre",
+    "building": "yes",
+    "name": "Skovlunde Friluftsscene",
+    "operator": "Ballerup Kommune",
+    "operator:type": "government",
+    "owner": "Ballerup Kommune",
+    "ownership": "municipal",
+    "start_date": "1990",
+    "website": "https://ballerup.dk/brug-byen/kunst-i-ballerup/skovlunde-friluftsscene"
+  }
+},
+{
+  "type": "way",
+  "id": 173965859,
+  "center": {
+    "lat": 55.7295974,
+    "lon": 12.3948111
+  },
+  "nodes": [
+    1847128763,
+    1847128751,
+    1847128758,
+    1847128772,
+    1847128762,
+    1847128759,
+    1847128755,
+    1847128741,
+    1847128763
+  ],
+  "tags": {
+    "amenity": "school",
+    "building": "yes",
+    "check_date": "2026-08-12",
+    "fvst:navnelbnr": "905555",
+    "name": "S/I FGU Nord",
+    "ref:DK:cvr": "39816423",
+    "ref:DK:cvr:pnummer": "1024369850",
+    "website": "https://fgunord.dk/kontakt-fgu-nord/"
+  }
+},
+{
+  "type": "way",
+  "id": 189068897,
+  "center": {
+    "lat": 55.7486389,
+    "lon": 12.3395356
+  },
+  "nodes": [
+    4553758117,
+    1997187004,
+    1997187038,
+    1997187009,
+    1997187023,
+    1997187010,
+    1997187029,
+    1997187007,
+    1997187026,
+    1997187031,
+    1997187035,
+    1997187019,
+    1997187012,
+    1997187036,
+    1996120151,
+    4553758117
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "building": "kindergarten",
+    "check_date": "2025-09-30",
+    "fvst:navnelbnr": "97286",
+    "name": "Børnehuset Stjernehøj",
+    "ref:DK:cvr": "58271713",
+    "ref:DK:cvr:pnummer": "1021652306",
+    "website": "https://ballerup.inst.dk/Foresides/IntraForeside.aspx?Location=IP.30"
+  }
+},
+{
+  "type": "way",
+  "id": 196764585,
+  "center": {
+    "lat": 55.7305605,
+    "lon": 12.3522101
+  },
+  "nodes": [
+    2070558964,
+    2070558888,
+    2070558915,
+    2070558966,
+    2705329864,
+    2070558968,
+    2070558964
+  ],
+  "tags": {
+    "amenity": "theatre",
+    "building": "yes",
+    "check_date": "2026-07-13",
+    "name": "Baltoppen LIVE",
+    "operator": "Ballerup Kommune",
+    "toilets:wheelchair": "yes",
+    "website": "https://baltoppenlive.dk/",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 215234149,
+  "center": {
+    "lat": 55.7296222,
+    "lon": 12.3597670
+  },
+  "nodes": [
+    2246386579,
+    8390747246,
+    5921097207,
+    5921097206,
+    5921097201,
+    5921097205,
+    5921097208,
+    2246386602,
+    5921097210,
+    5921097209,
+    2246386597,
+    5921097204,
+    5921097203,
+    5921097202,
+    922963704,
+    2246386575,
+    2246386579
+  ],
+  "tags": {
+    "amenity": "library",
+    "building": "apartments",
+    "building:levels": "4",
+    "check_date": "2025-07-07",
+    "internet_access": "wlan",
+    "name": "Ballerup Bibliotek",
+    "opening_hours": "Mo-Th 10:00-19:00; Fr 10:00-17:00; Sa 10:00-14:00",
+    "phone": "+45 44773333",
+    "ref:isil": "DK-715100",
+    "toilets:wheelchair": "yes",
+    "website": "https://bib.ballerup.dk/",
+    "wheelchair": "yes",
+    "wikidata": "Q21097980"
+  }
+},
+{
+  "type": "way",
+  "id": 225347589,
+  "center": {
+    "lat": 55.7367851,
+    "lon": 12.3469011
+  },
+  "nodes": [
+    10744663215,
+    2341345896,
+    2341345893,
+    2341346202,
+    10744663214,
+    10744663215
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "building": "kindergarten",
+    "fvst:navnelbnr": "788895",
+    "name": "Børnehuset Bispevangen",
+    "ref:DK:cvr": "58271713",
+    "ref:DK:cvr:pnummer": "1017649643",
+    "toilets:wheelchair": "yes",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 225348362,
+  "center": {
+    "lat": 55.7563626,
+    "lon": 12.3432846
+  },
+  "nodes": [
+    2341360742,
+    2341360740,
+    2341360708,
+    2341360702,
+    2341360698,
+    2341360690,
+    9733486982,
+    2341360640,
+    2341360651,
+    2341360652,
+    2341360643,
+    2341360647,
+    2341360742
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "building": "yes",
+    "fvst:name": "Foodchoices",
+    "historic": "building",
+    "name": "Villa Blide",
+    "operator": "Ballerup Kommune",
+    "start_date": "1912"
+  }
+},
+{
+  "type": "way",
+  "id": 225350615,
+  "center": {
+    "lat": 55.7256594,
+    "lon": 12.3602791
+  },
+  "nodes": [
+    2341365945,
+    2341365941,
+    5366306398,
+    2341365898,
+    2341365891,
+    2341365881,
+    2341365883,
+    2341365863,
+    2341365823,
+    2341365760,
+    2341365776,
+    2341365758,
+    2341365813,
+    2341365745,
+    2341365687,
+    2341365626,
+    2341365634,
+    2341365625,
+    2341365681,
+    2341365620,
+    2341365581,
+    2341365539,
+    2341365571,
+    2341365529,
+    2341365499,
+    2341365460,
+    2341365497,
+    2341365448,
+    13268630122,
+    2341365383,
+    2341365323,
+    13268630121,
+    2341365420,
+    2341365455,
+    2341365445,
+    2341365479,
+    2341365481,
+    2341365912,
+    2341365909,
+    5366306399,
+    2341365945
+  ],
+  "tags": {
+    "amenity": "school",
+    "building": "school",
+    "education": "school",
+    "name": "Baltorpskolen - Rugvænget",
+    "operator": "Ballerup Kommune",
+    "ref:DK:cvr": "58271713",
+    "ref:DK:cvr:pnummer": "1003260312",
+    "source:name": "website",
+    "website": "https://baltorpskolen.dk/"
+  }
+},
+{
+  "type": "way",
+  "id": 319419744,
+  "center": {
+    "lat": 55.7605797,
+    "lon": 12.3316913
+  },
+  "nodes": [
+    8750190783,
+    1405354794,
+    3258356404,
+    3258356405,
+    8750190785,
+    8750190786,
+    8750190784,
+    3258356407,
+    8750190783
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Krudthuset",
+    "website": "http://www.krudthuset.furesoe.dk/"
+  }
+},
+{
+  "type": "way",
+  "id": 325752603,
+  "center": {
+    "lat": 55.7335116,
+    "lon": 12.3084827
+  },
+  "nodes": [
+    3323648840,
+    4597039437,
+    4597039436,
+    3323648820,
+    1643326028,
+    1643326069,
+    1643326123,
+    3323648840
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Boesagerskolen",
+    "wikidata": "Q122946690"
+  }
+},
+{
+  "type": "way",
+  "id": 331297860,
+  "center": {
+    "lat": 55.7504719,
+    "lon": 12.3965524
+  },
+  "nodes": [
+    3383564534,
+    3383564535,
+    3383564536,
+    3383564537,
+    3383564538,
+    3383564534
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børneinstitutionen Troldemosen"
+  }
+},
+{
+  "type": "way",
+  "id": 331422727,
+  "center": {
+    "lat": 55.7421225,
+    "lon": 12.4206408
+  },
+  "nodes": [
+    3384930912,
+    3384930913,
+    3384930914,
+    3384930915,
+    3384930916,
+    3384930917,
+    3384930918,
+    3384930919,
+    3384930912
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Eventyrhuset"
+  }
+},
+{
+  "type": "way",
+  "id": 331441248,
+  "center": {
+    "lat": 55.7422402,
+    "lon": 12.4218794
+  },
+  "nodes": [
+    3385123368,
+    1885913320,
+    1885913337,
+    3385123369,
+    3385123368
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehuset Kildespring"
+  }
+},
+{
+  "type": "way",
+  "id": 331472972,
+  "center": {
+    "lat": 55.7649039,
+    "lon": 12.4029694
+  },
+  "nodes": [
+    3385499020,
+    8582141002,
+    8582141001,
+    3385499010,
+    3385499019,
+    3385499006,
+    3385499028,
+    3385499057,
+    8582141010,
+    8582141009,
+    8582141008,
+    8582141007,
+    8582141005,
+    8582141006,
+    8582141004,
+    8582141003,
+    3385499020
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Hareskov Skole",
+    "wikidata": "Q122972636"
+  }
+},
+{
+  "type": "way",
+  "id": 331844691,
+  "center": {
+    "lat": 55.7321616,
+    "lon": 12.2898958
+  },
+  "nodes": [
+    1644818551,
+    3389370175,
+    3389370178,
+    3389370185,
+    3389370184,
+    1644818597,
+    3389370180,
+    1644818551
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehuset Regnbuehytten"
+  }
+},
+{
+  "type": "way",
+  "id": 397475577,
+  "center": {
+    "lat": 55.7429101,
+    "lon": 12.3242402
+  },
+  "nodes": [
+    4002699773,
+    4002699752,
+    4002699751,
+    4002699749,
+    4002699766,
+    4002699782,
+    4002700290,
+    4002700289,
+    4002700291,
+    4002699787,
+    4002699783,
+    4002699775,
+    4002699774,
+    4002699773
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "108484",
+    "name": "Børnehuset Søndergården",
+    "ref:DK:cvr": "58271713",
+    "ref:DK:cvr:pnummer": "1010369912"
+  }
+},
+{
+  "type": "way",
+  "id": 400916616,
+  "center": {
+    "lat": 55.7456558,
+    "lon": 12.2914895
+  },
+  "nodes": [
+    4034127879,
+    4034127897,
+    4034127853,
+    4034127844,
+    4034127827,
+    4034127835,
+    4034127833,
+    4034127865,
+    4034127864,
+    4034127879
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "966637",
+    "name": "Børnehuset Solsikken",
+    "ref:DK:cvr": "29188386",
+    "ref:DK:cvr:pnummer": "1003269771"
+  }
+},
+{
+  "type": "way",
+  "id": 419423280,
+  "center": {
+    "lat": 55.7180167,
+    "lon": 12.4033754
+  },
+  "nodes": [
+    291502706,
+    4194889364,
+    4194889366,
+    4194889367,
+    442873901,
+    291502706
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2025-01-16",
+    "name": "Børnehaven Ellekilde"
+  }
+},
+{
+  "type": "way",
+  "id": 435611565,
+  "center": {
+    "lat": 55.7213924,
+    "lon": 12.4129323
+  },
+  "nodes": [
+    12799697802,
+    4335160373,
+    4335160370,
+    4335160368,
+    4335160367,
+    4335160364,
+    1686133108,
+    1686133166,
+    4335160374,
+    4335160375,
+    4335160376,
+    4335160377,
+    12799697802
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Skovlunde Skole, afdeling Lundebjerg",
+    "old_name": "Lundebjergskolen",
+    "wikidata": "Q122926086"
+  }
+},
+{
+  "type": "way",
+  "id": 459560997,
+  "center": {
+    "lat": 55.7555329,
+    "lon": 12.3458019
+  },
+  "nodes": [
+    4553773490,
+    4553773491,
+    14063463107,
+    4553773492,
+    4553773493,
+    4553773494,
+    4436751803,
+    4436749300,
+    4553773490
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Ballerup Ny Skole",
+    "name:etymology:wikidata": "Q28143",
+    "website": "https://ballerupnyskole.dk/"
+  }
+},
+{
+  "type": "way",
+  "id": 468089572,
+  "center": {
+    "lat": 55.7543755,
+    "lon": 12.3274951
+  },
+  "nodes": [
+    4626443529,
+    4626443526,
+    4626443531,
+    4626443528,
+    4626443525,
+    4626443527,
+    4626443530,
+    4626443532,
+    4626443529
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2023-09-20",
+    "fvst:navnelbnr": "96455",
+    "name": "Børnehuset Kærlodden",
+    "ref:DK:cvr": "58271713",
+    "ref:DK:cvr:pnummer": "1003260877"
+  }
+},
+{
+  "type": "way",
+  "id": 490066015,
+  "center": {
+    "lat": 55.7498412,
+    "lon": 12.3336888
+  },
+  "nodes": [
+    1997245997,
+    7825337006,
+    4822538782,
+    7825337025,
+    7825337021,
+    1990007288,
+    1990020262,
+    1990007284,
+    350232417,
+    4822538781,
+    350232414,
+    7825304780,
+    350232407,
+    12908139264,
+    12908139266,
+    12908139265,
+    12908139267,
+    350232395,
+    1997245997
+  ],
+  "tags": {
+    "amenity": "school",
+    "branch": "Østerhøj",
+    "name": "Måløvhøj Skole",
+    "old_name": "Østerhøjskolen",
+    "wikidata": "Q122926087"
+  }
+},
+{
+  "type": "way",
+  "id": 492707937,
+  "center": {
+    "lat": 55.7410455,
+    "lon": 12.3081694
+  },
+  "nodes": [
+    1663236022,
+    1663236026,
+    4846971169,
+    4846971168,
+    4846971167,
+    1663247207,
+    1663236088,
+    1663235988,
+    1663236022
+  ],
+  "tags": {
+    "amenity": "school",
+    "construction": "school",
+    "name": "Balsmoseskolen",
+    "name:etymology:wikidata": "Q131926462",
+    "note": "Lokalplan 068: Skoleændringer",
+    "website": "https://distriktsskole-smoerum.aula.dk/skoler-i-distriktet/balsmoseskolen/velkommen",
+    "website:lokalplan": "https://dokument.plandata.dk/20_11021455_1662452479356.pdf",
+    "wikidata": "Q12302825",
+    "wikipedia": "da:Balsmoseskolen"
+  }
+},
+{
+  "type": "way",
+  "id": 554239470,
+  "center": {
+    "lat": 55.7319769,
+    "lon": 12.3652505
+  },
+  "nodes": [
+    5348959484,
+    5348959485,
+    5348959486,
+    5348959487,
+    5348959488,
+    5348959489,
+    5348959490,
+    5348959491,
+    5348959484
+  ],
+  "tags": {
+    "amenity": "school",
+    "check_date": "2024-11-05",
+    "name": "Parkskolen"
+  }
+},
+{
+  "type": "way",
+  "id": 578215368,
+  "center": {
+    "lat": 55.7606525,
+    "lon": 12.3393810
+  },
+  "nodes": [
+    5541041126,
+    5541041125,
+    5541041124,
+    5541041123,
+    5541041122,
+    5541041121,
+    5541040520,
+    5541040519,
+    5541040518,
+    5541040517,
+    5541040516,
+    5541040515,
+    5541040514,
+    5541040513,
+    5541040512,
+    5541040511,
+    5541041126
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Egeskolen",
+    "wikidata": "Q122972638"
+  }
+},
+{
+  "type": "way",
+  "id": 607104149,
+  "center": {
+    "lat": 55.7426290,
+    "lon": 12.3638945
+  },
+  "nodes": [
+    5754345395,
+    5754345394,
+    5754345393,
+    5754345392,
+    5754345391,
+    5754345390,
+    5754345389,
+    5754345388,
+    5754345387,
+    5754345386,
+    5754345385,
+    5754345384,
+    5754345383,
+    5754345382,
+    5754345381,
+    5754345380,
+    5754345379,
+    5754345378,
+    5754345377,
+    5754345376,
+    5754345375,
+    5754345374,
+    5754345373,
+    5754345372,
+    5754345371,
+    5754345370,
+    5754345369,
+    5754345395
+  ],
+  "tags": {
+    "amenity": "school",
+    "branch": "Vest",
+    "check_date": "2026-03-26",
+    "name": "Skovvejens Skole",
+    "old_name": "Højagerskolen",
+    "wikidata": "Q122890039"
+  }
+},
+{
+  "type": "way",
+  "id": 663753895,
+  "center": {
+    "lat": 55.7199152,
+    "lon": 12.3584914
+  },
+  "nodes": [
+    1676271133,
+    2566876030,
+    6212691085,
+    1676253844,
+    1676253837,
+    1676280554,
+    1676280561,
+    1676276390,
+    1676271188,
+    1676271209,
+    9783873080,
+    1676276389,
+    1676276393,
+    1676271133
+  ],
+  "tags": {
+    "amenity": "school",
+    "check_date": "2025-02-24",
+    "name": "Hedegårdsskolen",
+    "wikidata": "Q18199368"
+  }
+},
+{
+  "type": "way",
+  "id": 673065796,
+  "center": {
+    "lat": 55.7312591,
+    "lon": 12.3522841
+  },
+  "nodes": [
+    2070558944,
+    4115006239,
+    4115006238,
+    4115006247,
+    4115006248,
+    4115006249,
+    14122166681,
+    2705329846,
+    2705329844,
+    2705329837,
+    6303051175,
+    6303051174,
+    2070559066,
+    2070558960,
+    2070558958,
+    3404320512,
+    6303051173,
+    6303051172,
+    2070558947,
+    2070558944
+  ],
+  "tags": {
+    "amenity": "school",
+    "check_date": "2025-05-26",
+    "name": "NEXT - Handelsskole",
+    "operator:type": "public"
+  }
+},
+{
+  "type": "way",
+  "id": 675203082,
+  "center": {
+    "lat": 55.7273669,
+    "lon": 12.3542225
+  },
+  "nodes": [
+    6323317014,
+    6323317020,
+    6323317018,
+    6323317019,
+    6323317021,
+    6323317013,
+    6323317012,
+    7573438736,
+    6323317011,
+    6323317010,
+    6323317014
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2026-06-18",
+    "name": "Børnehuset Stjernehuset"
+  }
+},
+{
+  "type": "way",
+  "id": 699657786,
+  "center": {
+    "lat": 55.7500507,
+    "lon": 12.3785910
+  },
+  "nodes": [
+    6570205326,
+    9430942842,
+    9430942841,
+    6570205325,
+    6570115718,
+    6570205324,
+    9430942843,
+    9430942844,
+    9430942840,
+    9430942845,
+    9430942846,
+    9430942847,
+    9430942848,
+    9430942849,
+    6570205326
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "95457",
+    "name": "Børnehuset Ved Skoven",
+    "ref:DK:cvr": "58271713",
+    "ref:DK:cvr:pnummer": "1017318345"
+  }
+},
+{
+  "type": "way",
+  "id": 699657790,
+  "center": {
+    "lat": 55.7534352,
+    "lon": 12.3770467
+  },
+  "nodes": [
+    6570205333,
+    2454989313,
+    2454989296,
+    2454989289,
+    2454989284,
+    2454989276,
+    9430942851,
+    6570115717,
+    6570205333
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehuset Valhalla i Skoven"
+  }
+},
+{
+  "type": "way",
+  "id": 743258895,
+  "center": {
+    "lat": 55.7587520,
+    "lon": 12.4026153
+  },
+  "nodes": [
+    6957202329,
+    6957202328,
+    6957202327,
+    6957202326,
+    6957202325,
+    9072153332,
+    9072153333,
+    6957202329
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "904546",
+    "name": "Hareskov Børnehus",
+    "ref:DK:cvr": "29188327",
+    "ref:DK:cvr:pnummer": "1015434410"
+  }
+},
+{
+  "type": "way",
+  "id": 926740533,
+  "center": {
+    "lat": 55.7390642,
+    "lon": 12.2876675
+  },
+  "nodes": [
+    8599345524,
+    8599345523,
+    8599345522,
+    8599345521,
+    8599345520,
+    8599345519,
+    8599345518,
+    8599345517,
+    8599345524
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Fantasihaven"
+  }
+},
+{
+  "type": "way",
+  "id": 935293770,
+  "center": {
+    "lat": 55.7429212,
+    "lon": 12.4119278
+  },
+  "nodes": [
+    8667236520,
+    8667236519,
+    8667236518,
+    3391359766,
+    3391359749,
+    8667229511,
+    3391359748,
+    8667236517,
+    8667229516,
+    8667229515,
+    8667229514,
+    8667229513,
+    8667229512,
+    8667236520
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Herlev Privatskole",
+    "name:etymology:wikidata": "Q3646715"
+  }
+},
+{
+  "type": "way",
+  "id": 1035750544,
+  "center": {
+    "lat": 55.7263250,
+    "lon": 12.3408551
+  },
+  "nodes": [
+    9542868837,
+    9542868836,
+    1802452541,
+    9542868835,
+    9542868834,
+    9542868833,
+    9542868832,
+    9542868831,
+    9542868830,
+    9542868837
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2024-11-19",
+    "fvst:navnelbnr": "533356",
+    "name": "Børnehuset Grantoften",
+    "ref:DK:cvr": "58271713",
+    "ref:DK:cvr:pnummer": "1003260427"
+  }
+},
+{
+  "type": "way",
+  "id": 1066580205,
+  "center": {
+    "lat": 55.7390214,
+    "lon": 12.3034156
+  },
+  "nodes": [
+    9793852735,
+    9793852734,
+    9793852733,
+    1643389331,
+    1643389349,
+    1643389370,
+    1643389327,
+    9793852732,
+    9793852735
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Lille Sødal"
+  }
+},
+{
+  "type": "way",
+  "id": 1517559813,
+  "center": {
+    "lat": 55.7356408,
+    "lon": 12.4053698
+  },
+  "nodes": [
+    13852814054,
+    13852814055,
+    13852814056,
+    13852814057,
+    13852814061,
+    13852814058,
+    13852814059,
+    13852814060,
+    13852814054
+  ],
+  "tags": {
+    "amenity": "school",
+    "education": "school",
+    "name": "Michael Skolen",
+    "operator": "Michael Skolen",
+    "operator:type": "private",
+    "ref:DK:cvr": "58333816",
+    "website": "https://michaelskolen.dk"
+  }
+},
+{
+  "type": "relation",
+  "id": 2254125,
+  "center": {
+    "lat": 55.7315091,
+    "lon": 12.3973560
+  },
+  "members": [
+    {
+      "type": "way",
+      "ref": 25629636,
+      "role": "outer"
+    },
+    {
+      "type": "way",
+      "ref": 169267086,
+      "role": "inner"
+    },
+    {
+      "type": "way",
+      "ref": 169267083,
+      "role": "inner"
+    },
+    {
+      "type": "way",
+      "ref": 169267078,
+      "role": "inner"
+    },
+    {
+      "type": "way",
+      "ref": 169267082,
+      "role": "inner"
+    },
+    {
+      "type": "way",
+      "ref": 169267085,
+      "role": "inner"
+    },
+    {
+      "type": "way",
+      "ref": 169267081,
+      "role": "inner"
+    },
+    {
+      "type": "way",
+      "ref": 169267080,
+      "role": "inner"
+    },
+    {
+      "type": "way",
+      "ref": 169267084,
+      "role": "inner"
+    },
+    {
+      "type": "way",
+      "ref": 169267079,
+      "role": "inner"
+    }
+  ],
+  "tags": {
+    "amenity": "university",
+    "building": "university",
+    "description": "Danmarks Tekniske Universitet campus Ballerup",
+    "name": "DTU Ballerup",
+    "name:etymology:wikidata": "Q28143",
+    "type": "multipolygon",
+    "website": "https://www.dtu.dk/"
+  }
+}
+
+  ]
+}

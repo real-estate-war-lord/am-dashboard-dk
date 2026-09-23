@@ -1,0 +1,2770 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-09-22T08:45:51Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 617252010,
+  "lat": 55.7834737,
+  "lon": 12.4904187,
+  "tags": {
+    "amenity": "school",
+    "name": "Sorgenfriskolen",
+    "name:etymology:wikidata": "Q13218315"
+  }
+},
+{
+  "type": "node",
+  "id": 618160363,
+  "lat": 55.7820228,
+  "lon": 12.4695133,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Vuggestuen Kaplegården"
+  }
+},
+{
+  "type": "node",
+  "id": 632432219,
+  "lat": 55.7814298,
+  "lon": 12.5636339,
+  "tags": {
+    "amenity": "theatre",
+    "check_date": "2025-06-21",
+    "name": "Ulvedalene"
+  }
+},
+{
+  "type": "node",
+  "id": 922903974,
+  "lat": 55.7869915,
+  "lon": 12.5950169,
+  "tags": {
+    "amenity": "library",
+    "name": "Taarbæk Bibliotek",
+    "opening_hours": "We 14:00-17:00;Sa 10:00-14:00",
+    "phone": "+45 45284392",
+    "ref:isil": "DK-717303",
+    "website": "https://www.lyngbybib.dk/taarbaekbibliotek",
+    "wikidata": "Q21098071"
+  }
+},
+{
+  "type": "node",
+  "id": 1266157169,
+  "lat": 55.8115893,
+  "lon": 12.4716064,
+  "tags": {
+    "amenity": "library",
+    "level": "2",
+    "name": "Holte bibliotek",
+    "name:etymology:wikidata": "Q3388444",
+    "opening_hours": "Mo-Su 07:00-21:00",
+    "wikidata": "Q21098753"
+  }
+},
+{
+  "type": "node",
+  "id": 1729469073,
+  "lat": 55.7869044,
+  "lon": 12.5233431,
+  "tags": {
+    "alt_name": "Danmarks Tekniske Informationscenter",
+    "amenity": "library",
+    "name": "DTU Bibliotek",
+    "name:en": "DTU Library",
+    "wikidata": "Q21107600"
+  }
+},
+{
+  "type": "node",
+  "id": 1755191250,
+  "lat": 55.7766562,
+  "lon": 12.5750123,
+  "tags": {
+    "amenity": "theatre",
+    "check_date": "2025-08-01",
+    "name": "Friluftsscenen"
+  }
+},
+{
+  "type": "node",
+  "id": 1757261886,
+  "lat": 55.7526371,
+  "lon": 12.4675037,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehuset Vibevænget"
+  }
+},
+{
+  "type": "node",
+  "id": 1765531847,
+  "lat": 55.7697085,
+  "lon": 12.4966119,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Den Kommunale Dagpleje"
+  }
+},
+{
+  "type": "node",
+  "id": 2244465736,
+  "lat": 55.7536114,
+  "lon": 12.5717780,
+  "tags": {
+    "amenity": "hospital",
+    "emergency": "no",
+    "healthcare": "hospital",
+    "name": "Privathospitalet Danmark",
+    "ref:DK:cvr": "15501707",
+    "ref:DK:cvr:pnummer": "1000934144",
+    "wikidata": "Q7246270"
+  }
+},
+{
+  "type": "node",
+  "id": 2332890326,
+  "lat": 55.7802028,
+  "lon": 12.4813217,
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2024-01-25",
+    "name": "Børnehaven Prinsessehøj"
+  }
+},
+{
+  "type": "node",
+  "id": 2381056950,
+  "lat": 55.7645027,
+  "lon": 12.5193660,
+  "tags": {
+    "amenity": "hospital",
+    "contact:email": "info@kbhprivat.dk",
+    "healthcare": "hospital",
+    "name": "Københavns Privathospital",
+    "opening_hours": "Mo-Fr 08:00-15:30",
+    "phone": "+45 45933933",
+    "website": "http://www.kbhprivat.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 2882580878,
+  "lat": 55.7871612,
+  "lon": 12.5947849,
+  "tags": {
+    "amenity": "school",
+    "name": "Taarbæk Skole",
+    "name:etymology:wikidata": "Q3304501",
+    "operator": "Lyngby-Taarbæk Kommune",
+    "phone": "+45 45 28 43 80",
+    "website": "https://taarbaekskole.dk",
+    "wikidata": "Q122927034"
+  }
+},
+{
+  "type": "node",
+  "id": 3404321053,
+  "lat": 55.7574200,
+  "lon": 12.4536700,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Novo Børnegård"
+  }
+},
+{
+  "type": "node",
+  "id": 3545109376,
+  "lat": 55.7709766,
+  "lon": 12.5064625,
+  "tags": {
+    "amenity": "school",
+    "branch": "Lyngby Sprogskole",
+    "name": "Sprogcenter Hellerup"
+  }
+},
+{
+  "type": "node",
+  "id": 3802593259,
+  "lat": 55.7986428,
+  "lon": 12.4819539,
+  "tags": {
+    "amenity": "clinic",
+    "healthcare": "clinic",
+    "name": "Børneungecenter for Rehabilitering",
+    "website": "https://www.densocialevirksomhed.dk/bcfr"
+  }
+},
+{
+  "type": "node",
+  "id": 3949081604,
+  "lat": 55.7852202,
+  "lon": 12.5930277,
+  "tags": {
+    "amenity": "school",
+    "name": "Hjuldamperen"
+  }
+},
+{
+  "type": "node",
+  "id": 4185788329,
+  "lat": 55.7939041,
+  "lon": 12.4749139,
+  "tags": {
+    "amenity": "library",
+    "name": "Mikrobibliotek",
+    "opening_hours": "Mo-Th 08:00-22:00, Fr-Su 08:00-19:00"
+  }
+},
+{
+  "type": "node",
+  "id": 4581580096,
+  "lat": 55.7772524,
+  "lon": 12.5195275,
+  "tags": {
+    "amenity": "clinic",
+    "healthcare": "clinic",
+    "name": "Træningscenter Fortunen"
+  }
+},
+{
+  "type": "node",
+  "id": 4700171024,
+  "lat": 55.7700799,
+  "lon": 12.5123042,
+  "tags": {
+    "amenity": "school",
+    "education": "school",
+    "fvst:navnelbnr": "1397762",
+    "name": "CPH Business Academy Lyngby",
+    "ref:DK:cvr": "24997189",
+    "ref:DK:cvr:pnummer": "1020717560",
+    "website": "https://www.cphbusiness.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 5304718025,
+  "lat": 55.7647340,
+  "lon": 12.5196460,
+  "tags": {
+    "amenity": "hospital",
+    "healthcare": "hospital",
+    "name": "Capio CFR Lyngby",
+    "operator": "Capio",
+    "operator:type": "private",
+    "operator:wikidata": "Q498606",
+    "ref:DK:cvr": "27506909",
+    "ref:DK:cvr:pnummer": "1020669809",
+    "website": "http://www.capiocfr.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 7006853039,
+  "lat": 55.7795766,
+  "lon": 12.5337306,
+  "tags": {
+    "alt_name": "Unord",
+    "amenity": "college",
+    "fvst:navnelbnr": "1347278",
+    "name": "Lyngby Gymnasium og Handelsgymnasium",
+    "ref:DK:cvr": "63504416",
+    "ref:DK:cvr:pnummer": "1007272452",
+    "website": "https://unord.dk/skoler/lyngby-handelsgymnasium"
+  }
+},
+{
+  "type": "node",
+  "id": 11090340613,
+  "lat": 55.7682497,
+  "lon": 12.4492860,
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Vævergården"
+  }
+},
+{
+  "type": "node",
+  "id": 11090959037,
+  "lat": 55.7699084,
+  "lon": 12.4457036,
+  "tags": {
+    "amenity": "school",
+    "name": "Bagsværd Kostskole",
+    "name:etymology:wikidata": "Q2509805",
+    "wikidata": "Q4842136"
+  }
+},
+{
+  "type": "node",
+  "id": 11190549943,
+  "lat": 55.7912149,
+  "lon": 12.4851558,
+  "tags": {
+    "amenity": "doctors",
+    "healthcare": "doctor",
+    "name": "Lægehuset Kongevejen",
+    "opening_hours": "Mo-We, Fr 08:00-15:00; Th 08:00-17:00",
+    "phone": "+4545878277",
+    "website": "https://45878277.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 11217231322,
+  "lat": 55.7674717,
+  "lon": 12.4985309,
+  "tags": {
+    "amenity": "clinic",
+    "healthcare": "clinic",
+    "name": "Helle og Allan Trankjær"
+  }
+},
+{
+  "type": "node",
+  "id": 11530605949,
+  "lat": 55.7582392,
+  "lon": 12.4494254,
+  "tags": {
+    "amenity": "doctors",
+    "healthcare": "doctor",
+    "healthcare:speciality": "general",
+    "name": "Lægerne Bagsværd Nord",
+    "opening_hours": "Mo-Su 08:00-16:00",
+    "phone": "+45 44 98 50 00",
+    "website": "https://www.lbnord.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 11634221400,
+  "lat": 55.7708049,
+  "lon": 12.5027700,
+  "tags": {
+    "amenity": "doctors",
+    "healthcare": "doctor",
+    "healthcare:speciality": "otorhinolaryngology",
+    "name": "Klinik for Øre-Næse og Halssygdomme ved speciallæge",
+    "operator": "Anna Tomczyk Aarup",
+    "phone": "+45 45 87 30 40",
+    "website": "https://www.annaaarup.dk"
+  }
+},
+{
+  "type": "node",
+  "id": 12803962584,
+  "lat": 55.7565183,
+  "lon": 12.4975497,
+  "tags": {
+    "amenity": "doctors",
+    "healthcare": "doctor",
+    "name": "De to læger",
+    "opening_hours": "Mo,Th 07:30-16:00; Tu 08:00-16:00; We 07:30-18:00; Fr 07:30-15:00",
+    "phone": "+45 45 87 65 40",
+    "website": "https://detolaeger.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 13022525290,
+  "lat": 55.7735711,
+  "lon": 12.4723767,
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "956866",
+    "name": "Børnehuset Nybrogård",
+    "official_name": "Nybrogård Børneinstitution",
+    "operator": "Gladsaxe Kommune",
+    "ref:DK:cvr": "62761113",
+    "ref:DK:cvr:pnummer": "1021420685",
+    "website": "https://glx-nybrogaard.aula.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 13025463189,
+  "lat": 55.7609376,
+  "lon": 12.4511472,
+  "tags": {
+    "amenity": "doctors",
+    "healthcare": "doctor",
+    "name": "Bagvsærd Lægecenter",
+    "phone": "+45 44 98 09 00",
+    "website": "https://www.kasperreuther.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 13025512603,
+  "lat": 55.7608829,
+  "lon": 12.4527291,
+  "tags": {
+    "amenity": "doctors",
+    "healthcare": "doctor",
+    "name": "Lægerne I Det Gule Hus",
+    "operator": "Lægerne I Det Gule Hus",
+    "phone": "+45 44 98 10 14",
+    "website": "https://44981014.dk/"
+  }
+},
+{
+  "type": "node",
+  "id": 13514448550,
+  "lat": 55.7838178,
+  "lon": 12.5184596,
+  "tags": {
+    "amenity": "university",
+    "department": "computer_science",
+    "name": "DTU Compute"
+  }
+},
+{
+  "type": "node",
+  "id": 13514448551,
+  "lat": 55.7832055,
+  "lon": 12.5162065,
+  "tags": {
+    "amenity": "university",
+    "department": "space",
+    "name": "DTU Space"
+  }
+},
+{
+  "type": "node",
+  "id": 13514448552,
+  "lat": 55.7847876,
+  "lon": 12.5170541,
+  "tags": {
+    "amenity": "university",
+    "department": "physics",
+    "name": "DTU Fysik",
+    "name:en": "DTU Physics"
+  }
+},
+{
+  "type": "node",
+  "id": 13514448553,
+  "lat": 55.7869624,
+  "lon": 12.5182530,
+  "tags": {
+    "amenity": "university",
+    "department": "chemistry",
+    "name": "DTU Kemi",
+    "name:en": "DTU Chemistry"
+  }
+},
+{
+  "type": "node",
+  "id": 13514448554,
+  "lat": 55.7821542,
+  "lon": 12.5182343,
+  "tags": {
+    "amenity": "university",
+    "department": "electricity",
+    "name": "DTU Electro"
+  }
+},
+{
+  "type": "node",
+  "id": 13852199267,
+  "lat": 55.7967282,
+  "lon": 12.5222365,
+  "tags": {
+    "amenity": "library",
+    "name": "Lundtofte Bibliotek",
+    "operator": "Lyngby-Taarbæk Bibliotekerne",
+    "operator:type": "public",
+    "website": "https://www.lyngbybib.dk/lundtofte-bibliotek"
+  }
+},
+{
+  "type": "node",
+  "id": 14132892765,
+  "lat": 55.7686391,
+  "lon": 12.5063547,
+  "tags": {
+    "amenity": "doctors",
+    "check_date": "2026-08-29",
+    "healthcare": "doctor",
+    "healthcare:speciality": "pulmonology",
+    "name": "Peter Lange"
+  }
+},
+{
+  "type": "node",
+  "id": 14132892766,
+  "lat": 55.7686608,
+  "lon": 12.5063177,
+  "tags": {
+    "amenity": "doctors",
+    "check_date": "2026-08-29",
+    "healthcare": "doctor",
+    "healthcare:speciality": "general",
+    "name": "Jakob Dahl"
+  }
+},
+{
+  "type": "way",
+  "id": 25483569,
+  "center": {
+    "lat": 55.7734117,
+    "lon": 12.4984123
+  },
+  "nodes": [
+    277681119,
+    277681120,
+    2437061084,
+    2437061085,
+    279437890,
+    2437061086,
+    2437061092,
+    2437061091,
+    2437061090,
+    2437061089,
+    2433920883,
+    2433920860,
+    2437061083,
+    277681127,
+    277681128,
+    277681119
+  ],
+  "tags": {
+    "amenity": "library",
+    "building": "yes",
+    "name": "Stadsbiblioteket i Lyngby",
+    "opening_hours": "Mo-Th 08:00-19:00; Sa, Su 09:00-15:00; Fr 08:00-18:00",
+    "phone": "+45 45973700",
+    "ref:isil": "DK-717300",
+    "website": "https://www.lyngbybib.dk/stadsbiblioteket",
+    "wikidata": "Q21098068"
+  }
+},
+{
+  "type": "way",
+  "id": 25557605,
+  "center": {
+    "lat": 55.7775726,
+    "lon": 12.5899881
+  },
+  "nodes": [
+    278565721,
+    2090465547,
+    2090465546,
+    278565722,
+    2090465538,
+    2090465537,
+    2090465540,
+    2090465542,
+    2090465543,
+    2090465544,
+    278565723,
+    26327250,
+    2090465550,
+    2090465551,
+    278565724,
+    278565721
+  ],
+  "tags": {
+    "amenity": "theatre",
+    "building": "yes",
+    "check_date": "2025-03-28",
+    "fvst:navnelbnr": "659058",
+    "name": "Bellevue Teatret",
+    "ref:DK:cvr": "18734230",
+    "website": "https://www.bellevueteatret.dk/",
+    "wikidata": "Q815963",
+    "wikipedia": "da:Bellevue Teatret"
+  }
+},
+{
+  "type": "way",
+  "id": 25567300,
+  "center": {
+    "lat": 55.7854063,
+    "lon": 12.5195609
+  },
+  "nodes": [
+    279435031,
+    279435030,
+    644685668,
+    614146593,
+    9970592791,
+    8182232322,
+    10043382082,
+    9725075011,
+    9725093125,
+    9725075009,
+    9725075010,
+    5227919657,
+    612452998,
+    5227919655,
+    10087294554,
+    10087294556,
+    10087294566,
+    9738006482,
+    9738006483,
+    278685933,
+    9738006487,
+    9738006488,
+    9738006489,
+    4162956597,
+    10087294567,
+    3631007364,
+    10087294586,
+    612453001,
+    10087294585,
+    10087294584,
+    10087294592,
+    10087294591,
+    4095134884,
+    10087294593,
+    10087294594,
+    3631007365,
+    10087294578,
+    10087294577,
+    10087294576,
+    9947810360,
+    3631007366,
+    9947810353,
+    3631007363,
+    4095134885,
+    3631007300,
+    278685934,
+    4095134887,
+    3631007302,
+    4095134888,
+    278685935,
+    9738007026,
+    278685936,
+    9738007028,
+    3631007309,
+    612453012,
+    3631007316,
+    9738007023,
+    3631007318,
+    278685937,
+    9738007058,
+    4095135290,
+    3631007334,
+    9972868398,
+    3465608028,
+    9972868397,
+    1311692868,
+    1311692875,
+    3465608030,
+    5227919694,
+    1655297114,
+    1655298312,
+    1655298347,
+    1655298372,
+    1655298384,
+    1655298405,
+    1655298443,
+    1655298500,
+    5638133828,
+    1655298539,
+    5638133827,
+    1655298550,
+    1655298574,
+    1655298585,
+    3465608031,
+    3465608032,
+    3465608033,
+    3465608034,
+    3465608035,
+    3465608036,
+    3465608037,
+    3465608038,
+    279435031
+  ],
+  "tags": {
+    "amenity": "university",
+    "branch": "DTU Lyngby Campus",
+    "name": "Danmarks Tekniske Universitet",
+    "name:da": "Danmarks Tekniske Universitet",
+    "name:de": "Dänemarks Technische Universität",
+    "name:en": "Technical University of Denmark",
+    "name:fr": "Université technique du Danemark",
+    "name:it": "Università Tecnica della Danimarca",
+    "short_name": "DTU",
+    "website": "https://www.dtu.dk/",
+    "wheelchair": "limited",
+    "wikidata": "Q1269766",
+    "wikipedia": "da:Danmarks Tekniske Universitet"
+  }
+},
+{
+  "type": "way",
+  "id": 26278229,
+  "center": {
+    "lat": 55.7574177,
+    "lon": 12.4732668
+  },
+  "nodes": [
+    287838565,
+    287838566,
+    2484629539,
+    2484629540,
+    287838613,
+    287838578,
+    287838614,
+    287838610,
+    287838565
+  ],
+  "tags": {
+    "amenity": "school",
+    "check_date": "2026-04-14",
+    "name": "Stengård Skole",
+    "wheelchair": "yes",
+    "wikidata": "Q122924737"
+  }
+},
+{
+  "type": "way",
+  "id": 26406764,
+  "center": {
+    "lat": 55.7857817,
+    "lon": 12.5115963
+  },
+  "nodes": [
+    289308639,
+    279912027,
+    289308641,
+    4472294272,
+    289308642,
+    5064970461,
+    5064970462,
+    4472294273,
+    289308639
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Lyngby Handelsskole U/NORD",
+    "name:etymology:wikidata": "Q2239"
+  }
+},
+{
+  "type": "way",
+  "id": 31338579,
+  "center": {
+    "lat": 55.7665436,
+    "lon": 12.4922043
+  },
+  "nodes": [
+    349025600,
+    3789373621,
+    3789373623,
+    349025601,
+    349025602,
+    349025603,
+    349025604,
+    349025605,
+    3789373616,
+    349025606,
+    349025600
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Engelsborgskolen",
+    "website": "https://engelsborgskolen.skoleporten.dk/sp",
+    "wikidata": "Q12310126"
+  }
+},
+{
+  "type": "way",
+  "id": 44823901,
+  "center": {
+    "lat": 55.8079985,
+    "lon": 12.5122374
+  },
+  "nodes": [
+    568325420,
+    7726589664,
+    5334672426,
+    7726589665,
+    9376748865,
+    568325423,
+    9376748797,
+    9376748796,
+    7606581319,
+    277678812,
+    9368654937,
+    9368654938,
+    7606581318,
+    3394603534,
+    2081560466,
+    2081560465,
+    7606527384,
+    8544411749,
+    8544411748,
+    9205232573,
+    9205232574,
+    568325420
+  ],
+  "tags": {
+    "amenity": "school",
+    "branch": "Vangebo",
+    "name": "Ravnholm Skole",
+    "old_name": "Vangeboskolen",
+    "wikidata": "Q122932891"
+  }
+},
+{
+  "type": "way",
+  "id": 165771584,
+  "center": {
+    "lat": 55.7563746,
+    "lon": 12.4790976
+  },
+  "nodes": [
+    1773002137,
+    1773002148,
+    1773002110,
+    1773002131,
+    1773002134,
+    1773002112,
+    1773002153,
+    1773002143,
+    1773002116,
+    8772965686,
+    1773002161,
+    1773002103,
+    1773002123,
+    1773002128,
+    1773002124,
+    1773002106,
+    1773002137
+  ],
+  "tags": {
+    "amenity": "school",
+    "contact:website": "https://denlilleskole.dk/",
+    "name": "Den Lille Skole"
+  }
+},
+{
+  "type": "way",
+  "id": 165771793,
+  "center": {
+    "lat": 55.7549179,
+    "lon": 12.4829248
+  },
+  "nodes": [
+    1773005856,
+    1773005871,
+    1773005879,
+    1773005866,
+    1773005858,
+    1773005875,
+    1773005873,
+    1773005867,
+    1773005854,
+    1773005856
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Gladsaxe Privatskole",
+    "name:etymology:wikidata": "Q7224828",
+    "website": "https://gladsaxeprivatskole.skoleporten.dk/sp"
+  }
+},
+{
+  "type": "way",
+  "id": 199010335,
+  "center": {
+    "lat": 55.7585889,
+    "lon": 12.5736251
+  },
+  "nodes": [
+    2090734943,
+    2090734941,
+    2090734936,
+    2090734928,
+    2090734930,
+    924963494,
+    2090734932,
+    2090734933,
+    2090734934,
+    2090734939,
+    2090734943
+  ],
+  "tags": {
+    "amenity": "library",
+    "building": "yes",
+    "name": "Ordrup Bibliotek",
+    "opening_hours": "Mo-Fr 10:00-18:00;Sa 10:00-14:00",
+    "phone": "+45 39985750",
+    "ref:isil": "DK-715701",
+    "website": "https://genbib.dk/ordrup",
+    "wikidata": "Q21098008"
+  }
+},
+{
+  "type": "way",
+  "id": 219698273,
+  "center": {
+    "lat": 55.7982629,
+    "lon": 12.4832591
+  },
+  "nodes": [
+    2288370410,
+    11189139288,
+    3724417020,
+    2288370427,
+    2288370398,
+    11189139281,
+    11189139280,
+    11189139279,
+    11189139278,
+    11189139277,
+    2288370379,
+    11189139272,
+    11189139271,
+    2290056698,
+    2290056696,
+    11189139283,
+    2288370445,
+    11189139284,
+    2288370437,
+    2288370373,
+    11189139305,
+    2288370345,
+    11189139304,
+    11189139182,
+    11189139306,
+    4061679056,
+    4061679055,
+    11189139183,
+    2288370330,
+    2288370406,
+    11189139185,
+    11189139184,
+    4061680089,
+    277679103,
+    11189139187,
+    11189139318,
+    2288370434,
+    2288370425,
+    2288370435,
+    3724417932,
+    2288370441,
+    2288370385,
+    11189139198,
+    11189139199,
+    3724417941,
+    11189139197,
+    11189139296,
+    11189139282,
+    3724417023,
+    2288370325,
+    11189139200,
+    2288370410
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Geelsgårdskolen"
+  }
+},
+{
+  "type": "way",
+  "id": 235642320,
+  "center": {
+    "lat": 55.7615539,
+    "lon": 12.5269305
+  },
+  "nodes": [
+    2437211120,
+    2437211122,
+    2437211124,
+    2437211119,
+    4169264985,
+    8222401316,
+    4169264997,
+    7732047968,
+    2437211120
+  ],
+  "tags": {
+    "amenity": "library",
+    "building": "yes",
+    "name": "Jægersborg Bibliotek",
+    "opening_hours": "Mo-Th 11:00-17:00;Fr 11:00-16:00;Sa 10:00-14:00",
+    "phone": "+45 39985740",
+    "ref:isil": "DK-715705",
+    "website": "https://genbib.dk/bibliotek/jaegersborg",
+    "wikidata": "Q21098021"
+  }
+},
+{
+  "type": "way",
+  "id": 239259362,
+  "center": {
+    "lat": 55.7661010,
+    "lon": 12.5704041
+  },
+  "nodes": [
+    2470614682,
+    2470614683,
+    2470614685,
+    2470614686,
+    4061104633,
+    4061104624,
+    4061084559,
+    4061084573,
+    2470614687,
+    4061084529,
+    2470614688,
+    2470614689,
+    2470614690,
+    2470614682
+  ],
+  "tags": {
+    "amenity": "school",
+    "education": "school",
+    "name": "Skovgårdsskolen",
+    "website": "https://skovgaardsskolen.aula.dk",
+    "wikidata": "Q122924664"
+  }
+},
+{
+  "type": "way",
+  "id": 242485249,
+  "center": {
+    "lat": 55.8019076,
+    "lon": 12.5370102
+  },
+  "nodes": [
+    2499469288,
+    2499469295,
+    2499469290,
+    2499469294,
+    2499469293,
+    2499469297,
+    2499469292,
+    2499469288
+  ],
+  "tags": {
+    "amenity": "university",
+    "building": "school",
+    "name": "DTU Miljø"
+  }
+},
+{
+  "type": "way",
+  "id": 242485251,
+  "center": {
+    "lat": 55.8018660,
+    "lon": 12.5370190
+  },
+  "nodes": [
+    2499469297,
+    2499469292,
+    2499469291,
+    2499469296,
+    2499469297
+  ],
+  "tags": {
+    "amenity": "university",
+    "building": "school",
+    "name": "DTU Miljø"
+  }
+},
+{
+  "type": "way",
+  "id": 261481229,
+  "center": {
+    "lat": 55.7716292,
+    "lon": 12.5120217
+  },
+  "nodes": [
+    3627122215,
+    3627122214,
+    3627122227,
+    2670995489,
+    2670995496,
+    2670995502,
+    2670995511,
+    2670997274,
+    2670995522,
+    2670995519,
+    3627122215
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Medieskolen Lyngby",
+    "name:en": "Lyngby School of Media",
+    "name:etymology:wikidata": "Q2239",
+    "phone": "+4545970900",
+    "source": "Geodatastyrelsen : FOT ortofoto"
+  }
+},
+{
+  "type": "way",
+  "id": 300716193,
+  "center": {
+    "lat": 55.7537653,
+    "lon": 12.5316922
+  },
+  "nodes": [
+    3048223107,
+    1027311819,
+    1027311747,
+    7197367095,
+    3048223109,
+    8520346851,
+    3048223110,
+    3048223107
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Vidar Skolen",
+    "name:etymology:wikidata": "Q372614",
+    "phone": "+45 39 65 71 18",
+    "website": "https://vidarskolen.dk/",
+    "wikidata": "Q12343914",
+    "wikipedia": "da:Vidar Skolen"
+  }
+},
+{
+  "type": "way",
+  "id": 319813655,
+  "center": {
+    "lat": 55.7758380,
+    "lon": 12.5084869
+  },
+  "nodes": [
+    3262824836,
+    9453978314,
+    5711292184,
+    5711292181,
+    9453978316,
+    3262824831,
+    9453978315,
+    9453978293,
+    9454898407,
+    9454898485,
+    9454898486,
+    2433758125,
+    9454898487,
+    3262824825,
+    3262824824,
+    9457967454,
+    9457967453,
+    3262824829,
+    3262824828,
+    3262824826,
+    3262824827,
+    9453978321,
+    3262824830,
+    9453978320,
+    3262824833,
+    9453978319,
+    9453978318,
+    3262824834,
+    3262824836
+  ],
+  "tags": {
+    "amenity": "school",
+    "contact:email": "lindegaard@ltk.dk",
+    "fee": "no",
+    "isced:level": "0-2",
+    "name": "Lindegårdsskolen",
+    "operator": "Lyngby taarbæk kommune",
+    "phone": "+45 45284050",
+    "website": "http://www.lindegaardsskolen.dk/",
+    "wikidata": "Q122927032"
+  }
+},
+{
+  "type": "way",
+  "id": 324282819,
+  "center": {
+    "lat": 55.7591924,
+    "lon": 12.4623486
+  },
+  "nodes": [
+    3310163438,
+    10959273693,
+    10959273694,
+    10959273695,
+    10959881203,
+    10959899606,
+    10958032791,
+    10958032800,
+    10958032799,
+    10959761036,
+    10959413565,
+    10959273696,
+    3310163444,
+    10960171857,
+    10956753567,
+    10956753566,
+    10956753572,
+    10956753573,
+    10958011379,
+    10960308800,
+    3310163439,
+    10960376615,
+    10960376614,
+    10960919449,
+    3310163432,
+    10958951019,
+    10956754676,
+    10956754675,
+    10960919450,
+    3310163420,
+    3310163425,
+    3310163428,
+    11802762407,
+    11802762408,
+    3310163437,
+    4945266614,
+    10958013833,
+    10958013811,
+    3310163438
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Bagsværd Skole",
+    "name:etymology:wikidata": "Q2509805",
+    "wikidata": "Q12302748",
+    "wikipedia": "da:Bagsværd Skole"
+  }
+},
+{
+  "type": "way",
+  "id": 330139276,
+  "center": {
+    "lat": 55.7664568,
+    "lon": 12.4463961
+  },
+  "nodes": [
+    3370991775,
+    3370991776,
+    3370991777,
+    3370991778,
+    3370991773,
+    3370991774,
+    3370991775
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Bagsværd Friskole",
+    "name:etymology:wikidata": "Q2509805",
+    "website": "https://www.bagsvardfriskole.dk/",
+    "wikidata": "Q12302747",
+    "wikipedia": "da:Bagsværd Friskole"
+  }
+},
+{
+  "type": "way",
+  "id": 375373075,
+  "center": {
+    "lat": 55.7961604,
+    "lon": 12.5214945
+  },
+  "nodes": [
+    3787450302,
+    3787450297,
+    3787450300,
+    1033512120,
+    1033512559,
+    279912441,
+    279912445,
+    621812761,
+    3787450294,
+    8585209668,
+    3787450295,
+    8585209671,
+    8585209670,
+    8585209669,
+    3787450296,
+    3787450298,
+    3787450299,
+    3787450301,
+    3787450302
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Lundtofte Skole",
+    "name:etymology:wikidata": "Q12325146",
+    "wikidata": "Q122927033"
+  }
+},
+{
+  "type": "way",
+  "id": 375911855,
+  "center": {
+    "lat": 55.7903585,
+    "lon": 12.4591326
+  },
+  "nodes": [
+    3792510042,
+    3792510041,
+    3792510045,
+    3792510043,
+    10209641820,
+    10209641821,
+    10209641822,
+    5225053332,
+    5225053323,
+    10209641823,
+    3792510042
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Virum Skole",
+    "name:etymology:wikidata": "Q2315179",
+    "operator": "WWW.LTK.DK",
+    "operator:type": "public",
+    "website": "https://virumskole.skoleporten.dk/sp",
+    "wikidata": "Q24067206"
+  }
+},
+{
+  "type": "way",
+  "id": 404132057,
+  "center": {
+    "lat": 55.8162225,
+    "lon": 12.5398253
+  },
+  "nodes": [
+    4064057842,
+    4064057841,
+    4064057844,
+    4064057845,
+    13894358814,
+    4064057843,
+    4064057840,
+    4064057846,
+    4064057839,
+    4064057842
+  ],
+  "tags": {
+    "amenity": "library",
+    "building": "yes",
+    "name": "Nærum Bibliotek",
+    "opening_hours": "Mo-Su 07:00-21:00",
+    "wikidata": "Q21098754"
+  }
+},
+{
+  "type": "way",
+  "id": 412478334,
+  "center": {
+    "lat": 55.7600267,
+    "lon": 12.4477781
+  },
+  "nodes": [
+    4138960769,
+    4138960765,
+    4138960757,
+    4138960752,
+    4138960754,
+    4138960759,
+    4138960762,
+    4138960769
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Sofieskolen",
+    "name:etymology:wikidata": "Q3490991",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 417081330,
+  "center": {
+    "lat": 55.8060182,
+    "lon": 12.4658727
+  },
+  "nodes": [
+    4177047424,
+    4177047425,
+    4177047423,
+    4177047428,
+    4177047426,
+    26467709,
+    4177047434,
+    4177047436,
+    4177047438,
+    4177047439,
+    4177047437,
+    4177047424
+  ],
+  "tags": {
+    "amenity": "school",
+    "education": "school",
+    "name": "Rudersdal Lilleskole",
+    "operator": "Rudersdal Lilleskole",
+    "operator:type": "private",
+    "website": "https://www.rudersdal-lilleskole.dk/"
+  }
+},
+{
+  "type": "way",
+  "id": 437215408,
+  "center": {
+    "lat": 55.7808336,
+    "lon": 12.5226555
+  },
+  "nodes": [
+    4350309327,
+    4350309328,
+    4350309329,
+    2090328544,
+    2090328528,
+    2090328530,
+    2090328520,
+    2090328518,
+    4350309330,
+    4350309331,
+    4350309332,
+    4350309333,
+    4350309327
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehuset Drivhuset"
+  }
+},
+{
+  "type": "way",
+  "id": 489277633,
+  "center": {
+    "lat": 55.7644124,
+    "lon": 12.4515518
+  },
+  "nodes": [
+    4815344445,
+    4815344446,
+    4815344447,
+    8772965698,
+    8772965697,
+    4815344448,
+    8772965699,
+    4815344449,
+    4816745447,
+    4816745446,
+    4816745445,
+    4816745444,
+    4816745443,
+    4816745442,
+    8772965700,
+    8772965701,
+    4815344450,
+    3572205393,
+    4815344452,
+    4815344453,
+    4815344454,
+    4815344455,
+    4815344456,
+    8772965696,
+    4815344445
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Bagsværd Kostskole og Gymnasium",
+    "name:etymology:wikidata": "Q2509805",
+    "website": "https://www.bagkost.dk/",
+    "wikidata": "Q4842136",
+    "wikipedia": "da:Bagsværd Kostskole og Gymnasium"
+  }
+},
+{
+  "type": "way",
+  "id": 490933052,
+  "center": {
+    "lat": 55.7959795,
+    "lon": 12.4787518
+  },
+  "nodes": [
+    4831008569,
+    4831008568,
+    4831008567,
+    4831008566,
+    4831008569
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehuset Blå"
+  }
+},
+{
+  "type": "way",
+  "id": 490935171,
+  "center": {
+    "lat": 55.7902659,
+    "lon": 12.4792265
+  },
+  "nodes": [
+    4831026250,
+    4831026249,
+    4831026248,
+    4831026247,
+    4831026246,
+    4831026245,
+    4831026244,
+    4831026243,
+    4831026242,
+    4831026241,
+    4831026240,
+    4831026239,
+    4831026238,
+    4831026250
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Virum Gymnasium",
+    "name:etymology:wikidata": "Q2315179",
+    "wikidata": "Q16325042"
+  }
+},
+{
+  "type": "way",
+  "id": 490935174,
+  "center": {
+    "lat": 55.7925004,
+    "lon": 12.4784280
+  },
+  "nodes": [
+    4831026279,
+    4831026278,
+    4831026277,
+    4831026276,
+    4831026275,
+    4831026274,
+    4831026273,
+    4831026272,
+    4831026271,
+    4831026270,
+    4831026269,
+    14177462859,
+    4831026268,
+    4831026279
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Fuglsanggårdsskolen",
+    "wikidata": "Q17165591"
+  }
+},
+{
+  "type": "way",
+  "id": 490936270,
+  "center": {
+    "lat": 55.7900931,
+    "lon": 12.4919097
+  },
+  "nodes": [
+    4831034318,
+    277680468,
+    277680470,
+    4831034317,
+    4831034318
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Kongevejens Skole",
+    "name:etymology:wikidata": "Q21712191",
+    "wikidata": "Q47151550"
+  }
+},
+{
+  "type": "way",
+  "id": 662025843,
+  "center": {
+    "lat": 55.7786852,
+    "lon": 12.5317070
+  },
+  "nodes": [
+    1339564003,
+    8963519426,
+    8963519427,
+    8963519428,
+    674170895,
+    674170896,
+    2089003068,
+    4145230139,
+    4145230140,
+    4145230143,
+    4145230142,
+    3262845743,
+    3262845742,
+    291612799,
+    748882810,
+    1339564015,
+    1339564007,
+    1339564002,
+    1339564003
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Trongårdsskolen",
+    "wikidata": "Q12339813"
+  }
+},
+{
+  "type": "way",
+  "id": 671244822,
+  "center": {
+    "lat": 55.8156169,
+    "lon": 12.4715558
+  },
+  "nodes": [
+    4119261789,
+    6285976148,
+    6285976147,
+    6285976146,
+    6285976145,
+    6285976144,
+    4119261789
+  ],
+  "tags": {
+    "amenity": "school",
+    "branch": "Grünersvej",
+    "name": "Holte Skole",
+    "name:etymology:wikidata": "Q3388444",
+    "old_name": "Ny Holte Skole",
+    "website": "https://nyholteskole.skoleporten.dk",
+    "wikidata": "Q122932889"
+  }
+},
+{
+  "type": "way",
+  "id": 676662646,
+  "center": {
+    "lat": 55.7677262,
+    "lon": 12.4931471
+  },
+  "nodes": [
+    6336526398,
+    6336526401,
+    6336526399,
+    6336526400,
+    6336526402,
+    6336526398
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Lyngby Friskole",
+    "name:etymology:wikidata": "Q2239"
+  }
+},
+{
+  "type": "way",
+  "id": 712040926,
+  "center": {
+    "lat": 55.7888562,
+    "lon": 12.4807037
+  },
+  "nodes": [
+    2532322861,
+    6695003731,
+    6695003732,
+    6695003733,
+    2532322861
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Bøgely",
+    "name:etymology:wikidata": "Q25403",
+    "operator": "LTK.DK",
+    "preschool": "yes",
+    "website": "http://boegely.ltk.dk/FrontEnd.aspx?id=155544"
+  }
+},
+{
+  "type": "way",
+  "id": 715741181,
+  "center": {
+    "lat": 55.8141951,
+    "lon": 12.5346289
+  },
+  "nodes": [
+    6726446821,
+    6726446820,
+    6726446819,
+    8795515273,
+    8795515272,
+    8795515271,
+    6726446818,
+    8795515269,
+    8795515270,
+    6726446817,
+    6726446821
+  ],
+  "tags": {
+    "amenity": "school",
+    "branch": "Nærum",
+    "name": "Ravnholm Skole",
+    "name:etymology:wikidata": "Q12332991",
+    "old_name": "Nærum Skole",
+    "website": "https://ravnholmskole.aula.dk/",
+    "wikidata": "Q122932890"
+  }
+},
+{
+  "type": "way",
+  "id": 748973602,
+  "center": {
+    "lat": 55.7601877,
+    "lon": 12.5757361
+  },
+  "nodes": [
+    26319838,
+    7004124325,
+    7004124324,
+    7004124323,
+    7004124322,
+    7004124321,
+    5543099147,
+    7004124334,
+    7004124329,
+    7004124328,
+    7004124327,
+    7004124326,
+    26319838
+  ],
+  "tags": {
+    "amenity": "school",
+    "education": "school",
+    "name": "Ordrup Gymnasium",
+    "name:etymology:wikidata": "Q68323625",
+    "wikidata": "Q12330402",
+    "wikipedia": "da:Ordrup Gymnasium"
+  }
+},
+{
+  "type": "way",
+  "id": 750596644,
+  "center": {
+    "lat": 55.7781062,
+    "lon": 12.5264744
+  },
+  "nodes": [
+    7018159253,
+    7018159252,
+    8592710843,
+    8592710842,
+    8592710841,
+    8592710840,
+    8592710839,
+    8592710845,
+    8592710846,
+    7018159251,
+    8592710847,
+    8592710848,
+    8592710849,
+    8592710850,
+    8592710851,
+    8592710852,
+    8592710853,
+    9723629291,
+    9723629294,
+    9723629293,
+    9723629292,
+    8592710854,
+    8592710855,
+    8592710856,
+    8592710857,
+    7018159250,
+    7018159253
+  ],
+  "tags": {
+    "amenity": "college",
+    "branch": "Lyngby",
+    "building": "college",
+    "building:levels": "3",
+    "name": "H.C. Ørsted Gymnasiet",
+    "name:etymology:wikidata": "Q44412"
+  }
+},
+{
+  "type": "way",
+  "id": 755627997,
+  "center": {
+    "lat": 55.8007976,
+    "lon": 12.4999120
+  },
+  "nodes": [
+    7057964068,
+    7057964067,
+    7057964066,
+    7057964065,
+    7057964064,
+    7057964063,
+    7057964068
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "max_age": "3",
+    "min_age": "0",
+    "name": "Mølleåen"
+  }
+},
+{
+  "type": "way",
+  "id": 755627998,
+  "center": {
+    "lat": 55.8108694,
+    "lon": 12.4750417
+  },
+  "nodes": [
+    7057964082,
+    7057964081,
+    7057964080,
+    7057964079,
+    7057964078,
+    7057964077,
+    7057964076,
+    7057964075,
+    7057964074,
+    7057964073,
+    7057964072,
+    7057964071,
+    7057964070,
+    7057964069,
+    7057964082
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "max_age": "6",
+    "min_age": "3",
+    "name": "Børnehaven Vangebovej"
+  }
+},
+{
+  "type": "way",
+  "id": 755627999,
+  "center": {
+    "lat": 55.8166615,
+    "lon": 12.4736734
+  },
+  "nodes": [
+    7057985895,
+    7057985894,
+    7057985893,
+    7057985892,
+    7057985891,
+    7057985890,
+    7057985889,
+    7057985888,
+    7057985887,
+    7057985886,
+    7057985885,
+    7057964084,
+    7057964083,
+    7057985895
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "max_age": "6",
+    "min_age": "0",
+    "name": "Børnehuset Karethen"
+  }
+},
+{
+  "type": "way",
+  "id": 755633937,
+  "center": {
+    "lat": 55.8152752,
+    "lon": 12.4644464
+  },
+  "nodes": [
+    7058012060,
+    7058012059,
+    7058012058,
+    7058012057,
+    7058012056,
+    7058012053,
+    7058012052,
+    7058012051,
+    7058012050,
+    7058012049,
+    7058012048,
+    7058012047,
+    7058012046,
+    7058012060
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "max_age": "6",
+    "min_age": "0",
+    "name": "Dronninggård Børnehus"
+  }
+},
+{
+  "type": "way",
+  "id": 755633938,
+  "center": {
+    "lat": 55.8148798,
+    "lon": 12.4649618
+  },
+  "nodes": [
+    7058012064,
+    7058012063,
+    7058012062,
+    7058012061,
+    7058012060,
+    7058012059,
+    7058012058,
+    7058012057,
+    7058012056,
+    7058012055,
+    7058012054,
+    7058012064
+  ],
+  "tags": {
+    "amenity": "school",
+    "branch": "Rønnebærvej",
+    "name": "Holte Skole",
+    "name:etymology:wikidata": "Q3388444",
+    "old_name": "Dronninggårdskolen",
+    "wikidata": "Q12308986"
+  }
+},
+{
+  "type": "way",
+  "id": 755633939,
+  "center": {
+    "lat": 55.8155756,
+    "lon": 12.4638470
+  },
+  "nodes": [
+    7058012074,
+    7058012073,
+    7058012072,
+    7058012071,
+    7058012070,
+    7058012069,
+    7058012068,
+    7058012067,
+    7058012066,
+    7058012074
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "max_age": "6",
+    "min_age": "0",
+    "name": "Dronninggård Børnehus"
+  }
+},
+{
+  "type": "way",
+  "id": 785401642,
+  "center": {
+    "lat": 55.7753647,
+    "lon": 12.5064404
+  },
+  "nodes": [
+    7340892122,
+    7340892121,
+    7340892120,
+    7340892119,
+    7340892118,
+    7340892117,
+    7340892116,
+    7340892115,
+    7340892114,
+    7340892113,
+    7340892112,
+    9457967460,
+    7340892122
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Sankt Knud Lavard Skole",
+    "name:etymology:wikidata": "Q434760"
+  }
+},
+{
+  "type": "way",
+  "id": 820510895,
+  "center": {
+    "lat": 55.7592533,
+    "lon": 12.5352863
+  },
+  "nodes": [
+    7661645564,
+    7661645563,
+    7661645562,
+    7661645561,
+    7661645560,
+    7661645559,
+    7661645564
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "fvst:navnelbnr": "96443",
+    "name": "Børnehuset Solstrålen",
+    "ref:DK:cvr": "12040105",
+    "ref:DK:cvr:pnummer": "1002915654"
+  }
+},
+{
+  "type": "way",
+  "id": 820510896,
+  "center": {
+    "lat": 55.7551804,
+    "lon": 12.5306743
+  },
+  "nodes": [
+    7661645573,
+    1058889396,
+    1058889473,
+    1058889448,
+    1058889458,
+    7661645572,
+    7661645571,
+    7661645570,
+    7661645569,
+    7661645568,
+    7661645550,
+    7661645567,
+    7661645566,
+    7661645565,
+    7661645573
+  ],
+  "tags": {
+    "amenity": "school",
+    "name": "Tjørnegårdsskolen",
+    "wikidata": "Q122924666"
+  }
+},
+{
+  "type": "way",
+  "id": 820510897,
+  "center": {
+    "lat": 55.7556875,
+    "lon": 12.5319466
+  },
+  "nodes": [
+    28323044,
+    7661645580,
+    7661645579,
+    7661645578,
+    28323042,
+    28323043,
+    28323044
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Jægersborg Børnehus"
+  }
+},
+{
+  "type": "way",
+  "id": 820510898,
+  "center": {
+    "lat": 55.7552045,
+    "lon": 12.5323392
+  },
+  "nodes": [
+    1058889473,
+    7661648486,
+    7661648485,
+    7661645584,
+    7661645583,
+    7661645582,
+    1058889448,
+    1058889473
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehuset Solstrålen"
+  }
+},
+{
+  "type": "way",
+  "id": 822119413,
+  "center": {
+    "lat": 55.7785455,
+    "lon": 12.5291169
+  },
+  "nodes": [
+    7676216768,
+    7676216767,
+    7676216766,
+    7676216765,
+    7676216768
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Dyrehavens Skovbørnehave"
+  }
+},
+{
+  "type": "way",
+  "id": 822119419,
+  "center": {
+    "lat": 55.7838325,
+    "lon": 12.5327302
+  },
+  "nodes": [
+    7676224018,
+    7676224011,
+    7676224010,
+    7676224005,
+    7676224018
+  ],
+  "tags": {
+    "amenity": "school",
+    "building": "yes",
+    "description": "Læringsinitativ med fokus på Læring, Ideer, Fascination og Experimenter",
+    "name": "LIFE campus"
+  }
+},
+{
+  "type": "way",
+  "id": 849267519,
+  "center": {
+    "lat": 55.7615700,
+    "lon": 12.5455339
+  },
+  "nodes": [
+    7923464998,
+    7501302621,
+    7501302620,
+    7501302619,
+    7501302618,
+    7501302617,
+    7501302616,
+    7923464997,
+    7923464996,
+    7923464995,
+    7923464994,
+    7923464993,
+    7923464992,
+    7923464991,
+    7923464990,
+    7923464998
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børn og Miljø Skovvej"
+  }
+},
+{
+  "type": "way",
+  "id": 858446777,
+  "center": {
+    "lat": 55.8061171,
+    "lon": 12.5601984
+  },
+  "nodes": [
+    8002713614,
+    1669451386,
+    1669451384,
+    1669451364,
+    8002713613,
+    8002713612,
+    1669451376,
+    8002713614
+  ],
+  "tags": {
+    "amenity": "school",
+    "education": "nature_school",
+    "name": "Raadvad Naturskole"
+  }
+},
+{
+  "type": "way",
+  "id": 863023128,
+  "center": {
+    "lat": 55.7707280,
+    "lon": 12.5009252
+  },
+  "nodes": [
+    8039854393,
+    8039844682,
+    8039854392,
+    8039854391,
+    8039844681,
+    8039854390,
+    8039854389,
+    8039844680,
+    2154260942,
+    8039854388,
+    8039854387,
+    8039854386,
+    8039854385,
+    8039844684,
+    8039844679,
+    8039844683,
+    8039854393
+  ],
+  "tags": {
+    "amenity": "school",
+    "check_date": "2024-05-12",
+    "name": "Lyngby Private Skole",
+    "name:etymology:wikidata": "Q2239"
+  }
+},
+{
+  "type": "way",
+  "id": 905227130,
+  "center": {
+    "lat": 55.7619562,
+    "lon": 12.5339672
+  },
+  "nodes": [
+    8406488939,
+    8406488938,
+    8406488937,
+    8406488936,
+    8406488939
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "branch": "Sauntesvej",
+    "fvst:navnelbnr": "652953",
+    "name": "Jægersborg Børnehus Sauntesvej",
+    "ref:DK:cvr": "19438414",
+    "ref:DK:cvr:pnummer": "1013748442"
+  }
+},
+{
+  "type": "way",
+  "id": 905605617,
+  "center": {
+    "lat": 55.7919824,
+    "lon": 12.4981920
+  },
+  "nodes": [
+    8409981970,
+    8409981971,
+    8409981972,
+    8409981973,
+    8409981974,
+    8409981975,
+    8409981976,
+    8409981977,
+    8409981978,
+    8409981979,
+    8409981980,
+    8409981981,
+    8409981982,
+    8409981983,
+    8409981984,
+    8409981985,
+    8409981986,
+    8409981987,
+    8409981988,
+    8409981989,
+    8409981970
+  ],
+  "tags": {
+    "amenity": "theatre",
+    "name": "Frilandsmuseets udendørsscene",
+    "theatre:type": "amphi"
+  }
+},
+{
+  "type": "way",
+  "id": 930597442,
+  "center": {
+    "lat": 55.7612667,
+    "lon": 12.5943849
+  },
+  "nodes": [
+    8628612717,
+    8628566416,
+    8628566415,
+    8628566414,
+    8628566413,
+    26264844,
+    8628566412,
+    8628566411,
+    8628566410,
+    26264852,
+    26264849,
+    26264846,
+    8628566409,
+    8628566408,
+    8628566404,
+    8628566405,
+    8628566406,
+    8628566407,
+    8628612717
+  ],
+  "tags": {
+    "amenity": "school",
+    "education": "school",
+    "name": "Skovshoved Skole",
+    "name:etymology:wikidata": "Q12335825",
+    "wikidata": "Q122924665"
+  }
+},
+{
+  "type": "way",
+  "id": 970993351,
+  "center": {
+    "lat": 55.7944786,
+    "lon": 12.4975147
+  },
+  "nodes": [
+    413887806,
+    413887802,
+    1271416069,
+    8986495547,
+    8986495565,
+    849471790,
+    413887806
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Brede Børnehave"
+  }
+},
+{
+  "type": "way",
+  "id": 1012296175,
+  "center": {
+    "lat": 55.8107088,
+    "lon": 12.5276862
+  },
+  "nodes": [
+    9339214081,
+    9339214080,
+    9339220680,
+    9339220551,
+    9339220552,
+    9339220553,
+    9339220554,
+    9339220555,
+    9339220563,
+    9339220556,
+    9339220557,
+    9339220558,
+    4154139806,
+    9339214082,
+    4154139802,
+    9339220678,
+    9339214081
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "email": "info@bornehuset-trylleflojten.dk",
+    "max_age": "6",
+    "min_age": "0",
+    "name": "Børnehuset Tryllefløjten",
+    "opening_hours": "Mo-Th 07:00-17:00; Fr 07:00-16:00",
+    "phone": "+45 45 80 56 53",
+    "preschool": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 1016612724,
+  "center": {
+    "lat": 55.8093188,
+    "lon": 12.5117053
+  },
+  "nodes": [
+    9376748743,
+    9376748742,
+    9376748769,
+    9376748744,
+    9376748747,
+    2481122890,
+    2481122894,
+    9376748765,
+    9376748766,
+    2481122898,
+    9376748771,
+    2481122901,
+    9376748735,
+    9376748734,
+    2481122904,
+    2481122905,
+    5334672425,
+    9376748733,
+    9376748732,
+    9376748770,
+    9376748759,
+    9376748743
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Ravneholm Skovbørnehave",
+    "operator:type": "private"
+  }
+},
+{
+  "type": "way",
+  "id": 1021993396,
+  "center": {
+    "lat": 55.7930942,
+    "lon": 12.5401672
+  },
+  "nodes": [
+    9425865912,
+    9425865911,
+    9425865910,
+    9425865909,
+    9425865912
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "description": "Rudolf Steiner Børnehave",
+    "name": "Enhjørningen"
+  }
+},
+{
+  "type": "way",
+  "id": 1024876244,
+  "center": {
+    "lat": 55.7751338,
+    "lon": 12.5182562
+  },
+  "nodes": [
+    9450143256,
+    9450143262,
+    2433763783,
+    2433763360,
+    2433763167,
+    2433763858,
+    2433763165,
+    2433763834,
+    2433763464,
+    2433763692,
+    9450143264,
+    2433763759,
+    2433763061,
+    9453294500,
+    9453294501,
+    9450143128,
+    9450143129,
+    9450143130,
+    9450143131,
+    9450143132,
+    9450143133,
+    9450143256
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehuset Stoppestedet"
+  }
+},
+{
+  "type": "way",
+  "id": 1025820787,
+  "center": {
+    "lat": 55.7742554,
+    "lon": 12.5069324
+  },
+  "nodes": [
+    9453977875,
+    9453977876,
+    9453977877,
+    9453977878,
+    9453977879,
+    9453977880,
+    9453977881,
+    9453977910,
+    9453977911,
+    9453977912,
+    9453977913,
+    9453978132,
+    9453978131,
+    9453978130,
+    9453978129,
+    9453978128,
+    9453978127,
+    9453977869,
+    9453977870,
+    2433760412,
+    2433759207,
+    2433756785,
+    9453977871,
+    9453977872,
+    2433757743,
+    2433758133,
+    2433759939,
+    2433757735,
+    9453977873,
+    9453977874,
+    9453977875
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "capacity": "60",
+    "email": "trinbraettet@ltk.dk",
+    "name": "Børnehuset Trinbrættet",
+    "opening_hours": "Mo-Th 08:00-17:00, Fr 07:00-16:00",
+    "operator": "Lyngby Taarbæk Kommune",
+    "operator:type": "government",
+    "phone": "+45 45 28 55 10",
+    "website": "https://dagtilbud.ltk.dk/find-dagtilbud/lyngby-og-ulrikkenborg/boernehuset-trinbraettet"
+  }
+},
+{
+  "type": "way",
+  "id": 1028416373,
+  "center": {
+    "lat": 55.7601959,
+    "lon": 12.5681877
+  },
+  "nodes": [
+    9481351483,
+    9481351482,
+    9481351481,
+    9481351480,
+    9481351477,
+    9481351479,
+    9481351478,
+    9481351483
+  ],
+  "tags": {
+    "alt_name": "Ordrup Asyl",
+    "amenity": "kindergarten",
+    "education": "kindergarten",
+    "name": "Kong Christian IX og Dronning Louises Asyl",
+    "website": "https://ordrupasyl.dk/"
+  }
+},
+{
+  "type": "way",
+  "id": 1058974483,
+  "center": {
+    "lat": 55.7764190,
+    "lon": 12.5107548
+  },
+  "nodes": [
+    9730424918,
+    9730424919,
+    9730424920,
+    9730424921,
+    2433757583,
+    2433760559,
+    2433758661,
+    2433758053,
+    9730424935,
+    9730424922,
+    9730424923,
+    9730424924,
+    9730424925,
+    9730424918
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehuset Carlshøj",
+    "phone": "+45 45 28 54 60",
+    "preschool": "yes",
+    "website": "https://dagtilbud.ltk.dk/find-dit-dagtilbud/hjortekaer-lyngby-og-lundtofte/boernehuset-carlshoej"
+  }
+},
+{
+  "type": "way",
+  "id": 1059905171,
+  "center": {
+    "lat": 55.7804363,
+    "lon": 12.5105968
+  },
+  "nodes": [
+    9738007024,
+    3631007318,
+    278685937,
+    9738007056,
+    2433744727,
+    2433745185,
+    9738007057,
+    3631007314,
+    3631007316,
+    9738007023,
+    9738007025,
+    9738007024
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "email": "menighedsboernehaven@ltk.dk",
+    "name": "Lyngby Menighedsbørnehave",
+    "phone": "+45 45 28 54 40",
+    "website": "https://dagtilbud.ltk.dk/find-dit-dagtilbud/selvejende-institutioner/lyngby-meninghedsboernehave"
+  }
+},
+{
+  "type": "way",
+  "id": 1088154094,
+  "center": {
+    "lat": 55.7929821,
+    "lon": 12.4707978
+  },
+  "nodes": [
+    9969916392,
+    10209558291,
+    10209558308,
+    9969916391,
+    9969916390,
+    10209547904,
+    9969916389,
+    10209558292,
+    9969916388,
+    9969916387,
+    9969916392
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Børnehuset Mælkevejen"
+  }
+},
+{
+  "type": "way",
+  "id": 1180133908,
+  "center": {
+    "lat": 55.7581684,
+    "lon": 12.4621942
+  },
+  "nodes": [
+    10960919446,
+    10960919447,
+    10960919448,
+    10960919449,
+    3310163432,
+    10960919450,
+    10960931188,
+    10960931183,
+    10960919451,
+    10960931201,
+    10960919452,
+    10960919453,
+    10960919454,
+    10960919455,
+    10960919456,
+    10960919457,
+    10960919458,
+    10960919459,
+    1060129616,
+    1060129532,
+    10960919460,
+    1060129620,
+    10960919446
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "check_date": "2025-07-05",
+    "fvst:navnelbnr": "94070",
+    "name": "Børnehuset Midgård",
+    "operator": "Gladsaxe Kommune",
+    "ref:DK:cvr": "62761113",
+    "ref:DK:cvr:pnummer": "1003263839"
+  }
+},
+{
+  "type": "way",
+  "id": 1270977021,
+  "center": {
+    "lat": 55.7569456,
+    "lon": 12.4771436
+  },
+  "nodes": [
+    11802806009,
+    11802806010,
+    11802806011,
+    11802806012,
+    12198380521,
+    11802805989,
+    11802805990,
+    11802805991,
+    11802805992,
+    11802805993,
+    11802805994,
+    11802805995,
+    11802805996,
+    11802805997,
+    11802806009
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "name": "Regnskoven"
+  }
+},
+{
+  "type": "way",
+  "id": 1416951649,
+  "center": {
+    "lat": 55.7651319,
+    "lon": 12.4743904
+  },
+  "nodes": [
+    13020826527,
+    13020826610,
+    13020819262,
+    13020819250,
+    13020826528,
+    13020819216,
+    13020826600,
+    13020826527
+  ],
+  "tags": {
+    "amenity": "school",
+    "facebook": "https://facebook.com/profile.php?id=616333808377973",
+    "name": "Skolen ved Radiomarken",
+    "operator": "Gladsaxe Kommune",
+    "operator:type": "public",
+    "ref:DK:cvr": "62761113",
+    "ref:DK:cvr:pnummer": "1016778040",
+    "website": "https://skolenvedradiomarken.aula.dk/"
+  }
+},
+{
+  "type": "way",
+  "id": 1503338095,
+  "center": {
+    "lat": 55.7517049,
+    "lon": 12.4930821
+  },
+  "nodes": [
+    13758456493,
+    13758456494,
+    13758456495,
+    13758456496,
+    13758456497,
+    13758456498,
+    13758456493
+  ],
+  "tags": {
+    "amenity": "kindergarten",
+    "contact:phone": "+45 39576630",
+    "contact:website": "https://gladsaxe.dk/borger/boern-og-familie/dagtilbud-for-de-yngste/dagtilbud-og-dagpleje/boernehuse/boernehuset-humlebien",
+    "education": "kindergarten",
+    "fvst:navnelbnr": "93432",
+    "name": "Børnehuset Humlebien",
+    "opening_hours": "Mo-Fr 06:00-17:00",
+    "operator": "Gladsaxe Kommune",
+    "ref:DK:cvr": "62761113",
+    "ref:DK:cvr:pnummer": "1003263700"
+  }
+},
+{
+  "type": "way",
+  "id": 1513506142,
+  "center": {
+    "lat": 55.7573754,
+    "lon": 12.5736988
+  },
+  "nodes": [
+    13827667719,
+    13827667720,
+    13827667721,
+    13827667722,
+    13827667719
+  ],
+  "tags": {
+    "amenity": "school",
+    "education": "school",
+    "name": "Ordrup Skole",
+    "operator": "Gentofte Kommune",
+    "website": "https://ordrupskole.aula.dk"
+  }
+}
+
+  ]
+}

@@ -37,6 +37,7 @@ def main():
     micro_idx = load(PROC / "micro" / "index.json")
     infra = load(ROOT / "data" / "geo" / "infra_projects.geojson")
     infra_index = load(PROC / "infra_index.json")
+    public_index = load(PROC / "public_index.json")
     built = (makro.get("meta") or {}).get("built") or dt.date.today().isoformat()
     data = {
         "meta": makro.get("meta", {"built": built, "sources": [], "attribution": []}),
@@ -52,6 +53,9 @@ def main():
         # every project: the map layer filters on `map`, the Pipeline table lists them all
         "infra": {"features": (infra or {}).get("features", []), "meta": (infra or {}).get("meta")} if infra else None,
         "infra_index": (infra_index or {}).get("areas") if infra_index else None,
+        # public buildings: counts per area inline, the buildings themselves loaded on demand (dist/public/<kommune>.json)
+        "public": {"areas": public_index["areas"], "built": public_index["built"], "kommuner": public_index["kommuner"],
+                   "recent_years": public_index["recent_years"]} if public_index else None,
     }
     payload = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</script", "<\\/script")
     html = (SRC / "index.html").read_text(encoding="utf-8")
@@ -65,12 +69,19 @@ def main():
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(html, encoding="utf-8")
     # the infrastructure layer is inlined in the page, and also served as files so it can be reused
-    for src in (ROOT / "data" / "geo" / "infra_projects.geojson", PROC / "infra_index.json"):
+    for src in (ROOT / "data" / "geo" / "infra_projects.geojson", PROC / "infra_index.json", PROC / "public_index.json"):
         if src.exists():
             import shutil
             shutil.copy(src, out.parent / src.name)
             print(f"copied {src.name} → {out.parent}")
     # building-level files are loaded on demand by the page (dist/micro/<kommune>.json)
+    pub = PROC / "public"
+    if pub.exists():
+        import shutil
+        pd_ = out.parent / "public"; pd_.mkdir(exist_ok=True)
+        for f in pub.glob("*.json"):
+            shutil.copy(f, pd_ / f.name)
+        print(f"copied {len(list(pd_.glob('*.json')))} public-building files → {pd_}")
     if micro_idx:
         import shutil
         md = out.parent / "micro"; md.mkdir(exist_ok=True)
