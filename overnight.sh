@@ -13,7 +13,7 @@ set -u
 REPO="$(cd "$(dirname "$0")" && pwd)"; cd "$REPO" || exit 1
 BRANCH="v3.0-ui"
 ALL_PHASES=(P1 P2 P3 P4 P5 P6 P7 P8 P9)
-PHASE_TIMEOUT="${PHASE_TIMEOUT:-6000}"     # seconds per claude call (100 min)
+PHASE_TIMEOUT="${PHASE_TIMEOUT:-9000}"     # seconds per claude call (150 min)
 LIMIT_WAIT="${LIMIT_WAIT:-1200}"           # seconds to sleep when a usage limit is hit
 LIMIT_MAX_WAITS="${LIMIT_MAX_WAITS:-15}"   # up to 5 h of waiting in total
 PORT="${PORT:-8080}"
@@ -95,7 +95,7 @@ run_claude() {   # $1 prompt file, $2 log file
   local waits=0
   while :; do
     with_timeout "$PHASE_TIMEOUT" claude -p "${CLAUDE_PERMS[@]}" --output-format text \
-        "${MODEL_ARGS[@]}" < "$1" > "$2" 2>&1
+        ${MODEL_ARGS[@]+"${MODEL_ARGS[@]}"} < "$1" > "$2" 2>&1
     local rc=$?
     if [ $rc -ne 0 ] && hit_limit "$2" && [ $waits -lt "$LIMIT_MAX_WAITS" ]; then
       waits=$((waits + 1)); log "usage/rate limit — sleeping $LIMIT_WAIT s ($waits/$LIMIT_MAX_WAITS)"
@@ -181,7 +181,7 @@ release() {
 }
 
 main_run() {
-  local phases=("$@"); [ ${#phases[@]} -gt 0 ] || phases=("${ALL_PHASES[@]}")
+  local phases; if [ $# -gt 0 ]; then phases=("$@"); else phases=("${ALL_PHASES[@]}"); fi
   exclude_local; git checkout -q "$BRANCH" || { echo "run preflight first"; exit 1; }
   [ -f "$REPORT" ] || { report "# Overnight report — v3.0 UI ($(date '+%F %H:%M'))"; report "";
     report "Branch \`$BRANCH\`. Logs \`$LOGS\`. Review server: http://localhost:$PORT/"; report "";
