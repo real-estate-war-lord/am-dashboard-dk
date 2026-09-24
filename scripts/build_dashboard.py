@@ -77,6 +77,28 @@ def kommuner_lookup(out_dir: pathlib.Path):
           + (f" · simplified {simplify}" if simplify else " · not simplified"))
 
 
+def check_js(paths):
+    """Refuse to inline JavaScript that does not parse.
+
+    Without this `make build` happily writes a dist/index.html whose app.js has a syntax
+    error — the page then renders nothing and the build still says it succeeded. node is
+    optional: if it is not installed the check is skipped rather than failing the build.
+    """
+    import shutil
+    import subprocess
+    node = shutil.which("node")
+    if not node:
+        print("  · node not found — skipping the JavaScript syntax check")
+        return
+    for p in paths:
+        if not p.exists():
+            continue
+        r = subprocess.run([node, "--check", str(p)], capture_output=True, text=True)
+        if r.returncode:
+            raise SystemExit(f"✗ {p.name} does not parse:\n{(r.stderr or r.stdout).strip()}")
+    print(f"  · JavaScript parses ({', '.join(p.name for p in paths if p.exists())})")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--data", default=str(PROC / "makro.json"))
@@ -86,6 +108,7 @@ def main():
     ap.add_argument("--out", default=str(ROOT / "dist" / "index.html"))
     args = ap.parse_args()
 
+    check_js([SRC / "app.js", SRC / "testprop.js"])
     makro = load(pathlib.Path(args.data)) or {}
     market = load(pathlib.Path(args.market)) or {}
     portfolio = load(pathlib.Path(args.portfolio))
@@ -94,6 +117,7 @@ def main():
     infra = load(ROOT / "data" / "geo" / "infra_projects.geojson")
     infra_index = load(PROC / "infra_index.json")
     public_index = load(PROC / "public_index.json")
+    services_index = load(PROC / "services" / "index.json")
     built = (makro.get("meta") or {}).get("built") or dt.date.today().isoformat()
     data = {
         "meta": makro.get("meta", {"built": built, "sources": [], "attribution": []}),
@@ -115,6 +139,9 @@ def main():
         "public": {"areas": public_index["areas"], "built": public_index["built"], "kommuner": public_index["kommuner"],
                    "recent_years": public_index["recent_years"],
                    "schools": public_index.get("schools")} if public_index else None,
+        # services: the index only (as-of, vocabulary, per-kommune counts + bbox). The points
+        # themselves load on demand from dist/services/<kommune>.json for whatever is in view.
+        "services": services_index,
     }
     payload = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</script", "<\\/script")
     html = (SRC / "index.html").read_text(encoding="utf-8")
@@ -143,6 +170,13 @@ def main():
         for f in pub.glob("*.json"):
             shutil.copy(f, pd_ / f.name)
         print(f"copied {len(list(pd_.glob('*.json')))} public-building files → {pd_}")
+    srv = PROC / "services"
+    if srv.exists():
+        import shutil
+        sd = out.parent / "services"; sd.mkdir(exist_ok=True)
+        for f in srv.glob("*.json"):
+            shutil.copy(f, sd / f.name)
+        print(f"copied {len(list(sd.glob('*.json')))} services files → {sd}")
     if micro_idx:
         import shutil
         md = out.parent / "micro"; md.mkdir(exist_ok=True)
