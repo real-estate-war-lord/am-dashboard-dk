@@ -199,27 +199,8 @@ const tpRadLabel = m => m >= 1000 ? (m / 1000) + " km" : m + " m";
 const KOM = { list: null, err: false, p: null };   /* dist/geo/kommuner_lookup.json, fetched the first time a pin is dropped */
 const T = { q: "", level: "kommune", region: "", minPop: 0 };                     /* table view filters */
 const REGIONS = ["Hovedstaden", "Sjælland", "Syddanmark", "Midtjylland", "Nordjylland"];
-const LF = { map: null, center: [56.0, 10.5], zoom: 7, autoMuni: null, autoMicro: false, microManual: false };
+const LF = { map: null, center: [56.0, 10.5], zoom: 7 };
 const MICRO_ZOOM = 10;
-const BUILD_ZOOM = 14;
-/* The area ladder. The map subdivides itself as you zoom, the way the "Zoom to <kommune>" button
-   does on click: country → municipality → district (postal code, or quarter in København) →
-   buildings. Every rung is a level the publisher actually prints. There is no interpolated grid:
-   a number nobody published is not a figure this dashboard is allowed to draw. */
-const AREA_LADDER = [
-  { key: "country",      label: "Country",      what: "98 municipalities" },
-  { key: "municipality", label: "Municipality", what: "98 municipalities" },
-  { key: "district",     label: "District",     what: "postal codes" },
-  { key: "buildings",    label: "Buildings",    what: "individual buildings (BBR)" }];
-/* what is drawn right now, not merely what the zoom would allow */
-function areaLevel() {
-  if (microMode()) return "buildings";
-  const z = LF.map ? LF.map.getZoom() : LF.zoom;
-  if (MK.muni || z >= MICRO_ZOOM) return "district";
-  return z < 8 ? "country" : "municipality";
-}
-/* a rung the ladder entered by itself may be left by itself; one the user chose is left alone */
-const autoDrilled = () => !!MK.muni && LF.autoMuni === MK.muni;
 /* quarter indicators whose definition matches the national one closely enough to put København next to a quarter */
 const CPH_CMP = new Set(["growth", "young", "higher_ed", "renters", "almene", "avg_m2"]);
 const muniCmp = (e, key) => !!e.muni && (e.type !== "kvarter" || CPH_CMP.has(key) || !cphOwn(key));
@@ -300,8 +281,6 @@ function parseHash() {
   else if (v === "charts") { S.view = "charts"; CH.ind = q.ind || CH.ind; CH.areas = q.a ? q.a.split(",").filter(Boolean) : CH.areas; CH.y0 = q.y0 || CH.y0; CH.y1 = q.y1 || CH.y1; CH.median = q.med !== "0"; CH.mode = q.mode || "auto"; CH.dist = q.dist || "size";
     CH.fq = q.fq === "q" ? "q" : "year"; CH.ov = q.ov ? q.ov.split(",").filter(Boolean) : []; CH.nat = q.nat !== "0"; }
   else { S.view = "makro"; MK.muni = parts[1] && byCode[parts[1]] ? parts[1] : null;
-         /* a municipality the user chose is not the ladder’s to release */
-         if (MK.muni !== LF.autoMuni) { LF.autoMuni = null; LF.autoMicro = false; }
          MK.cphView = parts[2] === "postnr" ? "postnr" : "kvarter";
          MK.micro = q.micro === "1" && microAvail(MK.muni); if (q.mind && MICRO_INDS.some(i => i.key === q.mind)) MK.mind = q.mind;
          MK.infra = q.infra === "1"; MK.pub = q.public === "1"; MK.srv = q.services === "1";
@@ -392,11 +371,12 @@ document.addEventListener("click", e => {
   if (g("[data-chpng]")) { chartPng(); return; }
   if (g("[data-chcsv]")) { chartCsv(); return; }
   if (g("[data-chclear]")) { CH.areas = []; syncHash(); renderKeep(); return; }
+  if ((el = g("[data-mapjump]"))) { mapJump(el.dataset.mapjump); return; }
   if ((el = g("[data-tprad]"))) { TP.rad = TP_RADII.includes(Number(el.dataset.tprad)) ? Number(el.dataset.tprad) : 0;
     syncHash(); mkRefreshTools();
     if (LF.map) { lfInfraLayers(); if (MK.pub) { lfPublicLayers(true); lfPublicLabels(); } if (MK.srv) lfServicesLayers(true); tpLayers(); }
     return; }
-  if ((el = g("[data-micro]"))) { MK.micro = el.dataset.micro === "1"; LF.microManual = true; LF.autoMicro = false; syncHash(); renderKeep(); return; }
+  if ((el = g("[data-micro]"))) { MK.micro = el.dataset.micro === "1"; syncHash(); renderKeep(); return; }
   if (g("[data-infra]")) { MK.infra = !MK.infra; syncHash(); renderKeep(); return; }
   if ((el = g("[data-anlay]"))) { if (el.disabled) return; const k = el.dataset.anlay;
     if (k === "infra") ANL.infra = !ANL.infra; else if (k === "public") ANL.pub = !ANL.pub; else ANL.micro = !ANL.micro;
@@ -478,6 +458,14 @@ document.addEventListener("keydown", e => {
   if (e.key === "Enter" && e.target.id === "mf-addr") { microFind(e.target.value); return; }
   if (e.key === "Enter" && e.target.id === "tpq") { tpGo(e.target.value); return; }
   if (e.key === "Escape" && S.view === "area") history.back();
+  /* C / D jump the map view. Never while typing, and never with a modifier held, so they
+     cannot shadow a browser shortcut or eat a character in the search box. */
+  if (S.view !== "makro" || e.metaKey || e.ctrlKey || e.altKey) return;
+  const t = e.target;
+  if (t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable)) return;
+  const k = (e.key || "").toLowerCase();
+  if (k === "c") mapJump("cph");
+  else if (k === "d") mapJump("dk");
 });
 
 /* ---------- info tooltips (ⓘ) ---------- */
@@ -806,7 +794,7 @@ function upcomingLine(level, code) {
    would re-run lfInit and tear the live map down in the middle of a zoom gesture. */
 function mkTools() {
   const muni = MK.muni ? byCode[MK.muni] : null;
-  return `${areaSearch()}${tpBox()}${TP.lat != null ? `<div class="seg tprad" role="group" aria-label="Filter overlays by distance from the test property"><span class="segl">Within</span>${TP_RADII.map(m => `<button class="sg ${TP.rad === m ? "on" : ""}" data-tprad="${m}" title="${m ? `Infra projects, public buildings and services within ${esc(tpRadLabel(m))} of ${esc(TP.label || TP_LABEL)}` : "No distance filter"}">${m ? esc(tpRadLabel(m)) : "Any"}</button>`).join("")}</div>` : ""}${muni && microAvail(muni.code) ? `<div class="seg"><button class="sg ${!MK.micro ? "on" : ""}" data-micro="0">Areas</button><button class="sg ${MK.micro ? "on" : ""}" data-micro="1">Buildings (${nf(MICRO_IDX[String(Number(muni.code))].n, 0)})</button></div>` : ""}${muni && muni.code === CPH_MUNI && CPH && !microMode() ? `<div class="seg"><button class="sg ${MK.cphView !== "postnr" ? "on" : ""}" data-cphview="kvarter">Quarters (${CPH.areas.length})</button><button class="sg ${MK.cphView === "postnr" ? "on" : ""}" data-cphview="postnr">Postal codes</button></div>` : ""}${INFRA.length ? `<div class="seg"><button class="sg ${MK.infra ? "on" : ""}" data-infra title="Show planned and ongoing infrastructure projects on top of the map">Infra projects</button></div>` : ""}${PUB ? `<div class="seg"><button class="sg ${MK.pub ? "on" : ""}" data-public title="Public buildings from BBR: schools, daycare, health and culture${MK.muni && !pubAvail(MK.muni) ? " — no BBR pull for this municipality yet" : ""}">Public buildings</button></div>` : ""}${SRV ? `<div class="seg"><button class="sg ${MK.srv ? "on" : ""}" data-services title="Shops, places to eat, pharmacies and public-transport stops — OpenStreetMap and Rejseplanen">Services</button></div>` : ""}${microMode() ? mindSelect() : indSelect() + yearSelect()}${D.portfolio ? `<button class="lk mini ${MK.own ? "primary" : ""}" data-mkown>● Own properties</button>` : ""}<button class="lk" data-fs title="Full screen (Esc to exit)">⤢ Full screen</button>`;
+  return `${areaSearch()}${tpBox()}${TP.lat != null ? `<div class="seg tprad" role="group" aria-label="Filter overlays by distance from the test property"><span class="segl">Within</span>${TP_RADII.map(m => `<button class="sg ${TP.rad === m ? "on" : ""}" data-tprad="${m}" title="${m ? `Infra projects, public buildings and services within ${esc(tpRadLabel(m))} of ${esc(TP.label || TP_LABEL)}` : "No distance filter"}">${m ? esc(tpRadLabel(m)) : "Any"}</button>`).join("")}</div>` : ""}${`<div class="seg jumps">${Object.keys(MAP_JUMPS).map(id => { const j = MAP_JUMPS[id]; return `<button class="sg" data-mapjump="${id}" title="Zoom to ${esc(j.label)} (${j.key})">${esc(j.label)}</button>`; }).join("")}</div>`}${muni && microAvail(muni.code) ? `<div class="seg"><button class="sg ${!MK.micro ? "on" : ""}" data-micro="0">Areas</button><button class="sg ${MK.micro ? "on" : ""}" data-micro="1">Buildings (${nf(MICRO_IDX[String(Number(muni.code))].n, 0)})</button></div>` : ""}${muni && muni.code === CPH_MUNI && CPH && !microMode() ? `<div class="seg"><button class="sg ${MK.cphView !== "postnr" ? "on" : ""}" data-cphview="kvarter">Quarters (${CPH.areas.length})</button><button class="sg ${MK.cphView === "postnr" ? "on" : ""}" data-cphview="postnr">Postal codes</button></div>` : ""}${INFRA.length ? `<div class="seg"><button class="sg ${MK.infra ? "on" : ""}" data-infra title="Show planned and ongoing infrastructure projects on top of the map">Infra projects</button></div>` : ""}${PUB ? `<div class="seg"><button class="sg ${MK.pub ? "on" : ""}" data-public title="Public buildings from BBR: schools, daycare, health and culture${MK.muni && !pubAvail(MK.muni) ? " — no BBR pull for this municipality yet" : ""}">Public buildings</button></div>` : ""}${SRV ? `<div class="seg"><button class="sg ${MK.srv ? "on" : ""}" data-services title="Shops, places to eat, pharmacies and public-transport stops — OpenStreetMap and Rejseplanen">Services</button></div>` : ""}${microMode() ? mindSelect() : indSelect() + yearSelect()}${D.portfolio ? `<button class="lk mini ${MK.own ? "primary" : ""}" data-mkown>● Own properties</button>` : ""}<button class="lk" data-fs title="Full screen (Esc to exit)">⤢ Full screen</button>`;
 }
 function mkRefreshTools() {
   const el = document.querySelector("#mapcard .tools"); if (el) el.innerHTML = mkTools();
@@ -816,16 +804,6 @@ function mkRefreshTools() {
   if (ex) ex.innerHTML = microMode() ? microExplain() : indExplain(curInd());
   const st = document.getElementById("mkstrip"), mu = MK.muni ? byCode[MK.muni] : null;
   if (st) st.innerHTML = mu && !microMode() ? muniStrip(mu) : "";
-  setLevelChip();
-}
-/* The level label: what the map is drawing now, and what one more zoom step would give. */
-function setLevelChip() {
-  const el = document.getElementById("mklevel"); if (!el) return;
-  const key = areaLevel(), m = AREA_LADDER.find(l => l.key === key) || AREA_LADDER[0];
-  const what = key === "district" ? (cphMode() ? "Copenhagen quarters" : "postal codes") : m.what;
-  const nxt = key === "country" || key === "municipality" ? "zoom in for postal codes"
-    : key === "district" ? (microAvail(MK.muni) ? "zoom in for buildings" : "") : "";
-  el.innerHTML = `<b>${esc(m.label)}</b><span>${esc(what)}</span>` + (nxt ? `<span class="nx">${esc(nxt)}</span>` : "");
 }
 function vMakro() {
   if (!AREAS.length || !MUNI.length) return `<div class="card"><p class="empty">No macro data built yet — run <code>make fetch</code>, <code>make geo</code> and <code>make build</code>.</p></div>`;
@@ -839,7 +817,7 @@ function vMakro() {
       <div id="mkquick">${microMode() ? "" : indQuick()}</div><div class="tperr" id="tperr" role="status" ${TP.msg ? "" : 'style="display:none"'}>${esc(TP.msg)}</div>${tpNote()}</div>
     <div id="mkexplain">${microMode() ? microExplain() : indExplain(ind)}</div>
     <div id="mkstrip">${muni && !microMode() ? muniStrip(muni) : ""}</div>
-    <div class="mapwrap"><div id="lfmap"></div><div class="lvlchip" id="mklevel" title="Area level — set automatically by the zoom"></div><div class="maplegs"><div class="maplegend publiclegend" id="publiclegend"></div><div class="maplegend serviceslegend" id="serviceslegend"></div><div class="maplegend infralegend" id="infralegend"></div></div><div class="maplegend" id="maplegend"></div></div>
+    <div class="mapwrap"><div id="lfmap"></div><div class="maplegs"><div class="maplegend publiclegend" id="publiclegend"></div><div class="maplegend serviceslegend" id="serviceslegend"></div><div class="maplegend infralegend" id="infralegend"></div></div><div class="maplegend" id="maplegend"></div></div>
     ${srcNote(`<p class="cap">${muni ? "Click a polygon for its figures and a link to its page." : "Click a polygon for its figures; open a municipality with the search box above or from the popup. Table view lists everything side by side."} Colour classes: quintiles of the visible areas. Boundaries: DAGI, Klimadatastyrelsen (simplified); basemap OpenStreetMap.${MK.srv ? ` <b>Services:</b> ${esc(srvAttribLine())}.` : ""}</p>`)}
   </div>`;
 }
@@ -2199,9 +2177,7 @@ function exportMicroCsv() {
 function microRadius(dw, zoom) { const z = zoom != null ? zoom : (LF.map ? LF.map.getZoom() : 12); const k = z < 12 ? .7 : z < 13.5 ? 1.0 : z < 15 ? 1.5 : 2.2; return Math.max(2, Math.min(16, k * Math.sqrt(dw) + 1)); }
 function lfMicroLayers() {
   const code = MK.muni; const d = MICRO[String(Number(code))];
-  if (LF.areaG) LF.map.removeLayer(LF.areaG);
-  if (LF.labG) LF.map.removeLayer(LF.labG);
-  if (LF.microG) { LF.map.removeLayer(LF.microG); LF.microG = null; }
+  lfDrop("areaG", "labG", "microG");
   LF.level = "micro-b" + code; LF.ctx = null;
   /* area outlines only, so the dots read against the basemap */
   LF.areaG = L.layerGroup(muniAreas(code).map(a => L.polygon(a.rings, { color: "#141C18", weight: 1, fill: false, opacity: .35, interactive: false }))).addTo(LF.map);
@@ -2216,42 +2192,14 @@ function lfMicroLayers() {
   LF.microG = L.layerGroup(marks).addTo(LF.map); LF.microMarks = marks;
   tpLayers();
   setLegend("maplegend", sc, ind, "micro:" + ind.key, "buildings with ≥ 2 dwellings · dot size = dwellings");
-  setLevelChip();
   lfInfraLayers();
   lfPublicLayers();
-  lfServicesLayers();   /* the ladder can enter buildings mode on zoom alone, so this must draw here too */
+  lfServicesLayers();   /* buildings mode keeps every overlay, services included */
   if (cnt) cnt.textContent = `${nf(rows.length, 0)} of ${nf(d.meta.n, 0)} buildings · ${nf(rows.reduce((s_, r) => s_ + r[2], 0), 0)} dwellings`;
-}
-/* Keep the drawn granularity in step with the zoom, and with a pan that crosses a border.
-   Only rungs the ladder entered may be left by the ladder: an explicit drill-in (a "Zoom to …"
-   button, a popup link, /map/<code> in the URL) and an explicit Areas/Buildings choice both
-   outrank it, so the map never undoes what the user just asked for. Thresholds are asymmetric
-   so a half-step of zoom (zoomSnap 0.5) cannot flip the level back and forth.
-   Returns true when something changed and the layers need rebuilding. */
-function lfAutoLevel() {
-  if (!LF.map || S.view !== "makro" || LF.pendingFit) return false;
-  const z = LF.map.getZoom();
-  let changed = false;
-  if (z >= MICRO_ZOOM && (!MK.muni || autoDrilled())) {
-    /* adopt the municipality under the middle of the screen — the same drill the button does */
-    const c = LF.map.getCenter(), a = areaOf(AREAS, c.lat, c.lng), code = a && a.muni;
-    if (code && code !== MK.muni) { MK.muni = code; LF.autoMuni = code; LF.shownMuni = code; changed = true; }
-  } else if (autoDrilled() && z < MICRO_ZOOM - 0.5) {
-    MK.muni = null; LF.autoMuni = null; LF.shownMuni = null; LF.microManual = false;
-    if (LF.autoMicro) { MK.micro = false; LF.autoMicro = false; }
-    changed = true;
-  }
-  if (!LF.microManual) {
-    const avail = !!MK.muni && microAvail(MK.muni);
-    if (avail && !MK.micro && z >= BUILD_ZOOM) { MK.micro = true; LF.autoMicro = true; changed = true; }
-    else if (LF.autoMicro && MK.micro && (!avail || z < BUILD_ZOOM - 0.5)) { MK.micro = false; LF.autoMicro = false; changed = true; }
-  }
-  if (changed) { syncHash(); mkRefreshTools(); }
-  return changed;
 }
 function lfLayers() {
   if (LF.map && microMode()) { lfMicroLayers(); return; }
-  if (LF.microG && LF.map) { LF.map.removeLayer(LF.microG); LF.microG = null; }
+  lfDrop("microG");
   if (!LF.map) return;
   const zoom = LF.map.getZoom();
   const ind = curInd();
@@ -2259,8 +2207,7 @@ function lfLayers() {
   const fine = !!MK.muni || zoom >= MICRO_ZOOM;
   const micro = fine && (cphMode() ? cphOwn(ind.key) : ind.level === "postnr");
   LF.level = (fine ? "micro" : zoom < 8 ? "national" : "macro") + (cphMode() ? "-cph" : "") + (MK.muni || "");
-  if (LF.areaG) LF.map.removeLayer(LF.areaG);
-  if (LF.labG) LF.map.removeLayer(LF.labG);
+  lfDrop("areaG", "labG");
   const areas = MK.muni ? muniAreas(MK.muni) : AREAS;
   const munis = MK.muni ? [byCode[MK.muni]].filter(Boolean) : MUNI;
   const vk = o => V(o, ind.key);
@@ -2282,7 +2229,6 @@ function lfLayers() {
   lfPublicLayers();
   lfServicesLayers();
   lfLabels();
-  setLevelChip();
   setLegend("maplegend", sc, ind, ind.key, micro ? (cphMode() ? "quarters" + (bydelLevel(ind) ? " · ^ one figure per bydel" : "") : "postal codes") : (ind.level === "postnr" && !MK.muni ? "municipalities · zoom in for postal codes" : "municipalities" + (fine ? ` · ° ${cphMode() ? "quarters" : "postal codes"} take the municipality value` : "")));
   if (LF.ownG) { LF.map.removeLayer(LF.ownG); LF.ownG = null; }
   if (MK.own && D.portfolio) {
@@ -2295,6 +2241,40 @@ function lfLayers() {
     LF.ownG = L.layerGroup(marks).addTo(LF.map);
   }
   tpLayers();
+}
+/* Leaflet's canvas renderer draws into `this._ctx`, which exists only while the renderer is on
+   a map. A redraw that lands just after a map is torn down — an async building/services/public
+   file resolving, or a filter applied mid-rebuild — reaches an undefined context and throws
+   "Cannot read properties of undefined (reading 'save')". Reproduced exactly by calling
+   _redraw() on a renderer that was never added, or was removed. Guarded once at the prototype,
+   so it holds for the macro map, the area map, the Analysis mini map and every future one. */
+if (typeof L !== "undefined" && L.Canvas && L.Canvas.prototype && !L.Canvas.prototype._amGuarded) {
+  const cp = L.Canvas.prototype, _redraw = cp._redraw, _update = cp._update;
+  cp._amGuarded = true;
+  cp._redraw = function () { if (!this._map || !this._ctx) return; return _redraw.apply(this, arguments); };
+  cp._update = function () { if (!this._map) return; return _update.apply(this, arguments); };
+}
+/* Remove a layer group from the map and forget it in one step. A group left in LF after its
+   map is gone is exactly what later hands a dead renderer a redraw, so the two always happen
+   together and in this order. */
+function lfDrop() {
+  for (let i = 0; i < arguments.length; i++) {
+    const k = arguments[i], g = LF[k];
+    if (g && LF.map) { try { LF.map.removeLayer(g); } catch (e) {} }
+    LF[k] = null;
+  }
+}
+/* Quick view jumps. These move the camera and nothing else: no municipality is selected, the
+   breadcrumb, level and indicator are untouched and no popup opens — zooming is not selecting.
+   Copenhagen is København + Frederiksberg together, because the two read as one city. */
+const MAP_JUMPS = {
+  cph: { label: "Copenhagen", key: "C", codes: [CPH_MUNI, "147"] },
+  dk:  { label: "Denmark",    key: "D", codes: null },
+};
+function mapJump(id) {
+  const j = MAP_JUMPS[id]; if (!j || !LF.map) return;
+  const b = boundsOf(j.codes ? AREAS.filter(a => j.codes.includes(a.muni)) : AREAS);
+  if (b) LF.map.fitBounds(b, { padding: [24, 24] });
 }
 function lfInit() {
   const el = document.getElementById("lfmap");
@@ -2315,8 +2295,6 @@ function lfInit() {
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, className: "basemap",
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · Boundaries: DAGI, Klimadatastyrelsen' }).addTo(map);
   map.on("moveend", () => { const c = map.getCenter(); LF.center = [c.lat, c.lng]; LF.zoom = map.getZoom();
-    /* a pan can cross a municipality border while drilled in, so the ladder runs here too */
-    if (lfAutoLevel()) { lfLayers(); return; }
     if (MK.pub) { lfPublicLayers(); lfPublicLabels(); }
     /* services draw only what is in the viewport, so a pan is a redraw, not just a load */
     if (MK.srv) lfServicesLayers(); });
@@ -2335,14 +2313,11 @@ function lfInit() {
     lfInfraLabels();
     if (MK.pub) lfPublicLayers(true);            /* the zoom rule changes which public rows are drawn */
     if (MK.srv) lfServicesLayers(true);          /* likewise: each services category has its own zoom floor */
-    if (lfAutoLevel()) { lfLayers(); return; }
-    setLevelChip();
     if (microMode()) { (LF.microMarks || []).forEach(m => m.setRadius(microRadius(m._dw))); return; }
     const z = map.getZoom(), fine = !!MK.muni || z >= MICRO_ZOOM, lvl = (fine ? "micro" : z < 8 ? "national" : "macro") + (cphMode() ? "-cph" : "") + (MK.muni || "");
     if (lvl !== LF.level) lfLayers(); else if (fine) lfLabels();
   });
   lfLayers();
-  setLevelChip();
   applyPendingFit();
 }
 
@@ -2956,6 +2931,7 @@ function srvSetFilter(cats, tmodes) {
   if (tmodes !== undefined) SF.tmodes = tmodes;
   if (SF.cats.has("transport") && !SF.tmodes.size) SF.tmodes = new Set(SRV_DEFAULT_MODES);
   LF.srvDrawn = null;                     /* the viewport did not move, but what belongs on it changed */
+  lfDrop("srvG", "srvStG");               /* drop before the rebuild, never leave a group behind */
   syncHash(); renderKeep();
 }
 /* the zoom a category needs before it is drawn at all */

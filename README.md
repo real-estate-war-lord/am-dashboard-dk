@@ -88,12 +88,17 @@ Python 3.10+, no packages required (`shapely` and `openpyxl` optional for geomet
 
 ```bash
 git clone https://github.com/real-estate-war-lord/am-dashboard-dk.git && cd am-dashboard-dk
-make validate   # check every table/value code against the live API
+make validate   # every table/value code against the live API + a 2-area sample of source links
 make fetch      # ~36 pulls to data/raw (no key)
 make build      # raw → data/processed → dist/index.html
 make serve      # http://localhost:8080
 make test       # unit tests (python + node --test)
+make links      # full source-link sweep: all 165 Outlook links (slow, ~15 min — not in make validate)
 ```
+
+`make validate` is the pre-commit check and stays quick. The **full** source-link sweep —
+every one of the 98 municipalities and 67 Copenhagen quarters fetched and its displayed value
+recomputed from the response — is `make links`, run before a release rather than on every edit.
 
 `make geo` re-vendors boundaries (DAWA closed 2026-10-01 — see `docs/GEO.md` for the Datafordeler route). Rents are updated yearly with `scripts/import_lbf.py` and `scripts/import_boligstat.py` (see `data/external/SOURCES.md`).
 

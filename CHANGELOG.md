@@ -1,5 +1,39 @@
 # Changelog
 
+## v2.5.1 — 2026-09-24
+
+A corrective patch. v2.5 made the map choose the area level from the zoom; in use that was wrong,
+because it meant **zooming changed what was selected**. Panning or scrolling could silently drill
+into a municipality, swap the choropleth to buildings and rewrite the URL under the reader. Zooming
+is a camera movement, not a selection, and v2.5.1 restores that separation.
+
+- **The automatic zoom-tied granularity ladder is removed.** Wheel, trackpad, pinch, `+` / `−` and
+  double-click now change the view and nothing else: never the selected area, the breadcrumb, the
+  level or the indicator, and they never open a popup. Selection happens only when the reader asks
+  for it — clicking an area, the breadcrumb, the search box or the Areas / Buildings control. The
+  v2.4 drill-in is back exactly as it was: clicking København still opens its **67 quarters**.
+- **Quick jumps instead**: **Copenhagen** and **Denmark** buttons in the map toolbar, with the
+  keyboard shortcuts **C** and **D** (ignored while typing in any input, and never with a modifier
+  held). They move the camera only — `fitBounds` and nothing more. Copenhagen frames **København +
+  Frederiksberg** together, because the two read as one city; Denmark frames the whole country.
+  Neither selects a municipality, touches the breadcrumb or the indicator, or opens a popup.
+- **Kept from v2.5**: the test-property radius filter, the faster canvas-and-cluster Public layer,
+  and the fix that keeps the Services overlay drawn in Buildings mode.
+- **Fixed — the Leaflet canvas crash, at the root.** `Cannot read properties of undefined (reading
+  'save')` came from `_redraw()` running on a canvas renderer that was not on a map: its `_ctx`
+  exists only between `onAdd` and `onRemove`, so a redraw landing just after a map teardown — an
+  async building, services or public file resolving, a filter applied mid-rebuild — drew into
+  nothing. Reproduced exactly by redrawing a renderer that was never added, and one that was
+  removed. Guarded once on `L.Canvas.prototype`, so it holds for the macro map, the area map, the
+  Analysis mini map and any future one, while a live renderer still draws normally. Layer groups
+  are now dropped and forgotten in one step (`lfDrop`) in `lfLayers()`, `lfMicroLayers()` and
+  `srvSetFilter()`, so a half-removed group can never be handed back to a dead renderer.
+- **`make validate` is a pre-commit check again.** It samples **2 areas per indicator** for the
+  source links. The full sweep — all **165** Outlook links fetched and every displayed value
+  recomputed from the response, ~15 minutes — moved to its own target, **`make links`**, to be run
+  before a release. `make validate-links` stays as a deprecated alias. Documented in `README.md`
+  and `docs/RUNBOOK.md`.
+
 ## v2.5 — 2026-09-23
 
 Two layers and a projection: what is **around** a property (services), what a municipality or
