@@ -409,3 +409,133 @@ The old rule took the highest figure across every Klimaatlas stretch a kommune t
 The largest moves are where a kommune reaches around a headland into a much more exposed stretch: Thisted 255.2 → 166.9 cm, Lemvig 298.3 → 194.2, Fanø 488.4 → 399.4, Jammerbugt 184.0 → 148.8, Fredericia 186.3 → 149.2. In each case the old value came from a stretch the kommune barely touches. København moves 158.9 → 156.85 — off SJ8 (Køge Bugt) and onto SJ7 (Øresund), where almost all of its 116 km of coastline lies; SJ8 is still named in `other_kystkoder`.
 
 `make validate` and `make build` exit 0; 40 Python + 15 JS tests pass.
+
+---
+
+# v2.6 · step 3 — official Kystdirektoratet surge zones (2026-09-24)
+
+## What replaced what
+
+The zones are now **Kystdirektoratet's own published 100-year flood extents** for 2020, 2070 and
+2120 (`Kystplanlaegger_Oversvommelsesfare_2`, layers 3 / 12 / 21), pulled nationwide in EPSG:25832
+and cut to each kommune. Nothing is computed from a raster any more, so `depth_class` is null
+everywhere: the authority publishes an extent, not a depth we are entitled to bin.
+
+The v2.5 zones vectorised from Miljøstyrelsen's `OD_fare_2024` depth raster are retired to
+`data/interim/climate_fd2024/` (gitignored, with a README explaining why). Nothing in the build
+reads them.
+
+### The fetch
+
+Only 42 / 35 / 42 features, but each is a nationwide multipolygon, and the service answers **HTTP
+500** on a five-feature page. The fetcher therefore pulls **one OBJECTID at a time** with backoff,
+stepping coordinate precision from 0.1 m to 1 m on a retry. 208 MB of geojson in about 2 minutes.
+
+### Horizon ids are the Klimaatlas periods, not round decades
+
+| id | Klimaatlas period | surge zone |
+|---|---|---|
+| `today` | reference period 1981–2010 | published 2020 extent |
+| `2070` | 2041–2070 (periode 3) | published 2070 extent |
+| `2120` | 2071–2100 — the latest Klimaatlas period | published 2120 extent |
+
+This renames the earlier `2050` / `2100` ids across `config/indicators.json`,
+`data/processed/climate/index.json` and the tests. The underlying Klimaatlas cells are unchanged —
+periode 3 and periode 4 — only the labels now say what the data actually covers.
+
+## FD-2024 depth raster vs Kystplanlægger 2020 — area per kommune, top 20 by difference
+
+| code | kommune | FD-2024 depth raster | Kystplanlægger 2020 | difference |
+|---|---|---|---|---|
+| 0849 | Jammerbugt | 52.16 | 157.19 | +105.03 |
+| 0787 | Thisted | 29.64 | 112.93 | +83.28 |
+| 0360 | Lolland | 17.71 | 93.72 | +76.00 |
+| 0760 | Ringkøbing-Skjern | 103.28 | 176.34 | +73.06 |
+| 0730 | Randers | 40.48 | 97.12 | +56.63 |
+| 0390 | Vordingborg | 39.85 | 85.68 | +45.83 |
+| 0707 | Norddjurs | 23.35 | 61.91 | +38.56 |
+| 0376 | Guldborgsund | 30.76 | 66.22 | +35.46 |
+| 0846 | Mariagerfjord | 11.66 | 37.29 | +25.63 |
+| 0791 | Viborg | 1.26 | 26.76 | +25.50 |
+| 0665 | Lemvig | 39.40 | 64.57 | +25.17 |
+| 0185 | Tårnby | 16.89 | 41.97 | +25.09 |
+| 0851 | Aalborg | 48.51 | 72.36 | +23.84 |
+| 0779 | Skive | 30.25 | 53.87 | +23.62 |
+| 0661 | Holstebro | 17.40 | 39.74 | +22.34 |
+| 0330 | Slagelse | 16.59 | 38.92 | +22.33 |
+| 0706 | Syddjurs | 10.63 | 30.68 | +20.05 |
+| 0306 | Odsherred | 7.50 | 27.37 | +19.87 |
+| 0773 | Morsø | 22.47 | 40.49 | +18.01 |
+| 0820 | Vesthimmerlands | 13.91 | 30.19 | +16.28 |
+
+**The Kystplanlægger extent is 75 % larger nationally: 2 092 km² against 1 196 km².** They are not
+the same thing and should not be expected to agree — the flood-directive maps cover only the 26
+designated risk areas, while Kystplanlægger covers the whole coast, so most of the difference is
+coastline the FD maps never modelled. Where both cover the same ground the FD extent is the
+tighter of the two.
+
+## Exposure
+
+`surge_dw_pct` and `dwellings_in_zone` for kommune, postal code and Copenhagen quarter, at all
+three horizons. A dwelling counts when its BBR building point falls inside the published polygon,
+allowing **5 m** because BBR gives a point, not a footprint. Denominators come from
+`data/processed/bbr.json`, which uses the same v1.4 dwelling definition (boligtype 1–5, status 6).
+
+| horizon | kommune files | postal codes | quarters | national zone |
+|---|---|---|---|---|
+| today | 81 | 267 | 18 | 2 132.0 km² |
+| 2070 | 84 | 303 | 31 | 2 848.6 km² |
+| 2120 | 85 | 325 | 33 | 3 668.6 km² |
+
+**Invariants 2120 ≥ 2070 ≥ today held for every kommune, on both area and dwellings — 0
+violations.**
+
+Size budget: **32.0 MB** for `data/processed/climate` (limit 90 MB), **no file over 3 MB** — no
+tolerance needed for any horizon.
+
+## Check table — zone km² and surge_dw_pct, today / 2070 / 2120
+
+| area | stretch | zone km² today / 2070 / 2120 | surge_dw_pct today / 2070 / 2120 | dwellings |
+|---|---|---|---|---|
+| København (0101) | SJ7 (+SJ8) | 11.58 / 21.35 / 31.99 | 3.64 / 15.30 / 24.18 | 347,824 |
+| Hvidovre (0167) | SJ8 | 6.20 / 6.95 / 7.99 | 5.88 / 9.69 / 13.45 | 25,575 |
+| Brøndby (0153) | SJ8 | 1.43 / 1.51 / 1.58 | 0.93 / 1.21 / 1.44 | 18,782 |
+| Ishøj (0183) | SJ8 | 4.29 / 4.76 / 5.45 | 4.59 / 10.49 / 23.87 | 10,864 |
+| Vallensbæk (0187) | SJ8 | 2.23 / 2.70 / 3.10 | 8.54 / 13.71 / 16.40 | 7,554 |
+| Tårnby (0185) | SJ7 (+SJ8) | 41.97 / 43.84 / 50.09 | 28.18 / 34.15 / 42.92 | 21,401 |
+| Dragør (0155) | SJ8 (+SJ7) | 10.08 / 11.46 / 13.26 | 31.75 / 47.20 / 62.74 | 7,222 |
+| Køge (0259) | SJ8 | 8.19 / 12.01 / 15.35 | 13.28 / 22.33 / 30.65 | 29,452 |
+| Roskilde (0265) | SJ6 | 3.65 / 4.58 / 9.60 | 0.66 / 1.19 / 2.01 | 45,485 |
+| Esbjerg (0561) | VH2 (+VH3) | 22.79 / 26.32 / 30.99 | 2.09 / 3.47 / 5.61 | 62,043 |
+| Lemvig (0665) | LF3 (+VK1,VK4) | 64.57 / 72.17 / 80.35 | 27.61 / 32.09 / 35.04 | 13,510 |
+| Vejle (0630) | OJ6 | 8.45 / 10.32 / 12.04 | 7.82 / 12.79 / 15.72 | 62,189 |
+| Randers (0730) | OJ3 (+OJ2) | 97.12 / 107.36 / 120.44 | 1.33 / 2.67 / 3.93 | 53,891 |
+| **Denmark** | — | 2,092.2 / 2,807.7 / 3,619.5 | 3.17 / 6.68 / 10.48 | 2,898,894 |
+
+Top 10 postal codes by surge_dw_pct 2070:
+| postal code | dwellings | in the zone 2070 | % |
+|---|---|---|---|
+| 7680 | 1,212 | 1,204 | 99.3 |
+| 7673 | 2,202 | 2,006 | 91.1 |
+| 4873 | 6,992 | 5,898 | 84.3 |
+| 4874 | 2,035 | 1,685 | 82.8 |
+| 4942 | 269 | 199 | 74.0 |
+| 6792 | 2,857 | 1,838 | 64.3 |
+| 6893 | 2,848 | 1,610 | 56.5 |
+| 4872 | 1,902 | 1,059 | 55.7 |
+| 2450 | 17,814 | 9,826 | 55.2 |
+| 2791 | 8,519 | 4,664 | 54.8 |
+
+Reading it: Dragør goes from a third of its dwellings in the zone today to nearly two thirds by
+2120, and København from 3.6 % to 24 % — the steepest curve on the list, because the city's flat
+harbour edge floods over a wide front once the level rises. Randers has a huge zone (97 km²) but
+few dwellings in it: the fjord meadows are not built on. Roskilde is the opposite of Køge despite
+sitting on the same island — SJ6 is a sheltered fjord stretch.
+
+## Tests — 30 climate tests, 42 Python + 15 JS overall, all pass
+
+Klimaatlas anchors 156.85 · 24.89 (2070) · 39.44 (2120) · 181.74 · 196.29 · 51.31 · 52.73 ·
+F&P 98 rows · 26 risk areas · 51 designated kommuner. Plus: each horizon index carries a null
+`depth_class`, names Kystdirektoratet as the source and records the 100-årshændelse event.
+
+`make validate` exit 0 with no `✗`; `make build` exit 0 with no `⚠`; the `cph.json` stamp reverted.

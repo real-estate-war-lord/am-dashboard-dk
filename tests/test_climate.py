@@ -60,7 +60,7 @@ class KlimaatlasCoast(unittest.TestCase):
         self.assertEqual(self.cell(0, 1, "StormflNuvaerende100Aarsh"), 1)
 
     def test_ssp245_mean_sea_level(self):
-        """SSP2-4.5, p50: +24.89 cm by 2050 (periode 3) and +39.44 cm by 2100 (periode 4)."""
+        """SSP2-4.5, p50: +24.89 cm for 2041–2070 and +39.44 cm for 2071–2100."""
         self.assertAlmostEqual(self.cell(245, 3, "Middelvandstand"), 24.89, places=2)
         self.assertAlmostEqual(self.cell(245, 4, "Middelvandstand"), 39.44, places=2)
 
@@ -113,6 +113,29 @@ class FPClaims(unittest.TestCase):
 
 
 @unittest.skipUnless((PROC / "risk_areas.json").exists(), "risk areas not built")
+class SurgeZones(unittest.TestCase):
+    """The published Kystdirektoratet extents — nothing modelled, so the only checks are that
+    the three horizons exist, carry no depth class, and name their source."""
+
+    HZ = ("today", "2070", "2120")
+
+    def test_every_horizon_has_an_index(self):
+        for hz in self.HZ:
+            p = PROC / f"surge_{hz}" / "index.json"
+            if not p.exists():
+                self.skipTest(f"surge_{hz} not built")
+            m = jload(p)["meta"]
+            self.assertIsNone(m["depth_class"])
+            self.assertIn("Kystdirektoratet", m["source"])
+            self.assertEqual(m["event"], "100-årshændelse")
+
+    def test_horizon_ids_are_the_klimaatlas_periods(self):
+        p = PROC / "surge_2120" / "index.json"
+        if not p.exists():
+            self.skipTest("surge_2120 not built")
+        self.assertIn("2071", jload(p)["meta"]["period"])
+
+
 class RiskAreas(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -166,7 +189,7 @@ class CoastMap(unittest.TestCase):
 class Registry(unittest.TestCase):
     CLIMATE = ["sealevel_cm", "surge100_cm", "surge_freq_x", "rain100_1h_mm", "cloudbursts_yr",
                "weather_claims_1000", "flood_risk_area", "surge_dw_pct"]
-    HORIZONS = ["today", "2050", "2100"]
+    HORIZONS = ["today", "2070", "2120"]
 
     def test_every_climate_indicator_is_registered(self):
         for k in self.CLIMATE:
@@ -220,7 +243,7 @@ class ClimateIndex(unittest.TestCase):
         self.assertLessEqual(len(missing), 1, f"only Christiansø may miss a row: {missing}")
 
     def test_ranges_carry_percentiles_and_scenarios(self):
-        r = self.d["kommune"]["0101"]["surge100_cm"]["range"]["2050"]
+        r = self.d["kommune"]["0101"]["surge100_cm"]["range"]["2070"]
         for k in ("p10", "p90", "low", "high"):
             self.assertIn(k, r)
         self.assertLess(r["p10"], r["p90"])

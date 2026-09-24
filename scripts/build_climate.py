@@ -11,10 +11,11 @@ dashboard build and the Climate indicators in config/indicators.json both read:
   data/processed/climate/risk_areas.json   the designated flood-risk areas (build_surge_zones.py)
   data/processed/climate/surge_today/      Today storm-surge zones, for surge_dw_pct
 
-Horizon mapping (docs/CLIMATE_BUILD_LOG.md):
-    today = scenarie 0  · periode 1      the observed baseline
-    2050  = periode 3                    sea scenarie 245 (SSP2-4.5), rain scenarie 45 (RCP4.5)
-    2100  = periode 4                    same scenarios
+Horizon mapping — the ids are the Klimaatlas periods themselves, not round decades:
+    today = scenarie 0 · periode 1       Klimaatlas reference period 1981–2010
+    2070  = periode 3                    Klimaatlas period 2041–2070
+    2120  = periode 4                    Klimaatlas period 2071–2100, the latest one it publishes
+sea scenarie 245 (SSP2-4.5), rain scenarie 45 (RCP4.5)
 percentil 50 and absolutaendring 1 throughout. `range` carries p10/p90 at the same scenario and
 the low/high scenario at p50 — sea 126/585 (SSP1-2.6/SSP5-8.5), rain 26/85 (RCP2.6/RCP8.5).
 
@@ -38,7 +39,7 @@ GEO = ROOT / "data" / "geo" / "kommuner.geojson"
 
 P50, ABS = 50, 1
 BASE = (0, 1)                                   # scenarie, periode — the observed baseline
-HORIZONS = {"today": BASE, "2050": (None, 3), "2100": (None, 4)}
+HORIZONS = {"today": BASE, "2070": (None, 3), "2120": (None, 4)}
 SEA_SCEN = {"mid": 245, "low": 126, "high": 585}     # SSP2-4.5 / SSP1-2.6 / SSP5-8.5
 RAIN_SCEN = {"mid": 45, "low": 26, "high": 85}       # RCP4.5 / RCP2.6 / RCP8.5
 
@@ -145,10 +146,14 @@ def build():
                 "marginal": set(d["meta"].get("kommuner_marginal") or []),
                 "built": d["meta"].get("built") or d["meta"].get("fetched")}
 
-    surge = {}
-    sp = OUT / "surge_today" / "index.json"
-    if sp.exists():
-        surge = jload(sp).get("kommune", {})
+    surge, surge_meta = {}, {}
+    for hz in ("today", "2070", "2120"):
+        sp = OUT / f"surge_{hz}" / "index.json"
+        if sp.exists():
+            d = jload(sp)
+            surge[hz] = d.get("kommune", {})
+            surge_meta[hz] = {k: d["meta"].get(k) for k in
+                              ("year", "period", "zone_km2_national", "source")}
 
     out = {}
     for code, name in sorted(names.items()):
@@ -163,16 +168,16 @@ def build():
                 rec["other_kystnavne"] = cm["other_navne"]
         for key, (_src, col, nd, const) in COAST_INDS.items():
             if not cm:
-                rec[key] = {"today": None, "2050": None, "2100": None, "reason": NOT_COASTAL}
+                rec[key] = {"today": None, "2070": None, "2120": None, "reason": NOT_COASTAL}
                 continue
             idx = by_stretch.get(cm["kystkode"])
             rec[key] = (series(idx, col, SEA_SCEN, const, nd) if idx
-                        else {"today": None, "2050": None, "2100": None,
+                        else {"today": None, "2070": None, "2120": None,
                               "reason": "no Klimaatlas stretch"})
         for key, (_src, col, nd, const) in RAIN_INDS.items():
             idx = by_kom_rain.get(nkey, {})
             rec[key] = (series(idx, col, RAIN_SCEN, const, nd) if idx
-                        else {"today": None, "2050": None, "2100": None,
+                        else {"today": None, "2070": None, "2120": None,
                               "reason": "no Klimaatlas kommune row"})
         c = claims.get(code)
         rec["weather_claims_1000"] = ({"today": round(float(c["claims_per_1000"]), 1),
@@ -181,29 +186,35 @@ def build():
         rec["flood_risk_area"] = ({"today": 1 if code in risk["kommuner"] else 0,
                                    "marginal": code in risk["marginal"]} if risk
                                   else {"today": None, "reason": NOT_COMPUTED})
-        s = surge.get(code) or surge.get(str(int(code)))
-        if s and s.get("surge_dw_pct") is not None:
-            rec["surge_dw_pct"] = {"today": s["surge_dw_pct"], "2050": None, "2100": None,
-                                   "dwellings": s.get("dwellings"),
-                                   "dwellings_at_risk": s.get("dwellings_at_risk"),
-                                   "zone_km2": s.get("zone_km2")}
+        got = {hz: (surge.get(hz, {}).get(code) or {}) for hz in ("today", "2070", "2120")}
+        if any(g.get("surge_dw_pct") is not None for g in got.values()):
+            rec["surge_dw_pct"] = {
+                **{hz: got[hz].get("surge_dw_pct") for hz in ("today", "2070", "2120")},
+                "dwellings": next((g.get("dwellings") for g in got.values() if g.get("dwellings")),
+                                  None),
+                "dwellings_in_zone": {hz: got[hz].get("dwellings_in_zone")
+                                      for hz in ("today", "2070", "2120")},
+                "zone_km2": {hz: got[hz].get("zone_km2") for hz in ("today", "2070", "2120")}}
         else:
-            # no zone at all (inland, or the coast stays dry at the 100-year level), or no BBR pull
             why = (NOT_COASTAL if not cm
-                   else "no surge zone at the 100-year level" if s and not s.get("zone_km2")
-                   else s.get("dwellings_note") if s and s.get("dwellings_note")
+                   else "no published surge zone reaches this kommune" if got["today"]
                    else NOT_COMPUTED)
-            rec["surge_dw_pct"] = {"today": None, "2050": None, "2100": None, "reason": why,
-                                   "zone_km2": (s or {}).get("zone_km2")}
+            rec["surge_dw_pct"] = {"today": None, "2070": None, "2120": None, "reason": why,
+                                   "zone_km2": {hz: got[hz].get("zone_km2")
+                                                for hz in ("today", "2070", "2120")}}
         out[code] = rec
 
     meta = {"built": dt.date.today().isoformat(),
             "klimaatlas": {"version": sorted({v for p in meta_kl["pulls"].values()
                                               for v in p["version"]}),
                            "fetched": meta_kl["fetched"]},
-            "horizons": {"today": "scenarie 0 · periode 1 (observed baseline)",
-                         "2050": "periode 3 · sea SSP2-4.5 (245), rain RCP4.5 (45)",
-                         "2100": "periode 4 · sea SSP2-4.5 (245), rain RCP4.5 (45)"},
+            "horizons": {"today": "Klimaatlas reference period 1981–2010 "
+                                  "(scenarie 0 · periode 1); surge zones are the published 2020 extent",
+                         "2070": "Klimaatlas period 2041–2070 (periode 3) · "
+                                 "sea SSP2-4.5 (245), rain RCP4.5 (45)",
+                         "2120": "Klimaatlas period 2071–2100 (periode 4), the latest Klimaatlas "
+                                 "period · sea SSP2-4.5 (245), rain RCP4.5 (45); surge zones are "
+                                 "the published 2120 extent"},
             "percentil": P50, "absolutaendring": ABS,
             "range": {"p10/p90": "same scenario, 10th and 90th percentile",
                       "low/high": "sea SSP1-2.6 (126) / SSP5-8.5 (585); rain RCP2.6 (26) / RCP8.5 (85)"},
@@ -215,7 +226,7 @@ def build():
             "risk_areas": {"kommuner": len(risk.get("kommuner") or []),
                            "marginal": len(risk.get("marginal") or []),
                            "built": risk.get("built")} if risk else None,
-            "surge_today": {"kommuner": len(surge)} if surge else None}
+            "surge_zones": surge_meta or None}
     return {"meta": meta, "kommune": out}
 
 

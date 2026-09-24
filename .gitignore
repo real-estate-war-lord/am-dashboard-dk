@@ -44,3 +44,7 @@ data/raw/fp/
 data/raw/dhm/
 data/raw/bluespot/
 dist/climate/
+
+# v2.6 climate — Kystdirektoratet surge extents and the retired FD-2024 zones
+data/raw/kyst_surge/
+data/interim/
