@@ -187,10 +187,18 @@ const pubAllOff = () => !!(PF.cats && !PF.cats.size);
 const PF_SHORT = { education: "edu", institutions: "inst", health: "health", culture: "culture" };
 const PF_LONG = Object.fromEntries(Object.entries(PF_SHORT).map(([k, v]) => [v, k]));
 const PIPE = { type: "", status: "" };                                            /* pipeline filters */
-const AN = { a: "", label: "" };                                                  /* analysis view: the pinned coordinates */
-/* Analysis sheet: which overlays the "Where it is" map draws — the same three the Macro map offers.
-   Defaults: infra on, public buildings on where the BBR pull reaches the pin, buildings off (its
-   micro/<kommune>.json is fetched only once the pill is switched on). The set lives in the hash as lay=. */
+/* Test property (spec §5.5′, amendment A2): ONE pin, `#property?p=lat,lon[:label]`.
+   `rad` is the ring the mini map draws and the "within the ring" sections count inside;
+   `show` is the open set of the eight <details> sections, serialised as `show=`. */
+const AN = { a: "", label: "", rad: 1000, show: new Set() };
+const TP_SECS = ["outlook", "profile", "safety", "infra", "public", "schools", "climate", "sources"];
+/* Infrastructure nearby opens itself — it is the section that most often changes what an address is
+   worth, and the only one whose answer is usually short enough to read without scrolling. */
+const anShowDefault = () => ["infra"];
+/* Test property: which overlays the mini map draws — the same feature layers the Macro map offers,
+   chosen through the same Layers ▾ menu (spec §4.4). Defaults: infra on, public buildings on where
+   the BBR pull reaches the pin, buildings off (its micro/<kommune>.json is fetched only once the
+   layer is switched on). The set lives in the hash as lay=. */
 const ANL = { infra: true, pub: true, micro: false, climate: false };
 const anLayerList = () => [ANL.infra ? "infra" : "", ANL.pub ? "public" : "", ANL.micro ? "buildings" : "", ANL.climate ? "climate" : ""].filter(Boolean);
 function anParseLayers(q) {
@@ -239,9 +247,15 @@ const mapFrom = k => String((IND.find(i => i.key === k) || {}).map_from || "");
 const yearsForPool = (k, pool) => YEARS.filter(y => y >= mapFrom(k)).filter(y => y === LATEST || pool.some(m => m.hist && m.hist[k] && m.hist[k][y] != null));
 /* years with actual history for charts and sparklines — the lagging "latest" value is not repeated as a later year */
 const histYears = (k, pool) => YEARS.filter(y => pool.some(m => m.hist && m.hist[k] && m.hist[k][y] != null));
-function curPool() { if (S.view === "area") { const e = areaEntity(); return e ? e.peers : MUNI; } if (S.view === "table" && T.level === "kvarter") return CPH ? CPH.areas : MUNI; return cphMode() ? CPH.areas : MUNI; }
+function curPool() { if (S.view === "area") { const e = areaEntity(); return e ? e.peers : MUNI; }
+  if (S.view === "analysis") { const e = anEntity(); return e ? e.peers : MUNI; }
+  if (S.view === "table" && T.level === "kvarter") return CPH ? CPH.areas : MUNI; return cphMode() ? CPH.areas : MUNI; }
 const yearsFor = k => projOf(k) ? [] : yearsForPool(k, curPool());
-const curInds = () => { if (S.view === "area") { const e = areaEntity(); return e ? e.inds : IND; } if (S.view === "table") return T.level === "kvarter" ? IND_Q : IND; return cphMode() ? IND_Q : IND; };
+/* the indicators on offer: the entity's own list wherever a view is about one area — the test
+   property reads its pin's finest area (spec §5.5′), so a Copenhagen pin gets the quarter registry */
+const curInds = () => { if (S.view === "area") { const e = areaEntity(); return e ? e.inds : IND; }
+  if (S.view === "analysis") { const e = anEntity(); return e ? e.inds : IND; }
+  if (S.view === "table") return T.level === "kvarter" ? IND_Q : IND; return cphMode() ? IND_Q : IND; };
 const curInd = () => { const L = curInds(); return L.find(i => i.key === MK.ind) || L[0] || { key: "", label: "", fmt: "pct1" }; };
 
 /* ---------- routing (hash) ---------- */
@@ -273,6 +287,13 @@ function arShowParts() {
   const cur = AR_SECS.filter(k => AR.show.has(k)).join(",");
   return cur === def ? "" : (cur || "none");
 }
+/* the same key on the test property (spec §5.5′): the eight sections, `none` when the reader
+   closed the one that opens itself */
+function anShowParts() {
+  const def = anShowDefault().join(",");
+  const cur = TP_SECS.filter(k => AN.show.has(k)).join(",");
+  return cur === def ? "" : (cur || "none");
+}
 function hashFor() {
   const q = [`ind=${encodeURIComponent(MK.ind || "")}`]; if (MK.year && MK.year !== LATEST) q.push(`y=${MK.year}`);
   q.push(...hzParts());   /* one horizon for the zones and the Climate figures alike */
@@ -295,7 +316,9 @@ function hashFor() {
     /* the mini map rides in the link too: the headline tile that colours it, the overlays, the public filter */
     q.push(`ind=${encodeURIComponent(MK.ind || "")}`); if (MK.year && MK.year !== LATEST) q.push(`y=${MK.year}`);
     q.push(`lay=${anLayerList().join(",") || "none"}`); if (ANL.pub) q.push(...pubHashParts());
-    q.push(...hzParts()); }
+    q.push(...hzParts());
+    if (AN.rad !== AN_RING_M) q.push(`rad=${AN.rad}`);
+    const ash = anShowParts(); if (ash) q.push(`show=${ash}`); }
   else if (S.view === "market") { p = "market"; if (MKT.src) q.push("src=1"); }
   else if (S.view === "project") { p = `project/${PR.id}`; }
   else if (S.view === "climate") { p = `climate/${CS.code}`; }
@@ -330,6 +353,8 @@ function parseHash() {
   else if (v === "schoollist" && parts[1]) { S.view = "schoollist"; SL.key = decodeURIComponent(parts.slice(1).join(":")); schoolsLoad(); }
   else if (v === "pipeline") { S.view = "pipeline"; PIPE.type = q.ptype || ""; PIPE.status = q.pstatus || ""; }
   else if (v === "analysis") { S.view = "analysis"; AN.a = q.a || ""; AN.label = q.la || ""; anParseLayers(q); pubParseFilter(q);
+    AN.rad = TP_RADII.includes(Number(q.rad)) && Number(q.rad) > 0 ? Number(q.rad) : AN_RING_M;
+    AN.show = new Set(q.show == null ? anShowDefault() : q.show === "none" ? [] : q.show.split(",").filter(k => TP_SECS.includes(k)));
     /* the sheet cannot say which kommune the point is in until the rings are there — chain once, not on every hashchange */
     if (!KOM.list && !KOM.err) komLoad().then(() => { if (S.view === "analysis") renderKeep(); }); }
   else if (v === "climate" && parts[1]) { S.view = "climate"; CS.code = pad4(parts[1]); climSheetLoad();
@@ -498,11 +523,8 @@ document.addEventListener("click", e => {
   /* Layers ▾ (spec §4.4): one button, one popover, one handler for every row in it */
   if (g("[data-laypop]")) { layPopOpen(!UI.layOpen, true); return; }
   if ((el = g("[data-layer]"))) { mapLayerToggle(el.dataset.layer); return; }
-  if ((el = g("[data-anlay]"))) { if (el.disabled) return; const k = el.dataset.anlay;
-    if (k === "infra") ANL.infra = !ANL.infra; else if (k === "public") ANL.pub = !ANL.pub;
-    else if (k === "climate") { ANL.climate = !ANL.climate; if (ANL.climate && LF.anR && LF.anR.kommune) climSheetLoadFor(LF.anR.kommune.code); }
-    else ANL.micro = !ANL.micro;
-    syncHash(); renderKeep(); return; }
+  /* the test property's paste box: Go does what Enter in the box does */
+  if (g("[data-tpgo]")) { const q = document.getElementById("tpq"); if (q) tpGo(q.value); return; }
   if ((el = g("[data-hz]"))) { climSetHz(el.dataset.hz); return; }
   if ((el = g("[data-legfold]"))) { lgFold(el); return; }
   if ((el = g("[data-srvcat]"))) { const k = el.dataset.srvcat;
@@ -549,7 +571,10 @@ document.addEventListener("click", e => {
 });
 document.addEventListener("change", e => {
   const el = e.target;
-  if (el.id === "yearsel") { MK.year = el.value; syncHash(); if (!areaRefresh()) renderKeep(); }
+  if (el.id === "yearsel") { MK.year = el.value; syncHash(); if (!areaRefresh() && !tpRefresh()) renderKeep(); }
+  /* the test property's radius: it draws a different ring and counts inside a different one, but
+     the map itself does not move — so the page is updated in place, never rebuilt */
+  if (el.id === "tpradsel") { AN.rad = TP_RADII.includes(Number(el.value)) ? Number(el.value) : AN_RING_M; syncHash(); if (!tpRefresh()) renderKeep(); }
   if (el.id === "mindsel") { MK.mind = el.value; syncHash(); renderKeep(); }
   if (el.id === "chnat") { CH.nat = el.checked; syncHash(); renderKeep(); }
   if (el.id === "chy0") { CH.y0 = el.value; syncHash(); renderKeep(); }
@@ -595,6 +620,13 @@ document.addEventListener("toggle", e => {
       const row = e.target.querySelector("tr.on");
       if (row && row.scrollIntoView) row.scrollIntoView({ block: "nearest" });
     }
+  }
+  /* the test property's eight sections, the same rule on its own key (spec §5.5′) */
+  if (e.target.hasAttribute && e.target.hasAttribute("data-tpsec")) {
+    const k = e.target.dataset.tpsec, open = e.target.open;
+    if (AN.show.has(k) === open) return;
+    if (open) AN.show.add(k); else AN.show.delete(k);
+    syncHash();
   }
 }, true);
 /* the search dropdown opens on focus: the "Jump to" row at its top replaced two toolbar buttons and
@@ -776,6 +808,8 @@ const chartPool = () => IND.concat(IND_CPH.filter(i => !IND.some(x => x.key === 
 function pickLevel() {
   if (S.view === "table") return T.level;
   if (S.view === "area") return AR.type || "kommune";
+  /* the test property is read at the level of the pin's finest area (spec §5.5′) */
+  if (S.view === "analysis") { const e = anEntity(); return e ? e.type : "kommune"; }
   if (S.view === "makro") return cphMode() ? "kvarter" : MK.muni ? "postnr" : "kommune";
   return "kommune";
 }
@@ -885,9 +919,9 @@ function pickInd(key, target) {
   MK.ind = key;
   if (!yearsFor(MK.ind).includes(MK.year)) MK.year = LATEST;
   syncHash();
-  /* the area page updates in place: the mini map, the scroll position and the full-screen overlay
-     all survive an indicator change (AC-P4). areaRefresh() says so by returning true. */
-  if (areaRefresh()) return;
+  /* the area page and the test property update in place: the mini map, the scroll position and the
+     full-screen overlay all survive an indicator change (AC-P4, AC-TP3). */
+  if (areaRefresh() || tpRefresh()) return;
   renderKeep();
 }
 const pickTargetOf = el => { const w = el.closest("[data-target]"); return (w && w.dataset.target) || "ind"; };
@@ -1253,20 +1287,43 @@ function layRow(k, label, sub, on, title, filters, note) {
       <i class="laybox" aria-hidden="true">${on ? "✓" : ""}</i><b>${esc(label)}</b><span>${esc(sub || "")}</span></button>
     ${on && filters ? filters : ""}${note ? `<p class="laynote">${note}</p>` : ""}</div>`;
 }
-function layersMenu() {
-  const feats = MAP_LAYERS.filter(l => l.avail());
-  const zones = climZonesAvail();
-  const n = layCount();
-  const rad = TP.lat != null;
+/* The same menu on the test property (spec §5.5′): the pin's own feature layers, which are the
+   Macro map's three read around one point plus the BBR building dots, and the storm-surge zones of
+   its municipality as context. The state is `ANL` and the URL key is the same `lay=` — but its
+   values differ (`infra,public,buildings,climate`), which is why this is a second list and not a
+   flag on the first. `mapLayerToggle()` routes to `tpLayerToggle()` while this page is on screen. */
+const TP_LAYERS = [
+  { k: "infra", label: "Infra projects", on: () => ANL.infra, avail: () => INFRA.length > 0,
+    sub: () => `within ${nf((AN_INFRA_M + 1500) / 1000, 1)} km of the pin · Fingerplan, Anlægsstatus`,
+    title: "Every project in the layer around the pin, in its status tones" },
+  { k: "public", label: "Public buildings", on: () => ANL.pub, avail: () => !!PUB,
+    sub: () => `BBR · within ${nf(anPubMapM(), 0)} m of the pin`,
+    title: "Schools, daycare, health and culture from BBR around the pin", filters: () => pubFilterRows(),
+    note: () => anPubKoms(anLoc(), anRes()).length ? "" : "not covered yet: Copenhagen metro area only" },
+  { k: "buildings", label: "Buildings (BBR)", on: () => ANL.micro, avail: () => true,
+    sub: () => `dwellings per building · ${esc((anRes() && anRes().kommune || {}).name || "this municipality")}`,
+    title: "BBR buildings with at least two dwellings — the file is fetched when you switch this on",
+    note: () => microAvail(anKom()) ? "" : "no BBR building file for this municipality yet" },
+];
+const tpLayerCount = () => anLayerList().length + (AN.rad ? 1 : 0);
+function layersMenu(kind) {
+  const tp = kind === "tp";
+  const feats = (tp ? TP_LAYERS : MAP_LAYERS).filter(l => l.avail());
+  const zones = tp ? !!CLIM : climZonesAvail();
+  const n = tp ? tpLayerCount() : layCount();
+  const rad = !tp && TP.lat != null;
   return `<div class="layers${UI.layOpen ? " open" : ""}" data-testid="layers">
     <button type="button" class="lay-btn" data-testid="layers-btn" data-laypop aria-expanded="${UI.layOpen ? "true" : "false"}" aria-haspopup="dialog"
       title="Feature layers and context on top of the indicator fill">Layers${n ? `<b class="lay-n">· ${n}</b>` : ""}<em aria-hidden="true">▾</em></button>
     <div class="laypop" data-testid="layers-pop" role="dialog" aria-label="Map layers" ${UI.layOpen ? "" : "hidden"}>
       <div class="lay-h">Feature layers</div>
-      ${feats.map(l => layRow(l.k, l.label, l.sub(), l.on(), l.title, l.filters ? l.filters() : "",
-          l.k === "public" && MK.muni && !pubAvail(MK.muni) ? "no BBR pull for this municipality yet" : "")).join("")}
+      ${feats.map(l => layRow(l.k, l.label, l.sub(), l.on(), l.title, l.on() && l.filters ? l.filters() : "",
+          tp ? (l.note ? l.note() : "") : (l.k === "public" && MK.muni && !pubAvail(MK.muni) ? "no BBR pull for this municipality yet" : ""))).join("")}
       ${zones || rad || D.portfolio ? `<div class="lay-h">Context</div>` : ""}
-      ${zones ? layRow("zones", `Storm-surge zones ${CLIM_ZONE_YEAR[HZ.h] || ""}`, `Kystdirektoratet · zoom ${CLIM_ZOOM}+`, MK.zones,
+      ${tp && zones ? layRow("climate", `Storm-surge zones ${CLIM_ZONE_YEAR[HZ.h] || ""}`, `Kystdirektoratet · 100-year extent`, ANL.climate,
+          "The published flood extent for this municipality and the official risk areas", "",
+          "the horizon is the one the period control names") : ""}
+      ${!tp && zones ? layRow("zones", `Storm-surge zones ${CLIM_ZONE_YEAR[HZ.h] || ""}`, `Kystdirektoratet · zoom ${CLIM_ZOOM}+`, MK.zones,
           "The published flood extent and the official risk areas behind the Climate figures", "",
           `shown because a Climate indicator is active — ${esc(curInd().short || curInd().label)}`) : ""}
       ${rad ? `<div class="layrow ${TP.rad ? "on" : ""}">
@@ -1283,8 +1340,10 @@ function layPopOpen(open, refocus) {
   if (pop) pop.hidden = !UI.layOpen;
   if (btn) { btn.setAttribute("aria-expanded", UI.layOpen ? "true" : "false"); if (!UI.layOpen && refocus) btn.focus(); }
 }
-/* one handler for every row: the three feature layers, the Climate context zones and the pin radius */
+/* one handler for every row: the three feature layers, the Climate context zones and the pin radius.
+   The test property has its own state behind the same menu, so it branches out first. */
 function mapLayerToggle(k) {
+  if (S.view === "analysis") return tpLayerToggle(k);
   if (k === "infra") MK.infra = !MK.infra;
   else if (k === "public") { MK.pub = !MK.pub; LF.pubDrawn = null; }
   else if (k === "services") { MK.srv = !MK.srv; LF.srvDrawn = null; if (MK.srv) srvLoadVisible(); }
@@ -1293,6 +1352,19 @@ function mapLayerToggle(k) {
   else if (k === "radius") { TP.rad = TP.rad ? 0 : 1000; tpRadApply(); return; }
   else return;
   syncHash(); renderKeep();
+}
+/* the same rows on the test property. A layer never rebuilds the page: the overlays are redrawn on
+   the map that is already there, so the reader's pan, zoom and full-screen overlay all survive. */
+function tpLayerToggle(k) {
+  if (k === "infra") ANL.infra = !ANL.infra;
+  else if (k === "public") ANL.pub = !ANL.pub;
+  else if (k === "buildings") ANL.micro = !ANL.micro;
+  else if (k === "climate") { ANL.climate = !ANL.climate; const r = anRes(); if (ANL.climate && r && r.kommune) climSheetLoadFor(r.kommune.code); }
+  else return;
+  syncHash();
+  const el = document.querySelector("[data-testid=layers]");
+  if (el) el.outerHTML = layersMenu("tp");
+  anMapOverlays();
 }
 /* the distance filter changes what the overlays draw, not the map — redraw those and leave it alone */
 function tpRadApply() {
@@ -1712,7 +1784,8 @@ function bbrCard(e) {
      opts.mapId      the div the Leaflet map is built in       (default "armap")
      opts.legendId   the legend card inside the mini map       (default "arlegend")
      opts.mapKey     its key in LF / LF_MAPS                   (default "amap")
-     opts.note       one line over the map saying what it shows */
+     opts.note       one line over the map saying what it shows
+     opts.legends    extra legend cards inside the mini map, above the indicator one (P6's overlays) */
 function studyRow(e, opts) {
   const o = opts || {};
   return `<div class="studyrow" data-testid="study-row">${chartPanel(e, o)}${miniMap(o)}</div>`;
@@ -1857,7 +1930,7 @@ function miniMap(opts) {
   return `<div class="minimap${full ? " is-full" : ""}" data-testid="minimap" data-mapkey="${esc(o.mapKey || "amap")}">
     <div class="mm-map" id="${esc(o.mapId || "armap")}"></div>
     ${o.note ? `<div class="mm-note">${o.note}</div>` : ""}
-    <div class="maplegend small mm-leg" id="${esc(o.legendId || "arlegend")}"></div>
+    <div class="maplegs"><div class="maplegend small mm-leg" id="${esc(o.legendId || "arlegend")}"></div>${o.legends || ""}</div>
     <div class="mm-chips">${full ? mmChips() : ""}</div>
     <button type="button" class="mm-full" data-mmfull data-testid="minimap-full"
       title="${full ? "Close full screen (Esc)" : "Full screen"}" aria-label="${full ? "Close full screen" : "Full screen"}"
@@ -2307,11 +2380,28 @@ function tpEntity(r) {
   return null;
 }
 const tpWhere = r => [r.kommune ? r.kommune.name : null, r.postnr ? `${r.postnr.nr} ${r.postnr.name}` : null, r.kvarter ? r.kvarter.name : null].filter(Boolean).join(" · ");
+/* The located result and the entity for the pin on the **test property page** (AN.a), memoised the
+   same way tpRes() memoises the map's pin: curInds(), pickLevel() and every section ask for them on
+   every render, and locate() walks 606 postal-code rings. The cache key carries whether the kommune
+   ring file has landed, so the answer is recomputed once when it does. */
+const ANC = { key: "", r: null, e: null };
+function anRes() {
+  const pt = anLoc();
+  if (!pt) { ANC.key = ""; ANC.r = null; ANC.e = null; return null; }
+  const k = `${pt.lat},${pt.lon},${KOM.list ? 1 : 0}`;
+  if (ANC.key !== k) { ANC.key = k; ANC.r = locate(pt.lat, pt.lon); ANC.e = ANC.r && !ANC.r.error ? tpEntity(ANC.r) : null; }
+  return ANC.r;
+}
+const anEntity = () => { anRes(); return ANC.e; };
 
-/* the input on the map toolbar, its "?" tooltip and the inline error line under it */
-function tpBox() {
-  return `<span class="tpbox"><input id="tpq" class="indsel tpq" type="search" placeholder="Paste Google Maps link or coordinates" autocomplete="off" aria-label="Test property location">
-    <span class="tptip" tabindex="0" role="note" aria-label="Accepted formats">?<span class="tptipc"><b>Accepted formats</b>${TP_FORMATS.map(([, ex, what]) => `<i>${esc(ex)}</i><span>${esc(what)}</span>`).join("")}<span class="tpwarn">Short maps.app.goo.gl links can't be read — open one and copy the full URL.</span></span></span></span>`;
+/* the one paste box of the test property page (spec §5.5′): its "?" tooltip, a Go button and the
+   inline error line under it. A link pasted here REPLACES the pin — v3.0 shows one property at a
+   time (amendment A2), even though the URL codec is list-capable. */
+function tpBox(opts) {
+  const o = opts || {};
+  return `<span class="tpbox"><input id="tpq" data-testid="prop-input" class="indsel tpq" type="search" placeholder="${esc(o.placeholder || "Paste Google Maps link or lat, lon — replaces the current pin")}" autocomplete="off" aria-label="Test property location">
+    <span class="tptip" tabindex="0" role="note" aria-label="Accepted formats">?<span class="tptipc"><b>Accepted formats</b>${TP_FORMATS.map(([, ex, what]) => `<i>${esc(ex)}</i><span>${esc(what)}</span>`).join("")}<span class="tpwarn">Short maps.app.goo.gl links can't be read — open one and copy the full URL.</span></span></span>
+    <button type="button" class="lk primary tpgo" data-tpgo>Go</button></span>`;
 }
 /* the privacy line under the input: the parsing is local, but the coordinates travel in the hash of any link shared */
 const TP_NOTE = "Processed in your browser. The location is stored only in the page URL; don't paste confidential deal locations if you share the link.";
@@ -2328,9 +2418,11 @@ function tpGo(text) {
 function tpDrop(lat, lon) {
   const res = locate(lat, lon);
   if (res.error) { tpErr(`${lat.toFixed(5)}, ${lon.toFixed(5)} is ${res.error} — no municipality or postal code covers it.`); return; }
+  /* dropped on the test property page: the new link REPLACES the pin, and with it the label — a
+     different address is a different property, so it does not inherit the old one's name. */
+  if (S.view === "analysis") { TP.lat = lat; TP.lon = lon; TP.res = null; TP.label = TP_LABEL; AN.label = "";
+    go(propLink([{ lat, lon, label: "" }])); return; }
   if (!TP.label) TP.label = TP_LABEL;
-  /* dropped on the Analysis view: straight to the sheet, with the pin kept so the map picks it up later */
-  if (S.view === "analysis") { TP.lat = lat; TP.lon = lon; TP.res = null; go(analysisLink(lat, lon, TP.label)); return; }
   TP.fit = true;   /* the layer builder fits the map to the outer ring instead of the municipality */
   /* drill to the pin's municipality at postal-code level with the ordinary navigation */
   go(`map/${res.kommune.code}${res.kommune.code === CPH_MUNI ? "/postnr" : ""}?ind=${encodeURIComponent(MK.ind)}`
@@ -2432,29 +2524,31 @@ function anLoc() { const m = (AN.a || "").match(/^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\
 /* --- Outlook for the pin's own area (docs/FORECAST.md §5.7) ---
    The finest area that has a projection: a Copenhagen quarter uses KK throughout, anything else uses
    DST's municipal run. The two are never shown as one figure. */
-function anOutlookCard(e, r) {
-  if (!e) return "";
+/* the object the projection belongs to: a Copenhagen quarter that has one, otherwise the municipality */
+function anOutlookSrc(e, r) {
+  if (!e) return null;
   const isQ = e.type === "kvarter" && e.o && e.o.fc_growth != null;
-  const src = isQ ? e.o : (r.kommune ? byCode[r.kommune.code] : null);
-  if (!src || src.fc_growth == null) return "";
-  const list = isQ ? IND_CPH : IND;
+  const o = isQ ? e.o : (r && r.kommune ? byCode[r.kommune.code] : null);
+  if (!o || o.fc_growth == null) return null;
+  return { o, isQ, list: isQ ? IND_CPH : IND, where: isQ ? `${e.name} (quarter)` : `${(r.kommune || {}).name || ""} (municipality)` };
+}
+function anOutlookHint(s) {
+  const pr = ((s.list.find(i => i.key === "fc_growth") || {}).proj) || {};
+  return `<span class="tag proj">Projection</span> <span class="dim">${esc(pr.from || "")}→${esc(pr.to || "")} · ${esc(pr.publisher || "")} ${esc(pr.vintage || "")} · ${esc(s.where)}</span>`;
+}
+function anOutlookBody(s) {
+  const src = s.o, isQ = s.isQ, list = s.list, level = isQ ? "kvarter" : "kommune";
   const pr = ((list.find(i => i.key === "fc_growth") || {}).proj) || {};
-  const keys = ["fc_growth", "fc_growth_5y", "fc_20_34", "fc_80p"];
-  const tiles = keys.map(k => list.find(i => i.key === k)).filter(i => i && src[i.key] != null);
-  const where = isQ ? `${e.name} (quarter)` : `${(r.kommune || {}).name || ""} (municipality)`;
-  return `<div class="card outlook anoutlook">
-    <div class="card-head"><h3>Outlook</h3>
-      <span class="hint"><span class="tag proj">Projection</span> ${esc(pr.from || "")}→${esc(pr.to || "")} · ${esc(pr.publisher || "")} ${esc(pr.vintage || "")} · ${esc(where)}</span></div>
-    ${tiles.length ? `<div class="tiles wrap">${tiles.map(i => `<button type="button" class="hltile ${MK.ind === i.key ? "on" : ""}" data-ind="${esc(i.key)}" title="${esc(i.desc || i.label)}">
+  const tiles = ["fc_growth", "fc_growth_5y", "fc_20_34", "fc_80p"].map(k => list.find(i => i.key === k)).filter(i => i && src[i.key] != null);
+  return `${tiles.length ? `<div class="tiles wrap">${tiles.map(i => `<button type="button" class="hltile ${MK.ind === i.key ? "on" : ""}" data-ind="${esc(i.key)}" title="${esc(i.desc || i.label)}">
       <span class="tl">${esc(i.short || i.label)}</span><b class="proj">${fmtOf(i)(src[i.key])}</b><em class="dim">${esc(i.unit || "")}</em></button>`).join("")}</div>` : ""}
-    ${projChangeLine(src, isQ ? "kvarter" : "kommune") ? `<p class="olchg big">${projChangeLine(src, isQ ? "kvarter" : "kommune")}</p>` : ""}
+    ${projChangeLine(src, level) ? `<p class="olchg big">${projChangeLine(src, level)}</p>` : ""}
     ${popOutlookChart(src, { actualSource: isQ ? "KKBEF1" : "FOLK1A", projSource: pr.table || pr.publisher })}
-    <p class="cap srcrow">${srcLink(pr.src, srcCode(src, isQ ? "kvarter" : "kommune"), "Verify the projection at source")}
-      ${srcLink(pr.actuals, srcCode(src, isQ ? "kvarter" : "kommune"), "Verify the observed population")}</p>
+    <p class="cap srcrow">${srcLink(pr.src, srcCode(src, level), "Verify the projection at source")}
+      ${srcLink(pr.actuals, srcCode(src, level), "Verify the observed population")}</p>
     ${isQ ? pastAccuracyLine(src) : ""}
     ${isQ ? cphFcCaveat("kvarter") : `<p class="cap">${esc(((list.find(i => i.key === "fc_growth")) || {}).warn || "")}</p>`}
-    <p class="cap dim">The projection is for the whole ${isQ ? "quarter" : "municipality"}, not for this address — it carries no housing programme, so a development on this plot is not in it. Observed population from ${esc(isQ ? "KKBEF1" : "FOLK1A")}; the dashed line is ${esc(pr.table || "")}, a scenario rather than a measurement.</p>
-  </div>`;
+    <p class="cap dim">The projection is for the whole ${isQ ? "quarter" : "municipality"}, not for this address — it carries no housing programme, so a development on this plot is not in it. Observed population from ${esc(isQ ? "KKBEF1" : "FOLK1A")}; the dashed line is ${esc(pr.table || "")}, a scenario rather than a measurement.</p>`;
 }
 
 /* the nav item opens the pin that is on the map, if there is one — otherwise the empty state */
@@ -2515,47 +2609,42 @@ function anIndTable(e, r, inds) {
     <th class="num">${esc(r.kommune ? r.kommune.name : "Municipality")}</th><th class="num">Denmark</th></tr></thead>
     <tbody>${body}</tbody></table></div>`;
 }
-/* --- a. header: identity, links and the mini map --- */
-function anHead(pt, r, e) {
+/* --- a. the header card: the paste box, the identity line, the links and the headline tiles ---
+   Spec §5.5′ draws them in that order: what you can change, what the pin is, where to go from it,
+   then the five figures. The tiles are the shared §4.7 component, so clicking one chooses the
+   indicator that colours the mini map and fills the chart panel (AC-TP3). */
+function tpTop(pt, r, e) {
   const back = withQ("map" + (r.kommune ? `/${r.kommune.code}${r.kommune.code === CPH_MUNI ? "/postnr" : ""}` : ""))
     + `&pin=${pt.lat.toFixed(5)},${pt.lon.toFixed(5)}` + (AN.label && AN.label !== TP_LABEL ? `&pl=${encodeURIComponent(AN.label)}` : "");
+  /* one link per level the pin sits in — quarter, postal code, municipality (spec §5.5′ header) */
+  const areaBtn = (o, label) => o ? `<button class="lk" data-go="${withQ(pageOf(o))}">${esc(label)} ›</button>` : "";
   return `<div class="card accent arhead anhead">
+    <div class="tools tpinrow">${tpBox()}</div>
+    <div class="tperr" id="tperr" role="status" ${TP.msg ? "" : `style="display:none"`}>${esc(TP.msg)}</div>
+    ${tpNote()}
     <div class="arid">
       <input id="anlab" class="anlab" value="${esc(AN.label || TP_LABEL)}" maxlength="60" aria-label="Property label" title="Rename this property — the name travels in the link">
-      <div class="artags">${r.kommune ? `<span class="tag">${esc(r.kommune.name)}</span>` : ""}${r.postnr ? `<span class="tag">${esc(r.postnr.nr)} ${esc(r.postnr.name)}</span>` : ""}${r.kvarter ? `<span class="tag">${esc(r.kvarter.name)}</span>` : ""}${r.approx ? `<span class="tag warn" title="Municipality taken from the postal code — a postal code can cross a municipality border.">approx.</span>` : ""}<span class="tag">${pt.lat.toFixed(5)}, ${pt.lon.toFixed(5)}</span></div>
+      <div class="artags">${r.kommune ? `<span class="tag">${esc(r.kommune.name)}</span>` : ""}${r.postnr ? `<span class="tag">${esc(r.postnr.nr)} ${esc(r.postnr.name)}</span>` : ""}${r.kvarter ? `<span class="tag">${esc(r.kvarter.name)}</span>` : ""}${r.approx ? `<span class="tag warn" title="Municipality taken from the postal code — a postal code can cross a municipality border.">approx.</span>` : ""}<span class="tag">${pt.lat.toFixed(5)}, ${pt.lon.toFixed(5)}</span>${e ? `<span class="tag" title="the finest level the dashboard publishes for this point — the chart panel and the figures below are its">read as ${esc(PICK_LEVEL_LABEL[e.type] || e.type)}</span>` : ""}</div>
     </div>
     <div class="tools"><button class="lk primary" data-go="${esc(back)}">Open on map ›</button><button class="lk" data-ancopy>Copy link</button>
-      ${e ? `<button class="lk" data-go="${withQ(pageOf(e.o))}">${esc(e.name)} ›</button>` : ""}
+      ${areaBtn(r.kvarter, r.kvarter ? r.kvarter.name : "")}${areaBtn(r.postnr, r.postnr ? r.postnr.nr : "")}${areaBtn(r.kommune, r.kommune ? r.kommune.name : "")}
       <a class="lk" target="_blank" rel="noopener" href="https://www.openstreetmap.org/?mlat=${pt.lat}&mlon=${pt.lon}#map=17/${pt.lat}/${pt.lon}">OpenStreetMap ↗</a></div>
     ${e ? headlineHtml(e) : ""}
-  </div>`;
+  </div>
+  <div class="artools" data-testid="tp-toolbar">${indPicker("ind")}${periodControl("ind")}
+    <span class="tp-right">${layersMenu("tp")}<label class="radsel"><span>radius</span><select id="tpradsel" data-testid="tp-radius" class="indsel" aria-label="Radius around the property">${TP_RADII.filter(m => m).map(m => `<option value="${m}"${AN.rad === m ? " selected" : ""}>${esc(tpRadLabel(m))}</option>`).join("")}</select></label></span>
+    ${indChips("ind")}</div>`;
 }
-const AN_PUB_MAP_M = 2000;         /* public buildings drawn around the pin — twice the ring the cards count */
-/* the municipalities near the pin whose BBR pull exists — the coverage rule for the Public buildings pill */
-const anPubKoms = (pt, r) => anKomsNear(pt, r && r.kommune && r.kommune.code, AN_RING_M).filter(pubAvail);
+const AN_PUB_MAP_M = 2000;         /* public buildings drawn around the pin — at least twice the ring the sections count */
+/* the ring the sections count inside and the mini map draws, from the radius select (spec §5.5′) */
+const anRing = () => AN.rad || AN_RING_M;
+const anPubMapM = () => Math.max(AN_PUB_MAP_M, 2 * anRing());
+const anKom = () => { const r = anRes(); return r && r.kommune ? r.kommune.code : null; };
+/* the municipalities near the pin whose BBR pull exists — the coverage rule for the Public buildings layer */
+const anPubKoms = (pt, r) => (pt ? anKomsNear(pt, r && r.kommune && r.kommune.code, anRing()).filter(pubAvail) : []);
 const anPubRows = (pt, koms) => koms.flatMap(k => ((PUB_FILES[k] || {}).buildings || []))
   .filter(b => pubCatOn(b.cat) && pubKindOn(b.kind) && (b.kind === "existing" || b.recent)
-    && havM(pt.lat, pt.lon, b.lat, b.lon) <= AN_PUB_MAP_M);
-/* the layer pills above the mini map — the same three segments, styling and wording as the Macro map.
-   Schools are not a fourth overlay there either: they ride inside Public buildings, and isolating
-   Education ("only") recolours the school markers by their FP9 grade on both maps. */
-function anLayerBar(pt, r) {
-  const koms = anPubKoms(pt, r);
-  const kom = r && r.kommune ? r.kommune.code : null, name = r && r.kommune ? r.kommune.name : "this municipality";
-  const hasMicro = microAvail(kom);
-  const pill = (k, label, on, off, tip) => `<div class="seg"><button class="sg ${on ? "on" : ""}" data-anlay="${k}"${off ? " disabled" : ""} title="${esc(tip)}">${esc(label)}</button></div>`;
-  return `<div class="tools anlaybar">
-    ${INFRA.length ? pill("infra", "Infra projects", ANL.infra, false, `Every project in the layer within ${nf((AN_INFRA_M + 1500) / 1000, 1)} km of the pin, in its status tones`) : ""}
-    ${PUB ? pill("public", "Public buildings", ANL.pub && koms.length > 0, !koms.length,
-        koms.length ? `Schools, daycare, health and culture from BBR within ${nf(AN_PUB_MAP_M, 0)} m · the legend filters the categories`
-                    : "Not covered yet: Copenhagen metro area only") : ""}
-    ${CLIM ? pill("climate", "Climate risk", ANL.climate, false,
-        `Kystdirektoratet's published 100-year storm-surge extent for ${esc(name)} at the ${hzShort(HZ.h)} horizon, and the official flood risk areas`) : ""}
-    ${pill("buildings", "Buildings", ANL.micro && hasMicro, !hasMicro,
-        hasMicro ? `BBR buildings with ≥ 2 dwellings in ${name} — the file is fetched when you switch this on`
-                 : `Not covered yet: no BBR building file for ${name}`)}
-    <span class="hint">${esc(curInd().short || curInd().label)} colours the areas underneath · click a headline tile above to change it</span></div>`;
-}
+    && havM(pt.lat, pt.lon, b.lat, b.lon) <= anPubMapM());
 /* Leaflet swallows clicks inside a popup, so the page links are wired when one opens — the same set the
    Macro map rewires, which is what makes "Open … sheet ›" work from a popup on this map too. */
 function anPopupWire(popup) {
@@ -2625,7 +2714,7 @@ function anMapOverlays() {
   const waiting = pubOn ? koms.filter(k => !PUB_FILES[k] && !PUB_FILES["_error_" + k]).length : 0;
   setPubLegendIn("anpublegend", pubOn, pubRowsN,
     `${koms.length} municipality file${koms.length === 1 ? "" : "s"}`,
-    waiting ? ` · loading ${waiting} more…` : ` · within ${nf(AN_PUB_MAP_M, 0)} m of the pin`, gradeMode(true));
+    waiting ? ` · loading ${waiting} more…` : ` · within ${nf(anPubMapM(), 0)} m of the pin`, gradeMode(true));
 
   /* --- c. BBR buildings, lazy: the micro file is only fetched once the pill is on --- */
   const kom = r && r.kommune ? r.kommune.code : null;
@@ -2648,6 +2737,8 @@ function anMapOverlays() {
   }
   /* the pin and its rings stay on top of every overlay */
   if (LF.anPinG) LF.anPinG.eachLayer(l => { if (l.bringToFront) l.bringToFront(); });
+  /* the legend stack must stay inside the mini map and inside 60 % of its height (spec §4.5) */
+  lgFitSoon();
 }
 /* ⌖ — put the property back in the middle. The counterpart of making the mini map draggable:
    the pin is the whole point of the sheet, so getting back to it is one click, never a reload. */
@@ -2663,11 +2754,14 @@ function anRecentreControl(map, ll) {
   c.addTo(map);
   return c;
 }
+/* The mini map is built once per render of the page and then only ever re-painted (anMapPaint) —
+   choosing another indicator, another horizon or another layer must not cost the reader the pan,
+   the zoom or the full-screen overlay they are in (spec §4.6, the P5 rule read on this page). */
 function anMapInit() {
   if (S.view !== "analysis") return;              /* a render for another view got in first */
   const el = document.getElementById("anmap"); if (!el || typeof L === "undefined") return;
   const pt = anLoc(); if (!pt) return;
-  const r = locate(pt.lat, pt.lon); if (!r || r.error) return;
+  const r = anRes(); if (!r || r.error) return;
   dropMap("anmap");
   /* draggable since v3.0: the reader wants to look at the next street over without leaving the
      sheet. What a drag used to lose — the pin in the middle — the ⌖ control below brings back,
@@ -2677,6 +2771,27 @@ function anMapInit() {
   mapPanes(map);   /* one pane + renderer set per map — a cached one redraws into a dead context */
   syncMaps();
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, className: "basemap" }).addTo(map);
+  map.on("popupopen", ev => anPopupWire(ev.popup));
+  /* the public zoom rule and the building dot size both follow the zoom, as on the Macro map */
+  map.on("zoomend", () => { LF.anZoom = map.getZoom(); anMapOverlays(); });
+  /* a drag is a reading position, not a selection: it is remembered, and it changes nothing else */
+  map.on("moveend", () => { const c = map.getCenter(); LF.anCenter = [c.lat, c.lng]; LF.anZoom = map.getZoom(); });
+  anRecentreControl(map, [pt.lat, pt.lon]);
+  const rings = anMapPaint();
+  anMapOverlays();
+  /* a re-render keeps the reader's own view rather than re-fitting; a new pin is fitted to its ring */
+  const key = `${pt.lat},${pt.lon},${AN.rad}`;
+  if (LF.anKey === key && LF.anZoom) map.setView(LF.anCenter || [pt.lat, pt.lon], LF.anZoom);
+  else { map.fitBounds(rings.getBounds(), { padding: [14, 14] }); LF.anKey = key; LF.anZoom = map.getZoom(); LF.anCenter = null; }
+  /* the overlay survives a re-render, and a map built inside it has to be told its real size */
+  if (UI.mmFull) setTimeout(() => LF.anmap && LF.anmap.invalidateSize(), 60);
+}
+/* the choropleth, the pin, its rings and the indicator legend — on a map that already exists.
+   Returns the outermost ring, which is what the initial fit is framed on. */
+function anMapPaint() {
+  const map = LF.anmap; if (!map) return null;
+  const pt = anLoc(), r = anRes(); if (!pt || !r || r.error) return null;
+  ["anAreaG", "anPinG"].forEach(k => { if (LF[k]) { try { map.removeLayer(LF[k]); } catch (err) {} LF[k] = null; } });
   /* the current choropleth underneath, at the finest level the indicator reaches */
   const ind = curInd();
   const useQ = !!(CPH && r.kvarter && cphOwn(ind.key));
@@ -2684,33 +2799,27 @@ function anMapInit() {
   const micro = !useQ && AREAS.some(a => V(a, ind.key) != null);
   const sc = useQ ? scaleOf(CPH.areas.filter(a => V(a, ind.key) != null), a => V(a, ind.key), null, ind)
     : micro ? scaleOf(AREAS.filter(a => V(a, ind.key) != null), a => V(a, ind.key), null, ind) : scaleOf(MUNI, m => V(m, ind.key), null, ind);
+  const gm = L.layerGroup().addTo(map); LF.anAreaG = gm;
   areas.forEach(a => {
     /* an area with no figure of its own takes its municipality's, exactly as the macro map does */
     const own = V(a, ind.key);
     const t = sc.t(useQ ? own : micro && own != null ? own : V(byCode[a.muni], ind.key));
-    L.polygon(a.rings, { color: "#FFFFFF", weight: .8, fillColor: t == null ? "#C4CBC4" : mkShade(t, ind.key), fillOpacity: .5, interactive: false }).addTo(map);
+    L.polygon(a.rings, { color: "#FFFFFF", weight: .8, fillColor: t == null ? "#C4CBC4" : mkShade(t, ind.key), fillOpacity: .5, interactive: false }).addTo(gm);
   });
+  /* the walk/bike rings are the fixed scale; the radius the reader chose is the solid one */
   const col = cssVar("--pin", "#33372C"), ll = [pt.lat, pt.lon];
   const rings = TP_RINGS.map(m => L.circle(ll, { radius: m, color: col, weight: 1, opacity: .8, dashArray: "5 6", fill: false, interactive: false }));
-  LF.anPinG = L.layerGroup(rings.concat([
+  const sel = L.circle(ll, { radius: anRing(), color: col, weight: 1.8, opacity: .95, fill: true, fillOpacity: .05, interactive: false });
+  LF.anPinG = L.layerGroup(rings.concat([sel,
     L.marker(ll, { icon: L.divIcon({ className: "tp-pin", iconSize: [22, 22], iconAnchor: [11, 11], html: "<i></i>" }), zIndexOffset: 1200, interactive: false })])).addTo(map);
-  map.on("popupopen", ev => anPopupWire(ev.popup));
-  /* the public zoom rule and the building dot size both follow the zoom, as on the Macro map */
-  map.on("zoomend", () => { LF.anZoom = map.getZoom(); anMapOverlays(); });
-  /* a drag is a reading position, not a selection: it is remembered, and it changes nothing else */
-  map.on("moveend", () => { const c = map.getCenter(); LF.anCenter = [c.lat, c.lng]; LF.anZoom = map.getZoom(); });
-  anRecentreControl(map, ll);
-  anMapOverlays();
-  /* a pill toggle re-renders the sheet, so the reader's own view is kept rather than re-fitted */
-  const key = `${pt.lat},${pt.lon}`;
-  if (LF.anKey === key && LF.anZoom) map.setView(LF.anCenter || ll, LF.anZoom);
-  else { map.fitBounds(rings[rings.length - 1].getBounds(), { padding: [14, 14] }); LF.anKey = key; LF.anZoom = map.getZoom(); LF.anCenter = null; }
   setLegend("anlegend", sc, ind, ind.key, useQ ? "quarters" : micro ? "postal codes" : "municipalities");
+  return anRing() >= TP_RINGS[TP_RINGS.length - 1] ? sel : rings[rings.length - 1];
 }
-/* --- e. infrastructure nearby --- */
-function anInfraCard(pt) {
-  const rows = INFRA_ALL.map(f => ({ f, p: f.properties, d: featDistM(f, pt.lat, pt.lon) }))
-    .filter(x => x.d != null && x.d <= AN_INFRA_M).sort((a, b) => a.d - b.d);
+/* --- e. infrastructure nearby (the section that opens itself) --- */
+const anInfraRows = pt => INFRA_ALL.map(f => ({ f, p: f.properties, d: featDistM(f, pt.lat, pt.lon) }))
+  .filter(x => x.d != null && x.d <= AN_INFRA_M).sort((a, b) => a.d - b.d);
+function anInfraBody(pt) {
+  const rows = anInfraRows(pt);
   /* a station that has not opened yet and is inside the 1 200 m ring is the headline: it is the one
      thing in this layer that changes what the address is worth. Opened ones are listed, never flagged. */
   const chips = rows.filter(x => isPt(x.f) && x.d <= AN_CHIP_M && x.p.status !== "opened").map(x => {
@@ -2724,63 +2833,75 @@ function anInfraCard(pt) {
       <td class="num" data-v="${x.p.open_year || ""}">${esc(openLabel(x.p))}${x.p.open_year_original && x.p.open_year_original !== x.p.open_year ? `<br><span class="dim">originally ${esc(String(x.p.open_year_original))}</span>` : ""}</td>
       <td class="num" data-v="${Math.round(x.d)}">${anDist(x.d)}</td></tr>`).join("")}</tbody></table></div>`
     : `<p class="empty">no project in the layer within ${nf(AN_INFRA_M / 1000, 0)} km</p>`;
-  return `<div class="card"><div class="card-head"><h3>Infrastructure nearby</h3>
-      <span class="hint">${rows.length} project${rows.length === 1 ? "" : "s"} within ${nf(AN_INFRA_M / 1000, 0)} km · distance to the alignment, 0 m inside a development area</span></div>
-    ${chips ? `<div class="anchips">${chips}</div>` : ""}
+  return `${chips ? `<div class="anchips">${chips}</div>` : ""}
     ${body}
-    <p class="cap">Distance is from the pin to the mapped geometry — a station point, the nearest point of a line, or 0 m inside a development area. A corridor flagged schematic is not an official alignment, so its distance is indicative. Click a row for the project sheet.</p></div>`;
+    <p class="cap">Distance is from the pin to the mapped geometry — a station point, the nearest point of a line, or 0 m inside a development area. A corridor flagged schematic is not an official alignment, so its distance is indicative. Click a row for the project sheet.</p>`;
 }
 /* a placeholder block while a file is in flight \u2014 the section keeps its height and says nothing it does not know */
 const anSkel = n => `<div class="anskel">${Array.from({ length: n }, () => `<span></span>`).join("")}</div>`;
-/* --- f. public buildings within the ring --- */
-function anPubCard(pt, r) {
-  const card = (inner, hint) => `<div class="card"><div class="card-head"><h3>Public buildings within ${nf(AN_RING_M, 0)} m</h3><span class="hint">${hint}</span></div>${inner}</div>`;
-  if (!PUB) return card(`<p class="empty">The public-buildings layer is not in this build.</p>`, "");
-  const koms = anKomsNear(pt, r.kommune && r.kommune.code, AN_RING_M);
-  const covered = koms.filter(pubAvail);
-  if (!covered.length) return card(`<p class="empty">Not covered yet: public buildings are available for the Copenhagen metro area.</p>`,
-    `${PUB.kommuner.length} municipalities covered`);
+/* --- f. public buildings within the ring ---
+   Spec §5.5′: rows that are the same building read twice — same name, same BBR use code, the same
+   distance to within 20 m — become one row with a count. The BBR pull has a record per building
+   body, so a school with four wings arrived as four identical lines. Nothing is dropped: the count
+   says how many records the row stands for, and the distance is the nearest of them. */
+const PUB_DUP_M = 20;
+function anPubGroup(list) {
+  const out = [], by = new Map();
+  list.forEach(x => {
+    const k = `${pubName(x.b)}|${x.b.code}|${Math.round(x.d / PUB_DUP_M)}`;
+    const hit = by.get(k);
+    if (hit) { hit.n++; return; }
+    const row = { x, n: 1 }; by.set(k, row); out.push(row);
+  });
+  return out;
+}
+function anPubBody(pt, r) {
+  if (!PUB) return `<p class="empty">The public-buildings layer is not in this build.</p>`;
+  const ring = anRing();
+  const covered = anKomsNear(pt, r.kommune && r.kommune.code, ring).filter(pubAvail);
+  if (!covered.length) return `<p class="empty">Not covered yet: public buildings are available for the Copenhagen metro area (${PUB.kommuner.length} municipalities).</p>`;
   covered.forEach(pubLoad);
   const waiting = covered.filter(k => !PUB_FILES[k] && !PUB_FILES["_error_" + k]);
-  if (waiting.length) return card(anSkel(4), `loading ${waiting.length} municipalit${waiting.length === 1 ? "y" : "ies"}…`);
+  if (waiting.length) return anSkel(4);
   const all = covered.flatMap(k => ((PUB_FILES[k] || {}).buildings || []))
     .map(b => ({ b, d: havM(pt.lat, pt.lon, b.lat, b.lon) }))
-    .filter(x => x.d <= AN_RING_M && (x.b.kind === "existing" || x.b.recent))
+    .filter(x => x.d <= ring && (x.b.kind === "existing" || x.b.recent))
     .sort((a, b) => a.d - b.d);
   const cases = all.filter(x => x.b.kind === "case");
   const counts = Object.entries(PUB_CAT).map(([k, c]) => {
     const n = all.filter(x => x.b.cat === k && x.b.kind === "existing").length;
     return `<span class="hlc"><span>${esc(c.label)}</span><b>${nf(n, 0)}</b><em>${(() => { const near = all.find(x => x.b.cat === k); return near ? "nearest " + anDist(near.d) : "none in the ring"; })()}</em></span>`;
   }).join("");
+  let grouped = 0;
   const blocks = Object.entries(PUB_CAT).map(([k, c]) => {
-    const list = all.filter(x => x.b.cat === k).slice(0, AN_NEAREST);
+    const rows = anPubGroup(all.filter(x => x.b.cat === k));
+    grouped += rows.reduce((s, g) => s + (g.n - 1), 0);
+    const list = rows.slice(0, AN_NEAREST);
     if (!list.length) return "";
-    return `<tr class="angrp"><th colspan="4" style="color:${c.color}">${esc(c.label)}</th></tr>` + list.map(x => `<tr class="clickrow" data-pubsheet="${esc(x.b.id)}" data-pubkom="${esc(x.b.kom)}">
-      <th><span class="thn">${esc(pubName(x.b))} <span class="go">›</span></span></th><td class="dim">${esc(x.b.code)} ${esc(x.b.label)}</td>
+    return `<tr class="angrp"><th colspan="4" style="color:${c.color}">${esc(c.label)}</th></tr>` + list.map(({ x, n }) => `<tr class="clickrow" data-pubsheet="${esc(x.b.id)}" data-pubkom="${esc(x.b.kom)}">
+      <th><span class="thn">${esc(pubName(x.b))} <span class="go">›</span></span>${n > 1 ? `<span class="tag pubn" title="${n} BBR records with the same name, use code and distance — one building registered in several bodies">×${n}</span>` : ""}</th><td class="dim">${esc(x.b.code)} ${esc(x.b.label)}</td>
       <td>${x.b.kind === "existing" ? `<span class="dim">Existing${x.b.year ? " · " + x.b.year : ""}</span>` : `<i class="ipill st-decided">Open case${x.b.permit ? " · " + esc(x.b.permit) : ""}</i>`}</td>
       <td class="num" data-v="${Math.round(x.d)}">${anDist(x.d)}</td></tr>`).join("");
   }).join("");
   const extra = covered.filter(k => k !== String(Number(r.kommune ? r.kommune.code : 0)));
-  return card(`<div class="hl anhl4">${counts}</div>
+  return `<div class="hl anhl4">${counts}</div>
     <div class="anfacts"><span><em>Total</em><b>${nf(all.length, 0)}</b> buildings in the ring</span>
       <span><em>Open building cases</em><b>${nf(cases.length, 0)}</b> permit ${PUB.recent_years} yrs or newer</span>
       ${extra.length ? `<span><em>Also read</em><b>${extra.map(k => esc((byCode[k] || {}).name || k)).join(", ")}</b>neighbouring municipality files</span>` : ""}</div>
     ${blocks ? `<div class="scrollx"><table class="tbl compact" data-sortable><thead><tr><th>Building</th><th>BBR use</th><th>Status</th><th class="num">Distance</th></tr></thead><tbody>${blocks}</tbody></table></div>`
-      : `<p class="empty">no public building within ${nf(AN_RING_M, 0)} m</p>`}
-    <p class="cap">The ${AN_NEAREST} nearest per category. BBR via Datafordeler, ${esc(PUB.built || "")}; names from OpenStreetMap where one lies within 60 m. An open case is owner-reported and is not a construction schedule. Click a row for the building sheet.</p>`,
-    `${covered.length} municipality file${covered.length === 1 ? "" : "s"} read`);
+      : `<p class="empty">no public building within ${nf(ring, 0)} m</p>`}
+    <p class="cap">The ${AN_NEAREST} nearest per category${grouped ? `; ${nf(grouped, 0)} further BBR record${grouped === 1 ? " was" : "s were"} folded into the row it repeats (×n)` : ""}. BBR via Datafordeler, ${esc(PUB.built || "")}; names from OpenStreetMap where one lies within 60 m. An open case is owner-reported and is not a construction schedule. Click a row for the building sheet.</p>`;
 }
 /* --- g. schools within the ring --- */
-function anSchCard(pt, r) {
-  const card = (inner, hint, cap) => `<div class="card"><div class="card-head"><h3>Schools within ${nf(AN_RING_M, 0)} m</h3><span class="hint">${hint}</span></div>${inner}${cap || ""}</div>`;
-  if (!SCH_META) return card(`<p class="empty">The school layer is not in this build.</p>`, "");
-  const covered = anKomsNear(pt, r.kommune && r.kommune.code, AN_RING_M).filter(pubAvail);
-  if (!covered.length) return card(`<p class="empty">Not covered yet: school quality is available for the Copenhagen metro area.</p>`,
-    `${PUB.kommuner.length} municipalities covered`);
+function anSchBody(pt, r) {
+  if (!SCH_META) return `<p class="empty">The school layer is not in this build.</p>`;
+  const ring = anRing();
+  const covered = anKomsNear(pt, r.kommune && r.kommune.code, ring).filter(pubAvail);
+  if (!covered.length) return `<p class="empty">Not covered yet: school quality is available for the Copenhagen metro area (${PUB.kommuner.length} municipalities).</p>`;
   schoolsLoad();
-  if (!SCHOOLS) return card(anSkel(3), "loading the schools\u2026");
+  if (!SCHOOLS) return anSkel(3);
   const rows = (SCHOOLS.schools || []).filter(s => covered.includes(s.kom) && s.lat != null)
-    .map(s => ({ s, d: havM(pt.lat, pt.lon, s.lat, s.lon) })).filter(x => x.d <= AN_RING_M).sort((a, b) => a.d - b.d);
+    .map(s => ({ s, d: havM(pt.lat, pt.lon, s.lat, s.lon) })).filter(x => x.d <= ring).sort((a, b) => a.d - b.d);
   const body = rows.length ? `<div class="scrollx"><table class="tbl compact" data-sortable><thead><tr><th>School</th><th>Type</th><th class="num">Distance</th><th class="num">FP9 grade</th><th class="num">vs expected</th><th>School year</th></tr></thead>
     <tbody>${rows.map(x => { const s = x.s, d = schV(s, "soc_ref_diff"), sig = schSig(schV(s, "soc_ref_significant"));
       return `<tr class="clickrow" data-school="${esc(s.nr)}"><th><span class="thn">${esc(s.name)} <span class="go">\u203a</span></span></th>
@@ -2788,9 +2909,9 @@ function anSchCard(pt, r) {
         <td class="num" data-v="${schV(s, "grade_avg") ?? ""}">${schCell(schV(s, "grade_avg"), schGrade)}</td>
         <td class="num" data-v="${d ?? ""}">${d == null ? `<span class="dim" title="${SUPPRESSED}">\u2013</span>` : schDiff(d) + (sig ? ` <em class="schsig">\u2713 ${esc(sig)}</em>` : ` <em class="dim">\u2248 as expected</em>`)}</td>
         <td class="dim">${esc(schY(s, "grade_avg") || schY(s, "pupils_total") || SCH_LATEST)}</td></tr>`; }).join("")}</tbody></table></div>`
-    : `<p class="empty">no grundskole within ${nf(AN_RING_M, 0)} m</p>`;
-  return card(body, `${rows.length} school${rows.length === 1 ? "" : "s"} \u00b7 Uddannelsesstatistik.dk`,
-    `<p class="cap">Distance is to the school's register point, not to its gate. FP9 grade is the weighted average of the bundne pr\u00f8ver; "vs expected" is the grade minus the socioeconomic reference the ministry's model predicts from the pupils' background, \u2713 where the source calls the difference significant. A dash is suppressed by the source, not a zero. Kilde: Uddannelsesstatistik.dk, retrieved ${esc((SCH_META || {}).retrieved || "")}.</p>`);
+    : `<p class="empty">no grundskole within ${nf(ring, 0)} m</p>`;
+  return `${body}
+    <p class="cap">Distance is to the school's register point, not to its gate. FP9 grade is the weighted average of the bundne pr\u00f8ver; "vs expected" is the grade minus the socioeconomic reference the ministry's model predicts from the pupils' background, \u2713 where the source calls the difference significant. A dash is suppressed by the source, not a zero. Kilde: Uddannelsesstatistik.dk, retrieved ${esc((SCH_META || {}).retrieved || "")}.</p>`;
 }
 /* --- h. sources and as-of stamps, from the same metadata the Sources view uses --- */
 function anSources(e, r, inds, hasPub, hasSch) {
@@ -2810,30 +2931,84 @@ function anSources(e, r, inds, hasPub, hasSch) {
   if (hasPub) add("BBR via Datafordeler", "byg021BygningensAnvendelse 410–449 · open building cases", "", PUB.built || "", "Public buildings");
   if (hasSch) add("Uddannelsesstatistik.dk (STIL)", (SCH_META.years || []).join(" · "), (SCH_META.years || []).slice(-1)[0] || "", SCH_META.retrieved || "", "Schools");
   add("OpenStreetMap contributors (ODbL)", "basemap tiles · building names within 60 m", "", "", "Map and names");
-  return `<div class="card"><div class="card-head"><h3>Sources &amp; as of</h3><span class="hint">everything this sheet read · built ${esc((D.meta && D.meta.built) || "–")}</span></div>
-    <div class="scrollx"><table class="tbl compact"><thead><tr><th>Source</th><th>Tables / files</th><th>As of</th><th>Fetched</th><th>Used for</th></tr></thead>
+  return `<div class="scrollx"><table class="tbl compact"><thead><tr><th>Source</th><th>Tables / files</th><th>As of</th><th>Fetched</th><th>Used for</th></tr></thead>
     <tbody>${rows.map(x => `<tr><th>${esc(x.label)}</th><td class="dim">${esc(x.tables)}</td><td>${esc(x.asof || "–")}</td><td class="dim">${esc(x.fetched || "–")}</td><td class="dim">${esc(x.used)}</td></tr>`).join("")}</tbody></table></div>
-    <p class="cap">${((D.meta && D.meta.attribution) || []).map(esc).join(" · ")}${CPH && CPH.meta && CPH.meta.attribution ? " · " + esc(CPH.meta.attribution) : ""}. Full definitions and every table stamp under <button class="lk mini" data-go="market?src=1">Market › Sources</button>.</p></div>`;
+    <p class="cap">${((D.meta && D.meta.attribution) || []).map(esc).join(" · ")}${CPH && CPH.meta && CPH.meta.attribution ? " · " + esc(CPH.meta.attribution) : ""}. Full definitions and every table stamp under <button class="lk mini" data-go="data/sources">Data › Sources</button>.</p>`;
 }
-/* the two sections that wait for a file are refilled in place when it lands — no section blocks another,
-   and a re-render is avoided so the mini map is not torn down and rebuilt under the reader */
+/* the three sections that wait for a file are refilled in place when it lands — no section blocks
+   another, and a re-render is avoided so the mini map is not torn down and rebuilt under the reader */
 function anFill() {
   if (S.view !== "analysis") return;
   const pt = anLoc(); if (!pt) return;
-  const r = locate(pt.lat, pt.lon); if (!r || r.error) return;
-  [["anpub", anPubCard], ["ansch", anSchCard], ["anclim", anClimCard]].forEach(([id, fn]) => {
+  const r = anRes(); if (!r || r.error) return;
+  [["anpub", anPubBody], ["ansch", anSchBody], ["anclim", anClimBody]].forEach(([id, fn]) => {
     const el = document.getElementById(id); if (!el) return;
     el.innerHTML = fn(pt, r); enableSort(el);
   });
 }
-/* the empty state: the same box as the map toolbar, and a pin dropped here opens the sheet directly */
+/* the empty state (spec §5.5′, AC-E1): the paste box with the caret already in it, the privacy line
+   and one example link — nothing else on a page that has nothing to show yet. */
 function anEmpty() {
-  return `<div class="card accent"><div class="card-head"><h3>Test property</h3><span class="hint">one address, read against every layer</span></div>
-    <div class="tools">${tpBox()}</div>
+  setTimeout(() => { const el = document.getElementById("tpq"); if (el && S.view === "analysis") el.focus(); }, 0);
+  return `<div class="card accent" data-testid="state-empty"><div class="card-head"><h3>Test property</h3><span class="hint">one address, read against every layer</span></div>
+    <div class="tools tpinrow">${tpBox()}</div>
     <div class="tperr" id="tperr" role="status" ${TP.msg ? "" : `style="display:none"`}>${esc(TP.msg)}</div>
     ${tpNote()}
-    <p class="anlead">Paste a Google Maps link to analyse a location.</p>
-    <p class="cap">The sheet reads the pin's area statistics, the safety figures, every infrastructure project within ${nf(AN_INFRA_M / 1000, 0)} km and the public buildings and schools within ${nf(AN_RING_M, 0)} m. The map's search box takes the same links and coordinates: a location pasted there offers to open it here.</p></div>`;
+    <p class="anlead">Paste a Google Maps link or <code>lat, lon</code> to read one address against every layer.</p>
+    <p class="cap">For example <button class="lk mini" data-go="property?p=55.6545,12.539">https://www.google.com/maps/@55.6545,12.539,17z</button> — the page then reads the pin's area statistics, the safety figures, every infrastructure project within ${nf(AN_INFRA_M / 1000, 0)} km and the public buildings and schools inside the radius you choose. The map's search box takes the same links and coordinates.</p></div>`;
+}
+/* one short line over the mini map, the counterpart of the area page's arMapNote() */
+function tpMapNote(r) {
+  const ind = curInd();
+  return `<span title="Panning and zooming this map never change which property the page is about — a new pin is a pasted link, nothing else.">${esc(ind.short || ind.label)} <span class="dim">· rings ${TP_RINGS.map(m => nf(m, 0) + " m").join(" · ")}, solid ${esc(tpRadLabel(anRing()))}${r && r.kommune ? ` · ${esc(r.kommune.name)}` : ""}</span></span>`;
+}
+/* the overlay legends that live inside the mini map, above the indicator one (spec §4.5, §4.6) */
+const TP_MAP_LEGENDS = `<div class="maplegend small publiclegend" id="anpublegend"></div><div class="maplegend small infralegend" id="aninfralegend"></div><div class="maplegend small" id="anmicrolegend"></div>`;
+/* --- the eight <details> of spec §5.5′, open state in show= --- */
+function tpSec(k, label, hint, body) {
+  if (!body) return "";
+  return `<details class="card arsec" data-testid="tp-sec-${k}" data-tpsec="${k}"${AN.show.has(k) ? " open" : ""}>
+    <summary><span class="arsec-t">${esc(label)}</span>${hint ? `<span class="hint">${hint}</span>` : ""}</summary>
+    <div class="arsec-b">${body}</div></details>`;
+}
+function tpSections(pt, r, e) {
+  const ring = anRing();
+  const profile = e ? e.inds.filter(i => (i.group || "") !== "Safety" && eVal(e, i.key).v != null) : [];
+  const safety = e ? e.inds.filter(i => (i.group || "") === "Safety" && eVal(e, i.key).v != null) : [];
+  const koms = anPubKoms(pt, r);
+  const hint = `° = municipality value where no finer statistic exists${e && e.type === "kvarter" ? " · ^ = figure published for the whole bydel" : ""} · the percentile bar fills toward "better", so a low value fills it where lower is better${profile.some(i => neutralDir(i.key)) ? "; Outlook rows are neutral and the bar simply reads as a position among peers" : ""} · ↗ opens the indicator in Charts.`;
+  const ol = anOutlookSrc(e, r);
+  const inf = anInfraRows(pt);
+  const out = [];
+  if (ol) out.push(tpSec("outlook", "Population outlook", anOutlookHint(ol), anOutlookBody(ol)));
+  if (e) {
+    out.push(tpSec("profile", `Area profile (${profile.length})`,
+      `<span class="dim">${esc(e.typeLabel)} ${esc(e.name)}${MK.year !== LATEST ? " · " + MK.year : ""}</span> <span class="hq" title="${esc(hint)}">ⓘ</span>`,
+      anIndTable(e, r, profile)));
+    out.push(tpSec("safety", "Safety",
+      `<span class="dim">${esc(SAFETY.length ? (SAFETY[0].unit || "") : "")} · municipality level${e.type === "kvarter" ? " plus the city's own bydel survey" : ""}</span>`,
+      `${safety.length ? anIndTable(e, r, safety) : `<p class="empty">no safety figure for this area</p>`}
+       <p class="cap">Reported crime comes from Danmarks Statistik per municipality over a rolling four quarters; a postal code or quarter shows its municipality's figure (°).${e.type === "kvarter" ? ` Københavns Kommune's own safety survey publishes per bydel (^), so every quarter of ${esc(e.bydel || "the district")} carries the same number — a different source, period and geography from the national one.` : ""}</p>`));
+  } else {
+    out.push(tpSec("profile", "Area profile", "", `<p class="empty">No area statistics cover this point.</p>`));
+  }
+  out.push(tpSec("infra", "Infrastructure nearby",
+    `<span class="dim">${inf.length} project${inf.length === 1 ? "" : "s"} within ${nf(AN_INFRA_M / 1000, 0)} km · distance to the alignment, 0 m inside a development area</span>`,
+    anInfraBody(pt)));
+  out.push(tpSec("public", `Public buildings within ${nf(ring, 0)} m`,
+    `<span class="dim">${koms.length} municipality file${koms.length === 1 ? "" : "s"} read · BBR via Datafordeler</span>`,
+    `<div id="anpub">${anPubBody(pt, r)}</div>`));
+  out.push(tpSec("schools", `Schools within ${nf(ring, 0)} m`,
+    `<span class="dim">Uddannelsesstatistik.dk · FP9 and the socioeconomic reference</span>`,
+    `<div id="ansch">${anSchBody(pt, r)}</div>`));
+  const clim = anClimBody(pt, r);
+  if (clim) out.push(tpSec("climate", "Climate",
+    `<span class="tag clim">${esc(hzShort(HZ.h))}</span> <span class="dim">Kystdirektoratet 100-year extents${r.kommune ? " · " + esc(r.kommune.name) : ""}</span>`,
+    `<div id="anclim">${clim}</div>`));
+  out.push(tpSec("sources", "Sources &amp; as of",
+    `<span class="dim">everything this page read · built ${esc((D.meta && D.meta.built) || "–")}</span>`,
+    anSources(e, r, profile.concat(safety), koms.length > 0, koms.length > 0 && !!SCH_META)));
+  return out.join("");
 }
 function vAnalysis() {
   const pt = anLoc();
@@ -2841,38 +3016,40 @@ function vAnalysis() {
   /* the kommune rings answer which municipality the point is really in — everything else waits for them */
   if (!KOM.list && !KOM.err) return `<div class="card accent"><div class="card-head"><h3>${esc(AN.label || TP_LABEL)}</h3><span class="hint">${pt.lat.toFixed(5)}, ${pt.lon.toFixed(5)}</span></div>
     <p class="empty">Locating the property — loading the municipality boundaries…</p>${anSkel(5)}</div>`;
-  const r = locate(pt.lat, pt.lon);
+  const r = anRes();
   if (r.error) return `<div class="card accent"><div class="card-head"><h3>${esc(AN.label || TP_LABEL)}</h3><span class="hint">${pt.lat.toFixed(5)}, ${pt.lon.toFixed(5)}</span></div>
     <p class="empty">That point is ${esc(r.error)} — no municipality or postal code covers it.</p>
+    <div class="tools tpinrow">${tpBox()}</div>
+    <div class="tperr" id="tperr" role="status" ${TP.msg ? "" : `style="display:none"`}>${esc(TP.msg)}</div>
     <div class="tools"><button class="lk primary" data-go="${withQ("map")}">‹ Back to the map</button></div></div>`;
-  const e = tpEntity(r);
-  const profile = e ? e.inds.filter(i => (i.group || "") !== "Safety" && eVal(e, i.key).v != null) : [];
-  const safety = e ? e.inds.filter(i => (i.group || "") === "Safety" && eVal(e, i.key).v != null) : [];
-  const koms = anKomsNear(pt, r.kommune && r.kommune.code, AN_RING_M).filter(pubAvail);
+  const e = anEntity();
   mapInit(anMapInit);
   setTimeout(anFill, 0);
-  const hint = `° = municipality value where no finer statistic exists${e && e.type === "kvarter" ? " · ^ = figure published for the whole bydel" : ""} · the percentile bar fills toward "better", so a low value fills it where lower is better${profile.some(i => neutralDir(i.key)) ? "; Outlook rows are neutral and the bar simply reads as a position among peers" : ""} · ↗ opens the indicator in Charts.`;
-  return `
-  ${anHead(pt, r, e)}
-  <div class="card"><div class="card-head"><h3>Where it is</h3>
-      <span class="hint">rings at ${TP_RINGS.map(m => nf(m, 0) + " m").join(" · ")} · the layers below sit on top, each with its legend</span></div>
-    ${anLayerBar(pt, r)}
-    <div class="mapwrap anmapwrap${anLayerList().length ? " haslayers" : ""}"><div id="anmap"></div>
-      <div class="maplegs"><div class="maplegend small publiclegend" id="anpublegend"></div><div class="maplegend small infralegend" id="aninfralegend"></div><div class="maplegend small" id="anmicrolegend"></div></div>
-      <div class="maplegend small" id="anlegend"></div></div></div>
-  ${e ? anOutlookCard(e, r) : ""}
-  ${e ? `<div class="card"><div class="card-head"><h3>Area profile — ${esc(e.typeLabel)} ${esc(e.name)} <span class="hq" title="${esc(hint)}">ⓘ</span></h3>
-      <span class="hint">${profile.length} indicator${profile.length === 1 ? "" : "s"}${MK.year !== LATEST ? " · " + MK.year : ""}</span></div>
-    ${anIndTable(e, r, profile)}</div>
-  <div class="card"><div class="card-head"><h3>Safety</h3><span class="hint">${esc(SAFETY.length ? (SAFETY[0].unit || "") : "")} · municipality level${e.type === "kvarter" ? " plus the city's own bydel survey" : ""}</span></div>
-    ${safety.length ? anIndTable(e, r, safety) : `<p class="empty">no safety figure for this area</p>`}
-    <p class="cap">Reported crime comes from Danmarks Statistik per municipality over a rolling four quarters; a postal code or quarter shows its municipality's figure (°).${e.type === "kvarter" ? ` Københavns Kommune's own safety survey publishes per bydel (^), so every quarter of ${esc(e.bydel || "the district")} carries the same number — a different source, period and geography from the national one.` : ""}</p></div>`
-    : `<div class="card"><p class="empty">No area statistics cover this point.</p></div>`}
-  ${anInfraCard(pt)}
-  <div id="anpub">${anPubCard(pt, r)}</div>
-  <div id="ansch">${anSchCard(pt, r)}</div>
-  <div id="anclim">${anClimCard(pt, r)}</div>
-  ${anSources(e, r, profile.concat(safety), koms.length > 0, koms.length > 0 && !!SCH_META)}`;
+  /* the same study row the area page is built around (spec §5.5′), pointed at the pin's finest area */
+  return `<div id="tptop">${tpTop(pt, r, e)}</div>
+    ${e ? studyRow(e, { mapId: "anmap", legendId: "anlegend", mapKey: "anmap", note: tpMapNote(r), legends: TP_MAP_LEGENDS })
+        : `<div class="studyrow" data-testid="study-row"><div class="card panel" data-testid="chart-panel"><p class="empty">No area statistics cover this point, so there is nothing to chart.</p></div>${miniMap({ mapId: "anmap", legendId: "anlegend", mapKey: "anmap", note: tpMapNote(r), legends: TP_MAP_LEGENDS })}</div>`}
+    <div id="tpsecs">${tpSections(pt, r, e)}</div>`;
+}
+/* Choosing an indicator, a horizon, a year, a layer or a radius on the test property updates the
+   header, the panel, the sections and the map's colours **in place** — the same rule the area page
+   follows (spec §4.2, AC-P4): render() would drop the mini map and lose the reader's pan, zoom and
+   full-screen overlay. Returns false anywhere else, so every call site still ends in renderKeep(). */
+function tpRefresh() {
+  if (S.view !== "analysis") return false;
+  const pt = anLoc(); if (!pt) return false;
+  const r = anRes(); if (!r || r.error) return false;
+  const row = document.querySelector("[data-testid=study-row]"); if (!row) return false;
+  const e = anEntity();
+  const top = document.getElementById("tptop"); if (top) top.innerHTML = tpTop(pt, r, e);
+  const panel = row.querySelector("[data-testid=chart-panel]");
+  if (panel && e) panel.outerHTML = chartPanel(e, {});
+  const note = row.querySelector(".mm-note"); if (note) note.innerHTML = tpMapNote(r);
+  const ch = row.querySelector(".mm-chips"); if (ch && UI.mmFull) ch.innerHTML = mmChips();
+  const secs = document.getElementById("tpsecs");
+  if (secs) { secs.innerHTML = tpSections(pt, r, e); enableSort(secs); }
+  anMapPaint(); anMapOverlays();
+  return true;
 }
 function lfLabels() {
   /* labels are rebuilt on every zoom step: a name is shown only when its polygon is wide enough on screen */
@@ -4115,8 +4292,15 @@ function lgFitSoon() {
   if (LGFIT) return;                        /* one pass per frame, however many legends were refilled */
   LGFIT = requestAnimationFrame(() => { LGFIT = 0; lgFit(); });
 }
+/* P6: the mini map carries the same stack (indicator legend first, the pin's overlays under it), so
+   the 60 % rule is applied to it too — with its own fold order, widest layer first. */
+const MM_FOLD_ORDER = ["anpublegend", "anmicrolegend", "aninfralegend"];
 function lgFit() {
-  const wrap = document.getElementById("maplegs"), map = document.getElementById("lfmap");
+  lgFitIn(document.getElementById("maplegs"), document.getElementById("lfmap"), LG_FOLD_ORDER);
+  const mm = document.querySelector(".minimap .maplegs");
+  if (mm) lgFitIn(mm, mm.closest(".minimap"), MM_FOLD_ORDER);
+}
+function lgFitIn(wrap, map, order) {
   if (!wrap || !map) return;
   const live = () => [...wrap.children].filter(e => e.offsetWidth > 0 && e.offsetHeight > 0);
   live().forEach(e => e.classList.remove("afold"));
@@ -4126,8 +4310,8 @@ function lgFit() {
     return live().every(e => { const r = e.getBoundingClientRect();
       return r.top >= top - 1 && r.bottom <= m.bottom + 1 && r.left >= m.left - 1 && r.right <= m.right + 1; });
   };
-  for (let i = 0; i < LG_FOLD_ORDER.length && !fits(); i++) {
-    const el = document.getElementById(LG_FOLD_ORDER[i]);
+  for (let i = 0; i < order.length && !fits(); i++) {
+    const el = document.getElementById(order[i]);
     if (el && !LEGO.has(el.id) && el.offsetHeight > 0) el.classList.add("afold");
   }
 }
@@ -4186,7 +4370,8 @@ function climSetHz(h) {
   lfDrop("climZoneG");
   LF.climDrawn = null;
   syncHash();
-  if (areaRefresh()) return;      /* the area page redraws its panel and map in place (AC-P4) */
+  /* the area page and the test property redraw their panel and map in place (AC-P4) */
+  if (areaRefresh() || tpRefresh()) return;
   renderKeep();
 }
 /* the pill itself — in the legend and, when a Climate indicator is selected, beside the indicator */
@@ -4515,8 +4700,8 @@ function climateLine(level, code) {
   if (risk.length) bits.push(`<button class="lk mini" data-go="climate/${esc(pad4(kom))}" title="Designated under the Floods Directive, 2024 screening">official risk area</button>`);
   return `<span class="upcoming"><em>Climate</em>${bits.join("")}</span>`;
 }
-/* --- the Analysis sheet's climate section: the pin against the published extents --- */
-function anClimCard(pt, r) {
+/* --- the test property's climate section: the pin against the published extents --- */
+function anClimBody(pt, r) {
   if (!CLIM || !r || !r.kommune) return "";
   const kom = r.kommune.code, km = climKom(kom);
   if (!km) return "";
@@ -4530,15 +4715,13 @@ function anClimCard(pt, r) {
   const line = hits.map(x => `<b class="${x.known ? (x.v ? "climyes" : "climno") : "dim"}">${esc(hzShort(x.h))} ${x.known ? (x.v ? "yes" : "no") : "…"}</b>`).join(" · ");
   const risk = climRiskAt(pt.lat, pt.lon) || (climRiskNames(kom).length ? { area_name: climRiskNames(kom).join(" · "), whole: true } : null);
   const inds = climInds();
-  return `<div class="card"><div class="card-head"><h3>Climate</h3>
-      <span class="hint">Kystdirektoratet 100-year extents · ${esc(r.kommune.name)}</span></div>
-    <p class="anlead">In storm-surge zone (100-yr): ${line}</p>
+  return `<p class="anlead">In storm-surge zone (100-yr): ${line}</p>
     <p class="cap">${risk ? `The pin ${risk.whole ? `is in a municipality with an official flood risk area (${esc(risk.area_name)})` : `falls inside the official flood risk area <b>${esc(risk.area_name)}</b>`}.` : "No official flood risk area covers this point."}
       A point inside a published extent is a screening result for the 100-year event, not a property-level assessment: the maps carry no depth we are entitled to read, and nothing here accounts for a dike, a pump or the building's own floor level.</p>
     <div class="scrollx"><table class="tbl compact climtbl"><thead><tr><th>Indicator</th><th class="num">Today</th><th class="num">2070</th><th class="num">2120</th><th class="ansrc">Source</th></tr></thead>
       <tbody>${inds.map(i => `<tr><th><span class="thn">${esc(i.label)} <span class="dim">${esc(i.unit || "")}</span></span></th>${climHzCells(i, km)}
         <td class="ansrc">${climSrcLink(i, String(Number(kom)), "Verify")}</td></tr>`).join("")}</tbody></table></div>
-    <p class="cap"><button class="lk mini" data-go="climate/${esc(pad4(kom))}">Open the climate sheet for ${esc(r.kommune.name)} ›</button> Figures are the municipality's, not the address's. ${esc(hzLabel(HZ.h))}</p></div>`;
+    <p class="cap"><button class="lk mini" data-go="climate/${esc(pad4(kom))}">Open the climate sheet for ${esc(r.kommune.name)} ›</button> Figures are the municipality's, not the address's. ${esc(hzLabel(HZ.h))}</p>`;
 }
 function climSheetLoadFor(kom) {
   CLIM_HZ.forEach(h => { if ((climZones(h).kommune || {})[pad4(kom)]) climLoad(h, kom); });

@@ -185,9 +185,10 @@ def ac_p1_minimap_drag(page, base):
     page.wait_for_timeout(1500)
     assert page.evaluate("window.__maps.length") == 1, "the test property owns exactly one map"
     assert page.evaluate("LF.anmap.dragging.enabled()"), "the mini map must be draggable (v2.6 had dragging:false)"
-    # the pin and its three walk/bike rings survive the overlays that used to throw before them
+    # the pin and its rings survive the overlays that used to throw before them. P6 added the ring
+    # the radius select names (spec §5.5′) beside the three dashed walk/bike ones, so it is 3 + 1 + 1.
     rings = page.evaluate("LF.anPinG ? LF.anPinG.getLayers().length : 0")
-    assert rings == len([500, 1000, 1200]) + 1, f"expected 3 rings + the pin on the map, got {rings} layer(s)"
+    assert rings == len([500, 1000, 1200]) + 2, f"expected 3 scale rings + the radius ring + the pin, got {rings} layer(s)"
     before = map_center(page)
     drag(page, "#anmap", 120, 0)
     after = map_center(page)
@@ -349,7 +350,7 @@ def ac_u1(page, base):
 # Every route that has adopted the shared picker. P3 brought the map, Data › Areas and Charts;
 # P5 added the area page. The test property keeps its v2.6 selectors until P6, which extends this.
 PICKER_ROUTES = ["map?ind=growth", "data/areas/kommune?ind=growth", "charts?ind=growth&a=kommune:101",
-                 "area/kommune/101?ind=growth"]
+                 "area/kommune/101?ind=growth", "property?p=55.6545,12.539&ind=growth"]
 
 
 def pick_rows(page):
@@ -1108,6 +1109,192 @@ def ac_r2(page, base):
     assert row["y"] < 768, f"the study row starts {row['y']:.0f} px down, below the fold"
     assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 2"), \
         "the area page scrolls sideways at 1366"
+
+
+# =============================================================================================
+# P6 — the test property rebuilt around the study row (spec §5.5′, amendments A2/A3)
+# =============================================================================================
+TP = "property?p=55.6545,12.539&ind=growth"
+
+
+@ac("AC-TP2", phase="P6")
+def ac_tp2(page, base):
+    """The test property is the area page's study row pointed at the pin's finest area: the chart
+    panel and the mini map side by side, the map drags, ⤢ works, and nothing throws (spec §5.5′)."""
+    goto(page, TP, settle=2200, wait="#anmap .leaflet-pane")
+    del ERRORS[:]
+    kids = page.evaluate("""() => [...document.querySelector('[data-testid=study-row]').children]
+        .map(e => e.dataset.testid || e.tagName)""")
+    assert kids == ["chart-panel", "minimap"], f"the study row's children are {kids}"
+    assert page.locator("[data-testid=chart-panel]").count() == 1
+    assert page.locator("[data-testid=minimap]").count() == 1
+    assert page.evaluate("window.__maps.length") == 1, "the test property owns exactly one map"
+    # the entity is the pin's finest area, and it is named as such
+    lvl = page.evaluate("(() => { const e = anEntity(); return e && e.type; })()")
+    assert lvl == "kvarter", f"55.6545,12.539 is a Copenhagen quarter, the page read it as {lvl!r}"
+    # dragging moves the centre — and never changes which property the page is about
+    before = map_center(page)
+    drag(page, "[data-testid=minimap] .leaflet-container", 120, 0)
+    after = map_center(page)
+    assert abs(after[0] - before[0]) + abs(after[1] - before[1]) > 1e-5, \
+        f"a 120 px drag did not move the centre: {before} → {after}"
+    assert cur_hash(page).startswith("property?p=55.6545,12.539"), f"dragging navigated to {cur_hash(page)!r}"
+    # ⤢ full screen and back
+    page.click("[data-testid=minimap-full]")
+    page.wait_for_timeout(600)
+    assert "is-full" in (page.get_attribute("[data-testid=minimap]", "class") or "").split()
+    page.keyboard.press("Escape")
+    page.wait_for_timeout(500)
+    assert "is-full" not in (page.get_attribute("[data-testid=minimap]", "class") or "").split()
+    assert not ERRORS, f"pageerror on the test property: {ERRORS[:2]}"
+
+
+@ac("AC-TP3", phase="P6")
+def ac_tp3(page, base):
+    """A headline tile is a way of choosing an indicator here too: it writes ind= and the mini map's
+    legend follows — in place, without rebuilding the map (spec §5.5′ item 2)."""
+    goto(page, TP, settle=2200, wait="#anmap .leaflet-pane")
+    del ERRORS[:]
+    # the indicator legend is the first card of the mini map's stack; the overlays have their own
+    before = page.inner_text("[data-testid=minimap] .mm-leg .lgtitle")
+    maps = page.evaluate("window.__maps.length")
+    tile = page.locator("[data-testid=tile-unemp]")
+    assert tile.count() == 1, "no unemployment tile on the test property"
+    tile.click()
+    page.wait_for_timeout(900)
+    assert "ind=unemp" in cur_hash(page), f"the tile did not write ind=unemp: {cur_hash(page)!r}"
+    assert page.inner_text("[data-testid=minimap] .mm-leg .lgtitle") != before, \
+        "the mini-map legend title did not follow the tile"
+    # the picker follows too. The label is the registry's for the level on screen — a Copenhagen
+    # quarter reads KK's "Unemployed (Nov.)", not DST's "Unemployment rate" — so the key is checked.
+    assert page.evaluate("document.querySelector('[data-testid=ind-picker-btn]').dataset.ind") == "unemp", \
+        f"the picker button says {page.inner_text('[data-testid=ind-picker-btn]')!r}"
+    assert "on" in (page.get_attribute("[data-testid=tile-unemp]", "class") or "").split(), \
+        "the chosen tile is not marked active"
+    assert page.evaluate("window.__maps.length") == maps == 1, "the map was rebuilt instead of repainted"
+    assert not ERRORS, f"pageerror while choosing an indicator: {ERRORS[:2]}"
+
+
+@ac("AC-TP5", phase="P6")
+def ac_tp5(page, base):
+    """A Google Maps link pasted into the box REPLACES the pin — one property at a time (A2)."""
+    goto(page, TP, settle=2000, wait="#anmap .leaflet-pane")
+    box = page.locator("[data-testid=prop-input]")
+    assert box.count() == 1, "there is not exactly one paste box"
+    box.fill("https://www.google.com/maps/@55.6761,12.5683,15z")
+    box.press("Enter")
+    page.wait_for_timeout(1400)
+    h = cur_hash(page)
+    assert h.startswith("property?p=55.6761,12.5683"), f"the pasted link landed on {h!r}"
+    p = h.split("p=")[1].split("&")[0]
+    assert ";" not in p, f"more than one pin in p={p!r} — a new link replaces, it does not append"
+    assert page.evaluate("AN.a") == "55.6761,12.5683"
+    # and the Go button does the same thing as Enter
+    box = page.locator("[data-testid=prop-input]")
+    box.fill("55.6545, 12.539")
+    page.click("[data-tpgo]")
+    page.wait_for_timeout(1400)
+    assert cur_hash(page).startswith("property?p=55.6545,12.539"), f"Go landed on {cur_hash(page)!r}"
+
+
+@ac("AC-E1", phase="P6")
+def ac_e1(page, base):
+    """#property with no p= is the empty state, with the caret already in the box (spec §4.10)."""
+    goto(page, "property", settle=900)
+    assert page.locator("[data-testid=state-empty]").count() == 1, "no state-empty card"
+    box = page.locator("[data-testid=state-empty] [data-testid=prop-input]")
+    assert box.count() == 1, "the empty state has no text input"
+    assert page.evaluate("document.activeElement === document.querySelector('[data-testid=prop-input]')"), \
+        "the input must have focus on the empty state"
+    # one example link, and it opens a property
+    ex = page.locator("[data-testid=state-empty] [data-go^='property?p=']")
+    assert ex.count() == 1, "the empty state offers no example link"
+    assert not page.locator("[data-testid=study-row]").count(), "an empty page drew a study row"
+
+
+@ac("AC-MM1TP", phase="P6")
+def ac_mm1_tp(page, base):
+    """AC-MM1 on the test property: the mini map is draggable and zooming it never re-selects."""
+    goto(page, TP, settle=2200, wait="#anmap .leaflet-pane")
+    assert page.evaluate("LF.anmap.dragging.enabled()"), "the mini map is not draggable"
+    before = map_center(page)
+    drag(page, "[data-testid=minimap] .leaflet-container", 0, 120)
+    assert abs(map_center(page)[0] - before[0]) > 1e-5, "a 120 px drag did not move the centre"
+    page.evaluate("() => { window.__maps[0].setZoom(12); }")   # setZoom returns the map; do not serialise it
+    page.wait_for_timeout(700)
+    assert page.evaluate("AN.a") == "55.6545,12.539", "zooming the mini map changed the property"
+    assert cur_path(page) == "property", f"zooming navigated to {cur_hash(page)!r}"
+    # ⌖ brings the property back to the middle
+    page.click("[data-testid=minimap-recentre]")
+    page.wait_for_timeout(700)
+    back = map_center(page)
+    assert abs(back[0] - 55.6545) < 1e-3 and abs(back[1] - 12.539) < 1e-3, f"⌖ did not re-centre: {back}"
+
+
+@ac("AC-MM2TP", phase="P6")
+def ac_mm2_tp(page, base):
+    """AC-MM2 on the test property: ⤢ fills the viewport and the map is told its new size."""
+    goto(page, TP, settle=2200, wait="#anmap .leaflet-pane")
+    small = box_of(page, "[data-testid=minimap]")
+    page.click("[data-testid=minimap-full]")
+    page.wait_for_timeout(700)
+    full = box_of(page, "[data-testid=minimap]")
+    vw, vh = page.evaluate("[window.innerWidth, window.innerHeight]")
+    assert full["width"] >= vw * 0.9 and full["height"] >= vh * 0.9, \
+        f"full screen is {full['width']:.0f}×{full['height']:.0f} of {vw}×{vh}"
+    size = page.evaluate("() => { const s = LF.anmap.getSize(); return [s.x, s.y]; }")
+    assert size[0] >= vw * 0.9 and size[1] >= vh * 0.9, f"invalidateSize() did not run: map is {size}"
+    # the overlay covers the toolbar, so it carries the chips — and a pick keeps full screen
+    chip = page.locator("[data-testid=minimap-chips] .chip[data-ind=renters]")
+    assert chip.count() == 1, "the full-screen map offers no way to choose another indicator"
+    chip.click()
+    page.wait_for_timeout(900)
+    assert page.evaluate("document.querySelector('[data-testid=minimap]').classList.contains('is-full')"), \
+        "picking an indicator dropped out of full screen"
+    assert "ind=renters" in cur_hash(page)
+    page.keyboard.press("Escape")
+    page.wait_for_timeout(600)
+    back = box_of(page, "[data-testid=minimap]")
+    assert "is-full" not in (page.get_attribute("[data-testid=minimap]", "class") or "").split()
+    assert abs(back["width"] - small["width"]) <= 2, f"Escape did not restore the box: {back['width']} vs {small['width']}"
+
+
+@ac("AC-TPSEC", phase="P6")
+def ac_tpsec(page, base):
+    """P6-local: the eight sections are <details> whose open set is the one show= key (spec §5.5′
+    item 4), Infrastructure nearby opens itself, and identical BBR rows are folded with a count."""
+    goto(page, TP, settle=2400, wait="#anmap .leaflet-pane")
+    names = ["outlook", "profile", "safety", "infra", "public", "schools", "climate", "sources"]
+    for k in names:
+        assert page.locator(f"[data-testid=tp-sec-{k}]").count() == 1, f"no tp-sec-{k} section"
+    assert page.evaluate("document.querySelector('[data-testid=tp-sec-infra]').open"), \
+        "Infrastructure nearby does not open itself"
+    for k in ["outlook", "profile", "safety", "public", "schools", "climate", "sources"]:
+        assert not page.evaluate(f"document.querySelector('[data-testid=tp-sec-{k}]').open"), \
+            f"tp-sec-{k} opened itself — only infra does"
+    # opening one writes it into the hash; closing every one is a state of its own
+    page.click("[data-testid=tp-sec-profile] summary")
+    page.wait_for_timeout(500)
+    show = cur_hash(page).split("show=")[1].split("&")[0] if "show=" in cur_hash(page) else ""
+    assert "profile" in show and "infra" in show, f"toggling did not reach the hash: {cur_hash(page)!r}"
+    page.click("[data-testid=tp-sec-profile] summary")
+    page.click("[data-testid=tp-sec-infra] summary")
+    page.wait_for_timeout(500)
+    assert "show=none" in cur_hash(page), f"closing every section gave {cur_hash(page)!r}"
+    # and a link carrying show= opens what it names
+    goto(page, "property?p=55.6545,12.539&ind=growth&show=public", settle=2400, wait="#anmap .leaflet-pane")
+    assert page.evaluate("document.querySelector('[data-testid=tp-sec-public]').open")
+    assert not page.evaluate("document.querySelector('[data-testid=tp-sec-infra]').open")
+    # duplicate BBR records are one row with a count, never several identical lines
+    dupes = page.evaluate("""() => {
+      const seen = {}, out = [];
+      document.querySelectorAll('[data-testid=tp-sec-public] tbody tr[data-pubsheet]').forEach(tr => {
+        const k = tr.querySelector('.thn').textContent.trim() + '|' + tr.children[1].textContent.trim()
+                + '|' + tr.children[3].textContent.trim();
+        if (seen[k]) out.push(k); else seen[k] = 1;
+      });
+      return out; }""")
+    assert not dupes, f"identical public-building rows were not grouped: {dupes[:3]}"
 
 
 # ---------------------------------------------------------------------------------------------

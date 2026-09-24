@@ -577,3 +577,126 @@ all registered in `tests/ui_ac.py` under `phase="P5"`. AC-I1 and AC-I4 (P3) now 
   that shows a finer level than the figure gets it for free once `pickLevel()` knows the level.
 - `srcNoteBody(extra)` is the source catalogue without the `<details>` around it; `srcNote()` is
   still the wrapped version every other view uses.
+
+---
+
+## P6 — The test property rebuilt around the study row (one pin)
+
+Commit: `v3.0 P6: test property rebuilt on the study row, Layers ▾, radius and eight sections`
+Gate: green — build, 88 node tests, 42 python tests, 150/150 route×viewport smoke checks with **0 JS
+errors**, 49/49 acceptance criteria (3 P1 + 8 P2 + 9 P3 + 10 P4 + 12 P5 + 7 P6), budgets
+(app.js 420 KB / 450 KB, style.css 136 KB / 140 KB).
+
+### What was built
+
+**1. `#property?p=lat,lon[:label]` is the area page's study row, anchored on a pin** (spec §5.5′).
+`vAnalysis()` is now three regions in a column — `#tptop` (header card + one toolbar row), the
+**shared `studyRow(e, opts)`**, and `#tpsecs` (eight `<details>`) — pointed at `tpEntity()`, the
+pin's finest published area (quarter > postal code > municipality). No second chart panel and no
+second mini map were written: the panel, the four bodies (history · snapshot · outlook · climate),
+the headline tiles, the picker, the period control and the ⤢ overlay are P3's and P5's components.
+The v2.6 "Where it is" card, the `anLayerBar()` pill row and the eight free-standing cards are gone.
+- `anRes()` / `anEntity()` are the memoised located result and entity for the page's pin (the same
+  arrangement `tpRes()` has for the map's pin). `curInds()`, `curPool()` and `pickLevel()` answer
+  from them, so the picker, the year list and the `muni` tags are the pin's level, not the map's.
+- The identity line carries a `read as <level>` tag: the figures are the quarter's / postal code's /
+  municipality's, never the address's.
+
+**2. One toolbar row** (`data-testid=tp-toolbar`): `[Indicator ▾][Period]` on the left, `Layers ▾`
+and a `radius` select on the right, chips underneath — the §5.5′ layout.
+- **`layersMenu(kind)`** now serves both maps. `TP_LAYERS` (infra · public buildings · BBR buildings,
+  plus the municipality's storm-surge zones as context) is the test property's list, `MAP_LAYERS` the
+  map's; `mapLayerToggle()` routes to `tpLayerToggle()` here. A layer toggle redraws the overlays on
+  the map that is already there and re-renders the menu — it never rebuilds the page.
+- **`rad=`** (500 m · 1 km · 2 km · 5 km, default 1 km) draws the solid ring on the mini map *and* is
+  the ring "Public buildings within" and "Schools within" count inside.
+
+**3. The tiles, the picker and the chips all drive the page in place.** `tpRefresh()` is the
+`areaRefresh()` of this page: it replaces `#tptop`, the chart panel, the note, the chips and
+`#tpsecs`, then repaints the map through the new **`anMapPaint()`** (`anMapInit()` was split into
+"build the map" and "draw this indicator on it", exactly as P5 split `arMapInit`). `pickInd()`,
+`climSetHz()`, the year select and the radius select all try `areaRefresh() || tpRefresh()` before
+falling back to `renderKeep()`, so the reader's pan, zoom and full-screen overlay survive every pick.
+
+**4. One paste box, one pin.** `tpBox()` gained `data-testid=prop-input` and a `Go` button; Enter,
+paste and Go all run `tpGo()`. On this page a new link **replaces** the pin and its label (a different
+address is a different property). The empty state is `data-testid=state-empty` with the caret already
+in the box, the privacy line and one example link.
+
+**5. Eight `<details>`** (`tp-sec-outlook|profile|safety|infra|public|schools|climate|sources`), open
+state in the same `show=` key the area page uses, on its own `AN.show` set and `data-tpsec` branch.
+Default open: `infra`. The existing card content moved in unchanged apart from losing its card
+wrapper (`anOutlookBody`, `anIndTable`, `anInfraBody`, `anPubBody`, `anSchBody`, `anClimBody`,
+`anSources`) — the card heads became the sections' summaries and hints.
+
+**6. Public buildings are grouped.** Rows whose name, BBR use code and distance (to 20 m) all match
+are one row with a `×n` badge — one building registered as several bodies. The caption says how many
+records were folded; the distance shown is the nearest of them.
+
+**7. Header actions** (spec §5.5′): `Open on map ›` · `Copy link` · one link per level the pin sits
+in (quarter · postal code · municipality) · `OpenStreetMap ↗`. `D.portfolio`'s "own properties" path
+is untouched — it is still one row in the map's Layers menu and is hidden without the file.
+
+**8. The mini map's legend stack.** `miniMap(opts)` takes `opts.legends`, and the indicator legend
+plus the pin's overlay legends now live in one `.maplegs` column, indicator first. `lgFit()` was
+split into `lgFitIn(wrap, map, order)` and runs over the mini map's stack too, so §4.5's
+"never more than 60 % of the map's height" holds there as well — the overlay legends fold to their
+titles when they would not fit.
+
+### ACs delivered
+AC-TP2, AC-TP3, AC-TP5, AC-E1 (read `#properties` as `#property`), and **AC-MM1TP / AC-MM2TP** —
+AC-MM1 and AC-MM2 asserted on the test property, registered under their own ids because P5 owns
+`AC-MM1`/`AC-MM2` on the area page and an id may be registered once. Plus the phase-local
+**AC-TPSEC** (the eight sections, `show=`, and the public-building grouping). **AC-TP1** (P2) is
+re-checked by the suite and still passes. AC-I1 and AC-I4 (P3) now also run on `#property`.
+
+### Deviations
+- **AC-P1MM (P1-local) was updated**: it counted 3 rings + the pin on `LF.anPinG`, and §5.5′ adds the
+  ring the radius select names, so it counts 5. The invariant is unchanged; see `DECISIONS.md`.
+- **Multi-pin stays in the codec only.** `route_core.propParse/propSerialise` are still list-capable
+  and `p=a;b` still parses, but only the first item is rendered and only one is written (amendment
+  A2). *Several pasted links all appearing on the map is the owner's future idea* — it needs no
+  format change when it lands, only a view that loops.
+- **The indicator list on a Copenhagen pin is the quarter registry.** `curInds()` now answers from
+  the pin's entity, which is right, but it means price/m² and private rent are not in the picker on
+  a Copenhagen pin — the quarter layer does not publish them. Before P6 the list came from the map's
+  own state, so it depended on where the reader had last been. In `DECISIONS.md`.
+- **The radius select replaced the Layers ▾ radius row on this page.** §5.5′ draws it in the toolbar;
+  the Layers menu keeps its radius row on the *map*, where it filters the overlays around the pin.
+- **`Sources & as of` links to `Data › Sources`**, not to the v2.6 `#market?src=1` spelling.
+
+### Known issues / open items
+- Horizontal overflow at 390 px is still a note on every route (v2.6 shell defect); **P8 flips
+  `OVERFLOW_FATAL = True` in `tests/ui_smoke.py`**.
+- At ≤ 800 px the five headline tiles wrap 2×3 and the sixth grid cell shows the `.tiles` background
+  as a grey slab. It is the shared §4.7 component, so the area page has it too (it arrived with P5);
+  a `:last-child` span or an odd-count rule in `.tiles` would fix both. Cosmetic, P8/P9.
+- `style.css` is at 136 KB of the 140 KB budget (3.9 KB left for P7–P9). The v2.6 Finnish-commented
+  legacy block (lines 76–1110, mostly unused by the DK app) is where a daytime clean-up would find
+  room; P6 reclaimed the `.anhead .hl` rules it made dead.
+- The Export ▾ menu and the two Test property CSV files (AC-TP4, §5.5′) are **P7's** — the sidebar
+  button still calls `exportAll()`.
+- The KK vs BBR "built 2010+" gap and the surge keys' horizon-in-the-`desc` are still data tasks.
+
+### What the next phase must know
+- **`tpRefresh()` is the test property's `areaRefresh()`.** Anything that changes what the page is
+  showing (an indicator, a horizon, a year, a layer, the radius) must call
+  `areaRefresh() || tpRefresh()` before `renderKeep()`, or the map is torn down and the reader loses
+  their pan, zoom and full-screen overlay.
+- **`anMapPaint()` draws, `anMapInit()` builds.** A repaint never moves the camera; only the init
+  fits the bounds, and only for a pin/radius it has not framed before (`LF.anKey`).
+- **`anEntity()` is the test property's `areaEntity()`** and it is memoised in `ANC` on
+  `lat,lon,<have the kommune rings landed>`. Call it rather than `locate()` — `locate()` walks 606
+  postal-code rings and the picker asks for the level on every render.
+- **`layersMenu(kind)` takes a list now.** A third map with layers adds a `*_LAYERS` array and one
+  branch in `mapLayerToggle()`; it does not add a menu.
+- **`miniMap({..., legends})`** is how extra legend cards get inside a mini map, and
+  `lgFitIn(wrap, map, order)` is how a stack is kept inside its map. Give a new legend an id and put
+  it in the fold order (`MM_FOLD_ORDER`) or it will never fold.
+- **P7 (Export):** `anRing()`, `anPubKoms()`, `anPubGroup()` and `anInfraRows()` are the functions
+  that decide what the Test property CSV's `nearby` file must contain — the export should read the
+  same ones so the file and the page can never disagree. `tpEntity()` gives it the
+  `level, code, value_type` columns for the long schema.
+- **P8 (responsive):** the test property's toolbar puts `Layers ▾` and the radius in a `.tp-right`
+  block that becomes a full-width row below 600 px; the study row is the same component the area
+  page uses, so whatever P8 does to `.studyrow` applies to both.
