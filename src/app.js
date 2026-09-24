@@ -234,6 +234,14 @@ const curInds = () => { if (S.view === "area") { const e = areaEntity(); return 
 const curInd = () => { const L = curInds(); return L.find(i => i.key === MK.ind) || L[0] || { key: "", label: "", fmt: "pct1" }; };
 
 /* ---------- routing (hash) ---------- */
+/* The v3.0 alias table lives in src/route_core.js (pure, unit-tested in tests/route.test.js) and is
+   wired in at the two points that own the hash: hashFor() writes it, parseHash() reads it. It is
+   dormant until the Data section exists — with ROUTE_V3 false this phase emits and accepts exactly
+   the v2.6 spellings, byte for byte, and P2 flips the one flag. */
+const ROUTE_V3 = false;
+const RC = (typeof window !== "undefined" && window.ROUTE_CORE) || null;
+/* the new spelling of a hash the app just built (identity while ROUTE_V3 is false) */
+const routeOut = h => (ROUTE_V3 && RC) ? RC.toV3(h, { isClim }) : h;
 function hashFor() {
   const q = [`ind=${encodeURIComponent(MK.ind || "")}`]; if (MK.year && MK.year !== LATEST) q.push(`y=${MK.year}`);
   q.push(...CC.hzSerialise(HZ.h));   /* one horizon for the zones and the Climate figures alike */
@@ -268,10 +276,13 @@ function hashFor() {
   else if (S.view === "pipeline") { p = "pipeline"; if (PIPE.type) q.push(`ptype=${PIPE.type}`); if (PIPE.status) q.push(`pstatus=${PIPE.status}`); }
   else if (S.view === "makro") p = "map" + (MK.muni ? "/" + MK.muni + (MK.muni === CPH_MUNI && MK.cphView === "postnr" ? "/postnr" : "") : "");
   else p = S.view;
-  return p + "?" + q.join("&");
+  return routeOut(p + "?" + q.join("&"));
 }
 function parseHash() {
-  const h = (location.hash || "#map").slice(1);
+  let h = (location.hash || "#map").slice(1);
+  /* an old shared link is rewritten to the canonical spelling once, before anything reads it, and
+     the address bar is corrected without adding a history entry. Dormant while ROUTE_V3 is false. */
+  if (ROUTE_V3 && RC) { const c = RC.toV3(h, { isClim }); if (c !== h) { h = c; history.replaceState(null, "", "#" + h); } }
   const [path, qs] = h.split("?"); const parts = path.split("/").filter(Boolean);
   const q = {}; (qs || "").split("&").filter(Boolean).forEach(kv => { const [k, v] = kv.split("="); q[decodeURIComponent(k)] = decodeURIComponent(v || ""); });
   const prevView = S.view;
@@ -363,6 +374,8 @@ const RENDER = { makro: vMakro, table: vTable, area: vArea, charts: vCharts, mar
                  public: vPublic, publist: vPubList, school: vSchool, schoollist: vSchoolList, analysis: vAnalysis,
                  climate: vClimate, compare: vCompare };
 function render() {
+  /* every live map goes before the DOM it lives in does — see dropMap() */
+  dropMaps();
   renderNav(); renderTop();
   const body = document.getElementById("body");
   body.innerHTML = (RENDER[S.view] || vMakro)();
@@ -847,7 +860,7 @@ function mkRefreshTools() {
 function vMakro() {
   if (!AREAS.length || !MUNI.length) return `<div class="card"><p class="empty">No macro data built yet — run <code>make fetch</code>, <code>make geo</code> and <code>make build</code>.</p></div>`;
   const ind = curInd();
-  setTimeout(lfInit, 0);
+  mapInit(lfInit);
   const muni = MK.muni ? byCode[MK.muni] : null;
   return `
   <div class="card accent" id="mapcard">
@@ -1196,7 +1209,7 @@ function vArea() {
   const e = areaEntity();
   if (!e) return `<div class="back"><button data-go="map">‹ Macro map</button></div><div class="card"><p class="empty">Unknown area.</p></div>`;
   const ind = curInd();
-  setTimeout(arMapInit, 0);
+  mapInit(arMapInit);
   const groups = GROUP_ORDER.filter(gn => e.inds.some(i => (i.group || "Other") === gn && eVal(e, i.key).v != null));
   const grp = groups.includes(AR.group) ? AR.group : groups[0];
   const tiles = e.inds.filter(i => (i.group || "Other") === grp && eVal(e, i.key).v != null);
@@ -1264,11 +1277,12 @@ function arMapMode(e, ind) {
   return { useQ, sind, kommuneLevel };
 }
 function arMapInit() {
+  if (S.view !== "area") return;                  /* a render for another view got in first */
   const el = document.getElementById("armap"); if (!el || typeof L === "undefined") return;
   const e = areaEntity(); if (!e) return;
-  if (LF.amap) { try { LF.amap.remove(); } catch (x) {} LF.amap = null; }
+  dropMap("amap");
   const map = L.map(el, { center: [56, 10.5], zoom: 7, scrollWheelZoom: true, zoomSnap: 0.5, zoomDelta: 1, wheelPxPerZoomLevel: 60, wheelDebounceTime: 20, attributionControl: false });
-  LF.amap = map;
+  LF.amap = map; syncMaps();
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, className: "basemap" }).addTo(map);
   const ind = curInd(); const { useQ, sind, kommuneLevel } = arMapMode(e, ind);
   const ctx = e.type === "kommune" ? (useQ ? CPH.areas : kommuneLevel ? AREAS : e.ctx) : e.ctx;
@@ -1886,7 +1900,7 @@ function anMapOverlays() {
     const mind = curMind(), rows = microRows(kom), z = map.getZoom();
     const msc = scaleOf(rows, x => x[mind.col], mind.breaks);
     LF.anMicroG = L.layerGroup(rows.map(x => { const t = msc.t(x[mind.col]);
-      const m = L.circleMarker([x[0], x[1]], { renderer: LF.anCanvas, radius: microRadius(x[2], z), color: "#141C18", weight: .6, opacity: .7,
+      const m = L.circleMarker([x[0], x[1]], { renderer: amOf(map).base, radius: microRadius(x[2], z), color: "#141C18", weight: .6, opacity: .7,
         fillColor: t == null ? "#C4CBC4" : mkShade(t, "micro:" + mind.key), fillOpacity: .85 });
       m.bindPopup(() => microPopup(x, kom), { maxWidth: 440, autoPanPadding: [24, 24] }); return m; })).addTo(map);
     if (mLeg) { mLeg.style.display = ""; mLeg.innerHTML = legendHtml(msc, mind, "micro:" + mind.key, `${nf(rows.length, 0)} buildings · dot size = dwellings`); }
@@ -1898,15 +1912,33 @@ function anMapOverlays() {
   /* the pin and its rings stay on top of every overlay */
   if (LF.anPinG) LF.anPinG.eachLayer(l => { if (l.bringToFront) l.bringToFront(); });
 }
+/* ⌖ — put the property back in the middle. The counterpart of making the mini map draggable:
+   the pin is the whole point of the sheet, so getting back to it is one click, never a reload. */
+function anRecentreControl(map, ll) {
+  const c = L.control({ position: "topleft" });
+  c.onAdd = () => {
+    const d = L.DomUtil.create("div", "leaflet-bar am-recentre");
+    d.innerHTML = `<a href="#" role="button" data-testid="minimap-recentre" title="Re-centre on the property" aria-label="Re-centre on the property">⌖</a>`;
+    L.DomEvent.disableClickPropagation(d);
+    L.DomEvent.on(d, "click", ev => { L.DomEvent.stop(ev); map.setView(ll, map.getZoom()); });
+    return d;
+  };
+  c.addTo(map);
+  return c;
+}
 function anMapInit() {
+  if (S.view !== "analysis") return;              /* a render for another view got in first */
   const el = document.getElementById("anmap"); if (!el || typeof L === "undefined") return;
   const pt = anLoc(); if (!pt) return;
   const r = locate(pt.lat, pt.lon); if (!r || r.error) return;
-  if (LF.anmap) { try { LF.anmap.remove(); } catch (e) {} LF.anmap = null; }
-  /* zoom only: the rings frame the property and a drag would lose it */
-  const map = L.map(el, { center: [pt.lat, pt.lon], zoom: 15, scrollWheelZoom: true, dragging: false, zoomSnap: .5, attributionControl: false });
+  dropMap("anmap");
+  /* draggable since v3.0: the reader wants to look at the next street over without leaving the
+     sheet. What a drag used to lose — the pin in the middle — the ⌖ control below brings back,
+     and the position is kept across re-renders (LF.anCenter / LF.anZoom) rather than re-fitted. */
+  const map = L.map(el, { center: [pt.lat, pt.lon], zoom: 15, scrollWheelZoom: true, dragging: true, zoomSnap: .5, attributionControl: false });
   LF.anmap = map; LF.anPt = pt; LF.anR = r; LF.anKom = r.kommune ? r.kommune.code : null;
-  LF.anCanvas = L.canvas({ padding: .3 });   /* one renderer per map — a cached one redraws into a dead context */
+  mapPanes(map);   /* one pane + renderer set per map — a cached one redraws into a dead context */
+  syncMaps();
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, className: "basemap" }).addTo(map);
   /* the current choropleth underneath, at the finest level the indicator reaches */
   const ind = curInd();
@@ -1928,11 +1960,14 @@ function anMapInit() {
   map.on("popupopen", ev => anPopupWire(ev.popup));
   /* the public zoom rule and the building dot size both follow the zoom, as on the Macro map */
   map.on("zoomend", () => { LF.anZoom = map.getZoom(); anMapOverlays(); });
+  /* a drag is a reading position, not a selection: it is remembered, and it changes nothing else */
+  map.on("moveend", () => { const c = map.getCenter(); LF.anCenter = [c.lat, c.lng]; LF.anZoom = map.getZoom(); });
+  anRecentreControl(map, ll);
   anMapOverlays();
-  /* a pill toggle re-renders the sheet, so the reader's own zoom is kept rather than re-fitted */
+  /* a pill toggle re-renders the sheet, so the reader's own view is kept rather than re-fitted */
   const key = `${pt.lat},${pt.lon}`;
-  if (LF.anKey === key && LF.anZoom) map.setView(ll, LF.anZoom);
-  else { map.fitBounds(rings[rings.length - 1].getBounds(), { padding: [14, 14] }); LF.anKey = key; LF.anZoom = map.getZoom(); }
+  if (LF.anKey === key && LF.anZoom) map.setView(LF.anCenter || ll, LF.anZoom);
+  else { map.fitBounds(rings[rings.length - 1].getBounds(), { padding: [14, 14] }); LF.anKey = key; LF.anZoom = map.getZoom(); LF.anCenter = null; }
   setLegend("anlegend", sc, ind, ind.key, useQ ? "quarters" : micro ? "postal codes" : "municipalities");
 }
 /* --- e. infrastructure nearby --- */
@@ -2077,7 +2112,7 @@ function vAnalysis() {
   const profile = e ? e.inds.filter(i => (i.group || "") !== "Safety" && eVal(e, i.key).v != null) : [];
   const safety = e ? e.inds.filter(i => (i.group || "") === "Safety" && eVal(e, i.key).v != null) : [];
   const koms = anKomsNear(pt, r.kommune && r.kommune.code, AN_RING_M).filter(pubAvail);
-  setTimeout(anMapInit, 0);
+  mapInit(anMapInit);
   setTimeout(anFill, 0);
   const hint = `° = municipality value where no finer statistic exists${e && e.type === "kvarter" ? " · ^ = figure published for the whole bydel" : ""} · the percentile bar fills toward "better", so a low value fills it where lower is better${profile.some(i => neutralDir(i.key)) ? "; Outlook rows are neutral and the bar simply reads as a position among peers" : ""} · ↗ opens the indicator in Charts.`;
   return `
@@ -2240,7 +2275,7 @@ function lfMicroLayers() {
   /* same quintile classes as the area maps, computed on the buildings that pass the filters */
   const sc = scaleOf(rows, r => r[c], ind.breaks, ind); const t = sc.t;
   const marks = rows.map(r => { const tt = t(r[c]);
-    const m = L.circleMarker([r[0], r[1]], { renderer: LF.canvas, radius: microRadius(r[2]), color: "#141C18", weight: .6, opacity: .7, fillColor: tt == null ? "#C4CBC4" : mkShade(tt, "micro:" + ind.key), fillOpacity: .85 });
+    const m = L.circleMarker([r[0], r[1]], { renderer: amOf(LF.map).base, radius: microRadius(r[2]), color: "#141C18", weight: .6, opacity: .7, fillColor: tt == null ? "#C4CBC4" : mkShade(tt, "micro:" + ind.key), fillOpacity: .85 });
     m._dw = r[2]; m._row = r; m.bindPopup(() => microPopup(r, code), { maxWidth: 440, autoPanPadding: [24, 24] }); return m; });
   LF.microG = L.layerGroup(marks).addTo(LF.map); LF.microMarks = marks;
   tpLayers();
@@ -2311,6 +2346,73 @@ if (typeof L !== "undefined" && L.Canvas && L.Canvas.prototype && !L.Canvas.prot
   cp._redraw = function () { if (!this._map || !this._ctx) return; return _redraw.apply(this, arguments); };
   cp._update = function () { if (!this._map) return; return _update.apply(this, arguments); };
 }
+/* The same medicine one level up. A zoom animation started by fitBounds/setView keeps running for
+   ~250 ms after the map it belongs to was torn down (a route change is exactly that long), and the
+   transition's end handler then asks a pane that no longer exists for its position:
+   "Cannot read properties of undefined (reading '_leaflet_pos')". Leaflet has no teardown check of
+   its own, so it gets one here — once, at the prototype, for every map this app ever builds. */
+if (typeof L !== "undefined" && L.Map && L.Map.prototype && !L.Map.prototype._amGuarded) {
+  const mp = L.Map.prototype, _end = mp._onZoomTransitionEnd, _move = mp._move, _pos = mp._getMapPanePos;
+  mp._amGuarded = true;
+  mp._onZoomTransitionEnd = function () { if (!this._mapPane) return; return _end.apply(this, arguments); };
+  mp._move = function () { if (!this._mapPane) return this; return _move.apply(this, arguments); };
+  mp._getMapPanePos = function () { if (!this._mapPane) return L.point(0, 0); return _pos.apply(this, arguments); };
+}
+
+/* ---------- map lifecycle: one owner for every Leaflet instance ---------- */
+/* Every map this app builds lives under one of these keys in LF, together with the layer groups
+   drawn on it. `render()` replaces the page body wholesale, so a map whose container has just been
+   thrown away has to be told before its async callers reach it — the public, services, climate and
+   micro files all resolve minutes later and all end with "if (LF.map) redraw". dropMap() is the one
+   exit door: it stops the animations, removes the map and forgets every group that was on it. */
+const LF_MAPS = {
+  map:   ["areaG", "labG", "microG", "infraG", "infraHitG", "infraStG", "infraLabG",
+          "pubG", "pubLabG", "srvG", "srvStG", "climAreaG", "climZoneG", "ownG", "tpG"],
+  amap:  [],
+  anmap: ["anInfraG", "anInfraHitG", "anPubG", "anMicroG", "anClimG", "anPinG"],
+  pmap:  [],
+};
+const LF_MAP_KEYS = Object.keys(LF_MAPS);
+/* the test hook (UI spec §10): every live Leaflet instance, in the order the keys are declared */
+function syncMaps() { if (typeof window !== "undefined") window.__maps = LF_MAP_KEYS.map(k => LF[k]).filter(Boolean); }
+function dropMap(key) {
+  const m = LF[key];
+  LF[key] = null;
+  (LF_MAPS[key] || []).forEach(k => { LF[k] = null; });
+  /* the macro map's caches describe what is drawn on it; with the map gone they describe nothing */
+  if (key === "map") { LF.level = null; LF.ctx = null; LF.pubDrawn = null; LF.srvDrawn = null;
+                       LF.climDrawn = null; LF.microMarks = null; LF.tpMark = null; }
+  if (m) { try { m.off(); m.stop(); m.remove(); } catch (e) {} m._am = null; }
+  syncMaps();
+}
+function dropMaps() { LF_MAP_KEYS.forEach(dropMap); }
+syncMaps();   /* the hook exists from load on, empty until the first map is built */
+/* Two renders can land inside one frame — a hashchange, then the re-render an async file triggers —
+   and each schedules its own map init. Only the last one may build: an init that starts while the
+   previous map is still animating is root cause 3 of ENG_BRIEF §2.4. One timer, last one wins. */
+function mapInit(fn) {
+  if (LF.initTimer) clearTimeout(LF.initTimer);
+  LF.initTimer = setTimeout(() => { LF.initTimer = null; fn(); }, 0);
+}
+/* Panes and canvas renderers belong to one map, not to the app. A renderer built for the macro map
+   draws into *that* map's pane; handing it to the mini map is what threw "Cannot read properties of
+   undefined (reading 'appendChild')" in v2.6 (ENG_BRIEF §2.4, root cause 1), and the two follow-on
+   errors ('intersects', 'lat') were the same renderer failing again afterwards. Each map now gets
+   its own set, on `map._am`, and every builder reads the set of the map it is drawing on.
+   Stacking, unchanged: services above the choropleth, public buildings one step lower, climate
+   zones lowest and click-through — a zone fill must never swallow the click that opens a popup. */
+function mapPanes(map) {
+  if (!map) return null;
+  if (map._am) return map._am;
+  const pane = (name, z, noPointer) => {
+    if (!map.getPane(name)) { map.createPane(name); const p = map.getPane(name); p.style.zIndex = z; if (noPointer) p.style.pointerEvents = "none"; }
+  };
+  pane("srvpane", 450); pane("pubpane", 440); pane("climpane", 430, true);
+  map._am = { base: L.canvas({ padding: .3 }), srv: L.canvas({ pane: "srvpane", padding: .3 }),
+              pub: L.canvas({ pane: "pubpane", padding: .3 }), clim: L.canvas({ pane: "climpane", padding: .3 }) };
+  return map._am;
+}
+const amOf = map => (map ? mapPanes(map) : null);
 /* Remove a layer group from the map and forget it in one step. A group left in LF after its
    map is gone is exactly what later hands a dead renderer a redraw, so the two always happen
    together and in this order. */
@@ -2334,27 +2436,15 @@ function mapJump(id) {
   if (b) LF.map.fitBounds(b, { padding: [24, 24] });
 }
 function lfInit() {
+  if (S.view !== "makro") return;                 /* a render for another view got in first */
   const el = document.getElementById("lfmap");
   if (!el || typeof L === "undefined") return;
-  if (LF.map) { try { LF.map.remove(); } catch (e) {} LF.map = null; }
+  dropMap("map");
   const map = L.map(el, { center: LF.center, zoom: LF.zoom, scrollWheelZoom: true, zoomSnap: 0.5, zoomDelta: 1, wheelPxPerZoomLevel: 60, wheelDebounceTime: 20 });
   LF.map = map;
-  LF.canvas = L.canvas({ padding: .3 });     /* likewise: the building dots' renderer dies with its map */
-  /* Services sit in their own pane above the choropleth (overlayPane, z 400) and below the
-     labels and popups (markerPane, z 600). Without it the canvas element is created before
-     the area polygons and ends up under them, and their semi-transparent fill washes every
-     dot out — visible as grey-looking markers over a dark quintile and correct ones off it. */
-  if (!map.getPane("srvpane")) { map.createPane("srvpane"); map.getPane("srvpane").style.zIndex = 450; }
-  LF.srvCanvas = L.canvas({ pane: "srvpane", padding: .3 });
-  /* public buildings get the same treatment one step lower, so a services dot still draws on top */
-  if (!map.getPane("pubpane")) { map.createPane("pubpane"); map.getPane("pubpane").style.zIndex = 440; }
-  LF.pubCanvas = L.canvas({ pane: "pubpane", padding: .3 });
-  /* Climate zones sit above the choropleth and below every marker layer, and the pane takes no
-     pointer events at all: a fill covering half a municipality must never swallow the click that
-     opens that municipality's popup. What the zones know about the clicked point goes into that
-     same popup instead (climPopupBlock). */
-  if (!map.getPane("climpane")) { map.createPane("climpane"); const cp_ = map.getPane("climpane"); cp_.style.zIndex = 430; cp_.style.pointerEvents = "none"; }
-  LF.climCanvas = L.canvas({ pane: "climpane", padding: .3 });
+  /* this map's own panes and canvas renderers (services / public buildings / climate zones) */
+  mapPanes(map);
+  syncMaps();
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, className: "basemap",
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · Boundaries: DAGI, Klimadatastyrelsen' }).addTo(map);
   map.on("moveend", () => { const c = map.getCenter(); LF.center = [c.lat, c.lng]; LF.zoom = map.getZoom();
@@ -2772,6 +2862,7 @@ function pubCluster(rows) {
 }
 function pubClusterMarkers(cells, map) {
   const marks = [];
+  amOf(map);                                      /* make sure this map has a "pubpane" of its own */
   cells.forEach(c => {
     if (c.n === 1) return;                                  /* singletons stay real markers */
     const top = Object.entries(c.cats).sort((a, b) => b[1] - a[1])[0][0];
@@ -2820,6 +2911,8 @@ function lfPublicLayers(force) {
    all) keeps the base hue, drawn hollow, so it reads as "not on this scale", never as a low grade. */
 function pubMarkers(rows, map, gm) {
   const gsc = gm ? gradeScale() : null, marks = [];
+  /* the renderer and pane of *this* map — the mini map has its own set, see mapPanes() */
+  const am = amOf(map);
   rows.forEach(b => {
     const c = pubCat(b), existing = b.kind === "existing";
     let stroke = c.color, fill = existing ? c.color : "#FFFFFF", fop = existing ? .85 : 1, wt = 2;
@@ -2831,7 +2924,7 @@ function pubMarkers(rows, map, gm) {
     /* one canvas marker instead of an SVG halo + SVG marker: half the objects and no DOM node each.
        The white ring that used to be a separate halo is now this marker's own stroke. */
     const halo = null;
-    const m = L.circleMarker([b.lat, b.lon], { renderer: LF.pubCanvas || undefined, pane: LF.pubCanvas ? "pubpane" : undefined,
+    const m = L.circleMarker([b.lat, b.lon], { renderer: am ? am.pub : undefined, pane: am ? "pubpane" : undefined,
       radius: 6, color: existing ? "#FFFFFF" : stroke, weight: existing ? 1.6 : wt, opacity: .95,
       fillColor: fill, fillOpacity: fop, dashArray: existing ? null : "3 3" });
     m.on("click", e => L.popup({ maxWidth: 420, autoPanPadding: [24, 24] }).setLatLng(e.latlng || [b.lat, b.lon]).setContent(pubPopup(b)).openOn(map));
@@ -3133,7 +3226,7 @@ function lfServicesLayers(force) {
       stations.push(halo, m);
     } else {
       /* the dense categories go on the canvas renderer — thousands of SVG paths would stall the pan */
-      const m = L.circleMarker([p.lat, p.lon], { renderer: LF.srvCanvas || LF.canvas, radius: rDot,
+      const m = L.circleMarker([p.lat, p.lon], { renderer: amOf(LF.map).srv, radius: rDot,
         color: "#FFFFFF", weight: 1.4, opacity: .95, fillColor: col, fillOpacity: 1 });
       m.on("click", e => L.popup({ maxWidth: 420, autoPanPadding: [24, 24] }).setLatLng(e.latlng || [p.lat, p.lon]).setContent(srvPopup(p)).openOn(LF.map));
       dots.push(m);
@@ -3362,7 +3455,7 @@ function lfClimateLayers(force) {
   if (!LF.map) return;
   lfDrop("climAreaG", "climZoneG");
   if (!climOn()) { LF.climDrawn = null; setClimateLegend(); return; }
-  const rend = LF.climCanvas || LF.canvas;
+  const rend = amOf(LF.map).clim;
   if (climShow("areas")) {
     if (!CRA) climRiskLoad();
     else LF.climAreaG = L.geoJSON(CRA, { pane: "climpane", renderer: rend, interactive: false,
@@ -3977,7 +4070,7 @@ function vProject() {
   const p = f.properties, s = geomStats(f), st = infraSt(p);
   const bn = p.budget_mdkk == null ? null : nf(p.budget_mdkk / 1000, 1) + " bn DKK";
   const priceNote = /2015 prices|price level|PL\d|09PL|PL09/i.test(p.notes || "") ? "price basis — see the note below" : "";
-  setTimeout(prMapInit, 0);
+  mapInit(prMapInit);
   const tile = (l, v, sub) => v == null || v === "" ? "" : `<div><span>${esc(l)}</span><b>${v}</b>${sub ? `<em>${esc(sub)}</em>` : ""}</div>`;
   const kom = (p.kommuner || []).map(c => byCode[c]).filter(Boolean);
   const pnr = infraAreas(p.id, "postnr").map(c => byNr[c]).filter(Boolean);
@@ -4016,11 +4109,12 @@ function vProject() {
   </div>`;
 }
 function prMapInit() {
+  if (S.view !== "project") return;               /* a render for another view got in first */
   const el = document.getElementById("prmap"); if (!el || typeof L === "undefined") return;
   const f = projectEntity(); if (!f) return;
-  if (LF.pmap) { try { LF.pmap.remove(); } catch (e) {} LF.pmap = null; }
+  dropMap("pmap");
   const map = L.map(el, { center: [56, 10.5], zoom: 7, scrollWheelZoom: true, zoomSnap: .5, attributionControl: false });
-  LF.pmap = map;
+  LF.pmap = map; syncMaps();
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, className: "basemap" }).addTo(map);
   /* the current choropleth underneath, so the project is read against the market picture */
   const ind = curInd(), sc = scaleOf(MUNI, m => V(m, ind.key), null, ind);
@@ -4087,7 +4181,7 @@ function vPublic() {
   if (!b) { pubLoad(PB.kom); setTimeout(() => { if (pubFind(PB.kom, PB.id)) renderKeep(); }, 700);
     return `<div class="card"><p class="empty">Loading the building…</p></div>`; }
   const c = pubCat(b), area = [byNr[b.postnr], byQ[b.kvarter]].filter(Boolean), m = byCode[b.kom];
-  setTimeout(() => pbMapInit(b), 0);
+  mapInit(() => pbMapInit(b));
   const tile = (l, v, sub) => v == null || v === "" ? "" : `<span class="hlc"><span>${esc(l)}</span><b>${v}</b><em>${esc(sub || "")}</em></span>`;
   return `
   <div class="card accent arhead">
@@ -4126,10 +4220,11 @@ function vPublic() {
   </div>`;
 }
 function pbMapInit(b) {
+  if (S.view !== "public") return;                /* a render for another view got in first */
   const el = document.getElementById("prmap"); if (!el || typeof L === "undefined") return;
-  if (LF.pmap) { try { LF.pmap.remove(); } catch (e) {} LF.pmap = null; }
+  dropMap("pmap");
   const map = L.map(el, { center: [b.lat, b.lon], zoom: 15, scrollWheelZoom: true, zoomSnap: .5, attributionControl: false });
-  LF.pmap = map;
+  LF.pmap = map; syncMaps();
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, className: "basemap" }).addTo(map);
   const ind = curInd(), sc = scaleOf(MUNI, m => V(m, ind.key), null, ind);
   (byCode[b.kom] ? muniAreas(b.kom) : []).forEach(a => {

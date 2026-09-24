@@ -1697,3 +1697,27 @@ th .thn{display:inline}
 .cmptbl .cmpsame{color:var(--ink2,#33372C)}
 .cmptools{align-items:center;gap:8px;flex-wrap:wrap}
 .cmpvs{font-family:var(--mono);font-size:11px;color:var(--muted);padding:0 2px}
+
+/* ================= v3.0 design tokens (UI_SPEC_v3 §2.1–2.3) =================
+   Tokens only — no view is restyled here. They are declared at the end of the file so they win
+   over the two earlier :root blocks without either being edited, and so every later phase reads
+   its colours, spacing and type sizes from one place instead of from a literal. */
+:root{
+  /* §2.1 colour — projections purple, climate blue, inherited (municipality figure) grey */
+  --proj:#5B4A9C;--proj-2:#8A7CC2;--proj-bg:#F1EEF8;
+  --clim:#2F4E8C;--clim-2:#6E86B8;--clim-bg:#EDF1F8;
+  --inh:#8A8C81;--inh-bg:#F3F3EF;
+  --focus:#1C6B5C;--focus-ring:0 0 0 3px rgba(28,107,92,.28);
+  --danger-bg:#FBEFEC;--warn-bg:#FBF4E6;
+  --nodata:#D9DAD3;                       /* the "no data" bin of every ramp */
+  --cap-ink:#6F7168;                      /* §7 contrast: 11 px captions darken from --muted */
+  /* §2.2 spacing — one scale for card padding, gaps, page gutters and control heights */
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;
+  --card-pad:16px;--card-pad-m:12px;--card-gap:16px;--gutter:26px;--gutter-m:16px;
+  --ctl-h:32px;--chip-h:24px;--tile-h:84px;
+  /* §2.3 type — the families live in the first :root; these are the sizes and the prose measure */
+  --fs-title:26px;--fs-card-title:13px;--fs-body:14px;--fs-tbl:13px;
+  --fs-cap:11.5px;--fs-tile-val:26px;--fs-legend:11px;--prose:78ch;
+}
+/* ⌖ re-centre — the control that comes with a draggable mini map (v3.0 P1) */
+.leaflet-bar.am-recentre a{font-size:15px;line-height:26px;color:var(--ink);font-family:var(--mono)}
