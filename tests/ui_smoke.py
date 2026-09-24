@@ -20,13 +20,56 @@ v3.0 rule: keep the OLD hashes in ROUTES. They are the redirect test — every l
 v2.6 must keep landing on the right view for as long as the dashboard exists.
 """
 import argparse
+import functools
+import http.server
 import json
 import pathlib
 import re
+import socketserver
 import sys
+import threading
 import time
+import urllib.request
 
 from playwright.sync_api import sync_playwright
+
+TITLE = "Macro Dashboard · Denmark"
+DIST = pathlib.Path(__file__).resolve().parent.parent / "dist"
+
+
+def serve_dist(directory):
+    """Serve `directory` on a free loopback port from this process. Returns the base URL."""
+    class Quiet(http.server.SimpleHTTPRequestHandler):
+        def log_message(self, *a):
+            pass
+    httpd = socketserver.TCPServer(("127.0.0.1", 0), functools.partial(Quiet, directory=str(directory)))
+    threading.Thread(target=httpd.serve_forever, daemon=True).start()
+    return f"http://127.0.0.1:{httpd.server_address[1]}/"
+
+
+def our_url(url, directory=DIST):
+    """A URL that serves THIS repo's dist/ — the one given, or one we serve ourselves.
+
+    The runner is normally handed a server someone else started (`make smoke`, `overnight.sh gate`,
+    which serves dist/ on :8080 *only when nothing answers there*). On a shared machine another
+    project can already own that port, and then every route reads as a catastrophic regression in
+    this repo. That is an environment fault, not a code one, so the page's title is checked first and
+    dist/ is served here when it belongs to someone else.
+    """
+    try:
+        with urllib.request.urlopen(url, timeout=5) as r:
+            head = r.read(4096).decode("utf-8", "replace")
+        if TITLE in head:
+            return url
+        got = re.search(r"<title>(.*?)</title>", head, re.S)
+        why = f"it is serving {got.group(1).strip()!r}" if got else "its title is not this dashboard's"
+    except Exception as ex:
+        why = f"it did not answer ({type(ex).__name__})"
+    if not (directory / "index.html").exists():
+        raise SystemExit(f"{url}: {why}, and {directory}/index.html does not exist — run the build first.")
+    here = serve_dist(directory)
+    print(f"! {url}: {why} — serving {directory} on {here} instead")
+    return here
 
 # ---------------------------------------------------------------------------------------------
 # Routes. `land` = CSS selectors that must exist (and be non-empty when suffixed with "!").
@@ -39,7 +82,9 @@ ROUTES = [
     # --- map (v2.6 "makro") ---
     # __maps === 1 everywhere a view owns a map: the lifecycle invariant of v3.0 P1 — one live
     # Leaflet instance at a time, the previous one dropped before #body is replaced.
-    dict(id="map",            hash="map?ind=growth",                         land=["#lfmap .leaflet-pane", "#maplegend!", "#indsel", "#nav"], state="S.view==='makro' && !!LF.map && window.__maps.length===1"),
+    # the shared IndicatorPicker + PeriodControl replaced #indsel / the year select in v3.0 P3.
+    dict(id="map",            hash="map?ind=growth",                         land=["#lfmap .leaflet-pane", "#maplegend!", "[data-testid=ind-picker-btn]!", "[data-testid=ind-chips]!", "[data-testid=period-year]", "#nav"], state="S.view==='makro' && !!LF.map && window.__maps.length===1"),
+    dict(id="map_proj",       hash="map?ind=fc_growth",                      land=["#maplegend!", "[data-testid=period-proj]!"], state="curInd().key==='fc_growth' && !document.querySelector('[data-testid=period-year]')"),
     dict(id="map_muni",       hash="map/101?ind=growth",                     land=["#lfmap .leaflet-overlay-pane", "#mkstrip!"], state="MK.muni==='101' && !!LF.areaG"),
     dict(id="map_postnr",     hash="map/101/postnr?ind=renters",             land=["#lfmap"], state="MK.cphView==='postnr'"),
     dict(id="map_overlays",   hash="map/101?ind=growth&infra=1&public=1&services=1", land=["#infralegend!", "#publiclegend!", "#serviceslegend!"], wait="#serviceslegend .lg-body, #serviceslegend *", state="MK.infra && MK.pub && MK.srv"),
@@ -56,7 +101,7 @@ ROUTES = [
     # `redirect` = the hash the app must end up on. A route with one is a redirect test: the OLD
     # spellings below never leave this list, they are how a link shared from v2.6 stays alive.
     dict(id="data_root",      hash="data",                                   land=["[data-testid=data-tabs]", "table tbody tr"], state="S.view==='table' && T.level==='kommune'", redirect="data/areas/kommune"),
-    dict(id="data_areas",     hash="data/areas/kommune?ind=growth",           land=["[data-testid=data-tabs]", "[data-testid=areas-table] tbody tr", "#tq"], state="S.view==='table' && T.level==='kommune'"),
+    dict(id="data_areas",     hash="data/areas/kommune?ind=growth",           land=["[data-testid=data-tabs]", "[data-testid=areas-table] tbody tr", "#tq", "[data-testid=ind-picker-btn]!", "[data-testid=areas-table] th[data-col=growth].on"], state="S.view==='table' && T.level==='kommune'"),
     dict(id="data_areas_pn",  hash="data/areas/postnr?ind=growth",            land=["[data-testid=areas-table] tbody tr"], state="T.level==='postnr'"),
     dict(id="data_areas_kv",  hash="data/areas/kvarter?ind=growth",           land=["[data-testid=areas-table] tbody tr"], state="T.level==='kvarter'"),
     dict(id="data_projects",  hash="data/projects",                          land=["[data-testid=data-tabs]", "[data-testid=projects-table] tbody tr"], state="S.view==='pipeline'"),
@@ -73,8 +118,10 @@ ROUTES = [
     dict(id="pipeline",       hash="pipeline",                               land=["table tbody tr"], state="S.view==='pipeline'", redirect="data/projects"),
     dict(id="pipeline_filt",  hash="pipeline?ptype=metro&pstatus=construction", land=["table"], redirect="data/projects?ptype=metro&pstatus=construction"),
     # --- charts / project sheet ---
-    dict(id="charts",         hash="charts?ind=growth&a=kommune:101,kommune:751&y0=&y1=&med=1", land=["svg", "#chind"], state="S.view==='charts' && CH.areas.length===2"),
-    dict(id="charts_dist",    hash="charts?ind=growth&a=kommune:101&mode=dist&dist=size", land=["svg"]),
+    dict(id="charts",         hash="charts?ind=growth&a=kommune:101,kommune:751&y0=&y1=&med=1", land=["[data-testid=chart-svg]!", "[data-testid=ind-picker-btn]!", "[data-testid=ind-chips]!"], state="S.view==='charts' && CH.areas.length===2"),
+    dict(id="charts_dist",    hash="charts?ind=growth&a=kommune:101&mode=dist&dist=size", land=["[data-testid=chart-svg]!"]),
+    # Climate on Charts: the x axis is the horizon, not the year (spec §5.4, AC-C2)
+    dict(id="charts_clim",    hash="charts?ind=surge_dw_pct&a=kommune:101,kommune:751", land=["[data-testid=chart-svg]!", "[data-hztick=today]!", "[data-hztick='2120']!"], state="S.view==='charts' && chartMode()==='clim'"),
     dict(id="project",        hash=None,                                     land=[".card h2, .card h3"], state="S.view==='project'", dynamic="project"),
     # --- test property / compare redirect / climate / public / school ---
     dict(id="property_empty", hash="property",                               land=["#tpq"], state="S.view==='analysis'"),
@@ -95,6 +142,16 @@ VIEWPORTS = {"1440x900": (1440, 900), "1366x768": (1366, 768), "390x844": (390, 
 # the responsive shell and flips this to True; until then the finding is reported, not fatal.
 OVERFLOW_FATAL = False
 PHONE_W = 480
+
+
+def assert_this_app(page, url):
+    """Belt and braces after our_url(): the page the browser actually booted is this dashboard.
+    One Danish municipality is enough to tell the two apart."""
+    ok = page.evaluate("(() => { try { return !!(byCode && byCode['101']"
+                       " && /K\\u00f8benhavn/.test(byCode['101'].name)); } catch (e) { return false; } })()")
+    if not ok:
+        title = page.evaluate("document.title")
+        raise SystemExit(f"{url} is not serving this dashboard (title {title!r}, no Danish municipality data).")
 
 
 def hash_mismatch(actual, expect):
@@ -138,6 +195,7 @@ def main():
     ap.add_argument("--no-network", action="store_true")
     ap.add_argument("--full-page", action="store_true", help="also save a full-height screenshot")
     args = ap.parse_args()
+    args.url = our_url(args.url)
 
     out = pathlib.Path(args.out) / (args.phase or time.strftime("%Y%m%d-%H%M"))
     out.mkdir(parents=True, exist_ok=True)
@@ -160,6 +218,7 @@ def main():
             page.goto(args.url + "#map?ind=growth", wait_until="load")
             page.wait_for_function("typeof render === 'function' && IND.length > 0", timeout=60000)
             page.wait_for_timeout(600)
+            assert_this_app(page, args.url)
             errs.clear()
             for r in routes:
                 t0 = time.time()

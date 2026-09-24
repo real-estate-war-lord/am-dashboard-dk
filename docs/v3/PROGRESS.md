@@ -216,3 +216,129 @@ MUST, all registered in `tests/ui_ac.py` under `phase="P2"`.
   is the one list of tab ids and labels.
 - The Export phase: the footer button is `[data-testid=export-btn]` in `src/index.html` and still
   calls `exportAll()`; the spec wants the same menu in the Data page header.
+
+---
+
+## P3 — The shared IndicatorPicker, the chips row and the PeriodControl
+
+Commit: `v3.0 P3: shared IndicatorPicker, PeriodControl and chips on Map, Data › Areas and Charts`
+Gate: green — build, 83 node tests (63 + 20 new picker tests), 42 python tests, 123/123
+route×viewport smoke checks with **0 JS errors**, 20/20 acceptance criteria (3 from P1 + 8 from P2 +
+9 from P3), budgets (app.js 372 KB / 450 KB, style.css 121 KB / 140 KB).
+
+### What was built
+
+**1. `src/picker_core.js`** (IIFE → `window.PICKER_CORE`, wired into `src/index.html` and
+`scripts/build_dashboard.py` as `{{PICKER_JS}}` + `check_js`, 20 node tests in
+`tests/picker.test.js`). The parts of the picker that are a function of the registry alone:
+`GROUP_ORDER` (**moved here** — app.js now reads `PC.GROUP_ORDER`), `GROUP_PILL`
+(`Outlook → Projection`, `Climate → Horizon`), `grouped()`, `matches()`/`filter()` (label · short ·
+group · unit, every word has to hit), `periodMode()` (`horizon | projection | year`), `PERIOD_KEY`
+(`hz | "" | y`), `availTag()` and `step()` for ↑/↓.
+
+**2. One IndicatorPicker** (`indPicker(target)`, `data-testid=ind-picker`). Button showing
+`label · unit` plus a `municipality` tag when the figure is not native to the level on screen;
+popover with a search box, the twelve groups as `[data-group]` headers with their pill, and one row
+per indicator carrying label, unit, `↓ lower is better` and the availability tag (`muni` · `2016–` ·
+`snapshot` · `horizons` · `2026→2040`). `role=listbox` + `aria-activedescendant`, `aria-expanded` on
+the button, ↑/↓/Enter/Esc, Esc returns focus to the button. The popover ships with the view and is
+hidden — opening it toggles a class, so nothing re-renders and the search box keeps focus.
+
+**3. The chips row** (`indChips(target)`, `data-testid=ind-chips`): `QUICK_KEYS` ∩ the level's
+indicator list, the active one filled (`.chip.on`). Rows and chips share `data-ind=<key>`; the old
+`data-indq` / `#indsel` / `indQuick()` / `indSelect()` are deleted.
+
+**4. One PeriodControl** (`periodControl(target)`, `data-testid=period`) with four renderings:
+`period-year` (the year select, `#yearsel`), `period-hz` (the horizon segments — `hzPill()`, reused
+so the climate sheet gets the same test id), `period-proj` (the static
+`Projection 2026→2040 · DST 2026 · FRKM126` badge) and `period-asof` for a single-as-of snapshot.
+`yearSelect()` is now an alias of it, so the area page and the sheets share the one implementation
+until P5/P6 rebuild their toolbars. `hz=` leaves the URL when the indicator leaves the Climate
+family; `y=` already did.
+
+**5. Adopted on Map, Data › Areas and Charts.** The map toolbar's `indSelect() + yearSelect()` and
+the `#mkquick` chips, the Areas tab's toolbar, and the Charts `<select id="chind">` all became the
+shared pair. Charts writes to `CH.ind` through the same component (`data-target=chind`).
+
+**6. Data › Areas**: every indicator column header carries `data-col=<key>`, the active one also
+`.on` (green underline + tint), and the table is sorted by it — best first, the direction each
+header declares in `data-best` (AC-D5).
+
+**7. Charts: Climate is a horizon chart** (`chartSvgClim`, AC-C2). `chartMode()` returns `clim` for
+any Climate indicator; the x axis is Today · 2070 · 2120 (`[data-hztick]`, with the Klimaatlas
+period under each), one bar per area per horizon (`[data-series][data-hz]`), the publisher's own
+low–high range as a whisker where there is one, and the municipalities' median as a dashed tick per
+horizon. Nothing is drawn between the horizons. `Data CSV` gains an area × horizon file with the
+range columns. To make this possible `climValue(o, k, hz)` and `climHzFor(k, hz)` now take an
+explicit horizon (default `HZ.h`).
+
+**8. Chart test ids**: every generator SVG is `data-testid=chart-svg`; line paths and bars carry
+`data-series=<name>` + `data-series-kind=area|median|national` (AC-C1).
+
+**9. The harness serves `dist/` itself when it has to.** Mid-run, port 8080 was taken over by a
+sibling project on this machine (`Macro Dashboard · Sweden`), and because `overnight.sh gate` starts
+a server only when nothing answers on :8080, every route turned into "missing landmark" and every
+state expression into a ReferenceError — a catastrophic-looking failure with no cause in this repo.
+`our_url()` in `tests/ui_smoke.py` (imported by `tests/ui_ac.py`) now reads the page title first and,
+when it belongs to someone else, serves this repo's `dist/` on a free loopback port from inside the
+test process. It prints one line when it does. `assert_this_app()` re-checks after boot.
+
+### ACs delivered
+AC-I1, AC-I2, AC-I3, AC-I4, AC-T1, AC-T2, AC-D5, AC-C1, AC-C2 — all MUST, all registered in
+`tests/ui_ac.py` under `phase="P3"`. AC-I5 (the "From the municipality" group on a postal-code page)
+is P5's, as the phase file says.
+
+### Deviations
+- **AC-I1 is asserted on `map`, `data/areas/kommune` and `charts`** — the routes that had adopted
+  the picker when P3 landed. The area page and the test property keep their v2.6 selectors until
+  P5/P6; `PICKER_ROUTES` at the top of the P3 block in `tests/ui_ac.py` is the list to extend.
+- **AC-D5 sorts best first, not "descending regardless"** — the AC's own parenthetical contradicts
+  itself and the table's caption has said "best first" since v2.6. See `DECISIONS.md`.
+- **Charts gets no PeriodControl.** Its `from ▾ / to ▾` selects *are* its period control (spec §5.4
+  lists them in the toolbar), and a Climate chart shows all three horizons rather than choosing one.
+- The row availability tag has five shapes rather than the three named in §4.2, and all nine
+  `QUICK_KEYS` chips are rendered rather than "the first 8" (§4.2's own diagram lists nine). Both in
+  `DECISIONS.md`.
+- **A data defect is surfaced, not fixed**: the surge keys' registry `desc` names the default
+  horizon inside the sentence. `climDescNeutral()` drops that word in the horizon chart's subtitle
+  only. Daytime data task.
+
+### Known issues / open items
+- The map toolbar still carries the v2.6 `Infra projects` / `Public buildings` / `Services` /
+  `Climate risk` buttons and both search boxes — **P4** replaces them with `Layers ▾` and the
+  unified search, and that is also what will bring the toolbar down to one row (AC-M1, AC-S3).
+- `indExplain()` (the ⓘ strip under the toolbar) still renders its own label/unit/level tags, which
+  now repeat what the picker button says. P4 owns the info strip (spec §5.1) and should fold them.
+- Horizontal overflow at 390 px is still a note on every route (v2.6 defect); **P8 flips
+  `OVERFLOW_FATAL = True`**.
+- **Port 8080 is contested on this machine.** A sibling project (`Macro Dashboard · Sweden`) held it
+  for most of this phase. The runners now serve `dist/` themselves when that happens, so the gate is
+  unaffected, but anyone opening `http://localhost:8080/` for the morning review may be looking at
+  the wrong dashboard — check the page title first.
+- `mkRefreshTools()` rebuilds the toolbar's innerHTML on the zoom ladder, so a zoom closes an open
+  popover. Harmless, but P4 should keep it in mind when it rebuilds `mkTools`.
+
+### What the next phase must know
+- **`indPicker(target)` / `indChips(target)` / `periodControl(target)` are the three calls.**
+  `target` is `"ind"` (the global `MK.ind`) or `"chind"` (Charts). A view adopts the toolbar by
+  calling all three — do not write a fourth selector. `pickCtx(target)` is where a new target's
+  list, level and current key would go.
+- **One picker per page.** `indPopEl()` takes the first `[data-testid=ind-picker]`, and AC-I1 asserts
+  there is exactly one. A view that wants two indicators (P5's overlay, a future compare) needs the
+  component to be scoped by id first.
+- **`pickLevel()` decides which rows read `muni`.** P5's AC-I5 ("From the municipality" group with
+  `.tag-muni` on `#area/postnr/2450`) is a grouping change on top of `pickInherits()`, which already
+  returns the right answer for postnr and kvarter — the tag text is already `muni`.
+- **`pickYears(key, level)` is memoised** in `PICK_YEARS`. It has to be: `yearsForPool()` over 63
+  indicators × 606 postal codes is ~0.7 M reads, and the popover asks for all of them every render.
+- **`hzParts()` in `hashFor()` is the one place `hz=` is written.** The Climate phase deletes the
+  `MK.clim` term from it when the overlay goes.
+- **`climValue(o, k, hz)` takes a horizon now.** Anything that wants a figure at a horizon other
+  than the pill's (P5's three-bar `clim-bars`, P7's export) should pass it rather than move `HZ.h`.
+- **`tests/ui_ac.py`'s `boot()` hops through Data before the map**, so an AC always starts on a
+  freshly rendered page. Leave that in: without it an AC inherits the previous one's open popovers.
+- `tests/ui_smoke.py` gained `map_proj` and `charts_clim`, and the `map`, `data_areas`, `charts` and
+  `charts_dist` routes now land on the picker's test ids instead of `#indsel` / `#chind`.
+- **If a gate ever fails on every route at once, read the first line of the smoke output.** It now
+  says which dashboard the URL was serving. `our_url()` recovers by serving `dist/` itself, so a
+  phase should never go red for someone else's server again.
