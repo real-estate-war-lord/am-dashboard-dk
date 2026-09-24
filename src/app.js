@@ -236,7 +236,7 @@ const curInd = () => { const L = curInds(); return L.find(i => i.key === MK.ind)
 /* ---------- routing (hash) ---------- */
 function hashFor() {
   const q = [`ind=${encodeURIComponent(MK.ind || "")}`]; if (MK.year && MK.year !== LATEST) q.push(`y=${MK.year}`);
-  if (HZ.h !== "today") q.push(`hz=${HZ.h}`);   /* one horizon for the zones and the Climate figures alike */
+  q.push(...CC.hzSerialise(HZ.h));   /* one horizon for the zones and the Climate figures alike */
   if (S.view === "makro" && MK.micro) { q.push("micro=1"); q.push(`mind=${MK.mind}`); }
   if (S.view === "makro" && MK.infra) q.push("infra=1");   /* the overlay survives every level change */
   if (S.view === "makro" && MK.pub) q.push("public=1");
@@ -255,9 +255,11 @@ function hashFor() {
     /* the mini map rides in the link too: the headline tile that colours it, the overlays, the public filter */
     q.push(`ind=${encodeURIComponent(MK.ind || "")}`); if (MK.year && MK.year !== LATEST) q.push(`y=${MK.year}`);
     q.push(`lay=${anLayerList().join(",") || "none"}`); if (ANL.pub) q.push(...pubHashParts());
-    if (HZ.h !== "today") q.push(`hz=${HZ.h}`); }
+    q.push(...CC.hzSerialise(HZ.h)); }
   else if (S.view === "market") { p = "market"; if (MKT.src) q.push("src=1"); }
   else if (S.view === "project") { p = `project/${PR.id}`; }
+  else if (S.view === "compare") { p = "compare"; q.length = 0; if (CMP.a) q.push(`a=${encodeURIComponent(CMP.a)}`); if (CMP.b) q.push(`b=${encodeURIComponent(CMP.b)}`);
+    q.push(...CC.hzSerialise(HZ.h)); }
   else if (S.view === "climate") { p = `climate/${CS.code}`; }
   else if (S.view === "public") { p = `public/${PB.kom}/${PB.id}`; }
   else if (S.view === "publist") { p = `publist/${PL.key}`; }
@@ -290,6 +292,7 @@ function parseHash() {
   else if (v === "analysis") { S.view = "analysis"; AN.a = q.a || ""; AN.label = q.la || ""; anParseLayers(q); pubParseFilter(q);
     /* the sheet cannot say which kommune the point is in until the rings are there — chain once, not on every hashchange */
     if (!KOM.list && !KOM.err) komLoad().then(() => { if (S.view === "analysis") renderKeep(); }); }
+  else if (v === "compare") { S.view = "compare"; CMP.a = q.a || ""; CMP.b = q.b || ""; }
   else if (v === "climate" && parts[1]) { S.view = "climate"; CS.code = pad4(parts[1]); climSheetLoad();
     /* the zone files land asynchronously; the sheet is redrawn once, when they do */ }
   else if (v === "charts") { S.view = "charts"; CH.ind = q.ind || CH.ind; CH.areas = q.a ? q.a.split(",").filter(Boolean) : CH.areas; CH.y0 = q.y0 || CH.y0; CH.y1 = q.y1 || CH.y1; CH.median = q.med !== "0"; CH.mode = q.mode || "auto"; CH.dist = q.dist || "size";
@@ -321,8 +324,9 @@ const VIEWS = [
   ["charts",  "Charts",        "Pick an indicator, areas and years — export the chart as PNG or the data as CSV", "charts"],
   ["market",  "Market",        "Prices, rents, supply, construction, macro indicators — and the data sources", "market"],
   ["pipeline", "Pipeline",     "Every infrastructure project in the layer: budget, status, opening year, municipalities", "pipeline"],
-  ["analysis", "Test property", "Drop a pin from a Google Maps link and analyse its surroundings", "analysis"]];
-const NAV_GROUPS = [["Market intelligence", ["makro", "table", "charts", "market", "pipeline"]], ["Analysis", ["analysis"]]];
+  ["analysis", "Test property", "Drop a pin from a Google Maps link and analyse its surroundings", "analysis"],
+  ["compare", "Compare", "Two areas side by side — every indicator aligned, no overall winner", "compare"]];
+const NAV_GROUPS = [["Market intelligence", ["makro", "table", "charts", "market", "pipeline"]], ["Analysis", ["analysis", "compare"]]];
 const viewOf = id => VIEWS.find(v => v[0] === id) || VIEWS[0];
 
 function renderNav() {
@@ -344,6 +348,8 @@ function crumbs() {
   else if (S.view === "school") { const s = SCH_BY[SC.nr]; if (s && byCode[s.kom]) c.push([s.kommune, `area/kommune/${s.kom}` + q]); tail = s ? s.name : "School"; kind = s ? (SCH_TYPE[s.type] || s.type) : "Uddannelsesstatistik.dk"; }
   else if (S.view === "schoollist") { tail = "Schools"; kind = "sorted by FP9 grade"; }
   else if (S.view === "analysis") { c.push(["Map", "map" + q]); tail = AN.label || TP_LABEL; kind = "test property"; }
+  else if (S.view === "compare") { const A = CMP.a ? chEntity(CMP.a) : null, B = CMP.b ? chEntity(CMP.b) : null;
+    tail = A && B ? `${A.name} vs ${B.name}` : "Compare"; kind = A && B ? "no overall winner" : "pick two areas"; }
   else if (S.view === "climate") { const m = byCode[String(Number(CS.code || 0))];
     if (m) c.push([m.name, `area/kommune/${m.code}` + q]); tail = "Climate risk"; kind = "Kystdirektoratet · DMI Klimaatlas"; }
   else { tail = viewOf(S.view)[1]; kind = { table: "every area side by side", charts: "PNG and CSV export", market: "national series and sources", pipeline: `${INFRA_ALL.length} projects · budget, status, opening year` }[S.view] || ""; }
@@ -355,7 +361,7 @@ function renderTop() {
 }
 const RENDER = { makro: vMakro, table: vTable, area: vArea, charts: vCharts, market: vMarket, pipeline: vPipeline, project: vProject,
                  public: vPublic, publist: vPubList, school: vSchool, schoollist: vSchoolList, analysis: vAnalysis,
-                 climate: vClimate };
+                 climate: vClimate, compare: vCompare };
 function render() {
   renderNav(); renderTop();
   const body = document.getElementById("body");
@@ -451,6 +457,8 @@ document.addEventListener("change", e => {
   if (el.id === "indsel") { MK.ind = el.value; if (!yearsFor(MK.ind).includes(MK.year)) MK.year = LATEST; syncHash(); renderKeep(); }
   if (el.id === "yearsel") { MK.year = el.value; syncHash(); renderKeep(); }
   if (el.id === "areaq") areaSearchGo(el.value);
+  if (el.id === "cmpa" || el.id === "cmpb") { const id = cmpResolve(el.value);
+    if (id) { CMP[el.id === "cmpa" ? "a" : "b"] = id; go(hashFor()); } }
   if (el.id === "mindsel") { MK.mind = el.value; syncHash(); renderKeep(); }
   if (el.id === "chind") { CH.ind = el.value; CH.ov = []; syncHash(); renderKeep(); }
   if (el.id === "chnat") { CH.nat = el.checked; syncHash(); renderKeep(); }
@@ -3202,12 +3210,15 @@ function lgFold(el) {
        the country still cannot take a click away from the polygon underneath it.
    Data: data/processed/climate (scripts/build_kyst_zones.py, build_climate.py), docs/CLIMATE_BUILD_LOG.md */
 const CLIM = D.climate || null;
-const CLIM_HZ = ["today", "2070", "2120"];
+/* the horizons, the labels and the point-in-extent test live in src/climate_core.js, which is
+   inlined just above this file and unit-tested by tests/climate.test.js — one definition, not two */
+const CC = (typeof window !== "undefined" && window.CLIMATE_CORE) || {};
+const CLIM_HZ = CC.CLIM_HZ;
 const HZ = { h: "today" };                                   /* the one horizon, hash hz= */
 const CLIM_KEYS = new Set(IND.filter(i => i.group === "Climate").map(i => i.key));
 const isClim = k => CLIM_KEYS.has(k);
 /* the two things the overlay draws; both on by default */
-const CLIM_LAY = { areas: "Official risk areas", surge: "Storm-surge zones" };
+const CLIM_LAY = CC.CLIM_LAY;
 const CF = { show: new Set(["areas", "surge"]) };
 const CLIM_ZOOM = 10;                       /* below this the zones are not fetched at all */
 const CLIM_MAX_FILES = 12;                  /* a hard ceiling on one pass, whatever the viewport */
@@ -3219,16 +3230,12 @@ const climShow = k => CF.show.has(k);
 /* one blue per horizon — the surge indicators' own hue (registry hue [16,64,120]) darkened as the
    horizon moves out. No depth classes: Kystdirektoratet publishes an extent, not a depth we bin. */
 const CLIM_COL = { today: "#6E9CC2", "2070": "#2F6FA8", "2120": "#123E66" };
-const CLIM_ZONE_YEAR = { today: "2020", "2070": "2070", "2120": "2120" };
+const CLIM_ZONE_YEAR = CC.CLIM_ZONE_YEAR;
 /* every label names both periods: the zones are Kystdirektoratet's published extents, the figures
    are Klimaatlas periods, and the two are not the same calendar */
-const CLIM_FIG = {
-  today: "Klimaatlas 1981–2010 reference period",
-  "2070": "Klimaatlas 2041–70 (SSP2-4.5 / RCP4.5 for rain)",
-  "2120": "Klimaatlas 2071–2100, latest Klimaatlas period (SSP2-4.5 / RCP4.5 for rain)",
-};
-const hzShort = h => h === "today" ? "Today" : h;
-const hzLabel = h => `${hzShort(h)} — zones: Kystdirektoratet ${CLIM_ZONE_YEAR[h]} · figures: ${CLIM_FIG[h]}`;
+const CLIM_FIG = CC.CLIM_FIG;
+const hzShort = CC.hzShort;
+const hzLabel = CC.hzLabel;
 const CLIM_FOOT = "Official screening data for comparing areas — Kystdirektoratet flood zones (100-year event) and DMI Klimaatlas. Not a property-level assessment.";
 const climZones = h => ((CLIM && CLIM.zones) || {})[h || HZ.h] || {};
 const climZoneMeta = h => (climZones(h).meta) || {};
@@ -3236,7 +3243,7 @@ const climKom = code => ((CLIM && CLIM.kommune) || {})[pad4(code)] || null;
 const climRiskNames = code => ((CLIM && CLIM.risk_names) || {})[pad4(code)] || [];
 
 /* ---- the horizon: hash, pill, and the value every Climate indicator shows ---- */
-function climParseHz(q) { HZ.h = CLIM_HZ.includes(q.hz) ? q.hz : "today"; }
+function climParseHz(q) { HZ.h = CC.hzParse(q); }
 function climSetHz(h) {
   if (!CLIM_HZ.includes(h) || h === HZ.h) return;
   HZ.h = h;
@@ -3335,30 +3342,13 @@ function climLoadVisible() {
 const climLoaded = h => Object.keys(CZ).filter(k => !k.startsWith("_") && k.startsWith((h || HZ.h) + ":")).map(k => CZ[k]);
 
 /* ---- point in zone: the one question a published extent can answer about a point ---- */
-function pipLL(lat, lon, ring) {
-  let ins = false;
-  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-    const yi = ring[i][1], xi = ring[i][0], yj = ring[j][1], xj = ring[j][0];
-    if ((yi > lat) !== (yj > lat) && lon < (xj - xi) * (lat - yi) / (yj - yi) + xi) ins = !ins;
-  }
-  return ins;
-}
-function gjHit(lat, lon, g) {
-  if (!g) return false;
-  const polys = g.type === "MultiPolygon" ? g.coordinates : g.type === "Polygon" ? [g.coordinates] : [];
-  return polys.some(poly => pipLL(lat, lon, poly[0]) && !poly.slice(1).some(h => pipLL(lat, lon, h)));
-}
+const pipLL = CC.pipLL, gjHit = CC.gjHit;
 /* true / false when the kommune's file for that horizon is loaded, null while it is not */
 function climInZone(lat, lon, h, kom) {
   const c = kom != null ? pad4(kom) : null;
   const key = c ? `${h}:${c}` : null;
-  if (key) {
-    if (!CZ[key]) return CZ["_e_" + key] ? false : null;
-    return (CZ[key].features || []).some(f => gjHit(lat, lon, f.geometry));
-  }
-  const fcs = climLoaded(h);
-  if (!fcs.length) return null;
-  return fcs.some(fc => (fc.features || []).some(f => gjHit(lat, lon, f.geometry)));
+  if (key) return CZ[key] ? CC.inZone(lat, lon, [CZ[key]]) : (CZ["_e_" + key] ? false : null);
+  return CC.inZone(lat, lon, climLoaded(h));
 }
 /* which official risk area a point falls in, once risk_areas.json is loaded */
 function climRiskAt(lat, lon) {
@@ -3390,15 +3380,8 @@ function lfClimateLayers(force) {
   LF.climDrawn = { zoom: LF.map.getZoom(), h: HZ.h };
   setClimateLegend();
 }
-function climHashParts() {
-  const v = [...CF.show].join(",");
-  return [`clim=${v || "none"}`];
-}
-function climParseFilter(q) {
-  const raw = (q.clim || "").trim();
-  if (!raw) { CF.show = new Set(["areas", "surge"]); return; }
-  CF.show = new Set(raw.split(",").filter(k => CLIM_LAY[k]));
-}
+const climHashParts = () => CC.climFilterSerialise(CF.show);
+function climParseFilter(q) { CF.show = CC.climFilterParse(q); }
 function climSetFilter(show) {
   CF.show = show;
   lfDrop("climAreaG", "climZoneG");
@@ -3497,6 +3480,129 @@ function climPopupBlock(a, muni) {
       ${row("Fetched", esc(zm.built || (CLIM.meta && CLIM.meta.built) || ""))}
     </div>
     <span class="lfact"><button class="lk mini" data-go="climate/${esc(pad4(kom))}">Open climate sheet ›</button></span></div>`;
+}
+
+/* ---------- Compare (#compare?a=<type>:<code>&b=<type>:<code>) ----------
+   Two areas side by side, one row per indicator, grouped exactly as the indicator dropdown groups
+   them. Three rules the view is built on:
+     · the better side is highlighted per row, direction-aware — and only per row. There is no
+       overall winner, because adding up indicators of different units and directions would be a
+       score this project does not have the data to justify;
+     · a neutral indicator gets no highlight at all — neither end is better;
+     · where both sides carry the same kommune's figure (one or both inheriting it), the row says
+       "same kommune value" instead of pretending one area beat the other with a number they share.
+   Climate rows sit in their own section because they are the one family with a horizon rather than
+   a year: the pill above the table moves all of them at once. */
+const CMP = { a: "", b: "" };
+const CMP_CLIM_KEYS = ["surge_dw_pct", "surge100_cm", "sealevel_cm", "weather_claims_1000"];
+function cmpIdFromOpt(o) {
+  if (!o || !o.h) return "";
+  const m = String(o.h).match(/^map\/(\d+)$/); if (m) return `kommune:${m[1]}`;
+  const a = String(o.h).match(/^area\/(postnr|kvarter)\/(.+)$/); if (a) return `${a[1]}:${a[2]}`;
+  return "";
+}
+function cmpResolve(txt) {
+  const q = (txt || "").trim(); if (!q) return "";
+  let o = AREA_OPTS.find(x => x.t === q);
+  if (!o) { const ql = q.toLowerCase().replace(/\s+—.*$/, "");
+    o = AREA_OPTS.find(x => x.k.some(k => k === ql)) || AREA_OPTS.find(x => x.k.some(k => k.startsWith(ql))); }
+  return cmpIdFromOpt(o);
+}
+/* the kommune a side's figure actually comes from — its own code when it has one, otherwise the
+   municipality it inherits from. Two sides with the same source share the number, not a verdict. */
+function cmpSrcCode(e, key) {
+  const own = V(e.o, key);
+  if (own != null) return `${e.type}:${e.code || e.o.code || e.o.nr}`;
+  return e.muni ? `kommune:${e.muni.code}` : "";
+}
+/* which side is better for this indicator: "a", "b", or "" for a tie, a neutral indicator, or a
+   row where the two sides are reading the same published figure */
+function cmpBetter(key, av, bv, same) {
+  if (same || av == null || bv == null || av === bv || neutralDir(key)) return "";
+  return (lowerBetter(key) ? av < bv : av > bv) ? "a" : "b";
+}
+function cmpValCell(e, i, v, own, win) {
+  if (v == null) return `<td class="num dim"${isClim(i.key) ? ` title="${esc(climReason(e.o, i.key))}"` : ""}>–</td>`;
+  return `<td class="num${win ? " cmpwin" : ""}" data-v="${v}">${fmtOf(i)(v)}${own ? (e.type === "kvarter" ? bydelMark(i) : "") : " °"}</td>`;
+}
+function cmpRow(i, A, B) {
+  const a = eVal(A, i.key), b = eVal(B, i.key);
+  if (a.v == null && b.v == null) return "";
+  const same = !!(a.v != null && b.v != null && cmpSrcCode(A, i.key) && cmpSrcCode(A, i.key) === cmpSrcCode(B, i.key));
+  const w = cmpBetter(i.key, a.v, b.v, same);
+  const note = same ? `<em class="cmpsame" title="Both areas show the same municipality's published figure — there is nothing to compare between them here">same kommune value</em>`
+    : neutralDir(i.key) ? `<em class="dim" title="Neither end is better, so no side is marked">neutral</em>`
+    : lowerBetter(i.key) ? `<em class="dim">↓ lower is better</em>` : "";
+  return `<tr><th><span class="thn">${esc(i.label)} <span class="dim">${esc(i.unit || "")}</span></span><span class="im" data-m="${esc(i.key)}">ⓘ</span></th>
+    ${cmpValCell(A, i, a.v, a.own, w === "a")}${cmpValCell(B, i, b.v, b.own, w === "b")}<td class="cmpnote">${note}</td></tr>`;
+}
+/* Is the area inside the published 100-year extent at this horizon? A kommune is where the extent
+   covers part of it; a postal code or a quarter is where at least one of its dwellings falls inside
+   it. Both are counts the exposure tables already publish — nothing is recomputed here. */
+function cmpInZone(e, h) {
+  if (!CLIM) return null;
+  const z = climZones(h);
+  if (e.type === "kommune") { const km = (z.kommune || {})[pad4(e.o.code)]; return km != null ? km > 0 : false; }
+  const tbl = e.type === "postnr" ? (z.postnr || {}) : (z.kvarter || {});
+  const row = tbl[e.type === "postnr" ? e.o.nr : e.o.code];
+  if (row) return (row.dwellings_in_zone || 0) > 0;
+  /* not listed: no dwelling of its own inside the extent — which is an answer where its kommune has
+     a zone at all, and no answer where the publisher has mapped nothing for that kommune */
+  const km = (z.kommune || {})[pad4(e.o.muni || CPH_MUNI)];
+  return km ? false : null;
+}
+function cmpZoneRow(A, B, h) {
+  const av = cmpInZone(A, h), bv = cmpInZone(B, h);
+  if (av == null && bv == null) return "";
+  /* in the zone is the worse side, so the better side is the one that is not in it */
+  const w = av == null || bv == null || av === bv ? "" : (av ? "b" : "a");
+  const cell = (v, win) => v == null ? `<td class="num dim" title="no published extent for this municipality">–</td>`
+    : `<td class="num${win ? " cmpwin" : ""}" data-v="${v ? 1 : 0}"><b class="${v ? "climyes" : "climno"}">${v ? "yes" : "no"}</b></td>`;
+  return `<tr><th><span class="thn">In storm-surge zone (100-yr) <span class="dim">extent ${esc(CLIM_ZONE_YEAR[h])}</span></span></th>
+    ${cell(av, w === "a")}${cell(bv, w === "b")}<td class="cmpnote"><em class="dim">in zone is the worse side</em></td></tr>`;
+}
+function cmpSection(title, rows, sub) {
+  return rows ? `<tr class="angrp"><th colspan="4">${esc(title)}${sub ? ` <span class="dim">${esc(sub)}</span>` : ""}</th></tr>${rows}` : "";
+}
+function cmpPick(id, cur, label) {
+  const e = cur ? chEntity(cur) : null;
+  return `<span class="asrch"><input id="${id}" list="arealist" class="indsel" placeholder="${esc(label)}" value="${esc(e ? e.name : "")}" autocomplete="off" aria-label="${esc(label)}"></span>`;
+}
+function vCompare() {
+  const A = CMP.a ? chEntity(CMP.a) : null, B = CMP.b ? chEntity(CMP.b) : null;
+  const pickers = `<div class="tools cmptools">${cmpPick("cmpa", CMP.a, "First area — municipality, postal code or quarter")}
+    <span class="cmpvs">vs</span>${cmpPick("cmpb", CMP.b, "Second area")}
+    ${CLIM ? hzPill("tools") : ""}
+    <datalist id="arealist">${AREA_OPTS.map(o => `<option value="${esc(o.t)}"></option>`).join("")}</datalist></div>`;
+  if (!A || !B) {
+    return `<div class="card accent"><div class="card-head"><h3>Compare two areas</h3><span class="hint">every indicator aligned, one row at a time</span></div>
+      ${pickers}
+      <p class="anlead">Pick two areas to compare.</p>
+      <p class="cap">Each row marks the better side on its own terms — and only its own: there is no overall winner, because indicators of different units and directions cannot be added up into a score this data supports. A row where both areas show the same municipality's figure says so instead of inventing a difference.</p></div>`;
+  }
+  /* the indicator list both sides can actually be read on */
+  const inds = IND.concat(IND_CPH.filter(i => !IND.some(x => x.key === i.key)));
+  const groups = GROUP_ORDER.filter(g => g !== "Climate").concat(["Other"]);
+  const body = groups.map(g => cmpSection(g, inds.filter(i => (i.group || "Other") === g && !isClim(i.key))
+    .map(i => cmpRow(i, A, B)).join(""))).join("");
+  const climRows = CLIM ? CLIM_HZ.map(h => cmpZoneRow(A, B, h)).join("")
+    + CMP_CLIM_KEYS.map(k => inds.find(i => i.key === k)).filter(Boolean).map(i => cmpRow(i, A, B)).join("") : "";
+  const head = e => `<th class="num">${esc(e.name)}<br><span class="dim">${esc(e.type === "kommune" ? "municipality" : e.type === "postnr" ? "postal code" : "Copenhagen quarter")}</span></th>`;
+  return `
+  <div class="card accent">
+    <div class="card-head"><h3>${esc(A.name)} vs ${esc(B.name)}</h3><span class="hint">no overall winner — each row on its own terms</span></div>
+    ${pickers}
+    <div class="tools"><button class="lk" data-go="${withQ(pageOf(A.o))}">${esc(A.name)} ›</button>
+      <button class="lk" data-go="${withQ(pageOf(B.o))}">${esc(B.name)} ›</button>
+      <button class="lk" data-go="${chartLink(MK.ind, A.type, A.code || A.o.code || A.o.nr)}">↗ Chart</button></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>Every indicator, side by side</h3><span class="hint">the better side is shaded · ° = municipality value · ${esc(CLIM ? hzShort(HZ.h) + " horizon for the climate rows" : "")}</span></div>
+    <div class="scrollx"><table class="tbl compact cmptbl" data-sortable><thead><tr><th>Indicator</th>${head(A)}${head(B)}<th class="cmpnote">Note</th></tr></thead>
+      <tbody>${body}${CLIM && climRows ? cmpSection("Climate", climRows, `· ${hzLabel(HZ.h)}`) : ""}</tbody></table></div>
+    <p class="cap"><b>No overall winner.</b> Every row is marked on its own terms and nothing is added up: the indicators have different units, different directions and different publishers, and a combined score would be a judgement the data does not carry. Rows where both areas read the same municipality's published figure are marked <em>same kommune value</em> — the two areas are not being compared there, they are showing one number twice. Neutral indicators are never marked at all. ${CLIM ? esc(hzLabel(HZ.h)) : ""}</p>
+  </div>
+  ${srcNote()}`;
 }
 
 /* ---------- Climate sheet (#climate/<kommune>), area-card line and the Analysis section ---------- */

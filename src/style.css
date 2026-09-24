@@ -1690,3 +1690,10 @@ th .thn{display:inline}
 .climtbl tr.hi>th,.climtbl th.hi{background:rgba(28,107,92,.07)}
 .climyes{color:#B5391F}
 .climno{color:#1C6B5C}
+/* ---- Compare: two areas, one row at a time, no overall winner (v2.6) ---- */
+.cmptbl td.cmpwin{background:rgba(28,107,92,.10);font-weight:600}
+.cmptbl .cmpnote{white-space:nowrap}
+.cmptbl .cmpnote em{font-style:normal;font-family:var(--mono);font-size:9.5px;color:var(--muted)}
+.cmptbl .cmpsame{color:var(--ink2,#33372C)}
+.cmptools{align-items:center;gap:8px;flex-wrap:wrap}
+.cmpvs{font-family:var(--mono);font-size:11px;color:var(--muted);padding:0 2px}

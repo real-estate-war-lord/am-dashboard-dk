@@ -26,12 +26,14 @@ test-js:    ## parser unit tests (node --test)
 	node --test tests/*.test.js
 test:       ## every unit test (python + js)
 	$(PY) -m unittest discover -s tests -p 'test_*.py' && $(MAKE) test-js
+ui-check:   ## drive dist/index.html headless and assert on the app's own state (needs Chrome)
+	$(PY) scripts/ui_check.py
 validate-forecast: ## the Outlook layer's own checks (hard-data audit, reconciliations, backtest)
 	$(PY) scripts/validate_forecast.py
 fixture:    ## synthetic render check (never ship)
 	$(PY) tests/make_fixture.py && $(PY) scripts/build_dashboard.py --data tests/fixture_makro.json --market tests/fixture_market.json --cph tests/fixture_cph.json --out dist/fixture.html
 refresh: fetch build
-.PHONY: validate links validate-links validate-forecast geo geo-cph bbr fetch build serve fixture refresh schools forecast test test-js
+.PHONY: validate links validate-links validate-forecast geo geo-cph bbr fetch build serve fixture refresh schools forecast test test-js ui-check
 
 # scripts/build_housing_gap.py is deliberately NOT a target: it needs a fitted household-size
 # trend, which the hard-data rule forbids in the UI (docs/FORECAST.md §0, §7). It stays in the

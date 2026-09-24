@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>ui-check</title></head>
+<body>
+<!-- Automated UI check for the climate layer. Loads dist/index.html in an iframe and asserts on
+     the app's own live state — not on a screenshot and not on a copy of the logic. Run it with
+     scripts/ui_check.py, which serves dist/ on a random port, drives headless Chrome and reads the
+     JSON this page writes into #out.
+
+     The app is a classic script, so its top-level `const` bindings are lexical, not properties of
+     window: everything here goes through frame.contentWindow.eval, which runs inside that realm
+     and sees them. -->
+<iframe id="f" width="1400" height="900" style="border:0"></iframe>
+<pre id="out">RUNNING</pre>
+<script>
+"use strict";
+const RESULTS = [];
+const F = document.getElementById("f");
+const ev = code => F.contentWindow.eval(code);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+function check(name, pass, detail) {
+  RESULTS.push({ name, pass: !!pass, detail: String(detail == null ? "" : detail).slice(0, 400) });
+  emit(false);      /* visible in --show, and the last state if the run is cut short */
+}
+function emit(final) {
+  const body = JSON.stringify(RESULTS);
+  document.getElementById("out").textContent = (final ? "DONE " : "RUNNING ") + body;
+  /* the runner waits on this POST rather than on a virtual-time budget */
+  if (final) { try { fetch("__result", { method: "POST", body }); } catch (e) {} }
+}
+/* poll until the predicate holds, so a check never depends on a fixed sleep */
+async function until(fn, ms, step) {
+  const t0 = Date.now();
+  for (;;) {
+    let v = null; try { v = await fn(); } catch (e) { v = null; }
+    if (v) return v;
+    if (Date.now() - t0 > (ms || 15000)) return null;
+    await sleep(step || 150);
+  }
+}
+const load = async hash => {
+  F.contentWindow.location.hash = hash;
+  await sleep(120);
+  ev("parseHash(); render();");
+  await sleep(400);
+};
+
+async function run() {
+  /* boot the app once; every check then drives it through the hash, as a reader would */
+  await new Promise(res => { F.onload = res; F.src = "index.html#map?ind=growth"; });
+  const booted = await until(() => ev("typeof render === 'function' && IND.length > 0"), 30000);
+  if (!booted) { check("app boots", false, "the app never finished loading"); return done(); }
+  check("app boots", true, ev("IND.length + ' indicators, ' + MUNI.length + ' municipalities'"));
+
+  /* ---- 1. national map with the overlay on, and a legend that names both periods ---- */
+  await load("map?ind=surge_dw_pct&hz=2070&climate=1");
+  await until(() => ev("!!document.getElementById('lfmap') && !!LF.map"), 15000);
+  await until(() => ev("(document.getElementById('climatelegend')||{}).innerHTML.length > 50"), 15000);
+  const legend = ev("document.getElementById('climatelegend').innerText");
+  check("1a national map renders with the Climate overlay on",
+    ev("S.view === 'makro' && MK.muni === null && MK.clim === true && !!LF.map"),
+    ev("'view=' + S.view + ' clim=' + MK.clim + ' map=' + (!!LF.map) + ' risk=' + (!!LF.climAreaG)"));
+  check("1b the legend names both calendars (Kystdirektoratet 2070 + Klimaatlas 2041–70)",
+    legend.includes("Kystdirektoratet 2070") && legend.includes("Klimaatlas 2041–70"),
+    legend.replace(/\n/g, " | ").slice(0, 220));
+  check("1c the legend carries the screening footnote",
+    legend.includes("Not a property-level assessment"), legend.includes("Not a property-level assessment"));
+  const mapInd = ev("curInd().key");
+  check("1d the map is drawing the Climate indicator", mapInd === "surge_dw_pct", "curInd=" + mapInd);
+
+  /* ---- 2. the horizon pill moves the values and the hash together ---- */
+  const vals = {};
+  for (const h of ["today", "2070", "2120"]) {
+    ev(`climSetHz(${JSON.stringify(h)});`);
+    await sleep(350);
+    vals[h] = { v: ev("V(byCode['101'], 'surge_dw_pct')"), hz: ev("HZ.h"), hash: ev("location.hash") };
+  }
+  check("2a today→2070→2120 changes the value for København",
+    vals.today.v !== vals["2070"].v && vals["2070"].v !== vals["2120"].v && vals.today.v < vals["2120"].v,
+    `today=${vals.today.v} 2070=${vals["2070"].v} 2120=${vals["2120"].v}`);
+  check("2b the hash follows the pill",
+    !/hz=/.test(vals.today.hash) && /hz=2070/.test(vals["2070"].hash) && /hz=2120/.test(vals["2120"].hash),
+    vals["2120"].hash);
+  check("2c an unknown horizon in a link falls back to today",
+    ev("(function(){var b=HZ.h; climParseHz({hz:'2050'}); var r=HZ.h; HZ.h=b; return r;})()") === "today",
+    "hz=2050 → today");
+
+  /* ---- 3. a landlocked kommune is grey and says why ---- */
+  ev("climSetHz('2070');"); await sleep(300);
+  const ll = ev("JSON.stringify({v: V(byCode['147'],'surge_dw_pct'), reason: climReason(byCode['147'],'surge_dw_pct'), shade: (function(){var sc=LF.ctx&&LF.ctx.sc; return sc? sc.t(V(byCode['147'],'surge_dw_pct')) : 'nosc';})()})");
+  const L = JSON.parse(ll);
+  check("3a Frederiksberg (landlocked) has no surge figure", L.v === null, "value=" + L.v);
+  check("3b and says 'not coastal' rather than showing a zero", /not coastal/i.test(L.reason), L.reason);
+  check("3c the scale gives it no class, so the map paints it grey", L.shade === null, "t=" + L.shade);
+  const bestRank = ev("JSON.stringify(rankOf(byCode['147'],'surge_dw_pct',MUNI))");
+  check("3d a null never takes a rank", bestRank === "null", bestRank);
+
+  /* ---- 4. the overlay never steals a polygon click ---- */
+  await load("map/101?ind=surge_dw_pct&hz=2070&climate=1");
+  await until(() => ev("!!LF.map && !!LF.areaG"), 15000);
+  const pe = ev("getComputedStyle(LF.map.getPane('climpane')).pointerEvents");
+  check("4a the climate pane takes no pointer events", pe === "none", "pointer-events=" + pe);
+  const topEl = ev("(function(){var c=LF.map.getContainer(),r=c.getBoundingClientRect();var e=document.elementFromPoint(r.left+r.width/2, r.top+r.height/2);return e? (e.tagName+'.'+(e.getAttribute('class')||'')) : 'none';})()");
+  check("4b the element under the cursor over the map is not the zone canvas",
+    !/climpane/.test(topEl), topEl);
+  const popup = ev(`(function(){
+    var ls=[]; LF.areaG.eachLayer(function(l){ls.push(l);});
+    var l=ls[0]; if(!l) return 'no layer';
+    var c=l.getBounds().getCenter();
+    LF.climPt = c;
+    l.fire('click', {latlng: c});
+    var p = LF.map._popup;
+    if (!p) return 'no popup';
+    /* the app binds a function as the popup content, so read what Leaflet actually rendered */
+    var el = p.getElement();
+    return el ? el.innerHTML : String(p.getContent());
+  })()`);
+  check("4c a polygon click still opens its popup", popup !== "no popup" && popup !== "no layer" && popup.length > 100,
+    popup === "no popup" ? "no popup opened" : "popup opened, " + popup.length + " chars");
+  check("4d and the popup carries the climate block",
+    /Climate risk/.test(popup) && /Kystdirektoratet/.test(popup) && /Open climate sheet/.test(popup),
+    (popup.match(/Climate risk[\s\S]{0,160}/) || [""])[0].replace(/<[^>]+>/g, " ").replace(/\s+/g, " "));
+
+  /* ---- 5. the climate sheet ---- */
+  await load("climate/0167?hz=2070");
+  await until(() => ev("document.getElementById('body').innerText.indexOf('Hvidovre') >= 0"), 15000);
+  const sheet = ev("document.getElementById('body').innerText").replace(/\s+/g, " ");
+  check("5a #climate/0167 opens the Hvidovre sheet", ev("S.view === 'climate' && CS.code === '0167'"), ev("S.view+' '+CS.code"));
+  check("5b it shows 9,7 % dwellings in the zone at 2070", /9[.,]7\s*%/.test(sheet),
+    (sheet.match(/DWELLINGS IN THE SURGE ZONE[\s\S]{0,60}/i) || [sheet.slice(0, 120)])[0]);
+  check("5c it names the coast stretch it uses", /SJ8/.test(sheet), /SJ8/.test(sheet) ? "SJ8" : "no stretch named");
+  check("5d every row offers a verify link", ev("document.querySelectorAll('.climtbl .srclink').length") >= 8,
+    ev("document.querySelectorAll('.climtbl .srclink').length") + " links");
+
+  /* ---- 6. the Analysis pin ---- */
+  await load("analysis?a=55.64250,12.53850&la=Sydhavn&lay=infra,climate&hz=2070");
+  const anok = await until(() => ev("(document.getElementById('anclim')||{}).innerText||''").indexOf("storm-surge zone") >= 0, 25000);
+  const an = ev("(document.getElementById('anclim')||{}).innerText||''").replace(/\s+/g, " ");
+  check("6a the Analysis sheet has a Climate section", !!anok, an.slice(0, 80));
+  const zoneLine = ev("(function(){var e=document.querySelector('#anclim .anlead'); return e? e.innerText : '';})()").replace(/\s+/g, " ");
+  check("6b it answers the point per horizon",
+    /Today\s+(yes|no)/.test(zoneLine) && /2070\s+(yes|no)/.test(zoneLine) && /2120\s+(yes|no)/.test(zoneLine), zoneLine.trim());
+  check("6c the three zone files for the pin's kommune were fetched",
+    ev("Object.keys(CZ).filter(function(k){return !/^_/.test(k) && /0101$/.test(k);}).length") === 3,
+    ev("JSON.stringify(Object.keys(CZ).filter(function(k){return !/^_/.test(k);}))"));
+
+  /* ---- 7. Compare ---- */
+  await load("compare?a=kvarter:20602&b=kommune:147&hz=2070");
+  await until(() => ev("document.querySelectorAll('.cmptbl tbody tr').length > 5"), 15000);
+  const cmp = ev("document.querySelector('.cmptbl').innerText").replace(/\s+/g, " ");
+  check("7a Compare opens with both areas", ev("S.view==='compare' && CMP.a==='kvarter:20602' && CMP.b==='kommune:147'"),
+    ev("CMP.a + ' vs ' + CMP.b"));
+  const grps = ev("JSON.stringify(Array.prototype.map.call(document.querySelectorAll('.cmptbl .angrp th'), function(t){return t.innerText.slice(0,40);}))");
+  /* the section headers are upper-cased by CSS, and innerText reports what is rendered */
+  check("7b it has a Climate section", /climate/i.test(grps), "section rows: " + grps);
+  check("7c with a per-horizon in-zone row for both sides",
+    (cmp.match(/In storm-surge zone \(100-yr\)/g) || []).length === 3,
+    (cmp.match(/In storm-surge zone \(100-yr\)/g) || []).length + " rows");
+  check("7d and the four climate indicators",
+    /Dwellings in the surge zone/.test(cmp) && /100-year storm surge/.test(cmp) && /Mean sea level rise/.test(cmp) && /Weather damage claims/.test(cmp),
+    cmp.slice(cmp.indexOf("Climate"), cmp.indexOf("Climate") + 220));
+  check("7e in zone is marked the worse side", /in zone is the worse side/.test(cmp), true);
+  check("7f no overall winner is stated", /No overall winner/.test(ev("document.getElementById('body').innerText")), true);
+  check("7g areas in different kommuner share no figure, so nothing is marked as shared",
+    ev("document.querySelectorAll('.cmptbl .cmpsame').length") === 0,
+    "Gl. Sydhavn (København) vs Frederiksberg: "
+      + ev("document.querySelectorAll('.cmptbl .cmpsame').length") + " shared-figure rows");
+  /* two areas inside the same municipality: every inherited row is one number shown twice */
+  await load("compare?a=kvarter:20602&b=postnr:2450&hz=2070");
+  await until(() => ev("document.querySelectorAll('.cmptbl tbody tr').length > 5"), 15000);
+  check("7h two areas of the same kommune are marked 'same kommune value', not compared",
+    ev("document.querySelectorAll('.cmptbl .cmpsame').length") > 0,
+    ev("document.querySelectorAll('.cmptbl .cmpsame').length") + " rows marked, e.g. "
+      + ev("(function(){var r=document.querySelector('.cmptbl .cmpsame'); return r? r.closest('tr').innerText.replace(/\\s+/g,' ') : '';})()"));
+
+  /* ---- 8. all four legend blocks fold ---- */
+  await load("map/101?ind=surge_dw_pct&hz=2070&climate=1&infra=1&public=1&services=1");
+  await until(() => ev("document.querySelectorAll('.maplegs .maplegend [data-legfold]').length >= 4"), 20000);
+  const folds = ev(`(function(){
+    var out=[]; var boxes=document.querySelectorAll('.maplegs .maplegend');
+    for (var i=0;i<boxes.length;i++){
+      var b=boxes[i], h=b.querySelector('[data-legfold]');
+      if(!h) { out.push([b.id,'no handle',false,false]); continue; }
+      h.click();
+      var folded=b.classList.contains('folded');
+      var hidden=(function(){var r=b.querySelector('.lgrow'); return r? getComputedStyle(r).display==='none' : true;})();
+      h.click();
+      var back=!b.classList.contains('folded');
+      out.push([b.id, 'ok', folded && hidden, back]);
+    }
+    return JSON.stringify(out);
+  })()`);
+  const F4 = JSON.parse(folds);
+  check("8a four legend blocks are in the column", F4.length === 4, F4.map(x => x[0]).join(", "));
+  check("8b every one folds from its own header and unfolds again",
+    F4.length === 4 && F4.every(x => x[2] && x[3]),
+    F4.map(x => `${x[0]}:${x[2] ? "folds" : "FAILS"}/${x[3] ? "unfolds" : "STUCK"}`).join(", "));
+
+  done();
+}
+function done() { emit(true); document.title = "done " + RESULTS.filter(r => !r.pass).length; }
+run().catch(e => { check("harness", false, "threw: " + (e && e.stack || e)); done(); });
+</script>
+</body>
+</html>
