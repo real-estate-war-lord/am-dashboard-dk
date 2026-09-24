@@ -326,6 +326,7 @@ am-dashboard-dk/
 | 2026-09-14 | Nationalbank sub-database on `api.statbank.dk` | ❌ not found |
 | — | Datafordeler GraphQL with a real key, EMOData, Rejseplanen GTFS download | not yet (need credentials) |
 | 2026-09-22 | `STRAF11`, `STRAF22` tableinfo + `validate_config.py` (all 11 + 3 × 2 codes ✓); test cells `STRAF11` code 1 2026K2 København / Aarhus / Odense / Denmark, `STRAF22` København 2025 | ✅ 15 045 / 5 202 / 2 977 / 76 275; ANM 68 802, SIG 11 763 |
+| 2026-09-24 | Climate layer, four independent checks — Klimaatlas cells, risk-area designation, exposure recount, Kystdirektoratet `/identify` (§7f) | ✅ 0 mismatches · 51 = 51 kommuner · worst 0.09 pp · 15/15 points |
 | 2026-09-22 | Safety indicators, 10-area check against statistikbanken.dk (§7c) | ⏳ statistikbanken values pending |
 | 2026-09-22 | `crime_1000` København recomputed by hand from `data/raw`: STRAF11 code 1 15323 + 14713 + 15205 + 15045 = 60 286 ÷ FOLK1A 2026K3 670 389 × 1000 | ✅ 89.93 = dashboard 89.93 |
 | 2026-09-22 | `crime_1000` Aarhus recomputed by hand from `data/raw`: STRAF11 code 1 5937 + 5010 + 4281 + 5202 = 20 430 ÷ FOLK1A 2026K3 378 270 × 1000 | ✅ 54.01 = dashboard 54.01 |
@@ -486,6 +487,54 @@ silently passed:
 
 Reproduce with `python3 scripts/verify_forecast_full.py --report` (`--cached` reuses its own pulls;
 they land in `data/raw/verify/`, gitignored).
+
+### 7f. Climate risk layer — verification (2026-09-24)
+
+Four checks, none of which reuses the build's own code. `make links` re-queries the publishers and
+recomputes what the page shows from what comes back; the other three were run once for the release
+with a standalone helper that imports no pipeline module and redoes the spatial work with its own
+point-in-polygon. The BBR dwelling points and the flood polygons are both in EPSG:25832, so no
+projection enters the count at all.
+
+| # | check | result |
+|---|---|---|
+| 1 | **`make links`, full sweep.** Every Klimaatlas cell at all three horizons recomputed from the response — `sealevel_cm`, `surge100_cm`, `surge_freq_x` per coastal stretch (231 cells each), `rain100_1h_mm`, `cloudbursts_yr` per kommune (294 each) — plus both Forsikring & Pension datasets and reachability of the two Miljøstyrelsen / Kystdirektoratet services | ✅ **1 281 cells, 0 mismatches · 98/98 F&P rows agree · every link resolves.** The Outlook half of the same sweep: 98 municipalities + 67 quarters, 0 mismatches |
+| 2 | **Risk areas re-derived.** All **26** sub-layers of `OD_risikoomraader_2024` group 16 re-queried live (653 features), the kommune overlap recomputed on a 100 m grid and the **≥ 1 km²** rule reapplied | ✅ **51 kommuner, exactly the published 51** — neither set holds a kommune the other does not (79 s) |
+| 3 | **Exposure spot check.** Five kommuner × three horizons recounted against the **raw, unsimplified** Kystplanlægger polygons (`data/raw/kyst_surge/`), with the dwellings re-derived from the BBR jsonl pulls rather than read from `bbr.json` | ✅ **worst difference 0.09 pp** (gate ≤ 0.5 pp) |
+| 4 | **Point check.** 15 buildings — five per horizon, each clearly inside or clearly outside, never within 15 m of a zone edge — put to Kystdirektoratet's own `/identify` on the matching year's layer | ✅ **15/15 agree** |
+
+Check 3 in full — the published share against the independent recount:
+
+| kommune | horizon | published | recomputed | Δ |
+|---|---|---|---|---|
+| København (0101) | today | 3.64 % | 3.73 % | **0.09 pp** |
+| Hvidovre (0167) | today | 5.88 % | 5.89 % | **0.01 pp** |
+| Dragør (0155) | today | 31.75 % | 31.75 % | **0.0 pp** |
+| Lemvig (0665) | today | 27.61 % | 27.62 % | **0.01 pp** |
+| Esbjerg (0561) | today | 2.09 % | 2.09 % | **0.0 pp** |
+| København (0101) | 2070 | 15.3 % | 15.33 % | **0.03 pp** |
+| Hvidovre (0167) | 2070 | 9.69 % | 9.7 % | **0.01 pp** |
+| Dragør (0155) | 2070 | 47.2 % | 47.2 % | **0.0 pp** |
+| Lemvig (0665) | 2070 | 32.09 % | 32.1 % | **0.01 pp** |
+| Esbjerg (0561) | 2070 | 3.47 % | 3.47 % | **0.0 pp** |
+| København (0101) | 2120 | 24.18 % | 24.21 % | **0.03 pp** |
+| Hvidovre (0167) | 2120 | 13.45 % | 13.46 % | **0.01 pp** |
+| Dragør (0155) | 2120 | 62.74 % | 62.74 % | **0.0 pp** |
+| Lemvig (0665) | 2120 | 35.04 % | 35.05 % | **0.01 pp** |
+| Esbjerg (0561) | 2120 | 5.61 % | 5.61 % | **0.0 pp** |
+
+One transient **HTTP 502** from the ArcGIS service during the first sweep was the only failure, on
+a cell that agreed exactly when re-queried (Glostrup `rain100_1h_mm` 2120, 52.9 = 52.9). A link
+checker should not fail a release over a publisher's bad gateway, so `get()` now retries 5xx and
+429 rather than returning on the first one, and `--climate-only` re-runs this section at full
+coverage without the 5-minute Outlook sweep in front of it.
+
+The residual differences are the 8 m simplification the *drawn* zones carry against the raw polygons
+the counts are made on, plus the 5 m point tolerance falling either side of an edge for a handful of
+buildings: single dwellings out of tens of thousands, and largest where the coastline is longest and
+most built up — København's 0.09 pp is about 100 dwellings in 348 000. The denominators reproduced
+exactly: København 347 824 dwellings both ways.
+
 
 ## 8. Infrastructure overlay (v2.1)
 

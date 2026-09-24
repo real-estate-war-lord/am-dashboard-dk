@@ -51,7 +51,7 @@ def src_url(src, code):
             f"&Tid={urllib.parse.quote(years)}")
 
 
-def get(url, tries=2):
+def get(url, tries=3):
     """One retry: a publisher's first response can time out without the link being broken."""
     req = urllib.request.Request(url, headers=UA)
     last = (0, "")
@@ -61,7 +61,14 @@ def get(url, tries=2):
                 # some publishers serve legacy encodings; a decode slip is not a dead link
                 return r.status, r.read().decode("utf-8-sig", "replace")
         except urllib.error.HTTPError as e:
-            return e.code, e.read().decode("utf-8", "replace")[:200]
+            body = e.read().decode("utf-8", "replace")[:200]
+            # 5xx and 429 are the publisher having a moment, not a broken link: one bad gateway in
+            # a 1 300-request sweep would otherwise fail a release over nothing
+            if e.code in (429, 500, 502, 503, 504) and n + 1 < tries:
+                time.sleep(3 * (n + 1))
+                last = (e.code, body)
+                continue
+            return e.code, body
         except Exception as e:                                  # noqa: BLE001
             last = (0, f"{type(e).__name__}: {e}")
             if n + 1 < tries:
@@ -299,6 +306,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--sample", type=int, default=5)
     ap.add_argument("--quick", action="store_true", help="skip the per-area Outlook sweep")
+    ap.add_argument("--climate-only", action="store_true",
+                    help="run only the Climate section, at full coverage")
     args = ap.parse_args()
 
     mk = json.loads((PROC / "makro.json").read_text(encoding="utf-8"))
@@ -316,6 +325,13 @@ def main():
     log(f"  {len(api)} indicators link to a per-area StatBank query")
     log(f"  {len(page)} link to the publisher's page (no per-area API)")
     log(f"  {len(none)} have no link" + (f" — {', '.join(i['key'] for i in none)}" if none else ""))
+
+    if args.climate_only:
+        clim = [i for i in mk["indicators"] if i.get("group") == "Climate"]
+        log(f"\nClimate only — {len(clim)} indicators, all three horizons, every area")
+        fails += check_climate(clim, True, args.sample)
+        log("\n" + ("✗ link check FAILED" if fails else "✓ every climate link resolves and agrees with the page"))
+        return 1 if fails else 0
 
     if not args.quick:
         log("\n1. Outlook — every area, link fetched and the shown value recomputed from it")
