@@ -597,6 +597,41 @@ the §9 Education buildings. Method, cube codes, the measured join and the discr
 
 Sources: Danmarks Statistik API docs (https://www.dst.dk/en/Statistik/brug-statistikken/muligheder-i-statistikbanken/api) · Finans Danmark Boligmarkedsstatistikken (https://finansdanmark.dk/tal-og-data/boligstatistik/boligmarkedsstatistikken/) · Klimadatastyrelsen, DAWA lukker 1. oktober 2026 (https://www.klimadatastyrelsen.dk/om-klimadatastyrelsen/nyheder/nyhedsarkiv/2026/jul/dawa-lukker-d-1-oktober-2026) · Datafordeler transition plan (https://datafordeler.dk/vejledning/transitionsnetvaerk/) · BBR GraphQL (https://datafordeler.dk/dataoversigt/bygnings-og-boligregistret-bbr/bbr-graphql/) · boligstat.dk om husleje (https://boligstat.dk/boligstat/dokumenter/omhusleje.html) · Landsbyggefonden Huslejestatistik 2026 (https://lbf.dk/viden/statistikker/huslejestatistik/huslejestatistik-2026) · DST STRAF11 documentation (https://www.dst.dk/documentationofstatistics/c1ac7749-1e15-4d3a-8ed0-fb2d26a9fe93) · Plandata WFS (https://geoserver.plandata.dk/geoserver/wfs?request=GetCapabilities&service=WFS) · Eurostat API (https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/nama_10r_3gdp?geo=DK011&unit=EUR_HAB&time=2023) · Frie geografiske data, vilkår (https://dataforsyningen.dk/asset/PDF/rettigheder_vilkaar/Vilk%C3%A5r%20for%20brug%20af%20frie%20geografiske%20data.pdf)
 
+## 12. Climate risk (v2.6)
+
+Storm surge, sea level, extreme rainfall and the official flood designation, per municipality and
+per horizon. Sources, licences, the horizon table, methods, coverage, caveats and the refresh
+procedure: [`docs/CLIMATE.md`](CLIMATE.md). Independent verification: §7f.
+
+- **Sources** DMI **Klimaatlas v2025a** (sea and rain values, `services9.arcgis.com`) ·
+  **Kystdirektoratet Kystplanlægger oversvømmelsesfare** (the published 100-year extents for 2020,
+  2070 and 2120, `gisportal.mst.dk`, layers 3 / 12 / 21) · **Miljøstyrelsen / Kystdirektoratet**
+  Floods Directive **2024** risk areas (`OD_risikoomraader_2024`, group 16, 26 sub-layers) ·
+  **Forsikring & Pension** weather-damage claims (two Datawrapper datasets, no licence stated —
+  taken as a dated, versioned snapshot with attribution). No key for any of them.
+- **One horizon drives everything.** `hz=today|2070|2120` moves the drawn extent *and* every
+  Climate indicator's value. The two calendars never blur: `2120` means Kystdirektoratet's 2120
+  extent beside Klimaatlas's **2071–2100** period, which is the latest one Klimaatlas publishes,
+  and every label says so.
+- **Eight indicators**, all `level: kommune`, all `lower_better`: `sealevel_cm`, `surge100_cm`,
+  `surge_freq_x`, `rain100_1h_mm`, `cloudbursts_yr`, `weather_claims_1000`, `flood_risk_area`,
+  `surge_dw_pct`. The last is the only one with its own figure below kommune level (postal codes
+  and Copenhagen quarters), so it is never marked `°`.
+- **Coast rule** Klimaatlas publishes per coastal stretch. A kommune takes the stretch it shares the
+  **longest coastline** with (25 m samples, nearest stretch within 2 km, majority); the others are
+  named beside the figure and never averaged in. 77 coastal kommuner, 42 touching more than one.
+- **Risk-area rule** ≥ **1 km²** inside a designated area, which reproduces the official **51**
+  kommuner exactly; the five that only clip an edge are kept as `kommuner_marginal`.
+- **Exposure** a dwelling counts when its BBR building point is inside the published polygon,
+  allowing **5 m** (BBR gives a point, not a footprint), against the v1.4 dwelling definition.
+  Counted on the **raw** polygons; the 8 m simplification is for drawing only.
+- **Not built, on purpose**: cloudburst/pluvial zones (only reachable by modelling surface water
+  ourselves, or through a Datafordeler login this repo does not hold), groundwater, flood *depth*
+  (published only as a rendered layer and a one-point-per-request `/identify`), and return periods
+  other than 100 years.
+- **Screening, not assessment.** The extents compare areas; they say nothing about an individual
+  building and account for no dike, pump or floor level. Every surface in the UI says so.
+
 ## 11. Test property pin and the Analysis sheet (v2.4)
 
 One coordinate read against every layer above. It adds **no new source** — the only new *file* is

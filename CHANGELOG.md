@@ -1,5 +1,93 @@
 # Changelog
 
+## v2.6 — 2026-09-24
+
+The climate risk layer: what the sea is projected to do to an area, from the authorities' own
+published maps and figures, and nothing else. **Four sources, eight indicators, three horizons,
+one pill that moves all of them at once.**
+
+- **The map gains a fourth overlay, `Climate risk`.** Kystdirektoratet's published **100-year
+  flood extents for 2020, 2070 and 2120** (`Kystplanlaegger_Oversvommelsesfare_2`, layers 3 / 12 /
+  21) and the **26 designated flood risk areas** from the Floods Directive's 2024 screening. The
+  risk areas draw nationally; the surge zones load per municipality for whatever is in the
+  viewport, from **zoom 10**, and the legend doubles as the filter (`&clim=areas,surge`, and
+  `&clim=none` is a state that survives a reload rather than snapping back to the default).
+- **Eight indicators in a new `Climate` group**, all municipality-level and all *lower is better*:
+  mean sea level rise, the 100-year storm-surge level, the **frequency multiplier** — how much more
+  often today's 100-year level would recur — 100-year hourly rainfall, cloudbursts per year,
+  insurers' weather-damage claims, the risk-area designation, and the **share of dwellings inside
+  the extent**. Sea and rain figures come from **DMI Klimaatlas v2025a**, claims from **Forsikring
+  & Pension**. The `Climate` chip sits after `Crime`.
+- **One horizon, two calendars, always both named.** `hz=today|2070|2120` drives the drawn extent
+  *and* every Climate indicator's value, so the map and the choropleth can never disagree about the
+  period. Every label names both: at 2070, *zones: Kystdirektoratet 2070 · figures: Klimaatlas
+  2041–70 (SSP2-4.5 / RCP4.5 for rain)*. At 2120 the figures half reads **2071–2100, latest
+  Klimaatlas period** — because there is no 2120 climate period, and pretending otherwise is the
+  easiest lie this layer could tell. A unit test asserts that exact wording.
+- **A municipality takes one coastal stretch, not the worst of several.** Klimaatlas publishes the
+  sea figures per stretch. The municipality's coastline is sampled every 25 m, each sample assigned
+  to the nearest stretch within 2 km, and the stretch holding the most samples wins; every other
+  stretch it touches is **named beside the figure and never averaged in**. 77 coastal
+  municipalities, 42 of them touching more than one stretch. This replaced a maximum across
+  stretches, which was a figure no publisher had ever published — København moved off Køge Bugt and
+  onto Øresund, where almost all of its 116 km of coast actually lies.
+- **Dwellings in the zone**, for municipalities, postal codes and Copenhagen quarters at all three
+  horizons: a dwelling counts when its **BBR building point falls inside the published polygon,
+  allowing 5 m**, against the same v1.4 dwelling definition the rest of the dashboard uses. The
+  count runs on the **raw** polygons; the 8 m simplification is a drawing decision only.
+  `surge_dw_pct` is the one climate figure with its own value below municipality level, so postal
+  codes and quarters are never marked `°` for it. Nationally: **3.2 % of dwellings today, 6.7 % at
+  2070, 10.5 % at 2120**.
+- **The overlay never steals a click.** The extents cover half a municipality at a time, so they
+  are drawn in their own pane with **`pointer-events: none`**, and what they know about the clicked
+  point goes into that municipality's own popup instead — hazard, the full horizon label, whether
+  the clicked point is inside the extent, the area's share, the risk-area name, source and fetch
+  date, and a link onward. A deliberate deviation from the plan, which asked for popups on the zone
+  polygons: both cannot hold, and losing a click on the choropleth is the worse failure.
+- **New surfaces.** A **climate sheet** at `#climate/<kommune>` — every indicator × three horizons
+  with the low–high scenario range in grey, zone area and dwelling counts per horizon, the stretch
+  used and the others it touches, the designation, claims with their rank, and a verify link on
+  every row. A **`Climate:` line on the municipality card**. A **Climate section in the Analysis
+  sheet**, testing the pin against the extent per horizon (*Today no · 2070 no · 2120 yes*) behind
+  a fourth overlay pill.
+- **`Compare` is new in this release** — two areas side by side, every indicator aligned in its
+  group, the better side shaded **per row and only per row**, neutral indicators never marked, and
+  an explicit **no overall winner**: indicators of different units and directions cannot be added
+  into a score this data supports. Rows where both areas read the same municipality's figure say
+  **same kommune value** instead of inventing a difference between one number shown twice. Its
+  Climate section carries a per-horizon *in storm-surge zone (100-yr)* row for both sides, where
+  being in the zone is the worse side.
+- **Every legend block in the map's legend column now folds from its own header.** Four of them is
+  more than a screen holds, and the fold survives a filter change, a pan and a horizon change.
+- **Verify at source, for the climate layer too.** The link recipe lives in the registry
+  (`climate_src`), and `src/app.js` and `scripts/check_source_links.py` build the identical URL
+  from it, so a drift between the page and the checker shows up in `make links`: a Klimaatlas
+  ArcGIS query per coastal stretch or municipality at the chosen horizon, the F&P dataset, and the
+  Kystdirektoratet extent layer. The sweep **recomputes every Klimaatlas cell from the response at
+  all three horizons and checks all 98 F&P values**.
+- **Nulls stay null.** A landlocked municipality has no sea level — it is grey, it says *not
+  coastal*, and it never takes a rank. `weather_claims_1000` and `flood_risk_area` have no horizon
+  at all, so they read their one published figure at every horizon and say `same`.
+- **Deliberately not built:** cloudburst/pluvial flood zones (only reachable by modelling surface
+  water ourselves, or through a Datafordeler login this repo does not hold), groundwater, flood
+  **depth** (published only as a rendered layer and a one-point-per-request `/identify` — and a
+  Sydhavn point reads `NoData` while a cell 150 m away carries 0.19 m), and return periods other
+  than the 100-year event.
+- **Testing.** `src/climate_core.js` holds the layer's pure logic — point-in-extent, the `hz=` and
+  `clim=` round-trip, the horizon label — lifted out of `app.js` so it can be unit-tested, the same
+  arrangement `testprop.js` has had since v2.4. **32 JS tests** (up from 15) and **42 Python
+  tests**. New: **`make ui-check`**, which drives `dist/index.html` headless and asserts on the
+  app's own live state — 26 checks, no screenshots. It paid for itself on its first run by catching
+  a redeclaration between the two inlined scripts that had left the page with an empty body.
+- **Independently verified.** `scripts/verify_climate.py` re-reads the published files and
+  re-queries every source **without importing a single pipeline module** — see `docs/CLIMATE.md §7`
+  and `docs/DATA_MAP.md §7f`, with every compared value in
+  `docs/verification/climate_v2_6.csv`.
+- **Refresh.** Klimaatlas and F&P ride along with the monthly automated job (no key, seconds). The
+  zones and the risk areas are rebuilt **by hand, by decision**: 208 MB from a service that answers
+  HTTP 500 on a multi-feature page, and a republished designation deserves a human and a changelog
+  line rather than a cron job. Documented in `docs/CLIMATE.md §8`.
+
 ## v2.5.1 — 2026-09-24
 
 A corrective patch. v2.5 made the map choose the area level from the zoom; in use that was wrong,

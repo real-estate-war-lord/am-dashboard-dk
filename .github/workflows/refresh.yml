@@ -35,6 +35,23 @@ jobs:
           python scripts/build_net_dwellings.py
           python scripts/build_cph_forecast.py
           python scripts/build_cph_backtest.py || echo "backtest skipped (superseded KK vintages unavailable)"
+      # Climate: the two keyless, quick sources only. DMI Klimaatlas is ~7 s for 8 748 rows and
+      # Forsikring & Pension is two small CSVs, so both ride along with the monthly refresh.
+      #
+      # The surge zones and the flood risk areas are deliberately NOT here. They are 208 MB and
+      # ~90 MB from gisportal.mst.dk, which answers HTTP 500 on a multi-feature page and has to be
+      # paged one OBJECTID at a time with backoff; and they change when an authority republishes a
+      # designation — an event that deserves a human decision and a changelog line, not a cron job.
+      # Rebuild them by hand (docs/CLIMATE.md §8):
+      #   python scripts/fetch_kyst_surge.py     && python scripts/build_kyst_zones.py
+      #   python scripts/fetch_flood_official.py --areas
+      # The committed data/processed/climate/ is left exactly as it is until then, and the layer
+      # keeps working on it.
+      - name: Refresh the climate figures (Klimaatlas + Forsikring & Pension)
+        run: |
+          python scripts/fetch_klimaatlas.py
+          python scripts/fetch_fp_claims.py
+          python scripts/build_climate.py
       - run: python scripts/build_makro.py && python scripts/build_market.py && (python scripts/build_cph.py || true)
       - name: Validate the outlook layer
         run: python scripts/validate_forecast.py

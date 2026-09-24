@@ -19,8 +19,11 @@ sea scenarie 245 (SSP2-4.5), rain scenarie 45 (RCP4.5)
 percentil 50 and absolutaendring 1 throughout. `range` carries p10/p90 at the same scenario and
 the low/high scenario at p50 — sea 126/585 (SSP1-2.6/SSP5-8.5), rain 26/85 (RCP2.6/RCP8.5).
 
-A kommune that touches more than one coastal stretch takes the MAX across them: the conservative
-reading for a risk indicator. A landlocked kommune gets null with reason "not coastal".
+A kommune that touches more than one coastal stretch takes the stretch it shares the LONGEST
+coastline with, which is what data/external/klimaatlas_coast_kommune.csv records; every other
+stretch it touches is carried in other_kystkoder and never combined into a number. (Until v2.6 this
+was a MAX across stretches — a maximum of two published figures is a figure nobody published.)
+A landlocked kommune gets null with reason "not coastal".
 
     python3 scripts/build_climate.py
 """

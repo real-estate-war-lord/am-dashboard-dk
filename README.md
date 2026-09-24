@@ -55,6 +55,10 @@ A third map overlay beside *Infra projects* and *Public buildings*: **44 181 poi
 
 ![Services overlay — Nørrebro at zoom 15 with groceries, food & drink, pharmacies and transport stops over the growth choropleth](docs/screenshot-services.jpg)
 
+### Climate risk — storm surge, sea level, rainfall
+
+A fourth map overlay: **Kystdirektoratet's own published 100-year flood extents** for **2020, 2070 and 2120**, the **26 designated flood risk areas** from the Floods Directive's 2024 screening, and **eight climate indicators** from **DMI Klimaatlas v2025a** — mean sea level rise, the 100-year storm-surge level, how much more often today's 100-year level recurs, 100-year hourly rainfall, cloudbursts per year, insurers' weather-damage claims, the risk-area designation, and the share of dwellings inside the extent. One pill (*Today · 2070 · 2120*) drives the drawn zones **and** every indicator value, and every label names both calendars, because they are not the same one: at 2120 the zone is Kystdirektoratet's 2120 extent while the figures are Klimaatlas's **2071–2100** period, the latest it publishes. Klimaatlas gives the sea figures per **coastal stretch**, so a municipality takes the stretch it shares the longest coastline with — 25 m samples, majority wins — and every other stretch it touches is **named beside the figure, never averaged into it**; a maximum of two published figures is a figure nobody published. Dwellings inside a zone are counted from their **BBR building point allowing 5 m**, for municipalities, postal codes and Copenhagen quarters at all three horizons, and the count runs on the raw polygons even though the drawn ones are simplified. Landlocked municipalities are grey and say *not coastal* rather than showing a zero, and never take a rank. The zones are drawn in a pane that takes **no pointer events at all**, so a fill covering half a municipality can never swallow the click that opens it — what the extent knows about the clicked point goes into that same popup instead. **This is screening data for comparing areas: it carries no depth, and it is not a property-level flood assessment** — it knows nothing about a dike, a pump or a floor level. Every figure links to the publisher's own query, and `scripts/verify_climate.py` re-checks the whole layer against the live sources without importing a line of the pipeline. Method, licences, horizons and caveats: [`docs/CLIMATE.md`](docs/CLIMATE.md).
+
 ### Population outlook
 
 Where a municipality — or a Copenhagen quarter — is **projected** to be in 2040, from the publishers' own runs. Ten indicators per area from **Danmarks Statistik's `FRKM126`** (2026 vintage): total growth to 2040 and to 2031, the change per 1 000 inhabitants per year, the absolute change in persons, and the 0–5, 6–16, 20–34 and 80+ cohorts, with 20–34 also shown **against Denmark's own −7.1 %** — because the national cohort shrinks over the window, only 7 of 98 municipalities gain any at all, and the relative map is the one that reads. Copenhagen's 67 quarters get the same ten again from **Københavns Kommune's own `KKFR2026`**, kept in its own file and its own view: the two runs are **never spliced**, and where both describe the same city the gap is stated (DST +5.9 %, KK +8.3 % by 2040) rather than averaged away. Beside them sits **net dwelling additions** from `BOL101` — what the stock actually did, a measurement, in its own unit, with nothing computed between the two. The colour model is diverging and centred on zero because growth and decline are different phenomena, and the indicators carry a `neutral` direction: a shrinking municipality is not failing, so nothing here is coloured good-to-bad or ranked best-to-worst. Area pages show the observed population as a solid line and the projection dashed to 2040 with a *today* marker, so a projected point never reads as an actual; Copenhagen quarters add one line of the forecast's own past accuracy. **Projections are scenarios, not guarantees** — and the housing-gap indicator that would have needed an assumption of ours is deliberately not here. Method, sources and what is excluded: [`docs/FORECAST.md`](docs/FORECAST.md).
@@ -117,6 +121,7 @@ Every push to `main` rebuilds and deploys to GitHub Pages; on the 3rd of each mo
 | [`docs/SCHOOLS.md`](docs/SCHOOLS.md) | school quality — cube codes, the BBR join, discretion rules, cadence |
 | [`docs/ANALYSIS.md`](docs/ANALYSIS.md) | the test-property pin and the Analysis sheet — link formats, kommune resolution, distances, coverage, privacy |
 | [`docs/SERVICES.md`](docs/SERVICES.md) | the services layer — sources, categories, zoom floors, clustering rules, refresh |
+| [`docs/CLIMATE.md`](docs/CLIMATE.md) | the climate risk layer — sources, the two calendars, the coast and risk-area rules, exposure, what was left out |
 | [`docs/FORECAST.md`](docs/FORECAST.md) | the population outlook — sources, the hard-data rule, what is shown and what is research |
 | [`docs/GEO.md`](docs/GEO.md) | boundary pipeline |
 | [`CHANGELOG.md`](CHANGELOG.md) | what changed in which version |
@@ -150,5 +155,12 @@ The services layer adds two of its own, carried on every popup, in the map foote
 
 - **© OpenStreetMap contributors, ODbL** — shops, eating places and pharmacies (Denmark extract processed by Geofabrik GmbH)
 - **Rejseplanen, CC BY 4.0** — metro, S-train, rail, light-rail and bus stops
+
+The climate risk layer adds four more, carried on every popup, on the climate sheet and in the legend:
+
+- **Contains data from the Danish Meteorological Institute** (*Indeholder data fra DMI*) — Klimaatlas v2025a, sea level, storm surge, rainfall and cloudbursts
+- **Kystdirektoratet, Kystplanlægger oversvømmelsesfare** — the published 100-year flood extents, always named with their year (2020 / 2070 / 2120)
+- **Miljøstyrelsen / Kystdirektoratet, risikoområder (oversvømmelsesdirektivet 2024)** — the 26 designated flood risk areas
+- **Forsikring & Pension, vejrskader** (charts `TUJ9b` / `z0zEO`, version 4, fetched 2026-09-23) — weather-damage claims. F&P states **no licence**, so the figures are treated as a dated, versioned snapshot with attribution rather than as a feed
 
 To cite: *AM Dashboard — Denmark Edition, v1.0 (2026), https://github.com/real-estate-war-lord/am-dashboard-dk.*
