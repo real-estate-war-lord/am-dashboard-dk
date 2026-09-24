@@ -220,7 +220,10 @@ const QUICK_KEYS = ["growth", "price_m2", "rent_private", "unemp", "renters", "s
 /* link into the chart generator with one area pre-selected */
 const chartLink = (key, type, code) => `charts?ind=${encodeURIComponent(key)}&a=${type}:${code}&y0=&y1=&med=1`;
 /* link into the one-property Analysis sheet */
-const analysisLink = (lat, lon, label) => `analysis?a=${Number(lat).toFixed(5)},${Number(lon).toFixed(5)}` + (label ? `&la=${encodeURIComponent(label)}` : "");
+/* the Test property route (spec §5.5′, amendment A3): one pin, `p=lat,lon[:label]`. `,` and `:` are
+   legal in a fragment and are what makes the link readable, so only the label is percent-encoded. */
+const propLink = items => "property?p=" + encodeURIComponent(RC.propSerialise(items)).replace(/%2C/g, ",").replace(/%3A/g, ":");
+const analysisLink = (lat, lon, label) => propLink([{ lat, lon, label: label || "" }]);
 /* value of indicator k for municipality/area o in the selected year (latest = live field, else history) */
 const V = (o, k, y) => { if (isClim(k)) return climValue(o, k); const yr = y || MK.year; if (!o) return null; if (!yr || yr === LATEST) return o[k] ?? null; const h = o.hist && o.hist[k]; return h && h[yr] != null ? h[yr] : null; };
 /* first year a year selector offers (registry `map_from`; Safety: 2008, the first full rolling year) — Charts go further back */
@@ -235,13 +238,16 @@ const curInd = () => { const L = curInds(); return L.find(i => i.key === MK.ind)
 
 /* ---------- routing (hash) ---------- */
 /* The v3.0 alias table lives in src/route_core.js (pure, unit-tested in tests/route.test.js) and is
-   wired in at the two points that own the hash: hashFor() writes it, parseHash() reads it. It is
-   dormant until the Data section exists — with ROUTE_V3 false this phase emits and accepts exactly
-   the v2.6 spellings, byte for byte, and P2 flips the one flag. */
-const ROUTE_V3 = false;
-const RC = (typeof window !== "undefined" && window.ROUTE_CORE) || null;
-/* the new spelling of a hash the app just built (identity while ROUTE_V3 is false) */
-const routeOut = h => (ROUTE_V3 && RC) ? RC.toV3(h, { isClim }) : h;
+   wired in at the two points that own the hash: hashFor() writes the v3 spelling, parseHash() reads
+   either one. Live since P2: every v2.6 link is redirected once, by replaceState, to its v3 hash.
+   The internal view ids (`table`, `pipeline`, `market`, `analysis`) are unchanged on purpose — only
+   the hash spelling and the nav labels moved. */
+const RC = window.ROUTE_CORE;
+/* `climate=1` is left alone for now: the alias table can already turn it into a Climate indicator,
+   but the overlay toggle it belongs to is still the working control. The Climate phase drops this. */
+const rcOpts = () => ({ isClim, keepClimateFlag: true });
+/* the new spelling of a hash the app just built */
+const routeOut = h => RC.toV3(h, rcOpts());
 function hashFor() {
   const q = [`ind=${encodeURIComponent(MK.ind || "")}`]; if (MK.year && MK.year !== LATEST) q.push(`y=${MK.year}`);
   q.push(...CC.hzSerialise(HZ.h));   /* one horizon for the zones and the Climate figures alike */
@@ -266,8 +272,6 @@ function hashFor() {
     q.push(...CC.hzSerialise(HZ.h)); }
   else if (S.view === "market") { p = "market"; if (MKT.src) q.push("src=1"); }
   else if (S.view === "project") { p = `project/${PR.id}`; }
-  else if (S.view === "compare") { p = "compare"; q.length = 0; if (CMP.a) q.push(`a=${encodeURIComponent(CMP.a)}`); if (CMP.b) q.push(`b=${encodeURIComponent(CMP.b)}`);
-    q.push(...CC.hzSerialise(HZ.h)); }
   else if (S.view === "climate") { p = `climate/${CS.code}`; }
   else if (S.view === "public") { p = `public/${PB.kom}/${PB.id}`; }
   else if (S.view === "publist") { p = `publist/${PL.key}`; }
@@ -279,12 +283,11 @@ function hashFor() {
   return routeOut(p + "?" + q.join("&"));
 }
 function parseHash() {
-  let h = (location.hash || "#map").slice(1);
-  /* an old shared link is rewritten to the canonical spelling once, before anything reads it, and
-     the address bar is corrected without adding a history entry. Dormant while ROUTE_V3 is false. */
-  if (ROUTE_V3 && RC) { const c = RC.toV3(h, { isClim }); if (c !== h) { h = c; history.replaceState(null, "", "#" + h); } }
-  const [path, qs] = h.split("?"); const parts = path.split("/").filter(Boolean);
-  const q = {}; (qs || "").split("&").filter(Boolean).forEach(kv => { const [k, v] = kv.split("="); q[decodeURIComponent(k)] = decodeURIComponent(v || ""); });
+  /* either spelling in, one set of internal parts out: `data/projects` and `pipeline` are the same
+     view, `property?p=…` and `analysis?a=…&la=…` the same pin. The address bar is corrected at the
+     end of this function, from hashFor(), so a shared v2.6 link redirects exactly once. */
+  const t = RC.toInternal((location.hash || "#map").slice(1), rcOpts());
+  const parts = t.parts, q = t.query;
   const prevView = S.view;
   if (q.ind) MK.ind = q.ind;
   climParseHz(q);
@@ -292,7 +295,6 @@ function parseHash() {
   const v = parts[0] || "map";
   if (v === "area" && parts[1] && parts[2]) { S.view = "area"; AR.type = parts[1]; AR.code = parts[2]; AR.group = q.g === "key" ? "" : (q.g || ""); AR.sub = q.sub || "kvarter"; AR.tab = ["ind", "bbr", "sub"].includes(q.t) ? q.t : "ind"; }
   else if (v === "table") { S.view = "table"; if (["kommune", "postnr", "kvarter"].includes(parts[1])) T.level = parts[1]; }
-  else if (v === "sources") { S.view = "market"; MKT.src = true; }
   else if (v === "market") { S.view = "market"; MKT.src = q.src === "1"; }
   else if (v === "project" && parts[1]) { S.view = "project"; PR.id = decodeURIComponent(parts[1]); }
   else if (v === "public" && parts[2]) { S.view = "public"; PB.kom = parts[1]; PB.id = decodeURIComponent(parts[2]); }
@@ -303,7 +305,6 @@ function parseHash() {
   else if (v === "analysis") { S.view = "analysis"; AN.a = q.a || ""; AN.label = q.la || ""; anParseLayers(q); pubParseFilter(q);
     /* the sheet cannot say which kommune the point is in until the rings are there — chain once, not on every hashchange */
     if (!KOM.list && !KOM.err) komLoad().then(() => { if (S.view === "analysis") renderKeep(); }); }
-  else if (v === "compare") { S.view = "compare"; CMP.a = q.a || ""; CMP.b = q.b || ""; }
   else if (v === "climate" && parts[1]) { S.view = "climate"; CS.code = pad4(parts[1]); climSheetLoad();
     /* the zone files land asynchronously; the sheet is redrawn once, when they do */ }
   else if (v === "charts") { S.view = "charts"; CH.ind = q.ind || CH.ind; CH.areas = q.a ? q.a.split(",").filter(Boolean) : CH.areas; CH.y0 = q.y0 || CH.y0; CH.y1 = q.y1 || CH.y1; CH.median = q.med !== "0"; CH.mode = q.mode || "auto"; CH.dist = q.dist || "size";
@@ -322,6 +323,11 @@ function parseHash() {
     if (!MK.muni && LF.shownMuni) { LF.center = [56.0, 10.5]; LF.zoom = 7; }
     LF.shownMuni = MK.muni;
   }
+  /* the URL is the state. After parsing, the address bar shows exactly what hashFor() would write,
+     so an old link redirects once and parse → serialise is idempotent for every route (AC-U1).
+     replaceState never fires hashchange, so this cannot loop. */
+  const want = hashFor();
+  if (location.hash.slice(1) !== want) history.replaceState(null, "", "#" + want);
   return { viewChanged: prevView !== S.view };
 }
 function go(hash) { if ("#" + hash === location.hash) { parseHash(); render(); } else location.hash = hash; }
@@ -329,22 +335,46 @@ function syncHash() { history.replaceState(null, "", "#" + hashFor()); }
 window.addEventListener("hashchange", () => { const r = parseHash(); render(); if (r.viewChanged) { const m = document.getElementById("main"); if (m) m.scrollTop = 0; } });
 
 /* ---------- views & navigation ---------- */
+/* Four destinations (spec §3.1 with owner amendment A1): Market · Pipeline · Compare are gone —
+   the first two became Data tabs, Compare was deleted. The internal view ids are unchanged. */
 const VIEWS = [
-  ["makro",   "Macro map",     "Demographics, income, housing and prices by municipality, postal code and Copenhagen quarter", "map"],
-  ["table",   "Table",         "Every municipality, postal code and quarter side by side — filter, sort, export", "table"],
+  ["makro",   "Map",           "Demographics, income, housing and prices by municipality, postal code and Copenhagen quarter", "map"],
+  ["table",   "Data",          "Every area, every project, the national series and the sources — one tab each", "data/areas/kommune"],
   ["charts",  "Charts",        "Pick an indicator, areas and years — export the chart as PNG or the data as CSV", "charts"],
-  ["market",  "Market",        "Prices, rents, supply, construction, macro indicators — and the data sources", "market"],
-  ["pipeline", "Pipeline",     "Every infrastructure project in the layer: budget, status, opening year, municipalities", "pipeline"],
-  ["analysis", "Test property", "Drop a pin from a Google Maps link and analyse its surroundings", "analysis"],
-  ["compare", "Compare", "Two areas side by side — every indicator aligned, no overall winner", "compare"]];
-const NAV_GROUPS = [["Market intelligence", ["makro", "table", "charts", "market", "pipeline"]], ["Analysis", ["analysis", "compare"]]];
+  ["analysis", "Test property", "Drop a pin from a Google Maps link and read every layer against it", "property"]];
+const NAV_GROUPS = [["Market intelligence", ["makro", "table", "charts"]], ["Analysis", ["analysis"]]];
 const viewOf = id => VIEWS.find(v => v[0] === id) || VIEWS[0];
+/* the views that live inside the Data section, and the tab each one is */
+const DATA_VIEWS = ["table", "pipeline", "market"];
+const isData = () => DATA_VIEWS.includes(S.view);
 
 function renderNav() {
-  const on = S.view === "area" ? "makro" : S.view === "project" ? "pipeline" : ["public", "publist", "school", "schoollist", "climate"].includes(S.view) ? "makro" : S.view;
+  const on = ["area", "public", "publist", "school", "schoollist", "climate"].includes(S.view) ? "makro"
+    : S.view === "project" ? "table" : isData() ? "table" : S.view;
   document.getElementById("nav").innerHTML = NAV_GROUPS.map(([lab, ids]) => `<div class="nav-glab">${lab}</div>` +
-    ids.map(id => { const v = viewOf(id), h = id === "analysis" ? anNavLink() : v[3];
-      return `<button class="nav-item ${on === id ? "on" : ""}" data-go="${esc(h)}" title="${esc(v[2])}"><b>${v[1]}</b></button>`; }).join("")).join("");
+    ids.map(id => { const v = viewOf(id), h = id === "analysis" ? anNavLink() : id === "table" ? dataHash() : v[3];
+      return `<button class="nav-item ${on === id ? "on" : ""}" data-testid="nav-item" data-go="${esc(h)}" title="${esc(v[2])}"><b>${v[1]}</b></button>`; }).join("")).join("");
+}
+/* ---------- the Data section: four tabs over three existing views (spec §5.3) ---------- */
+const DATA_TABS = [["areas", "Areas", "every municipality, postal code and quarter"],
+                   ["projects", "Projects", "the infrastructure pipeline"],
+                   ["national", "National series", "Denmark-wide rates, prices and construction"],
+                   ["sources", "Sources", "publisher, tables, as of, licence"]];
+const dataTab = () => S.view === "pipeline" ? "projects" : S.view === "market" ? (MKT.src ? "sources" : "national") : "areas";
+const dataTabHash = tab => tab === "areas" ? `data/areas/${T.level}` : `data/${tab}`;
+const dataHash = () => dataTabHash(isData() ? dataTab() : "areas");
+const dataTabLabel = tab => (DATA_TABS.find(t => t[0] === tab) || DATA_TABS[0])[1];
+function dataTabs() {
+  const cur = dataTab();
+  return `<div class="dtabs" data-testid="data-tabs" role="tablist" aria-label="Data">${DATA_TABS.map(([id, lab, hint]) =>
+    `<button class="dtab ${cur === id ? "on" : ""}" role="tab" aria-selected="${cur === id}" data-testid="data-tab" data-go="${esc(dataTabHash(id))}" title="${esc(hint)}">${esc(lab)}</button>`).join("")}</div>`;
+}
+
+/* "<level>:<code>[:…]" — a public-building or school list key — → the municipality it belongs to */
+function crumbMuni(key) {
+  const [level, code] = String(key || "").split(":");
+  const kom = level === "kommune" ? code : level === "postnr" ? (byNr[code] || {}).muni : CPH_MUNI;
+  return byCode[String(Number(kom || 0))] || null;
 }
 /* the top bar is a breadcrumb: Denmark › municipality › area — every step is a link, the last one is where you are */
 function crumbs() {
@@ -355,15 +385,25 @@ function crumbs() {
   else if (S.view === "makro") { const m = MK.muni ? byCode[MK.muni] : null;
     if (m) { if (microMode()) { c.push([m.name, `map/${m.code}` + q]); tail = "Buildings"; kind = "BBR register"; } else { tail = m.name; kind = cphMode() ? "quarters" : "postal codes"; } }
     else { tail = "Map"; kind = "municipalities and postal codes"; } }
-  else if (S.view === "project") { const f = projectEntity(); c.push(["Pipeline", "pipeline"]); tail = f ? f.properties.name : "Project"; kind = f ? (INFRA_TYPE[f.properties.type] || f.properties.type) : ""; }
+  else if (S.view === "project") { const f = projectEntity(); c.push(["Data", "data/areas/" + T.level], ["Projects", "data/projects"]);
+    tail = f ? f.properties.name : "Project"; kind = f ? (INFRA_TYPE[f.properties.type] || f.properties.type) : ""; }
   else if (S.view === "school") { const s = SCH_BY[SC.nr]; if (s && byCode[s.kom]) c.push([s.kommune, `area/kommune/${s.kom}` + q]); tail = s ? s.name : "School"; kind = s ? (SCH_TYPE[s.type] || s.type) : "Uddannelsesstatistik.dk"; }
-  else if (S.view === "schoollist") { tail = "Schools"; kind = "sorted by FP9 grade"; }
-  else if (S.view === "analysis") { c.push(["Map", "map" + q]); tail = AN.label || TP_LABEL; kind = "test property"; }
-  else if (S.view === "compare") { const A = CMP.a ? chEntity(CMP.a) : null, B = CMP.b ? chEntity(CMP.b) : null;
-    tail = A && B ? `${A.name} vs ${B.name}` : "Compare"; kind = A && B ? "no overall winner" : "pick two areas"; }
+  else if (S.view === "schoollist") { const m = crumbMuni(SL.key); if (m) c.push([m.name, `area/kommune/${m.code}` + q]); tail = "Schools"; kind = "sorted by FP9 grade"; }
+  /* a sheet you arrived at from content: the breadcrumb names the municipality it is in, never the
+     view you happened to come from (AC-SH3 — v2.6 showed "Macro map" here) */
+  else if (S.view === "public") { const b = pubFind(PB.kom, PB.id), m = byCode[String(Number(PB.kom))];
+    if (m) c.push([m.name, `area/kommune/${m.code}` + q]);
+    tail = b ? pubName(b) : "Public building"; kind = b ? `${pubCat(b).label} · BBR ${b.code}` : "BBR via Datafordeler"; }
+  else if (S.view === "publist") { const m = crumbMuni(PL.key); if (m) c.push([m.name, `area/kommune/${m.code}` + q]);
+    tail = "Public buildings"; kind = "BBR via Datafordeler"; }
+  else if (S.view === "analysis") { tail = AN.label || TP_LABEL; kind = "test property"; }
   else if (S.view === "climate") { const m = byCode[String(Number(CS.code || 0))];
     if (m) c.push([m.name, `area/kommune/${m.code}` + q]); tail = "Climate risk"; kind = "Kystdirektoratet · DMI Klimaatlas"; }
-  else { tail = viewOf(S.view)[1]; kind = { table: "every area side by side", charts: "PNG and CSV export", market: "national series and sources", pipeline: `${INFRA_ALL.length} projects · budget, status, opening year` }[S.view] || ""; }
+  else if (isData()) { const tab = dataTab(); c.push(["Data", "data/areas/" + T.level]); tail = dataTabLabel(tab);
+    kind = { areas: `${tableRows().length} rows · ${T.level === "kvarter" ? "Copenhagen quarters" : T.level === "postnr" ? "postal codes" : "municipalities"}`,
+             projects: `${INFRA_ALL.length} projects · budget, status, opening year`,
+             national: "latest available period per series", sources: `built ${(D.meta && D.meta.built) || "–"}` }[tab] || ""; }
+  else { tail = viewOf(S.view)[1]; kind = { charts: "PNG and CSV export" }[S.view] || ""; }
   return { c, tail, kind };
 }
 function renderTop() {
@@ -372,7 +412,7 @@ function renderTop() {
 }
 const RENDER = { makro: vMakro, table: vTable, area: vArea, charts: vCharts, market: vMarket, pipeline: vPipeline, project: vProject,
                  public: vPublic, publist: vPubList, school: vSchool, schoollist: vSchoolList, analysis: vAnalysis,
-                 climate: vClimate, compare: vCompare };
+                 climate: vClimate };
 function render() {
   /* every live map goes before the DOM it lives in does — see dropMap() */
   dropMaps();
@@ -470,8 +510,6 @@ document.addEventListener("change", e => {
   if (el.id === "indsel") { MK.ind = el.value; if (!yearsFor(MK.ind).includes(MK.year)) MK.year = LATEST; syncHash(); renderKeep(); }
   if (el.id === "yearsel") { MK.year = el.value; syncHash(); renderKeep(); }
   if (el.id === "areaq") areaSearchGo(el.value);
-  if (el.id === "cmpa" || el.id === "cmpb") { const id = cmpResolve(el.value);
-    if (id) { CMP[el.id === "cmpa" ? "a" : "b"] = id; go(hashFor()); } }
   if (el.id === "mindsel") { MK.mind = el.value; syncHash(); renderKeep(); }
   if (el.id === "chind") { CH.ind = el.value; CH.ov = []; syncHash(); renderKeep(); }
   if (el.id === "chnat") { CH.nat = el.checked; syncHash(); renderKeep(); }
@@ -536,6 +574,7 @@ function tipHide() { if (TIPEL) TIPEL.style.display = "none"; TIPFOR = null; }
 function enableSort(root) {
   root.querySelectorAll("table[data-sortable]").forEach(tbl => {
     tbl.querySelectorAll("thead th").forEach((th, idx) => {
+      if (th.hasAttribute("data-nosort")) return;   /* a sparkline or a link column has no order */
       th.classList.add("sth"); th.style.cursor = "pointer";
       th.addEventListener("click", () => {
         const tb = tbl.tBodies[0], rows = Array.from(tb.rows);
@@ -922,6 +961,7 @@ const best = i => lowerBetter(i.key) ? "asc" : "desc";
 function vTable() {
   const ind = curInd(), cols = tableCols(), y0 = yearsFor(ind.key)[0];
   return `
+  ${dataTabs()}
   <div class="card accent">
     <div class="card-head tools-only"><div class="tools">${indSelect()}${yearSelect()}</div>${indQuick()}</div>
     ${indExplain(ind)}
@@ -933,7 +973,7 @@ function vTable() {
       <span class="hint" id="tcount">${tableRows().length} rows</span>
       <button class="lk mini" data-csv>⤓ Export CSV</button>
     </div>
-    <div class="scrollx"><table class="tbl compact wraphead" data-sortable><thead><tr>
+    <div class="scrollx"><table class="tbl compact wraphead" data-testid="areas-table" data-sortable><thead><tr>
       <th>${T.level === "kvarter" ? "Quarter" : T.level === "postnr" ? "Area" : "Municipality"}</th><th>${T.level === "postnr" ? "Postal code" : "Code"}</th><th>${T.level === "kvarter" ? "District" : T.level === "postnr" ? "Municipality" : "Region"}</th><th class="num">Population</th>
       <th class="num hi" data-best="${best(ind)}">${esc(ind.label)}<br><span class="dim">${esc(ind.unit || "")}</span></th>${y0 && y0 !== MK.year ? `<th class="num">Δ since ${y0}<br><span class="dim">${isPct(ind) ? "pp" : "%"}</span></th>` : ""}
       ${cols.filter(i => i.key !== ind.key).map(i => `<th class="num" data-best="${best(i)}">${esc(i.label)}${lowerBetter(i.key) ? " ↓" : ""}<br><span class="dim">${esc(i.unit || "")}</span></th>`).join("")}</tr></thead>
@@ -1721,7 +1761,7 @@ function anOutlookCard(e, r) {
 }
 
 /* the nav item opens the pin that is on the map, if there is one — otherwise the empty state */
-const anNavLink = () => TP.lat != null ? analysisLink(TP.lat, TP.lon, TP.label) : "analysis";
+const anNavLink = () => TP.lat != null ? analysisLink(TP.lat, TP.lon, TP.label) : "property";
 /* every municipality whose bounding box touches the circle of radius m around the pin, the pin's own first */
 function anKomsNear(pt, own, m) {
   const dLat = m / 110540, dLon = m / (111320 * Math.cos(pt.lat * Math.PI / 180));
@@ -3575,128 +3615,10 @@ function climPopupBlock(a, muni) {
     <span class="lfact"><button class="lk mini" data-go="climate/${esc(pad4(kom))}">Open climate sheet ›</button></span></div>`;
 }
 
-/* ---------- Compare (#compare?a=<type>:<code>&b=<type>:<code>) ----------
-   Two areas side by side, one row per indicator, grouped exactly as the indicator dropdown groups
-   them. Three rules the view is built on:
-     · the better side is highlighted per row, direction-aware — and only per row. There is no
-       overall winner, because adding up indicators of different units and directions would be a
-       score this project does not have the data to justify;
-     · a neutral indicator gets no highlight at all — neither end is better;
-     · where both sides carry the same kommune's figure (one or both inheriting it), the row says
-       "same kommune value" instead of pretending one area beat the other with a number they share.
-   Climate rows sit in their own section because they are the one family with a horizon rather than
-   a year: the pill above the table moves all of them at once. */
-const CMP = { a: "", b: "" };
-const CMP_CLIM_KEYS = ["surge_dw_pct", "surge100_cm", "sealevel_cm", "weather_claims_1000"];
-function cmpIdFromOpt(o) {
-  if (!o || !o.h) return "";
-  const m = String(o.h).match(/^map\/(\d+)$/); if (m) return `kommune:${m[1]}`;
-  const a = String(o.h).match(/^area\/(postnr|kvarter)\/(.+)$/); if (a) return `${a[1]}:${a[2]}`;
-  return "";
-}
-function cmpResolve(txt) {
-  const q = (txt || "").trim(); if (!q) return "";
-  let o = AREA_OPTS.find(x => x.t === q);
-  if (!o) { const ql = q.toLowerCase().replace(/\s+—.*$/, "");
-    o = AREA_OPTS.find(x => x.k.some(k => k === ql)) || AREA_OPTS.find(x => x.k.some(k => k.startsWith(ql))); }
-  return cmpIdFromOpt(o);
-}
-/* the kommune a side's figure actually comes from — its own code when it has one, otherwise the
-   municipality it inherits from. Two sides with the same source share the number, not a verdict. */
-function cmpSrcCode(e, key) {
-  const own = V(e.o, key);
-  if (own != null) return `${e.type}:${e.code || e.o.code || e.o.nr}`;
-  return e.muni ? `kommune:${e.muni.code}` : "";
-}
-/* which side is better for this indicator: "a", "b", or "" for a tie, a neutral indicator, or a
-   row where the two sides are reading the same published figure */
-function cmpBetter(key, av, bv, same) {
-  if (same || av == null || bv == null || av === bv || neutralDir(key)) return "";
-  return (lowerBetter(key) ? av < bv : av > bv) ? "a" : "b";
-}
-function cmpValCell(e, i, v, own, win) {
-  if (v == null) return `<td class="num dim"${isClim(i.key) ? ` title="${esc(climReason(e.o, i.key))}"` : ""}>–</td>`;
-  return `<td class="num${win ? " cmpwin" : ""}" data-v="${v}">${fmtOf(i)(v)}${own ? (e.type === "kvarter" ? bydelMark(i) : "") : " °"}</td>`;
-}
-function cmpRow(i, A, B) {
-  const a = eVal(A, i.key), b = eVal(B, i.key);
-  if (a.v == null && b.v == null) return "";
-  const same = !!(a.v != null && b.v != null && cmpSrcCode(A, i.key) && cmpSrcCode(A, i.key) === cmpSrcCode(B, i.key));
-  const w = cmpBetter(i.key, a.v, b.v, same);
-  const note = same ? `<em class="cmpsame" title="Both areas show the same municipality's published figure — there is nothing to compare between them here">same kommune value</em>`
-    : neutralDir(i.key) ? `<em class="dim" title="Neither end is better, so no side is marked">neutral</em>`
-    : lowerBetter(i.key) ? `<em class="dim">↓ lower is better</em>` : "";
-  return `<tr><th><span class="thn">${esc(i.label)} <span class="dim">${esc(i.unit || "")}</span></span><span class="im" data-m="${esc(i.key)}">ⓘ</span></th>
-    ${cmpValCell(A, i, a.v, a.own, w === "a")}${cmpValCell(B, i, b.v, b.own, w === "b")}<td class="cmpnote">${note}</td></tr>`;
-}
-/* Is the area inside the published 100-year extent at this horizon? A kommune is where the extent
-   covers part of it; a postal code or a quarter is where at least one of its dwellings falls inside
-   it. Both are counts the exposure tables already publish — nothing is recomputed here. */
-function cmpInZone(e, h) {
-  if (!CLIM) return null;
-  const z = climZones(h);
-  if (e.type === "kommune") { const km = (z.kommune || {})[pad4(e.o.code)]; return km != null ? km > 0 : false; }
-  const tbl = e.type === "postnr" ? (z.postnr || {}) : (z.kvarter || {});
-  const row = tbl[e.type === "postnr" ? e.o.nr : e.o.code];
-  if (row) return (row.dwellings_in_zone || 0) > 0;
-  /* not listed: no dwelling of its own inside the extent — which is an answer where its kommune has
-     a zone at all, and no answer where the publisher has mapped nothing for that kommune */
-  const km = (z.kommune || {})[pad4(e.o.muni || CPH_MUNI)];
-  return km ? false : null;
-}
-function cmpZoneRow(A, B, h) {
-  const av = cmpInZone(A, h), bv = cmpInZone(B, h);
-  if (av == null && bv == null) return "";
-  /* in the zone is the worse side, so the better side is the one that is not in it */
-  const w = av == null || bv == null || av === bv ? "" : (av ? "b" : "a");
-  const cell = (v, win) => v == null ? `<td class="num dim" title="no published extent for this municipality">–</td>`
-    : `<td class="num${win ? " cmpwin" : ""}" data-v="${v ? 1 : 0}"><b class="${v ? "climyes" : "climno"}">${v ? "yes" : "no"}</b></td>`;
-  return `<tr><th><span class="thn">In storm-surge zone (100-yr) <span class="dim">extent ${esc(CLIM_ZONE_YEAR[h])}</span></span></th>
-    ${cell(av, w === "a")}${cell(bv, w === "b")}<td class="cmpnote"><em class="dim">in zone is the worse side</em></td></tr>`;
-}
-function cmpSection(title, rows, sub) {
-  return rows ? `<tr class="angrp"><th colspan="4">${esc(title)}${sub ? ` <span class="dim">${esc(sub)}</span>` : ""}</th></tr>${rows}` : "";
-}
-function cmpPick(id, cur, label) {
-  const e = cur ? chEntity(cur) : null;
-  return `<span class="asrch"><input id="${id}" list="arealist" class="indsel" placeholder="${esc(label)}" value="${esc(e ? e.name : "")}" autocomplete="off" aria-label="${esc(label)}"></span>`;
-}
-function vCompare() {
-  const A = CMP.a ? chEntity(CMP.a) : null, B = CMP.b ? chEntity(CMP.b) : null;
-  const pickers = `<div class="tools cmptools">${cmpPick("cmpa", CMP.a, "First area — municipality, postal code or quarter")}
-    <span class="cmpvs">vs</span>${cmpPick("cmpb", CMP.b, "Second area")}
-    ${CLIM ? hzPill("tools") : ""}
-    <datalist id="arealist">${AREA_OPTS.map(o => `<option value="${esc(o.t)}"></option>`).join("")}</datalist></div>`;
-  if (!A || !B) {
-    return `<div class="card accent"><div class="card-head"><h3>Compare two areas</h3><span class="hint">every indicator aligned, one row at a time</span></div>
-      ${pickers}
-      <p class="anlead">Pick two areas to compare.</p>
-      <p class="cap">Each row marks the better side on its own terms — and only its own: there is no overall winner, because indicators of different units and directions cannot be added up into a score this data supports. A row where both areas show the same municipality's figure says so instead of inventing a difference.</p></div>`;
-  }
-  /* the indicator list both sides can actually be read on */
-  const inds = IND.concat(IND_CPH.filter(i => !IND.some(x => x.key === i.key)));
-  const groups = GROUP_ORDER.filter(g => g !== "Climate").concat(["Other"]);
-  const body = groups.map(g => cmpSection(g, inds.filter(i => (i.group || "Other") === g && !isClim(i.key))
-    .map(i => cmpRow(i, A, B)).join(""))).join("");
-  const climRows = CLIM ? CLIM_HZ.map(h => cmpZoneRow(A, B, h)).join("")
-    + CMP_CLIM_KEYS.map(k => inds.find(i => i.key === k)).filter(Boolean).map(i => cmpRow(i, A, B)).join("") : "";
-  const head = e => `<th class="num">${esc(e.name)}<br><span class="dim">${esc(e.type === "kommune" ? "municipality" : e.type === "postnr" ? "postal code" : "Copenhagen quarter")}</span></th>`;
-  return `
-  <div class="card accent">
-    <div class="card-head"><h3>${esc(A.name)} vs ${esc(B.name)}</h3><span class="hint">no overall winner — each row on its own terms</span></div>
-    ${pickers}
-    <div class="tools"><button class="lk" data-go="${withQ(pageOf(A.o))}">${esc(A.name)} ›</button>
-      <button class="lk" data-go="${withQ(pageOf(B.o))}">${esc(B.name)} ›</button>
-      <button class="lk" data-go="${chartLink(MK.ind, A.type, A.code || A.o.code || A.o.nr)}">↗ Chart</button></div>
-  </div>
-  <div class="card">
-    <div class="card-head"><h3>Every indicator, side by side</h3><span class="hint">the better side is shaded · ° = municipality value · ${esc(CLIM ? hzShort(HZ.h) + " horizon for the climate rows" : "")}</span></div>
-    <div class="scrollx"><table class="tbl compact cmptbl" data-sortable><thead><tr><th>Indicator</th>${head(A)}${head(B)}<th class="cmpnote">Note</th></tr></thead>
-      <tbody>${body}${CLIM && climRows ? cmpSection("Climate", climRows, `· ${hzLabel(HZ.h)}`) : ""}</tbody></table></div>
-    <p class="cap"><b>No overall winner.</b> Every row is marked on its own terms and nothing is added up: the indicators have different units, different directions and different publishers, and a combined score would be a judgement the data does not carry. Rows where both areas read the same municipality's published figure are marked <em>same kommune value</em> — the two areas are not being compared there, they are showing one number twice. Neutral indicators are never marked at all. ${CLIM ? esc(hzLabel(HZ.h)) : ""}</p>
-  </div>
-  ${srcNote()}`;
-}
+/* Compare (#compare?a=…&b=…) was deleted in v3.0 — owner amendment A1. There is no view, no state
+   and no nav item; the old link redirects to the first area's own page (src/route_core.js ALIASES).
+   What it did well — two areas, one row per indicator, no overall winner — is what the area page's
+   All-figures table and Charts do without asking the reader to pick a second area first. */
 
 /* ---------- Climate sheet (#climate/<kommune>), area-card line and the Analysis section ---------- */
 const CS = { code: null };
@@ -4146,13 +4068,15 @@ function vPipeline() {
   const types = [...new Set(INFRA_ALL.map(f => f.properties.type))].sort();
   const bn = v => v == null ? "–" : nf(v / 1000, 1);
   return `
+  ${dataTabs()}
   <div class="card accent">
     <div class="card-head tools-only"><div class="tools">
       <select id="pptype" class="indsel"><option value="">All types</option>${types.map(x => `<option value="${x}" ${PIPE.type === x ? "selected" : ""}>${esc(INFRA_TYPE[x] || x)}</option>`).join("")}</select>
       <select id="ppstatus" class="indsel"><option value="">All statuses</option>${Object.keys(INFRA_ORDER).map(s => `<option value="${s}" ${PIPE.status === s ? "selected" : ""}>${esc(INFRA_ST[s].label)}</option>`).join("")}</select>
       <span class="hint">${rows.length} of ${INFRA_ALL.length} projects</span>
       <button class="lk mini" data-csv-pipe>⤓ Export CSV</button></div></div>
-    <div class="scrollx"><table class="tbl compact wraphead" data-sortable><thead><tr>
+    <p class="cap">Sources: Fingerplan, Anlægsstatus and the agencies' own decision documents.</p>
+    <div class="scrollx"><table class="tbl compact wraphead" data-testid="projects-table" data-sortable><thead><tr>
       <th>Project</th><th>Type</th><th>Status</th><th>Opening</th><th class="num">Budget<br><span class="dim">bn DKK</span></th><th>Agency</th><th>Municipalities</th></tr></thead>
       <tbody>${rows.map(f => { const p = f.properties; const kom = (p.kommuner || []).map(c => (byCode[c] || {}).name).filter(Boolean);
         return `<tr class="clickrow" data-pipe="${esc(p.id)}"><th><span class="thn">${esc(p.name)} <span class="go">›</span></span>${p.schematic ? ` <span class="dim">schematic</span>` : ""}</th>
@@ -4277,62 +4201,112 @@ function spark(series, w = 160, h = 26) {
   const pts = v.map((x, i) => `${(i / (v.length - 1) * w).toFixed(1)},${(h - 2 - (x - lo) / sp * (h - 4)).toFixed(1)}`).join(" ");
   return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polyline fill="none" stroke="currentColor" stroke-width="1.5" points="${pts}"/></svg>`;
 }
-function lineChart(key, opts = {}) {
-  const s = ((D.macro && D.macro.series) || {})[key] || [];
-  const pts = s.filter(p => p.v != null);
-  if (pts.length < 2) return `<p class="empty">no series for ${esc(key)}</p>`;
-  const W = 640, H = 180, L0 = 44, R = 10, T0 = 10, B = 24;
-  const v = pts.map(p => p.v), lo = opts.zero ? 0 : Math.min(...v), hi = Math.max(...v), sp = hi - lo || 1;
-  const x = i => L0 + i / (pts.length - 1) * (W - L0 - R), y = val => T0 + (1 - (val - lo) / sp) * (H - T0 - B);
-  const path = pts.map((p, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(p.v).toFixed(1)}`).join("");
-  const ticks = [lo, lo + sp / 2, hi];
-  const xl = [0, Math.floor(pts.length / 2), pts.length - 1];
-  return `<svg class="chart" viewBox="0 0 ${W} ${H}">
-    ${ticks.map(t => `<line class="grid" x1="${L0}" x2="${W - R}" y1="${y(t).toFixed(1)}" y2="${y(t).toFixed(1)}"/><text class="ax" x="${L0 - 6}" y="${(y(t) + 3).toFixed(1)}" text-anchor="end">${nf(t, opts.dec ?? 1)}</text>`).join("")}
-    ${xl.map(i => `<text class="ax" x="${x(i).toFixed(1)}" y="${H - 6}" text-anchor="${i === 0 ? "start" : i === pts.length - 1 ? "end" : "middle"}">${esc(pts[i].t)}</text>`).join("")}
-    <path d="${path}" fill="none" stroke="${opts.color || "#1C6B5C"}" stroke-width="2"/></svg>`;
+/* a period label from the macro series: 2026M08 = month, 2026K2 = quarter, 2026 = year */
+const NAT_PERIOD = t => /K\d$/.test(String(t)) ? "quarter" : /M\d\d$/.test(String(t)) ? "month" : "year";
+/* the last five years of a series — enough to read the shape, short enough to stay a sparkline */
+function natLast5(series) {
+  const s = (series || []).filter(p => p.v != null);
+  if (!s.length) return s;
+  const last = Number(String(s[s.length - 1].t).slice(0, 4));
+  return s.filter(p => Number(String(p.t).slice(0, 4)) >= last - 5);
 }
+/* Data › National series (spec §5.3): the four headline tiles as a compact row, then one row per
+   series — value, period, y/y, source, sparkline. The four large charts are gone; Charts is where a
+   series is studied at size. */
 function vMarket() {
+  if (MKT.src) return `${dataTabs()}${vSources()}`;
   const mac = D.macro || {}, lt = mac.latest || {};
-  if (!Object.keys(lt).length) return `<div class="card"><p class="empty">No macro series built yet — run the pipeline (see Sources).</p></div>`;
-  const tile = (key, label) => { const o = lt[key]; if (!o) return ""; const yoy = o.yoy;
-    return `<div><span>${esc(label)}</span><b>${nf(o.v, o.dec ?? 1)}<i class="u">${esc(o.unit || "")}</i></b>
-      ${yoy != null ? `<em class="k ${yoy > 0 ? "up" : yoy < 0 ? "dn" : ""}">${sign(yoy, x => nf(x, 1) + " %")} y/y</em>` : ""}<em>${esc(o.label || "")} · ${esc(o.t || "")}</em>${spark((mac.series || {})[key])}</div>`; };
-  const heroKeys = (mac.hero || ["rent_index", "hpi_flats", "supply_dk", "completions"]);
+  if (!Object.keys(lt).length) return `${dataTabs()}<div class="card"><p class="empty">No national series built yet — run the pipeline (see Sources).</p></div>`;
+  const tile = key => { const o = lt[key]; if (!o) return ""; const yoy = o.yoy;
+    return `<div data-testid="tile-${esc(key)}"><span>${esc(o.label || key)}</span><b>${nf(o.v, o.dec ?? 1)}<i class="u">${esc(o.unit || "")}</i></b>
+      <em class="k ${yoy > 0 ? "up" : yoy < 0 ? "dn" : ""}">${yoy != null ? sign(yoy, x => nf(x, 1) + " %") + " y/y" : "no y/y"} · ${esc(o.t || "")}</em></div>`; };
+  const heroKeys = mac.hero || ["rent_index", "hpi_flats", "supply_dk", "completions"];
   const tableKeys = mac.table || Object.keys(lt);
+  const row = k => { const o = lt[k]; if (!o) return "";
+    const pts = natLast5((mac.series || {})[k]);
+    return `<tr><th><span class="thn">${esc(o.label || k)}</span></th>
+      <td class="num" data-v="${o.v}">${nf(o.v, o.dec ?? 1)}${o.unit ? ` <span class="dim">${esc(o.unit)}</span>` : ""}</td>
+      <td class="dim">${esc(o.t || "")} <span class="tag mini">${NAT_PERIOD(o.t)}</span></td>
+      <td class="num ${o.yoy > 0 ? "good" : o.yoy < 0 ? "bad" : ""}" data-v="${o.yoy ?? ""}">${o.yoy != null ? sign(o.yoy, x => nf(x, 1) + " %") : "–"}</td>
+      <td class="dim">${esc(o.src || "")}</td>
+      <td class="sp">${pts.length > 1 ? `<span class="sparkbox" title="${esc(pts[0].t)} → ${esc(pts[pts.length - 1].t)}">${spark(pts)}</span>` : `<span class="dim">–</span>`}</td></tr>`; };
   return `
-  <div class="hero">${heroKeys.map(k => tile(k, (lt[k] || {}).label || k)).join("")}</div>
-  <div class="grid-2">
-    <div class="card"><div class="card-head"><h3>Rent index, private rental (2021 = 100)</h3><span class="hint">DST HUS1</span></div>${lineChart("rent_index")}</div>
-    <div class="card"><div class="card-head"><h3>House price index, owner-occupied flats</h3><span class="hint">DST EJ56</span></div>${lineChart("hpi_flats")}</div>
-    <div class="card"><div class="card-head"><h3>Homes for sale, Denmark</h3><span class="hint">Finans Danmark UDB010</span></div>${lineChart("supply_dk", { dec: 0, color: "#B07A1E" })}</div>
-    <div class="card"><div class="card-head"><h3>Interest rates</h3><span class="hint">Danmarks Nationalbank via DST</span></div>${lineChart("rate_policy", { dec: 2, color: "#5C5F52" })}</div>
-  </div>
-  <div class="card"><div class="card-head"><h3>Macro indicators</h3><span class="hint">latest available period per series</span></div>
-    <table class="tbl compact" data-sortable><thead><tr><th>Indicator</th><th class="num">Value</th><th class="num">y/y</th><th>Period</th><th>Source</th></tr></thead>
-    <tbody>${tableKeys.map(k => { const o = lt[k]; if (!o) return ""; return `<tr><th>${esc(o.label || k)}</th><td class="num" data-v="${o.v}">${nf(o.v, o.dec ?? 1)} ${esc(o.unit || "")}</td>
-      <td class="num ${o.yoy > 0 ? "good" : o.yoy < 0 ? "bad" : ""}">${o.yoy != null ? sign(o.yoy, x => nf(x, 1) + " %") : "–"}</td><td class="dim">${esc(o.t || "")}</td><td class="dim">${esc(o.src || "")}</td></tr>`; }).join("")}</tbody></table>
-    <p class="cap">${esc(mac.note || "")}</p></div>
-  <details class="dinfo srcfold" ${MKT.src ? "open" : ""} id="srcfold"><summary>Sources, freshness and indicator definitions</summary>${vSources()}</details>`;
+  ${dataTabs()}
+  <div class="hero hero-nat">${heroKeys.map(tile).join("")}</div>
+  <div class="card"><div class="card-head"><h3>National series</h3><span class="hint">${tableKeys.length} series · latest available period each</span></div>
+    <div class="scrollx"><table class="tbl compact" data-testid="national-table" data-sortable><thead><tr>
+      <th>Series</th><th class="num">Latest</th><th>Period</th><th class="num">y/y</th><th>Source</th><th data-nosort>Last 5 years</th></tr></thead>
+      <tbody>${tableKeys.map(row).join("")}</tbody></table></div>
+    <p class="cap">${esc(mac.note || "")} The sparkline shows the last five years of the same series; open Charts for the full history. Period tags: month, quarter or year as the publisher reports it.</p></div>`;
 }
 
-/* ---------- Sources (folded under Market) ---------- */
-function vSources() {
+/* ---------- Data › Sources (spec §5.3) ----------
+   The v2.6 accordion became a sortable table: Source · Publisher · Tables · As of · Fetched ·
+   Licence · Used for · ↗. Nothing is invented — the publisher is read off the catalogue key, "used
+   for" off the indicators that join to it, and an empty "Fetched" falls back to the build date with
+   a `build` tag rather than leaving the reader with a blank cell (AC-D4). */
+const SRC_PUB = { dst: "Danmarks Statistik", s20: "Finans Danmark", s30: "Københavns Kommune",
+  climate: "Danmarks Statistik", forecast: "Danmarks Statistik", net_dwellings: "Danmarks Statistik",
+  bbr: "BBR via Datafordeler", public: "BBR via Datafordeler", infra: "Curated layer (docs/INFRA.md)",
+  schools: "Uddannelsesstatistik.dk (STIL)", boligstat: "Social- og Boligstyrelsen",
+  lbf: "Landsbyggefonden", kk_tryghed: "Københavns Kommune", cph_forecast: "Københavns Kommune" };
+const srcPublisher = x => SRC_PUB[String(x.key || "").split("/")[0]] || String(x.label || "").split(/[,—]/)[0].trim() || "–";
+/* the table id when the key names one (`dst/FOLK1A` → FOLK1A), else the dataset's own name */
+const srcTableId = x => { const p = String(x.key || "").split("/"); return p.length > 1 ? p.slice(1).join("/") : p[0]; };
+/* The register and curated sources carry no table id, so no indicator joins to them through
+   `tables`. What they feed is documented in the repo (docs/PUBLIC_BUILDINGS.md, docs/INFRA.md,
+   docs/SCHOOLS.md, config/indicators.json) — it is named here rather than left as a blank cell. */
+const SRC_USED_EXTRA = {
+  bbr: "Housing stock (BBR): dwellings, sizes, rooms, rented share",
+  public: "Public buildings layer, public m² per 1,000, recent cases",
+  infra: "Infrastructure pipeline, Upcoming projects, Planned stations",
+  schools: "School indicators and the school sheets",
+  boligstat: "Private rent (DKK/m²)",
+  lbf: "Social housing rent (DKK/m²)",
+  forecast: "Outlook indicators — DST municipal projection",
+  cph_forecast: "Outlook indicators for Copenhagen quarters — KK projection",
+  net_dwellings: "Net dwelling additions",
+  kk_tryghed: "Safety survey, Copenhagen quarters",
+  "climate/climate_index": "Climate indicators",
+};
+/* which indicators read this source — they join to the catalogue through their `tables` list */
+function srcUsedFor(x) {
+  const inds = IND.concat(IND_CPH).filter(i => (i.tables || []).includes(x.key));
+  if (!inds.length) return { text: SRC_USED_EXTRA[x.key] || x.tables || "–", n: 0 };
+  const names = inds.map(i => i.short || i.label);
+  return { text: names.slice(0, 4).join(", ") + (names.length > 4 ? ` +${names.length - 4}` : ""), n: inds.length };
+}
+function sourcesTable() {
+  const built = (D.meta && D.meta.built) || "";
   const s = ((D.meta && D.meta.sources) || []).concat(CPH && CPH.meta ? CPH.meta.sources || [] : []);
+  return `<div class="scrollx"><table class="tbl compact srctbl" data-testid="sources-table" data-sortable><thead><tr>
+    <th>Source</th><th>Publisher</th><th>Tables</th><th>As of</th><th>Fetched</th><th>Licence</th><th>Used for</th><th data-nosort></th></tr></thead>
+    <tbody>${s.map(x => { const used = srcUsedFor(x), fetched = x.fetched || built;
+      return `<tr><th title="${esc(x.label)}">${esc(x.label)}</th>
+        <td class="dim">${esc(srcPublisher(x))}</td>
+        <td class="dim"><code title="${esc(x.tables || "")}">${esc(srcTableId(x))}</code></td>
+        <td data-v="${esc(x.asof || "")}">${esc(x.asof || "–")}</td>
+        <td class="dim" data-v="${esc(fetched)}">${esc(fetched || "–")}${x.fetched ? "" : ` <span class="tag mini" title="the publisher's own fetch date is not recorded for this source — the dashboard build date is shown instead">build</span>`}</td>
+        <td class="dim">${esc(x.licence || "–")}</td>
+        <td class="dim" title="${esc(used.n ? `${used.n} indicator(s)` : "")}">${esc(used.text)}</td>
+        <td>${x.url ? `<a class="lk mini" href="${esc(x.url)}" target="_blank" rel="noopener" title="Open the publisher's table information">↗</a>` : ""}</td></tr>`; }).join("")
+      || `<tr><td colspan="8" class="empty">no sources recorded</td></tr>`}</tbody></table></div>`;
+}
+function vSources() {
   const defs = (list, title) => `<div class="card"><div class="card-head"><h3>${title}</h3></div>
-    <table class="tbl compact"><thead><tr><th>Indicator</th><th>Unit</th><th>Level</th><th>Definition</th><th>Source</th><th>Caveat</th></tr></thead>
-    <tbody>${list.map(i => `<tr><th>${esc(i.label)}</th><td class="dim">${esc(i.unit || "")}</td><td class="dim">${esc(i.level)}</td><td>${esc(i.desc || "")}</td><td class="dim">${esc(i.source || "")}</td><td class="dim">${esc(i.warn || "")}</td></tr>`).join("")}</tbody></table></div>`;
-  return `<div class="card"><div class="card-head"><h3>Data sources and freshness</h3><span class="hint">built ${esc((D.meta && D.meta.built) || "–")}</span></div>
-    <table class="tbl compact"><thead><tr><th>Source</th><th>Tables / files</th><th>As of</th><th>Fetched</th><th>Licence</th></tr></thead>
-    <tbody>${s.map(x => `<tr><th>${x.url ? `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.label)}</a>` : esc(x.label)}</th><td class="dim">${esc(x.tables || "")}</td><td>${esc(x.asof || "")}</td><td class="dim">${esc(x.fetched || "")}</td><td class="dim">${esc(x.licence || "")}</td></tr>`).join("") || `<tr><td colspan="5" class="empty">no sources recorded</td></tr>`}</tbody></table>
-    <p class="cap">${((D.meta && D.meta.attribution) || []).map(esc).join(" · ")}${CPH && CPH.meta && CPH.meta.attribution ? " · " + esc(CPH.meta.attribution) : ""}${SRV ? " · " + esc(SRV_ATTRIB.join(" · ")) : ""}</p></div>
+    <div class="scrollx"><table class="tbl compact"><thead><tr><th>Indicator</th><th>Unit</th><th>Level</th><th>Definition</th><th>Source</th><th>Caveat</th></tr></thead>
+    <tbody>${list.map(i => `<tr><th>${esc(i.label)}</th><td class="dim">${esc(i.unit || "")}</td><td class="dim">${esc(i.level)}</td><td>${esc(i.desc || "")}</td><td class="dim">${esc(i.source || "")}</td><td class="dim">${esc(i.warn || "")}</td></tr>`).join("")}</tbody></table></div></div>`;
+  return `<div class="card accent"><div class="card-head"><h3>Data sources and freshness</h3><span class="hint">built ${esc((D.meta && D.meta.built) || "–")} · click a column to sort</span></div>
+    ${sourcesTable()}
+    <p class="cap">${((D.meta && D.meta.attribution) || []).map(esc).join(" · ")}${CPH && CPH.meta && CPH.meta.attribution ? " · " + esc(CPH.meta.attribution) : ""}${SRV ? " · " + esc(SRV_ATTRIB.join(" · ")) : ""}</p>
+    <p class="cap">A <b>build</b> tag in Fetched means the source file carries no fetch date of its own; the date shown is when this dashboard was built. "Used for" lists the indicators that read the table — the register and curated layers (BBR, schools, infrastructure) describe their own content instead.</p></div>
   ${IND.some(i => i.proj) ? `<div class="card"><div class="card-head"><h3>Population outlook</h3><span class="hint">projections \u2014 read the caveat</span></div>
     <table class="tbl compact"><thead><tr><th>Source</th><th>Table</th><th>Window</th><th>Vintage</th><th>Fetched</th><th>Licence</th></tr></thead><tbody>
       ${[["forecast", "Danmarks Statistik", IND.find(i => i.proj && i.proj.publisher === "DST")],
          ["cph_forecast", "K\u00f8benhavns Kommune", IND_CPH.find(i => i.proj && i.proj.table)]]
         .filter(([, , i]) => i).map(([k, pub, i]) => { const src = ((D.meta && D.meta.sources) || []).concat((D.cph && D.cph.meta && D.cph.meta.sources) || []).find(x => x.key === k) || {};
-          return `<tr><th>${esc(pub)}</th><td class="dim">${esc(i.proj.table)}</td><td>${esc(i.proj.from)}\u2013${esc(IND.concat(IND_CPH).filter(z => z.proj && z.proj.table === i.proj.table).map(z => z.proj.to).sort().pop() || i.proj.to)}</td><td>${esc(i.proj.vintage)}</td><td class="dim">${esc(src.fetched || "")}</td><td class="dim">${esc(src.licence || "free reuse with attribution")}</td></tr>`; }).join("")}
-      ${((D.meta && D.meta.sources) || []).filter(x => x.key === "net_dwellings").map(x => `<tr><th>Danmarks Statistik</th><td class="dim">BOL101 + FOLK1A</td><td>${esc((IND.find(i => i.key === "hist_net_dwell") || {}).window || "")}</td><td class="dim">measured, not projected</td><td class="dim">${esc(x.fetched || "")}</td><td class="dim">${esc(x.licence || "")}</td></tr>`).join("")}
+          return `<tr><th>${esc(pub)}</th><td class="dim">${esc(i.proj.table)}</td><td>${esc(i.proj.from)}\u2013${esc(IND.concat(IND_CPH).filter(z => z.proj && z.proj.table === i.proj.table).map(z => z.proj.to).sort().pop() || i.proj.to)}</td><td>${esc(i.proj.vintage)}</td><td class="dim">${esc(src.fetched || (D.meta && D.meta.built) || "\u2013")}</td><td class="dim">${esc(src.licence || "free reuse with attribution")}</td></tr>`; }).join("")}
+      ${((D.meta && D.meta.sources) || []).filter(x => x.key === "net_dwellings").map(x => `<tr><th>Danmarks Statistik</th><td class="dim">BOL101 + FOLK1A</td><td>${esc((IND.find(i => i.key === "hist_net_dwell") || {}).window || "")}</td><td class="dim">measured, not projected</td><td class="dim">${esc(x.fetched || (D.meta && D.meta.built) || "–")}</td><td class="dim">${esc(x.licence || "")}</td></tr>`).join("")}
     </tbody></table>
     <p class="cap"><b>Projections are scenarios based on the publishers\u2019 assumptions about fertility, mortality and migration; Copenhagen\u2019s district forecast also reflects the city\u2019s housing plans. They are not guarantees.</b></p>
     <p class="cap">DST\u2019s municipal projection and K\u00f8benhavns Kommune\u2019s district projection are different runs and are never combined \u2014 where both exist for the same city, the gap between them is stated rather than averaged away. Every Outlook figure is a published cell or plain arithmetic on published cells; nothing here uses a fitted trend or a model of our own.</p></div>` : ""}

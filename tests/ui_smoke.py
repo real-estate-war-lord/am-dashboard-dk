@@ -52,21 +52,37 @@ ROUTES = [
     dict(id="area_postnr",    hash="area/postnr/2450?ind=growth",            land=[".arhead h2!", "#armap"], state="AR.type==='postnr'"),
     dict(id="area_kvarter",   hash="area/kvarter/20602?ind=growth",          land=[".arhead h2!", "#armap"], state="AR.type==='kvarter'"),
     dict(id="area_aarhus",    hash="area/kommune/751?ind=unemp&t=bbr",       land=[".arhead h2!"], state="AR.code==='751'"),
-    # --- table / pipeline / market / charts (v2.6 names; v3.0 must redirect these) ---
-    dict(id="table_kommune",  hash="table/kommune?ind=growth",               land=["table tbody tr", "#tq"], state="S.view==='table' || S.view==='data'"),
-    dict(id="table_postnr",   hash="table/postnr?ind=growth",                land=["table tbody tr"]),
-    dict(id="table_kvarter",  hash="table/kvarter?ind=growth",               land=["table tbody tr"]),
+    # --- Data section (v3.0 spellings) ---
+    # `redirect` = the hash the app must end up on. A route with one is a redirect test: the OLD
+    # spellings below never leave this list, they are how a link shared from v2.6 stays alive.
+    dict(id="data_root",      hash="data",                                   land=["[data-testid=data-tabs]", "table tbody tr"], state="S.view==='table' && T.level==='kommune'", redirect="data/areas/kommune"),
+    dict(id="data_areas",     hash="data/areas/kommune?ind=growth",           land=["[data-testid=data-tabs]", "[data-testid=areas-table] tbody tr", "#tq"], state="S.view==='table' && T.level==='kommune'"),
+    dict(id="data_areas_pn",  hash="data/areas/postnr?ind=growth",            land=["[data-testid=areas-table] tbody tr"], state="T.level==='postnr'"),
+    dict(id="data_areas_kv",  hash="data/areas/kvarter?ind=growth",           land=["[data-testid=areas-table] tbody tr"], state="T.level==='kvarter'"),
+    dict(id="data_projects",  hash="data/projects",                          land=["[data-testid=data-tabs]", "[data-testid=projects-table] tbody tr"], state="S.view==='pipeline'"),
+    dict(id="data_proj_filt", hash="data/projects?ptype=metro&pstatus=construction", land=["[data-testid=projects-table]"], state="PIPE.type==='metro'"),
+    dict(id="data_national",  hash="data/national",                          land=["[data-testid=data-tabs]", "[data-testid=national-table] tbody tr", ".hero"], state="S.view==='market' && !MKT.src"),
+    dict(id="data_sources",   hash="data/sources",                           land=["[data-testid=data-tabs]", "[data-testid=sources-table] tbody tr"], state="S.view==='market' && MKT.src"),
+    # --- the v2.6 spellings: these now redirect and must keep landing on the right tab ---
+    dict(id="table_kommune",  hash="table/kommune?ind=growth",               land=["table tbody tr", "#tq"], state="S.view==='table'", redirect="data/areas/kommune"),
+    dict(id="table_postnr",   hash="table/postnr?ind=growth",                land=["table tbody tr"], redirect="data/areas/postnr"),
+    dict(id="table_kvarter",  hash="table/kvarter?ind=growth",               land=["table tbody tr"], redirect="data/areas/kvarter"),
+    dict(id="market",         hash="market",                                 land=[".card"], state="S.view==='market'", redirect="data/national"),
+    dict(id="sources",        hash="sources",                                land=[".card"], state="MKT.src", redirect="data/sources"),
+    dict(id="market_src",     hash="market?src=1",                           land=["[data-testid=sources-table]"], redirect="data/sources"),
+    dict(id="pipeline",       hash="pipeline",                               land=["table tbody tr"], state="S.view==='pipeline'", redirect="data/projects"),
+    dict(id="pipeline_filt",  hash="pipeline?ptype=metro&pstatus=construction", land=["table"], redirect="data/projects?ptype=metro&pstatus=construction"),
+    # --- charts / project sheet ---
     dict(id="charts",         hash="charts?ind=growth&a=kommune:101,kommune:751&y0=&y1=&med=1", land=["svg", "#chind"], state="S.view==='charts' && CH.areas.length===2"),
     dict(id="charts_dist",    hash="charts?ind=growth&a=kommune:101&mode=dist&dist=size", land=["svg"]),
-    dict(id="market",         hash="market",                                 land=["svg, .card"], state="S.view==='market' || S.view==='data'"),
-    dict(id="sources",        hash="sources",                                land=[".card"]),
-    dict(id="pipeline",       hash="pipeline",                               land=["table tbody tr"], state="S.view==='pipeline' || S.view==='data'"),
-    dict(id="pipeline_filt",  hash="pipeline?ptype=metro&pstatus=construction", land=["table"]),
     dict(id="project",        hash=None,                                     land=[".card h2, .card h3"], state="S.view==='project'", dynamic="project"),
-    # --- analysis / compare / climate / public / school ---
-    dict(id="analysis_empty", hash="analysis",                               land=["#tpq"], state="S.view==='analysis'"),
-    dict(id="analysis",       hash="analysis?a=55.64250,12.53850&la=Sydhavn&lay=infra,public,climate&hz=2070", land=["#anmap .leaflet-pane", "#anlegend!", "#anpub!", "#anclim!"], wait="#anmap .leaflet-overlay-pane", state="S.view==='analysis' && !!LF.anmap && !!KOM.list && window.__maps.length===1 && LF.anmap.dragging.enabled()", settle=2500),
-    dict(id="compare",        hash="compare?a=kvarter:20602&b=kommune:147&hz=2070", land=["table tbody tr", "#cmpa", "#cmpb"], state="S.view==='compare'"),
+    # --- test property / compare redirect / climate / public / school ---
+    dict(id="property_empty", hash="property",                               land=["#tpq"], state="S.view==='analysis'"),
+    dict(id="property",       hash="property?p=55.64250,12.53850:Sydhavn&lay=infra,public,climate&hz=2070", land=["#anmap .leaflet-pane", "#anlegend!", "#anpub!", "#anclim!"], wait="#anmap .leaflet-overlay-pane", state="S.view==='analysis' && !!LF.anmap && !!KOM.list && window.__maps.length===1", settle=2500, redirect="property?p=55.6425,12.5385:Sydhavn"),
+    dict(id="analysis_empty", hash="analysis",                               land=["#tpq"], state="S.view==='analysis'", redirect="property"),
+    dict(id="analysis",       hash="analysis?a=55.64250,12.53850&la=Sydhavn&lay=infra,public,climate&hz=2070", land=["#anmap .leaflet-pane", "#anlegend!", "#anpub!", "#anclim!"], wait="#anmap .leaflet-overlay-pane", state="S.view==='analysis' && !!LF.anmap && !!KOM.list && window.__maps.length===1 && LF.anmap.dragging.enabled()", settle=2500, redirect="property?p=55.6425,12.5385:Sydhavn"),
+    # Compare is deleted (amendment A1): the old link lands on the first area's own page.
+    dict(id="compare_redirect", hash="compare?a=kommune:101&b=kommune:751&hz=2070", land=[".arhead h2!", "#armap"], state="S.view==='area' && AR.type==='kommune' && AR.code==='101'", redirect="area/kommune/101"),
     dict(id="climate_sheet",  hash="climate/0167?hz=2070",                   land=[".climtbl, table"], state="S.view==='climate' && CS.code==='0167'", settle=2000),
     dict(id="publist",        hash="publist/kommune:101:education:existing", land=["table, .card"], state="S.view==='publist'", settle=2000),
     dict(id="schoollist",     hash="schoollist/kommune:101",                 land=["table, .card"], state="S.view==='schoollist'", settle=2000),
@@ -79,6 +95,29 @@ VIEWPORTS = {"1440x900": (1440, 900), "1366x768": (1366, 768), "390x844": (390, 
 # the responsive shell and flips this to True; until then the finding is reported, not fatal.
 OVERFLOW_FATAL = False
 PHONE_W = 480
+
+
+def hash_mismatch(actual, expect):
+    """'' when `actual` is the canonical spelling of `expect`: same path, and every query key the
+    expectation names present with that value. The app adds its own keys (ind=, hz=…) on the way,
+    so a redirect is checked on what it promises, not on the whole string."""
+    a_path, _, a_qs = actual.lstrip("#").partition("?")
+    e_path, _, e_qs = expect.lstrip("#").partition("?")
+    if a_path != e_path:
+        return f"redirect path {a_path!r}, expected {e_path!r}"
+    aq = {}
+    for part in a_qs.split("&"):
+        k, _, v = part.partition("=")
+        if k:
+            aq[k] = v
+    for part in e_qs.split("&"):
+        if not part:
+            continue
+        k, _, v = part.partition("=")
+        if aq.get(k) != v:
+            return f"redirect {k}={aq.get(k)!r}, expected {v!r}"
+    return ""
+
 
 # Console noise that is not the app's fault (tile 404s when offline etc.). Everything else fails.
 IGNORE = [
@@ -144,6 +183,10 @@ def main():
                     n = page.evaluate(f"(() => {{ const e = document.querySelector({json.dumps(sel)}); return e ? (e.innerHTML||'').trim().length : -1; }})()")
                     if n < 0: issues.append(f"missing landmark {sel}")
                     elif nonempty and n == 0: issues.append(f"empty landmark {sel}")
+                if r.get("redirect"):
+                    bad = hash_mismatch(page.evaluate("location.hash"), r["redirect"])
+                    if bad:
+                        issues.append(bad)
                 if r.get("state"):
                     try:
                         ok = page.evaluate(f"!!({r['state']})")

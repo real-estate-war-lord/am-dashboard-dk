@@ -118,6 +118,21 @@ test("an empty hash is the map", () => {
   assert.strictEqual(R.toV3(""), "map");
   assert.strictEqual(R.toV3("#"), "map");
 });
+test("a bare Data link is spelled out in full — #data → #data/areas/kommune (AC-D1)", () => {
+  assert.strictEqual(R.toV3("#data"), "data/areas/kommune");
+  assert.strictEqual(R.toV3("#data/areas"), "data/areas/kommune");
+  assert.strictEqual(R.toV3("#data/areas/bogus?ind=growth"), "data/areas/kommune?ind=growth");
+  assert.strictEqual(R.toV3("#data/areas/kvarter"), "data/areas/kvarter");
+  ["projects", "national", "sources"].forEach(t => assert.strictEqual(R.toV3("#data/" + t), "data/" + t));
+});
+test("keepClimateFlag leaves climate=1 alone (the overlay is still a working toggle)", () => {
+  const o = { isClim, keepClimateFlag: true };
+  assert.strictEqual(R.toV3("#map?ind=growth&climate=1&clim=areas,surge", o), "map?ind=growth&climate=1&clim=areas,surge");
+  assert.strictEqual(R.toV3(R.toV3("#map?ind=growth&climate=1", o), o), "map?ind=growth&climate=1");
+  /* it changes nothing else: the Data and property aliases still fire */
+  assert.strictEqual(R.toV3("#table/postnr", o), "data/areas/postnr");
+  assert.strictEqual(R.toV3("#analysis?a=55.6545,12.539&la=T", o), "property?p=55.6545,12.539:T");
+});
 test("toV3 is idempotent — it can run on every hashchange", () => {
   ["#table/postnr?ind=growth", "#pipeline", "#market?src=1", "#sources", "#analysis?a=55.6545,12.539&la=T",
    "#compare?a=kommune:101&b=kommune:751", "#map?ind=growth&climate=1", "#map?ind=sealevel_cm&climate=1",

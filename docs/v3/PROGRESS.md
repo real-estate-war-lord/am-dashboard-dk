@@ -106,3 +106,113 @@ scale with card/gutter/control sizes, and the type scale. **No view is restyled.
   second codec, and can use `toInternal()` to get `{a, la}` out of `p=`.
 - Every phase: add one `@ac(...)` per MUST AC it delivers to `tests/ui_ac.py`, and never weaken an
   earlier phase's.
+
+---
+
+## P2 — Navigation, the Data section, Compare deleted, the redirects live
+
+Commit: `v3.0 P2: nav + Data section, v3 hashes live, Compare deleted, breadcrumbs`
+Gate: green — build, 63 node tests, 42 python tests, 117/117 route×viewport smoke checks with **0 JS
+errors**, 11/11 acceptance criteria (3 from P1 + 8 from P2), budgets (app.js 353 KB / 450 KB,
+style.css 115 KB / 140 KB).
+
+### What was built
+
+**1. Four destinations.** `VIEWS` / `NAV_GROUPS` are now `Market intelligence: Map · Data · Charts`
+and `Analysis: Test property`. Market, Pipeline and Compare are gone as nav items. Every nav button
+carries `data-testid=nav-item`, the `<aside>` carries `data-testid=sidebar`, and the footer export
+button `data-testid=export-btn` (P7 turns it into the menu). The sidebar's `on` mapping folds
+`table`/`pipeline`/`market`/`project` onto **Data** and the sheets onto **Map**.
+
+**2. The Data section** — `#data/areas/<level>` · `#data/projects` · `#data/national` ·
+`#data/sources`, `#data` → `#data/areas/kommune`. One tab bar (`dataTabs()`,
+`data-testid=data-tabs`, four `data-testid=data-tab` buttons) rendered at the top of `vTable`,
+`vPipeline` and `vMarket`. **The internal view ids are unchanged** (`table`, `pipeline`, `market` +
+`MKT.src`) — only the hash spelling, the labels and the breadcrumb moved.
+- **Areas** = the old Table, behaviour untouched; the table gained `data-testid=areas-table`.
+- **Projects** = the old Pipeline with its `ptype`/`pstatus` filters and CSV button
+  (`data-testid=projects-table`); the toolbar keeps the `n of N projects` count and the caption
+  names the publishers (Fingerplan, Anlægsstatus, the agencies' decision documents).
+- **National series** = the old Market rebuilt as a table (`data-testid=national-table`):
+  `Series · Latest · Period (+ month/quarter/year tag) · y/y · Source · Last 5 years` sparkline.
+  The four big `lineChart()` charts and `lineChart()` itself are **deleted**; the four headline
+  tiles stay as a compact row (`.hero.hero-nat`, no sparkline inside the tile).
+- **Sources** = the old accordion as a sortable table (`data-testid=sources-table`):
+  `Source · Publisher · Tables · As of · Fetched · Licence · Used for · ↗`. Publisher is read off
+  the catalogue key (`dst/` → Danmarks Statistik …), "Used for" joins indicators through their
+  `tables` list with a named fallback for the register/curated sources, and an empty **Fetched**
+  falls back to the build date with a `build` tag (AC-D4).
+
+**3. The v3 hashes are live.** `ROUTE_V3` is deleted; `hashFor()` always ends in `RC.toV3()` and
+`parseHash()` always starts from `RC.toInternal()`. `parseHash()` then ends with a canonical
+`replaceState` of `hashFor()`, so the address bar always shows what the app would serialise — an old
+link redirects exactly once and every route round-trips (AC-U1). `climate=1` is deliberately left
+alone (`keepClimateFlag`) until the Climate phase.
+Redirects verified in the suite: `#table/<lvl>` → `#data/areas/<lvl>`, `#pipeline[?filters]` →
+`#data/projects`, `#market` → `#data/national`, `#market?src=1` and `#sources` → `#data/sources`,
+`#analysis?a=&la=` → `#property?p=lat,lon:label`, `#compare?a=&b=` → the **a** side's area page.
+
+**4. Compare is deleted** (amendment A1): `vCompare`, `cmpRow`, `cmpZoneRow`, `cmpInZone`,
+`cmpSection`, `cmpPick`, `cmpBetter`, `cmpValCell`, `cmpSrcCode`, `cmpResolve`, `cmpIdFromOpt`,
+`CMP`, `CMP_CLIM_KEYS`, the `cmpa`/`cmpb` change handlers, the `VIEWS`/`RENDER`/`crumbs` entries,
+the `hashFor`/`parseHash` branches and the `.cmp*` CSS. No route shows the word (AC-TP6).
+
+**5. Test property route** `#property?p=lat,lon[:label]` (A3). `analysisLink()` now builds it
+through `RC.propSerialise` (`propLink()`), so the popup "Analyse ›" button, the nav item and the
+pin-drop all emit the new hash; `#analysis?a=…&la=…` redirects to it. The view is still the existing
+`analysis` sheet — §5.5′ is P6's rebuild.
+
+**6. Breadcrumbs** for every view. Data → `Denmark › Data › <tab>`; project sheet →
+`Denmark › Data › Projects › <name>`; **public-building sheet → `Denmark › København › <building>`**
+(AC-SH3 — v2.6 showed "Macro map"); public list and school list gained the municipality; the test
+property no longer pushes a "Map" crumb.
+
+**7. Tests.** `tests/ui_smoke.py` ROUTES: eight new `#data/*` + two `#property` routes, a
+`compare_redirect` route replacing `compare`, and a new `redirect=` field checked by
+`hash_mismatch()` (same path, and every query key the expectation names) — the old hashes all carry
+one now, so they are literally the redirect test. `tests/ui_ac.py` gained AC-D1, AC-D2, AC-D3,
+AC-D4, AC-SH3, AC-TP1, AC-TP6, AC-U1. `tests/route.test.js` gained the `data` alias and
+`keepClimateFlag` cases (31 route tests, 63 node tests in all).
+
+### ACs delivered
+AC-D1, AC-D2 (read as the four amended items), AC-D3, AC-D4, AC-SH3, AC-TP1, AC-TP6, AC-U1 — all
+MUST, all registered in `tests/ui_ac.py` under `phase="P2"`.
+
+### Deviations
+- **AC-D2 is asserted with four nav items**, not the spec's five: owner amendment A1 removes
+  Compare, and Market/Pipeline were already folded into Data by §1 of the spec.
+- The **`keepClimateFlag` option** is new in `route_core.js` and not in any phase file. Flipping the
+  route flag would otherwise have activated P1's `climate=1` → `ind=surge_dw_pct` rewrite, which
+  deletes the working Climate-risk overlay button two phases early (the smoke `map_climate` route
+  asserts `MK.clim`). The Climate phase deletes the option, its app.js call sites and its node test
+  in the same commit that removes `MK.clim`.
+- **Internal view ids kept** (`table`, `pipeline`, `market`) as the phase file allows; there is no
+  `S.view === "data"`. Anything testing for one should test `isData()`.
+- The National series `↗ Chart` per row is SHOULD in the spec and is **not** built — the table is
+  the MUST. Charts does not yet take a national series as an entity (that is the Charts phase).
+
+### Known issues / open items
+- `scripts/ui_check.py` (the older headless-Chrome check) still drives `#compare` and asserts its
+  climate rows. It is outside this run's allowed files and is **not** part of `./overnight.sh gate`;
+  `make ui-check` will fail its compare group until someone removes that block.
+- Horizontal overflow at 390 px is still a note on every route (v2.6 defect); **P8 flips
+  `OVERFLOW_FATAL = True`**. The Data tab bar is already `overflow-x:auto` below 600 px.
+- The Data tabs do not yet carry the view's query state in their `data-go` (they emit a bare path),
+  so switching tabs keeps the indicator only because `parseHash()` leaves `MK.ind` alone when the
+  hash names none. If a later phase makes the tabs stateful, give them `withQ()`.
+- `exportCsv` / `exportAll` are untouched — the Export phase owns the schema and the menu.
+
+### What the next phase must know
+- **`hashFor()` is the single serialiser and it is now enforced**: `parseHash()` rewrites the address
+  bar to `hashFor()` on every parse. A new URL key must be written by `hashFor()` *and* read by
+  `parseHash()`, or it will be silently dropped from the bar one frame after it is set.
+- **Add a hash spelling in `src/route_core.js`, not in app.js.** `toV3()` (old → canonical, must stay
+  idempotent — there is a test for it) and `toInternal()` (either spelling → the v2.6 view id).
+- **Never remove an old hash from `tests/ui_smoke.py` ROUTES.** Give a new route a `redirect=` when
+  it must land somewhere else; `hash_mismatch()` checks the path plus the query keys you name.
+- The Data section is three views behind one tab bar: a change to the Areas tab is a change to
+  `vTable`, to Projects `vPipeline`, to National series / Sources `vMarket` / `vSources`.
+- `dataTabs()`, `dataTabHash()`, `dataTab()` and `isData()` are the helpers to reuse; `DATA_TABS`
+  is the one list of tab ids and labels.
+- The Export phase: the footer button is `[data-testid=export-btn]` in `src/index.html` and still
+  calls `exportAll()`; the spec wants the same menu in the Data page header.

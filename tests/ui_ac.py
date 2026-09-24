@@ -74,6 +74,19 @@ def boot(page, base):
     goto(page, "map?ind=growth", settle=600)
 
 
+def cur_hash(page):
+    """The hash the app settled on — parseHash() rewrites an old link to its canonical v3 spelling."""
+    return page.evaluate("location.hash").lstrip("#")
+
+
+def cur_path(page):
+    return cur_hash(page).split("?")[0]
+
+
+def texts(page, selector):
+    return page.eval_on_selector_all(selector, "els => els.map(e => (e.textContent || '').trim())")
+
+
 def map_center(page, i=0):
     return page.evaluate("i => { const c = window.__maps[i].getCenter(); return [c.lat, c.lng]; }", i)
 
@@ -163,6 +176,147 @@ def ac_p1_minimap_drag(page, base):
     page.wait_for_timeout(700)
     back = map_center(page)
     assert abs(back[0] - 55.6545) < 1e-3 and abs(back[1] - 12.539) < 1e-3, f"⌖ did not re-centre on the pin: {back}"
+
+
+# =============================================================================================
+# P2 — navigation, the Data section, Compare removed, the redirects live
+# =============================================================================================
+@ac("AC-D1", phase="P2")
+def ac_d1(page, base):
+    """#data redirects to #data/areas/kommune, the Data tab bar has four tabs, and every v2.6
+    tabular link (#table/*, #pipeline, #market, #sources) redirects to its #data/… hash."""
+    goto(page, "data")
+    assert cur_path(page) == "data/areas/kommune", f"#data landed on {cur_hash(page)!r}"
+    tabs = texts(page, "[data-testid=data-tabs] [data-testid=data-tab]")
+    assert tabs == ["Areas", "Projects", "National series", "Sources"], f"tabs are {tabs}"
+    for old, new in [("table/kommune", "data/areas/kommune"), ("table/postnr", "data/areas/postnr"),
+                     ("table/kvarter", "data/areas/kvarter"), ("pipeline", "data/projects"),
+                     ("market", "data/national"), ("market?src=1", "data/sources"),
+                     ("sources", "data/sources"), ("data", "data/areas/kommune")]:
+        goto(page, old, settle=500)
+        assert cur_path(page) == new, f"#{old} landed on {cur_hash(page)!r}, expected #{new}"
+        assert page.locator("[data-testid=data-tabs]").count() == 1, f"no tab bar on #{old}"
+
+
+@ac("AC-D2", phase="P2")
+def ac_d2(page, base):
+    """The sidebar has exactly four nav items: Map, Data, Charts, Test property (amendment A1 —
+    Market, Pipeline and Compare are gone)."""
+    items = texts(page, "[data-testid=sidebar] [data-testid=nav-item]")
+    assert items == ["Map", "Data", "Charts", "Test property"], f"nav items are {items}"
+    assert page.locator("[data-testid=nav-item]").count() == 4
+
+
+@ac("AC-D3", phase="P2")
+def ac_d3(page, base):
+    """#data/national is a table of at least 13 series, every row carrying a source, and the four
+    large charts are gone — nothing on the page draws wider than 300 px."""
+    goto(page, "data/national", settle=1100)
+    rows = page.locator("[data-testid=national-table] tbody tr")
+    n = rows.count()
+    assert n >= 13, f"only {n} series rows"
+    srcs = texts(page, "[data-testid=national-table] tbody tr td:nth-child(5)")
+    assert len(srcs) == n, f"{len(srcs)} source cells for {n} rows"
+    blank = [i for i, s in enumerate(srcs) if not s]
+    assert not blank, f"rows {blank} have an empty Source cell"
+    wide = page.evaluate("[...document.querySelectorAll('svg,canvas')]"
+                         ".map(e => Math.round(e.getBoundingClientRect().width)).filter(w => w > 300)")
+    assert not wide, f"a chart {wide} px wide survived on the National series tab"
+
+
+@ac("AC-D4", phase="P2")
+def ac_d4(page, base):
+    """#data/sources is a table with no empty cell in the Fetched column — a source that records no
+    fetch date of its own shows the build date with a `build` tag."""
+    goto(page, "data/sources", settle=900)
+    head = texts(page, "[data-testid=sources-table] thead th")
+    assert "Fetched" in head, f"no Fetched column in {head}"
+    i = head.index("Fetched") + 1
+    cells = texts(page, f"[data-testid=sources-table] tbody tr td:nth-child({i})")
+    assert len(cells) >= 20, f"only {len(cells)} source rows"
+    blank = [k for k, c in enumerate(cells) if not c or c == "–"]
+    assert not blank, f"rows {blank} have an empty Fetched cell"
+
+
+@ac("AC-SH3", phase="P2")
+def ac_sh3(page, base):
+    """The breadcrumb on a public-building sheet names the municipality the building is in, not the
+    view the reader came from (v2.6 showed "Macro map")."""
+    goto(page, "publist/kommune:101:education:existing", settle=2200)
+    first = page.locator("[data-pubsheet]").first
+    bid = first.get_attribute("data-pubsheet")
+    kom = first.get_attribute("data-pubkom") or "101"
+    assert bid, "no public building to open"
+    goto(page, f"public/{kom}/{bid}", settle=1600)
+    crumb = page.locator(".crumbs").inner_text()
+    assert "Macro map" not in crumb, f"breadcrumb still says Macro map: {crumb!r}"
+    assert "København" in crumb, f"breadcrumb does not name the municipality: {crumb!r}"
+
+
+@ac("AC-TP1", phase="P2")
+def ac_tp1(page, base):
+    """An #analysis link redirects to the Test property route: #property?p=lat,lon[:label]."""
+    goto(page, "analysis?a=55.65450,12.53900&la=Test", settle=1200)
+    h = cur_hash(page)
+    assert h.startswith("property?p=55.6545,12.539"), f"redirected to {h!r}"
+    assert page.evaluate("S.view === 'analysis' && AN.a === '55.6545,12.539' && AN.label === 'Test'"), \
+        "the pin did not survive the redirect"
+
+
+@ac("AC-TP6", phase="P2")
+def ac_tp6(page, base):
+    """Compare is gone (amendment A1): no route shows the word, and the old link lands on the first
+    area's own page."""
+    for h in ["map?ind=growth", "area/kommune/101?ind=growth", "area/postnr/2450?ind=growth",
+              "data/areas/kommune", "data/projects", "data/national", "data/sources",
+              "charts?ind=growth&a=kommune:101", "property?p=55.6545,12.539"]:
+        goto(page, h, settle=700)
+        hits = page.evaluate("""() => {
+          const out = [];
+          const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+          for (let n = w.nextNode(); n; n = w.nextNode()) {
+            const p = n.parentElement;
+            if (!p || /^(SCRIPT|STYLE|TEMPLATE|NOSCRIPT)$/.test(p.tagName)) continue;
+            if (!p.offsetParent && p.tagName !== 'BODY') continue;   /* not rendered = not shown */
+            if (/\\bcompare\\b/i.test(n.nodeValue || '')) out.push((n.nodeValue || '').trim().slice(0, 60));
+          }
+          return out;
+        }""")
+        assert not hits, f"'Compare' is still on #{h}: {hits[:3]}"
+    goto(page, "compare?a=kommune:101&b=kommune:751", settle=1200)
+    assert cur_path(page) == "area/kommune/101", f"#compare landed on {cur_hash(page)!r}"
+    assert page.evaluate("S.view === 'area' && AR.code === '101'")
+
+
+@ac("AC-U1", phase="P2")
+def ac_u1(page, base):
+    """Every route that exists now round-trips through parseHash() → hashFor() unchanged: the hash
+    in the address bar is exactly what the app would serialise, after load, after one interaction
+    and after history.back()."""
+    pid = page.evaluate("(INFRA_ALL[0] || {properties:{id:''}}).properties.id")
+    routes = ["map", "map/101?ind=growth", "map/101/postnr?ind=renters",
+              "area/kommune/101?ind=growth", "area/postnr/2450?ind=growth", "area/kvarter/20602?ind=growth",
+              "data/areas/kommune?ind=unemp", "data/areas/postnr", "data/areas/kvarter",
+              "data/projects?ptype=metro", "data/national", "data/sources",
+              "charts?ind=growth&a=kommune:101,kommune:751", "property?p=55.6545,12.539:Test",
+              "climate/0167?hz=2070", "school/280657", "publist/kommune:101:education:existing"]
+    if pid:
+        routes.append("project/" + pid)
+    for h in routes:
+        goto(page, h, settle=700)
+        a, b = page.evaluate("[location.hash.slice(1), hashFor()]")
+        assert a == b, f"#{h}: the bar says {a!r}, hashFor() writes {b!r}"
+        # one interaction: the indicator chips are the control every view with a picker shares
+        chip = page.locator("[data-indq]").first
+        if chip.count():
+            chip.click()
+            page.wait_for_timeout(700)
+            a, b = page.evaluate("[location.hash.slice(1), hashFor()]")
+            assert a == b, f"#{h} after a chip click: bar {a!r}, hashFor() {b!r}"
+    page.evaluate("history.back()")
+    page.wait_for_timeout(900)
+    a, b = page.evaluate("[location.hash.slice(1), hashFor()]")
+    assert a == b, f"after history.back(): bar {a!r}, hashFor() {b!r}"
 
 
 # ---------------------------------------------------------------------------------------------

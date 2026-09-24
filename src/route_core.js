@@ -96,6 +96,13 @@ const AREA_TYPES = ["kommune", "postnr", "kvarter"];
 const ALIASES = {
   table:    (parts, q) => ({ path: "data/areas/" + (LEVELS.indexOf(parts[1]) >= 0 ? parts[1] : "kommune"), query: q }),
   pipeline: (parts, q) => ({ path: "data/projects", query: q }),
+  /* the Data section itself: `#data` and `#data/areas` are spelled out in full, so a bare link is
+     already the canonical link and the tab bar never has to guess which level it is showing */
+  data:     (parts, q) => {
+    const tab = parts[1] || "areas";
+    if (tab === "projects" || tab === "national" || tab === "sources") return { path: "data/" + tab, query: q };
+    return { path: "data/areas/" + (LEVELS.indexOf(parts[2]) >= 0 ? parts[2] : "kommune"), query: q };
+  },
   /* #sources was already an alias for "market with the sources panel open"; both land on the tab */
   market:   (parts, q) => { const src = q.src === "1"; const r = Object.assign({}, q); delete r.src;
                             return { path: src ? "data/sources" : "data/national", query: r }; },
@@ -127,14 +134,16 @@ function climateFlag(query, isClim) {
   return q;
 }
 
-/* old hash → the canonical v3 hash. Idempotent: toV3(toV3(h)) === toV3(h) for every h. */
+/* old hash → the canonical v3 hash. Idempotent: toV3(toV3(h)) === toV3(h) for every h.
+   `opts.keepClimateFlag` leaves `climate=1` alone: the overlay is still a working toggle until the
+   phase that turns Climate into an indicator family lands, and converting it early would delete it. */
 function toV3(hash, opts) {
   const o = opts || {};
   const { parts, query } = splitHash(hash);
   const head = parts[0] || "map";
   const fn = Object.prototype.hasOwnProperty.call(ALIASES, head) ? ALIASES[head] : null;
   if (fn) { const r = fn(parts, query); return buildHash(r.path, r.query); }
-  if (head === "map") return buildHash(parts.join("/") || "map", climateFlag(query, o.isClim));
+  if (head === "map" && !o.keepClimateFlag) return buildHash(parts.join("/") || "map", climateFlag(query, o.isClim));
   return buildHash(parts.join("/") || "map", query);
 }
 
