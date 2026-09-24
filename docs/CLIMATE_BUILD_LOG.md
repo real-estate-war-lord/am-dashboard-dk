@@ -539,3 +539,78 @@ F&P 98 rows · 26 risk areas · 51 designated kommuner. Plus: each horizon index
 `depth_class`, names Kystdirektoratet as the source and records the 100-årshændelse event.
 
 `make validate` exit 0 with no `✗`; `make build` exit 0 with no `⚠`; the `cph.json` stamp reverted.
+
+---
+
+# v2.6 · step 4 — the UI (2026-09-24)
+
+The first step on this branch to touch `src/`. Three commits: the map overlay, the indicators and
+their source links, and the sheet / card line / Analysis section.
+
+## Shared files touched in this step
+
+| File | Edit | Why |
+|---|---|---|
+| `src/app.js` | +~470 lines in three additive blocks (a Climate section before the Schools block, a collapsible-legend helper) and ~20 one-line hooks: hash, click handlers, `V()`, `yearSelect()`, `mkTools()`, `lfInit()`, `lfLayers()`, `lfPopup()`, `setLegend()`, `GROUP_ORDER`, `ANL`, `anMapOverlays()`, `anFill()`, `vAnalysis()`, `RENDER`, `crumbs()` | the layer itself; every hook is one line beside the existing infra / public / services equivalents |
+| `src/style.css` | +24 lines at the end: the climate legend, the legend fold, the sheet's range text | no existing rule changed |
+| `config/indicators.json` | `climate_src` on all 8 Climate indicators; `chip`/`chip_label` on `surge_dw_pct`; the 2050/2100 and "max across stretches" prose corrected to 2070/2120 and the longest-coastline rule | the link recipe, and prose that v2.6 steps 2–3 had left stale |
+| `scripts/build_makro.py` | +2 names in the registry passthrough tuple (`horizon`, `chip_label`, `climate_src`) | the page needs the horizon list and the link recipe |
+| `scripts/build_dashboard.py` | +28 lines: `climate_payload()` and one key in the data dict | the inline index; the polygons still load on demand |
+| `scripts/check_source_links.py` | +85 lines: a `check_climate()` section and two one-line exclusions | `make links` now covers the Climate layer |
+
+## Decisions that shaped the code
+
+**One horizon pill, two calendars, one label.** `hz=today|2070|2120` in the hash drives the zones
+*and* every Climate indicator's value, through one line in `V()`. Every label names both periods —
+"2070 — zones: Kystdirektoratet 2070 · figures: Klimaatlas 2041–70 (SSP2-4.5 / RCP4.5 for rain)" —
+because the published extent year and the Klimaatlas period are not the same calendar and pretending
+they are is the easiest lie this layer could tell. `weather_claims_1000` and `flood_risk_area` carry
+no horizon, so they read their one published figure at every horizon and say "same" in the sheet
+rather than going blank when the pill moves.
+
+**The zone pane takes no clicks.** The zones cover half a kommune at a time. Drawn interactive they
+would swallow the polygon click that opens a municipality's popup, which is the map's main verb. So
+`climpane` has `pointer-events: none`, and what the zones know about the clicked point is folded
+into that same popup instead: a `p.on("click")` registered *before* `bindPopup` records the latlng,
+and `climPopupBlock` tests it against the loaded extents. One popup, both layers, no lost clicks.
+
+**Deviation from the brief, stated:** the brief asked for popups on the zone polygons themselves.
+That cannot coexist with "never blocks polygon clicks" — one of the two has to give, and taking a
+click away from the choropleth is the worse failure. The zone popup content lives in the area popup.
+
+**Postal codes and quarters own `surge_dw_pct`.** It is the one Climate figure computed below
+kommune level, so it is never marked °. A postal code that the exposure table does not list, in a
+kommune that has a zone, is 0 % — no BBR dwelling point inside the published polygon — and null
+where the kommune has no zone at all. Nothing is inherited and relabelled.
+
+**Four legends do not fit.** Every block in `.maplegs` now folds from its own header, and the fold
+is remembered per box so a filter change or a pan never springs one back open.
+
+## Verify at source
+
+`climate_src` in the registry is the whole recipe; `src/app.js` and `scripts/check_source_links.py`
+build the identical URL from it, so a drift between the page and the checker shows up in `make links`.
+
+| indicator | link | checked |
+|---|---|---|
+| `sealevel_cm` · `surge100_cm` · `surge_freq_x` | Klimaatlas `VandstandStormflodKyst_latest/0` query, `kystkode` = the kommune's own stretch, `periode`/`scenarie` from the horizon | value recomputed from the response |
+| `rain100_1h_mm` · `cloudbursts_yr` | Klimaatlas `NedboerKommuner_latest/0` query, `komkode` | value recomputed |
+| `weather_claims_1000` | the F&P Datawrapper dataset CSV | all 98 values recomputed |
+| `flood_risk_area` | `OD_risikoomraader_2024` MapServer | reachability |
+| `surge_dw_pct` | `Kystplanlaegger_Oversvommelsesfare_2` layer 3 / 12 / 21 for the horizon | reachability of all three layers |
+
+`make validate` (which runs the quick sweep) exits 0: **every Klimaatlas cell agrees at all three
+horizons, 98/98 F&P values agree, both MST services resolve.** `make build` exits 0 with no `⚠`;
+`data/processed/cph.json`'s stamp was rewritten again and reverted. Tests: **42 Python + 15 JS, all
+pass** — no new test was added for the UI in this step, which is the gap this step leaves behind.
+
+## Checked in the browser (local server on a random port, stopped afterwards)
+
+* København 2070 `surge_dw_pct` = 15.30, postal code 2450 = 55.16, Hvidovre sheet 9.7 % and
+  6.95 km² — the same figures as step 3's check table.
+* Zones lazy-load per kommune for the viewport from zoom 10: panning Copenhagen at zoom 12 fetched
+  `2070:{0101,0155,0167,0185}` and nothing else.
+* Point-in-polygon: 855 of 4 000 random points in the Hvidovre 2070 bbox fall inside the extent
+  (21 %, and the zone is 7.0 km² of a 22 km² bbox), and `climInZone` agrees for a sampled point.
+  Both pins tried by hand (Sydhavn, Avedøre Holme) are dry at all three horizons, which matches
+  `docs/CLIMATE_PROBE.md` §9 — the published extent is not the whole coastline.

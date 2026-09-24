@@ -183,12 +183,12 @@ const AN = { a: "", label: "" };                                                
 /* Analysis sheet: which overlays the "Where it is" map draws — the same three the Macro map offers.
    Defaults: infra on, public buildings on where the BBR pull reaches the pin, buildings off (its
    micro/<kommune>.json is fetched only once the pill is switched on). The set lives in the hash as lay=. */
-const ANL = { infra: true, pub: true, micro: false };
-const anLayerList = () => [ANL.infra ? "infra" : "", ANL.pub ? "public" : "", ANL.micro ? "buildings" : ""].filter(Boolean);
+const ANL = { infra: true, pub: true, micro: false, climate: false };
+const anLayerList = () => [ANL.infra ? "infra" : "", ANL.pub ? "public" : "", ANL.micro ? "buildings" : "", ANL.climate ? "climate" : ""].filter(Boolean);
 function anParseLayers(q) {
-  if (q.lay == null) { ANL.infra = true; ANL.pub = true; ANL.micro = false; return; }
+  if (q.lay == null) { ANL.infra = true; ANL.pub = true; ANL.micro = false; ANL.climate = false; return; }
   const set = new Set(q.lay.split(",").filter(Boolean));
-  ANL.infra = set.has("infra"); ANL.pub = set.has("public"); ANL.micro = set.has("buildings");
+  ANL.infra = set.has("infra"); ANL.pub = set.has("public"); ANL.micro = set.has("buildings"); ANL.climate = set.has("climate");
 }
 /* Test property: one pin dropped from a pasted Google Maps link or a "lat, lon" pair (parseLocation, src/testprop.js).
    It lives in the map hash (pin=, pl=), so it survives a reload and every level change. */
@@ -258,6 +258,7 @@ function hashFor() {
     if (HZ.h !== "today") q.push(`hz=${HZ.h}`); }
   else if (S.view === "market") { p = "market"; if (MKT.src) q.push("src=1"); }
   else if (S.view === "project") { p = `project/${PR.id}`; }
+  else if (S.view === "climate") { p = `climate/${CS.code}`; }
   else if (S.view === "public") { p = `public/${PB.kom}/${PB.id}`; }
   else if (S.view === "publist") { p = `publist/${PL.key}`; }
   else if (S.view === "school") { p = `school/${SC.nr}`; }
@@ -289,6 +290,8 @@ function parseHash() {
   else if (v === "analysis") { S.view = "analysis"; AN.a = q.a || ""; AN.label = q.la || ""; anParseLayers(q); pubParseFilter(q);
     /* the sheet cannot say which kommune the point is in until the rings are there — chain once, not on every hashchange */
     if (!KOM.list && !KOM.err) komLoad().then(() => { if (S.view === "analysis") renderKeep(); }); }
+  else if (v === "climate" && parts[1]) { S.view = "climate"; CS.code = pad4(parts[1]); climSheetLoad();
+    /* the zone files land asynchronously; the sheet is redrawn once, when they do */ }
   else if (v === "charts") { S.view = "charts"; CH.ind = q.ind || CH.ind; CH.areas = q.a ? q.a.split(",").filter(Boolean) : CH.areas; CH.y0 = q.y0 || CH.y0; CH.y1 = q.y1 || CH.y1; CH.median = q.med !== "0"; CH.mode = q.mode || "auto"; CH.dist = q.dist || "size";
     CH.fq = q.fq === "q" ? "q" : "year"; CH.ov = q.ov ? q.ov.split(",").filter(Boolean) : []; CH.nat = q.nat !== "0"; }
   else { S.view = "makro"; MK.muni = parts[1] && byCode[parts[1]] ? parts[1] : null;
@@ -323,7 +326,7 @@ const NAV_GROUPS = [["Market intelligence", ["makro", "table", "charts", "market
 const viewOf = id => VIEWS.find(v => v[0] === id) || VIEWS[0];
 
 function renderNav() {
-  const on = S.view === "area" ? "makro" : S.view === "project" ? "pipeline" : ["public", "publist", "school", "schoollist"].includes(S.view) ? "makro" : S.view;
+  const on = S.view === "area" ? "makro" : S.view === "project" ? "pipeline" : ["public", "publist", "school", "schoollist", "climate"].includes(S.view) ? "makro" : S.view;
   document.getElementById("nav").innerHTML = NAV_GROUPS.map(([lab, ids]) => `<div class="nav-glab">${lab}</div>` +
     ids.map(id => { const v = viewOf(id), h = id === "analysis" ? anNavLink() : v[3];
       return `<button class="nav-item ${on === id ? "on" : ""}" data-go="${esc(h)}" title="${esc(v[2])}"><b>${v[1]}</b></button>`; }).join("")).join("");
@@ -341,6 +344,8 @@ function crumbs() {
   else if (S.view === "school") { const s = SCH_BY[SC.nr]; if (s && byCode[s.kom]) c.push([s.kommune, `area/kommune/${s.kom}` + q]); tail = s ? s.name : "School"; kind = s ? (SCH_TYPE[s.type] || s.type) : "Uddannelsesstatistik.dk"; }
   else if (S.view === "schoollist") { tail = "Schools"; kind = "sorted by FP9 grade"; }
   else if (S.view === "analysis") { c.push(["Map", "map" + q]); tail = AN.label || TP_LABEL; kind = "test property"; }
+  else if (S.view === "climate") { const m = byCode[String(Number(CS.code || 0))];
+    if (m) c.push([m.name, `area/kommune/${m.code}` + q]); tail = "Climate risk"; kind = "Kystdirektoratet · DMI Klimaatlas"; }
   else { tail = viewOf(S.view)[1]; kind = { table: "every area side by side", charts: "PNG and CSV export", market: "national series and sources", pipeline: `${INFRA_ALL.length} projects · budget, status, opening year` }[S.view] || ""; }
   return { c, tail, kind };
 }
@@ -349,7 +354,8 @@ function renderTop() {
   document.getElementById("hd").innerHTML = `<nav class="crumbs">${c.map(([l, h]) => `<button data-go="${esc(h)}">${esc(l)}</button><i>›</i>`).join("")}<b>${esc(tail)}</b>${kind ? `<span class="dim">${esc(kind)}</span>` : ""}</nav>`;
 }
 const RENDER = { makro: vMakro, table: vTable, area: vArea, charts: vCharts, market: vMarket, pipeline: vPipeline, project: vProject,
-                 public: vPublic, publist: vPubList, school: vSchool, schoollist: vSchoolList, analysis: vAnalysis };
+                 public: vPublic, publist: vPubList, school: vSchool, schoollist: vSchoolList, analysis: vAnalysis,
+                 climate: vClimate };
 function render() {
   renderNav(); renderTop();
   const body = document.getElementById("body");
@@ -390,7 +396,9 @@ document.addEventListener("click", e => {
   if ((el = g("[data-micro]"))) { MK.micro = el.dataset.micro === "1"; syncHash(); renderKeep(); return; }
   if (g("[data-infra]")) { MK.infra = !MK.infra; syncHash(); renderKeep(); return; }
   if ((el = g("[data-anlay]"))) { if (el.disabled) return; const k = el.dataset.anlay;
-    if (k === "infra") ANL.infra = !ANL.infra; else if (k === "public") ANL.pub = !ANL.pub; else ANL.micro = !ANL.micro;
+    if (k === "infra") ANL.infra = !ANL.infra; else if (k === "public") ANL.pub = !ANL.pub;
+    else if (k === "climate") { ANL.climate = !ANL.climate; if (ANL.climate && LF.anR && LF.anR.kommune) climSheetLoadFor(LF.anR.kommune.code); }
+    else ANL.micro = !ANL.micro;
     syncHash(); renderKeep(); return; }
   if (g("[data-public]")) { MK.pub = !MK.pub; LF.pubDrawn = null; syncHash(); renderKeep(); return; }
   if (g("[data-services]")) { MK.srv = !MK.srv; LF.srvDrawn = null; if (MK.srv) srvLoadVisible(); syncHash(); renderKeep(); return; }
@@ -727,7 +735,7 @@ function muniStrip(m) {
     .concat(STRIP_EXTRA.map(k => IND.find(i => i.key === k)).filter(has));
   const cell = i => { const rk = rankOf(m, i.key, MUNI); return `<div><span>${esc(i.short || i.label)}</span><b>${fmtOf(i)(V(m, i.key))}</b><em>${rk ? `#${rk.r} of ${rk.n}` : ""}</em></div>`; };
   return `<div class="mstrip">
-    <div class="mstrip-id"><b>${esc(m.name)}</b><span class="dim">${esc(m.region || "")} · ${m.pop != null ? nf(m.pop, 0) + " inhabitants" : ""} · ${muniAreas(m.code).length} ${cphMode() ? "quarters" : "postal codes"}</span>${upcomingLine("kommune", m.code)}${publicLine("kommune", m.code)}${String(m.code) === CPH_MUNI_CODE && CPH_CITY_FC ? outlookBothHtml(m) : outlookLine(m, "kommune")}</div>
+    <div class="mstrip-id"><b>${esc(m.name)}</b><span class="dim">${esc(m.region || "")} · ${m.pop != null ? nf(m.pop, 0) + " inhabitants" : ""} · ${muniAreas(m.code).length} ${cphMode() ? "quarters" : "postal codes"}</span>${upcomingLine("kommune", m.code)}${publicLine("kommune", m.code)}${climateLine("kommune", m.code)}${String(m.code) === CPH_MUNI_CODE && CPH_CITY_FC ? outlookBothHtml(m) : outlookLine(m, "kommune")}</div>
     <div class="mstrip-k">${key.map(cell).join("")}</div>
     <div class="mstrip-act"><button class="lk primary" data-go="${withQ(pageOf(m))}">Open ${esc(m.name)} page ›</button><button class="lk" data-go="${chartLink(MK.ind, "kommune", m.code)}" title="Open the chart generator with this municipality">↗ Chart</button></div>
   </div>`;
@@ -1782,6 +1790,8 @@ function anLayerBar(pt, r) {
     ${PUB ? pill("public", "Public buildings", ANL.pub && koms.length > 0, !koms.length,
         koms.length ? `Schools, daycare, health and culture from BBR within ${nf(AN_PUB_MAP_M, 0)} m · the legend filters the categories`
                     : "Not covered yet: Copenhagen metro area only") : ""}
+    ${CLIM ? pill("climate", "Climate risk", ANL.climate, false,
+        `Kystdirektoratet's published 100-year storm-surge extent for ${esc(name)} at the ${hzShort(HZ.h)} horizon, and the official flood risk areas`) : ""}
     ${pill("buildings", "Buildings", ANL.micro && hasMicro, !hasMicro,
         hasMicro ? `BBR buildings with ≥ 2 dwellings in ${name} — the file is fetched when you switch this on`
                  : `Not covered yet: no BBR building file for ${name}`)}
@@ -1804,7 +1814,17 @@ function anPopupWire(popup) {
 function anMapOverlays() {
   const map = LF.anmap, pt = LF.anPt, r = LF.anR;
   if (!map || !pt || !document.getElementById("anmap")) return;
-  ["anInfraG", "anInfraHitG", "anPubG", "anMicroG"].forEach(k => { if (LF[k]) { try { map.removeLayer(LF[k]); } catch (e) {} LF[k] = null; } });
+  ["anInfraG", "anInfraHitG", "anPubG", "anMicroG", "anClimG"].forEach(k => { if (LF[k]) { try { map.removeLayer(LF[k]); } catch (e) {} LF[k] = null; } });
+
+  /* --- 0. the climate zone for the pin's kommune, under everything else and never clickable --- */
+  if (ANL.climate && CLIM && r && r.kommune) {
+    climSheetLoadFor(r.kommune.code);
+    const fc = CZ[`${HZ.h}:${pad4(r.kommune.code)}`];
+    const shapes = [];
+    if (fc) shapes.push(L.geoJSON(fc, { interactive: false, style: { color: CLIM_COL[HZ.h], weight: .8, opacity: .7, fillColor: CLIM_COL[HZ.h], fillOpacity: .38 } }));
+    if (CRA) shapes.push(L.geoJSON(CRA, { interactive: false, style: { color: "#16262E", weight: 1.2, opacity: .85, fill: false, dashArray: "5 3" } }));
+    if (shapes.length) LF.anClimG = L.layerGroup(shapes).addTo(map);
+  }
 
   /* --- a. infrastructure, in its status tones, with the project popup the Macro map opens --- */
   const inf = ANL.infra ? INFRA.map(f => ({ f, d: featDistM(f, pt.lat, pt.lon) })).filter(x => x.d != null && x.d <= AN_INFRA_M + 1500) : [];
@@ -2021,7 +2041,7 @@ function anFill() {
   if (S.view !== "analysis") return;
   const pt = anLoc(); if (!pt) return;
   const r = locate(pt.lat, pt.lon); if (!r || r.error) return;
-  [["anpub", anPubCard], ["ansch", anSchCard]].forEach(([id, fn]) => {
+  [["anpub", anPubCard], ["ansch", anSchCard], ["anclim", anClimCard]].forEach(([id, fn]) => {
     const el = document.getElementById(id); if (!el) return;
     el.innerHTML = fn(pt, r); enableSort(el);
   });
@@ -2071,6 +2091,7 @@ function vAnalysis() {
   ${anInfraCard(pt)}
   <div id="anpub">${anPubCard(pt, r)}</div>
   <div id="ansch">${anSchCard(pt, r)}</div>
+  <div id="anclim">${anClimCard(pt, r)}</div>
   ${anSources(e, r, profile.concat(safety), koms.length > 0, koms.length > 0 && !!SCH_META)}`;
 }
 function lfLabels() {
@@ -3250,8 +3271,12 @@ function climValue(o, k) {
   const km = climKom(o.code || o.muni);
   const e = km && km[k];
   if (!e) return null;
-  return e[HZ.h] ?? null;
+  /* Two Climate indicators have no horizon at all — the insurers' claim count and the official
+     designation are one published figure, not a projection. They read the same at every horizon
+     rather than going blank when the pill moves. */
+  return e[climHzFor(k)] ?? null;
 }
+const climHzFor = k => { const i = indOf(k); return (i && i.horizon && i.horizon.indexOf(HZ.h) >= 0) ? HZ.h : "today"; };
 /* why a Climate value is missing, in the publisher's own terms — never a best rank, never a zero */
 function climReason(o, k) {
   if (!CLIM || !o) return "";
@@ -3273,7 +3298,10 @@ function climLoad(h, code) {
   if (CZ[k] || CZ["_l_" + k] || CZ["_e_" + k]) return;
   CZ["_l_" + k] = true;
   fetch(`climate/surge_${h}/${c}.json`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then(d => { CZ[k] = d; delete CZ["_l_" + k]; if (climOn() && LF.map && HZ.h === h) lfClimateLayers(true); })
+    .then(d => { CZ[k] = d; delete CZ["_l_" + k];
+      if (climOn() && LF.map && HZ.h === h) lfClimateLayers(true);
+      if (S.view === "climate") renderKeep();
+      else if (S.view === "analysis") { anFill(); anMapOverlays(); } })
     .catch(() => { delete CZ["_l_" + k]; CZ["_e_" + k] = true; });
 }
 /* every kommune's bounding box, from the postal-code rings already in the page — one pass, cached */
@@ -3469,6 +3497,137 @@ function climPopupBlock(a, muni) {
       ${row("Fetched", esc(zm.built || (CLIM.meta && CLIM.meta.built) || ""))}
     </div>
     <span class="lfact"><button class="lk mini" data-go="climate/${esc(pad4(kom))}">Open climate sheet ›</button></span></div>`;
+}
+
+/* ---------- Climate sheet (#climate/<kommune>), area-card line and the Analysis section ---------- */
+const CS = { code: null };
+const climInds = () => IND.filter(i => i.group === "Climate");
+/* the three horizons of one indicator for one kommune, with the scenario range under each figure */
+function climHzCells(i, km) {
+  const e = km[i.key] || {};
+  const fixed = !(i.horizon && i.horizon.length);     /* published once, not per horizon */
+  return CLIM_HZ.map(h => {
+    const v = e[fixed ? "today" : h];
+    if (v == null) return `<td class="num dim" title="${esc(e.reason || "not computed")}">–</td>`;
+    if (fixed && h !== "today") return `<td class="num dim" title="One published figure, the same at every horizon">${fmtOf(i)(v)} <em class="climrange">same</em></td>`;
+    const r = (e.range || {})[h];
+    return `<td class="num" data-v="${v}">${fmtOf(i)(v)}${r && r.low != null && r.high != null
+      ? `<em class="climrange" title="Low scenario (sea SSP1-2.6 / rain RCP2.6) to high (SSP5-8.5 / RCP8.5), same percentile">${fmtTight(i)(r.low)}–${fmtTight(i)(r.high)}</em>` : ""}</td>`;
+  }).join("");
+}
+function climSheetLoad() {
+  if (!CS.code) return;
+  CLIM_HZ.forEach(h => { if ((climZones(h).kommune || {})[CS.code]) climLoad(h, CS.code); });
+  climRiskLoad();
+}
+function vClimate() {
+  const km = climKom(CS.code), m = byCode[String(Number(CS.code))];
+  if (!km || !m) return `<div class="back"><button data-go="map">‹ Macro map</button></div><div class="card"><p class="empty">No climate data for that municipality.</p></div>`;
+  const zon = CLIM_HZ.map(h => (climZones(h).kommune || {})[CS.code] || 0);
+  const dw = km.surge_dw_pct || {};
+  const risk = climRiskNames(CS.code), marginal = (km.flood_risk_area || {}).marginal;
+  const claims = IND.find(i => i.key === "weather_claims_1000");
+  const crk = claims ? rankOf(m, "weather_claims_1000", MUNI) : null;
+  const others = (km.other_kystkoder || []).map((c, n) => `${c}${(km.other_kystnavne || [])[n] ? ` (${String(km.other_kystnavne[n]).trim().replace(/_/g, " ")})` : ""}`);
+  const tile = (l, v, sub) => `<span class="hlc"><span>${esc(l)}</span><b>${v}</b><em>${esc(sub || "")}</em></span>`;
+  const hi = h => HZ.h === h ? ' class="hi"' : "";
+  return `
+  <div class="card accent arhead">
+    <div class="arid"><h2>${esc(km.name)} — climate risk</h2>
+      <div class="artags"><span class="tag">Municipality ${esc(CS.code)}</span>
+        ${km.coastal ? `<span class="tag">Coast stretch ${esc(km.kystkode)} · ${esc(String(km.kystnavn || "").trim().replace(/_/g, " "))}</span>` : `<span class="tag">landlocked</span>`}
+        <span class="tag">${risk.length ? `Official risk area: ${esc(risk.join(" · "))}` : marginal ? "Touches a risk area (under 1 km²)" : "No designated risk area"}</span></div>
+    </div>
+    <div class="tools"><button class="lk" data-back>‹ Back</button>
+      <button class="lk primary" data-go="map/${esc(String(Number(CS.code)))}?ind=surge_dw_pct&climate=1&hz=${HZ.h}">Show the zones on the map</button>
+      <button class="lk" data-go="${withQ(`area/kommune/${String(Number(CS.code))}`)}">${esc(km.name)} page ›</button>${hzPill("sheet")}</div>
+    <div class="hl">
+      ${tile("Dwellings in the surge zone", dw[HZ.h] != null ? fmtOf(IND.find(i => i.key === "surge_dw_pct"))(dw[HZ.h]) : "–",
+             (dw.dwellings_in_zone || {})[HZ.h] != null ? `${nf((dw.dwellings_in_zone || {})[HZ.h], 0)} of ${nf(dw.dwellings, 0)} dwellings` : (dw.reason || ""))}
+      ${tile("Zone area", zon[CLIM_HZ.indexOf(HZ.h)] ? nf(zon[CLIM_HZ.indexOf(HZ.h)], 1) + " km²" : "–", `Kystdirektoratet ${esc(CLIM_ZONE_YEAR[HZ.h])} · 100-year event`)}
+      ${claims ? tile("Weather-damage claims", fmtOf(claims)(V(m, "weather_claims_1000")), crk ? `#${crk.r} of ${crk.n} municipalities` : "") : ""}
+    </div>
+    <p class="cap">${esc(hzLabel(HZ.h))}</p>
+  </div>
+  <div class="card">
+    <div class="card-head"><h3>Every climate figure, all three horizons</h3><span class="hint">small grey = the low–high scenario range at the same percentile</span></div>
+    <div class="scrollx"><table class="tbl compact climtbl" data-sortable><thead><tr><th>Indicator</th>
+      <th class="num"${hi("today")}>Today<br><span class="dim">1981–2010 · zones 2020</span></th>
+      <th class="num"${hi("2070")}>2070<br><span class="dim">2041–70 · zones 2070</span></th>
+      <th class="num"${hi("2120")}>2120<br><span class="dim">2071–2100 · zones 2120</span></th>
+      <th class="num">Rank</th><th class="ansrc">Source</th></tr></thead>
+    <tbody>${climInds().map(i => { const rk = rankOf(m, i.key, MUNI);
+      return `<tr><th><span class="thn">${esc(i.label)} <span class="dim">${esc(i.unit || "")}</span></span><span class="im" data-m="${esc(i.key)}">ⓘ</span></th>
+        ${climHzCells(i, km)}
+        <td class="num">${rk ? `#${rk.r} / ${rk.n}` : "–"}</td>
+        <td class="ansrc">${climSrcLink(i, String(Number(CS.code)), "Verify")}</td></tr>`; }).join("")}
+    </tbody></table></div>
+    <p class="cap">↓ lower is better throughout. A dash is the publisher having no figure for this municipality — a landlocked kommune has no sea level, which is not a zero. Rank is among the ${MUNI.length} municipalities at the selected horizon.</p>
+  </div>
+  <div class="grid-2">
+    <div class="card"><div class="card-head"><h3>Dwellings in the storm-surge zone</h3><span class="hint">BBR dwelling points inside the published extent</span></div>
+      <table class="tbl compact"><thead><tr><th>Horizon</th><th class="num">Zone</th><th class="num">Dwellings in it</th><th class="num">Share</th></tr></thead>
+      <tbody>${CLIM_HZ.map((h, n) => `<tr${HZ.h === h ? ' class="hi"' : ""}><th>${esc(hzShort(h))} <span class="dim">· extent ${esc(CLIM_ZONE_YEAR[h])}</span></th>
+        <td class="num">${zon[n] ? nf(zon[n], 1) + " km²" : "–"}</td>
+        <td class="num">${(dw.dwellings_in_zone || {})[h] != null ? nf((dw.dwellings_in_zone || {})[h], 0) : "–"}</td>
+        <td class="num">${dw[h] != null ? nf(dw[h], 2) + " %" : "–"}</td></tr>`).join("")}</tbody></table>
+      <p class="cap">Denominator: ${dw.dwellings != null ? nf(dw.dwellings, 0) + " dwellings" : "–"} (BBR boligtype 1–5, status 6). A dwelling counts when its building point falls inside the published polygon, allowing 5 m — BBR gives a point, not a footprint. The three extents are Kystdirektoratet's own 100-year maps for 2020, 2070 and 2120; they are not a depth and not a property-level assessment.</p></div>
+    <div class="card"><div class="card-head"><h3>Where the figures come from</h3><span class="hint">one stretch, named — never an average of several</span></div>
+      <table class="tbl compact"><tbody>
+        <tr><th>Coast stretch used</th><td>${km.coastal ? `${esc(km.kystkode)} — ${esc(String(km.kystnavn || "").trim().replace(/_/g, " "))}` : "none — landlocked"}</td></tr>
+        <tr><th>Other stretches it touches</th><td>${others.length ? esc(others.join(" · ")) : `<span class="dim">none</span>`}</td></tr>
+        <tr><th>Rule</th><td class="dim">${esc((CLIM.meta || {}).coastal_rule || "")}</td></tr>
+        <tr><th>Official flood risk area</th><td>${risk.length ? `yes — ${esc(risk.join(" · "))}` : marginal ? "no — it clips a designated area by under 1 km²" : "no"}</td></tr>
+        <tr><th>Klimaatlas version</th><td class="dim">${esc((((CLIM.meta || {}).klimaatlas || {}).version || []).join(" · "))} · fetched ${esc(((CLIM.meta || {}).klimaatlas || {}).fetched || "")}</td></tr>
+        <tr><th>Zones</th><td class="dim">${esc(climZoneMeta().source || "")} · built ${esc(climZoneMeta().built || "")}</td></tr>
+      </tbody></table>
+      <p class="cap">Klimaatlas publishes the sea figures per coastal stretch, not per kommune. This municipality takes the stretch it shares the longest coastline with; every other stretch it touches is named above and never averaged into the figure. Rain and cloudbursts are published per kommune. Method: <code>docs/CLIMATE_BUILD_LOG.md</code>.</p></div>
+  </div>
+  ${srcNote()}`;
+}
+/* the CLIMATE line on an area card — only where there is something to say */
+function climateLine(level, code) {
+  if (!CLIM) return "";
+  const kom = level === "kommune" ? code : level === "kvarter" ? CPH_MUNI : (byNr[code] || {}).muni;
+  const km = climKom(kom); if (!km) return "";
+  const o = level === "kommune" ? byCode[String(Number(code))] : level === "kvarter" ? byQ[code] : byNr[code];
+  const v = o ? climValue(o, "surge_dw_pct") : null;
+  const risk = climRiskNames(kom);
+  if (v == null && !risk.length) return "";
+  const i = IND.find(x => x.key === "surge_dw_pct");
+  const bits = [];
+  if (v != null && i) bits.push(`<button class="lk mini" data-go="climate/${esc(pad4(kom))}" title="${esc(hzLabel(HZ.h))}">${fmtOf(i)(v)} dwellings in storm-surge zone (${esc(hzShort(HZ.h))})</button>`);
+  if (risk.length) bits.push(`<button class="lk mini" data-go="climate/${esc(pad4(kom))}" title="Designated under the Floods Directive, 2024 screening">official risk area</button>`);
+  return `<span class="upcoming"><em>Climate</em>${bits.join("")}</span>`;
+}
+/* --- the Analysis sheet's climate section: the pin against the published extents --- */
+function anClimCard(pt, r) {
+  if (!CLIM || !r || !r.kommune) return "";
+  const kom = r.kommune.code, km = climKom(kom);
+  if (!km) return "";
+  climSheetLoadFor(kom);
+  const zoneKom = h => (climZones(h).kommune || {})[pad4(kom)];
+  const hits = CLIM_HZ.map(h => {
+    if (!zoneKom(h)) return { h, v: false, known: true };     /* no zone at all in this kommune */
+    const v = climInZone(pt.lat, pt.lon, h, kom);
+    return { h, v, known: v !== null };
+  });
+  const line = hits.map(x => `<b class="${x.known ? (x.v ? "climyes" : "climno") : "dim"}">${esc(hzShort(x.h))} ${x.known ? (x.v ? "yes" : "no") : "…"}</b>`).join(" · ");
+  const risk = climRiskAt(pt.lat, pt.lon) || (climRiskNames(kom).length ? { area_name: climRiskNames(kom).join(" · "), whole: true } : null);
+  const inds = climInds();
+  return `<div class="card"><div class="card-head"><h3>Climate</h3>
+      <span class="hint">Kystdirektoratet 100-year extents · ${esc(r.kommune.name)}</span></div>
+    <p class="anlead">In storm-surge zone (100-yr): ${line}</p>
+    <p class="cap">${risk ? `The pin ${risk.whole ? `is in a municipality with an official flood risk area (${esc(risk.area_name)})` : `falls inside the official flood risk area <b>${esc(risk.area_name)}</b>`}.` : "No official flood risk area covers this point."}
+      A point inside a published extent is a screening result for the 100-year event, not a property-level assessment: the maps carry no depth we are entitled to read, and nothing here accounts for a dike, a pump or the building's own floor level.</p>
+    <div class="scrollx"><table class="tbl compact climtbl"><thead><tr><th>Indicator</th><th class="num">Today</th><th class="num">2070</th><th class="num">2120</th><th class="ansrc">Source</th></tr></thead>
+      <tbody>${inds.map(i => `<tr><th><span class="thn">${esc(i.label)} <span class="dim">${esc(i.unit || "")}</span></span></th>${climHzCells(i, km)}
+        <td class="ansrc">${climSrcLink(i, String(Number(kom)), "Verify")}</td></tr>`).join("")}</tbody></table></div>
+    <p class="cap"><button class="lk mini" data-go="climate/${esc(pad4(kom))}">Open the climate sheet for ${esc(r.kommune.name)} ›</button> Figures are the municipality's, not the address's. ${esc(hzLabel(HZ.h))}</p></div>`;
+}
+function climSheetLoadFor(kom) {
+  CLIM_HZ.forEach(h => { if ((climZones(h).kommune || {})[pad4(kom)]) climLoad(h, kom); });
+  climRiskLoad();
 }
 
 const SCH_META = (PUB && PUB.schools) || null;      /* {built, retrieved, years, n, benchmarks} */
