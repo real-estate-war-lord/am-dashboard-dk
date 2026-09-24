@@ -2781,38 +2781,7 @@
    "calc": "climate",
    "fmt": "pct1",
    "source": "Miljøstyrelsen OD_fare_2024 sea 100-year depth raster × BBR via Datafordeler",
-   "note": "BBR dwellings (boligtype 1–5, status 6) whose building point falls inside the modelled 100-year sea flood extent. Today only for now; the 2050 and 2100 horizons are declared and filled once the future-horizon rasters are processed."
-  },
-  {
-   "key": "cloudburst_dw_pct",
-   "label": "Dwellings in the cloudburst zone",
-   "short": "Dwellings at rain risk",
-   "unit": "% of dwellings",
-   "desc": "Share of the kommune's dwellings inside the modelled cloudburst flooding zone.",
-   "level": "kommune",
-   "hue": [
-    48,
-    88,
-    144
-   ],
-   "group": "Climate",
-   "direction": "lower_better",
-   "horizon": [
-    "today",
-    "2050",
-    "2100"
-   ],
-   "sources": [
-    {
-     "db": "climate",
-     "table": "climate_index",
-     "geo": "kommune"
-    }
-   ],
-   "calc": "climate",
-   "fmt": "pct1",
-   "source": "DHM/Bluespot_ekstremregn (Datafordeler) × BBR — pending credentials",
-   "note": "Declared but not computed yet: it needs the DHM bluespot raster, which is behind a Datafordeler login the repo does not currently hold (docs/CLIMATE_PROBE.md §5–6)."
+   "note": "BBR dwellings (boligtype 1–5, status 6) whose building falls inside the published 100-year storm-surge extent. Counted, not modelled: the zone is the authority's own polygon and the dwellings are the register's own records."
   }
  ],
  "macro": [

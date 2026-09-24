@@ -352,3 +352,60 @@ about 15 times as often by 2050 and 46 times as often by 2100 in Øresund**. Fre
 Herning show the landlocked case — no sea figures at all, but full rain figures. Brøndby is the
 marginal risk-area case: it touches Køge Bugt/København with 0.71 km², under the 1 km² rule, so
 `flood_risk_area = 0` while Køge next door is 1.
+
+---
+
+# v2.6 · step 2 — scope to official data only (2026-09-24)
+
+## Removed: cloudburst zones
+
+`cloudburst_dw_pct` is gone from `config/indicators.json` and from `data/processed/climate/index.json`. It could only ever have been filled from the DHM Bluespot_ekstremregn raster, which sits behind a Datafordeler login this repo does not hold (`docs/CLIMATE_PROBE.md` §5–6), and an indicator that can only be estimated has no place in a branch that shows published figures. **Kept:** `rain100_1h_mm`, `cloudbursts_yr` and `weather_claims_1000` — all three are published numbers, not modelled exposure. The Climate group is now eight indicators.
+
+## Changed: coast → kommune is the longest shared coastline, not MAX
+
+The old rule took the highest figure across every Klimaatlas stretch a kommune touched. A maximum of two published figures is a figure nobody published, so it breaks the branch's data principle. The new rule samples the kommune's coastline every 25 m, assigns each sample to its nearest stretch within 2 km, and gives the kommune the stretch holding the most samples. Every other touching stretch is kept in `other_kystkoder` for display and never combined into a number.
+
+**42 of 77 coastal kommuner touch more than one stretch. 36 of them change at least one value; 21 change `surge100_cm`.** The rest touched several stretches that publish the same figures, so only the label moved.
+
+| code | kommune | touched | now uses | also touches | `sealevel_cm` 2070 | `surge100_cm` today | `surge_freq_x` 2120 |
+|---|---|---|---|---|---|---|---|
+| 0101 | København | SJ7;SJ8 | **SJ7** | SJ8 | 26.1 → **24.9** | 158.9 → **156.8** | 45.9 → **20.5** |
+| 0185 | Tårnby | SJ7;SJ8 | **SJ7** | SJ8 | 26.1 → **24.9** | 158.9 → **156.8** | 45.9 → **20.5** |
+| 0217 | Helsingør | SJ4;SJ7 | **SJ4** | SJ7 | 24.9 → **22.9** | = | 20.5 → **14.2** |
+| 0250 | Frederikssund | SJ5;SJ6 | **SJ6** | SJ5 | 26.1 → **25.4** | = | 13.6 → **5.9** |
+| 0260 | Halsnæs | SJ4;SJ5;SJ6 | **SJ6** | SJ4;SJ5 | 26.1 → **25.4** | = | 14.2 → **5.9** |
+| 0306 | Odsherred | SJ3;SJ4;SJ5 | **SJ3** | SJ5;SJ4 | = | 188.9 → **163.9** | = |
+| 0326 | Kalundborg | SJ2;SJ3 | **SJ2** | SJ3 | = | = | 32.6 → **17.9** |
+| 0330 | Slagelse | SD3;SD5;SJ1;SJ2 | **SD5** | SJ2;SD3;SJ1 | 28 → **27.3** | 170.1 → **162.1** | 30 → **21.7** |
+| 0336 | Stevns | SD7;SJ8 | **SJ8** | SD7 | 26.7 → **26.1** | 165 → **158.9** | = |
+| 0350 | Lejre | SJ5;SJ6 | **SJ6** | SJ5 | 26.1 → **25.4** | = | 13.6 → **5.9** |
+| 0370 | Næstved | SD5;SD7 | **SD5** | SD7 | = | 165 → **162.1** | 30.8 → **21.7** |
+| 0376 | Guldborgsund | SD4;SD5;SD6 | **SD4** | SD5;SD6 | = | 191.1 → **178.2** | = |
+| 0390 | Vordingborg | SD5;SD6;SD7 | **SD7** | SD6;SD5 | 28.2 → **26.7** | 191.1 → **165** | = |
+| 0410 | Middelfart | OJ6;OJ7;SD1 | **SD1** | OJ7;OJ6 | = | = | 43.1 → **30.2** |
+| 0430 | Faaborg-Midtfyn | SD1;SD2 | **SD2** | SD1 | 30.5 → **29.5** | = | 30.2 → **10.5** |
+| 0450 | Nyborg | SD3;SJ1 | **SD3** | SJ1 | = | 170.1 → **154.1** | = |
+| 0479 | Svendborg | SD2;SD3 | **SD2** | SD3 | = | = | 30 → **10.5** |
+| 0480 | Nordfyns | OJ6;SJ1 | **SJ1** | OJ6 | = | 171.1 → **170.1** | 25.2 → **22.8** |
+| 0482 | Langeland | SD2;SD3;SD4 | **SD2** | SD4;SD3 | 29.6 → **29.5** | = | 30 → **10.5** |
+| 0550 | Tønder | VH1;VH2 | **VH1** | VH2 | = | 488.4 → **459.4** | = |
+| 0561 | Esbjerg | VH2;VH3 | **VH2** | VH3 | = | = | 6.7 → **3.5** |
+| 0563 | Fanø | VH2;VH3 | **VH3** | VH2 | 31.5 → **30.8** | 488.4 → **399.4** | = |
+| 0573 | Varde | VH3;VK1 | **VH3** | VK1 | = | = | 18.1 → **6.7** |
+| 0607 | Fredericia | OJ6;OJ7;SD1 | **OJ7** | OJ6;SD1 | 30.5 → **29** | 186.3 → **149.2** | = |
+| 0621 | Kolding | SD1;OJ7 | **SD1** | — | = | = | 43.1 → **30.2** |
+| 0661 | Holstebro | VK1;LF3 | **VK1** | LF3 | = | = | 37.9 → **18.1** |
+| 0665 | Lemvig | VK1;VK4;LF3 | **LF3** | VK1;VK4 | 30 → **28.5** | 298.3 → **194.2** | = |
+| 0706 | Syddjurs | OJ4;OJ5 | **OJ5** | OJ4 | = | 176.8 → **160.9** | = |
+| 0707 | Norddjurs | OJ2;OJ3;OJ4 | **OJ4** | OJ2;OJ3 | 24.3 → **23.9** | = | 21.9 → **16.1** |
+| 0741 | Samsø | OJ5;SJ1;SJ3 | **SJ3** | OJ5;SJ1 | 27.9 → **26.1** | 170.1 → **163.9** | = |
+| 0773 | Morsø | LF2;LF3;LF4 | **LF4** | LF3;LF2 | 28.5 → **25.4** | 194.2 → **166.9** | 49 → **48.2** |
+| 0779 | Skive | LF2;LF3 | **LF2** | LF3 | 28.5 → **26** | 194.2 → **184** | = |
+| 0787 | Thisted | VK4;VK5;LF3;LF4 | **LF4** | VK5;LF3;VK4 | 28.5 → **25.4** | 255.2 → **166.9** | = |
+| 0813 | Frederikshavn | VK6;OJ1 | **OJ1** | VK6 | = | = | 34.4 → **22.8** |
+| 0849 | Jammerbugt | VK5;VK6;LF1;LF4;LF2 | **LF1** | VK6;VK5;LF4 | 26 → **23.4** | 184 → **148.8** | 49 → **28.9** |
+| 0851 | Aalborg | LF1;OJ1;OJ2 | **LF1** | OJ2;OJ1 | = | 160.7 → **148.8** | = |
+
+The largest moves are where a kommune reaches around a headland into a much more exposed stretch: Thisted 255.2 → 166.9 cm, Lemvig 298.3 → 194.2, Fanø 488.4 → 399.4, Jammerbugt 184.0 → 148.8, Fredericia 186.3 → 149.2. In each case the old value came from a stretch the kommune barely touches. København moves 158.9 → 156.85 — off SJ8 (Køge Bugt) and onto SJ7 (Øresund), where almost all of its 116 km of coastline lies; SJ8 is still named in `other_kystkoder`.
+
+`make validate` and `make build` exit 0; 40 Python + 15 JS tests pass.

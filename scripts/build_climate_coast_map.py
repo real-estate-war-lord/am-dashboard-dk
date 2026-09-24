@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Coastal kommune → Klimaatlas coastal stretch(es) → data/external/klimaatlas_coast_kommune.csv.
+"""Coastal kommune → Klimaatlas coastal stretch → data/external/klimaatlas_coast_kommune.csv.
 
 Klimaatlas publishes sea level and storm surge per *coastal stretch* (34 of them, `kystkode`),
 not per kommune, so the dashboard needs a map from one to the other. It is generated here and
@@ -7,18 +7,23 @@ committed, because it changes only when DAGI boundaries or the Klimaatlas stretc
 
 Method, in EPSG:25832 throughout:
   1. dissolve neighbours away — what is left of a kommune's own boundary after subtracting every
-     other kommune's boundary (60 m tolerance, absorbing the 0.0005° simplification sliver) is its
-     coastline. Over 100 m of it is a candidate; less is a polygon artifact.
+     other kommune's boundary (60 m tolerance, absorbing the 0.0005 deg simplification sliver) is
+     its coastline. Over 100 m of it is a candidate; less is a polygon artifact.
   2. a candidate is coastal when its coastline runs within 2 km of a Klimaatlas stretch polygon.
-     This is what separates a real short shore (Vallensbæk, 376 m, touching SJ8) from an enclave
+     This is what separates a real short shore (Vallensbaek, 376 m, touching SJ8) from an enclave
      sliver (Frederiksberg, 136 m, nearest stretch 3.8 km away).
-  3. every stretch within 2 km is kept in `kystkoder`. Where a kommune touches more than one, the
-     build takes the MAX across them — the conservative reading for a risk indicator.
+  3. the kommune takes the stretch it shares the LONGEST coastline with. The coastline is sampled
+     every 25 m and each sample is assigned to its nearest stretch within 2 km; the stretch
+     holding the most samples wins. Every other stretch the coastline touches is kept in
+     `other_kystkoder` so the UI can name them, but no number is ever combined across stretches.
+     This replaces the earlier MAX-across-stretches rule: a maximum of two published figures is a
+     figure nobody published, and this branch shows official figures only.
   4. landlocked kommuner get no row at all; the build renders their coastal indicators as null
      with reason "not coastal".
 
     python3 scripts/build_climate_coast_map.py
 """
+
 import argparse
 import csv
 import datetime as dt
@@ -28,7 +33,7 @@ import sys
 from pathlib import Path
 
 try:
-    from shapely.geometry import shape
+    from shapely.geometry import Point, shape
     from shapely.ops import transform, unary_union
     from shapely.strtree import STRtree
 except ImportError:
@@ -42,6 +47,7 @@ OUT = ROOT / "data" / "external" / "klimaatlas_coast_kommune.csv"
 NEIGHBOUR_TOL_M = 60          # absorbs the sliver between two simplified neighbours
 MIN_COAST_M = 100             # below this the free boundary is a polygon artifact
 STRETCH_MAX_M = 2000          # the 2 km rule
+SAMPLE_M = 25                 # coastline sampling step when ranking stretches by shared length
 METRO19 = ["0101", "0147", "0151", "0153", "0155", "0157", "0159", "0161", "0163", "0165",
            "0167", "0169", "0173", "0175", "0183", "0185", "0187", "0190", "0230"]
 
@@ -112,13 +118,28 @@ def build():
             skipped.append((k["code"], k["name"], coast_m, near_any,
                             "no Klimaatlas stretch within 2 km"))
             continue
+        # rank the touching stretches by how much of this coastline is nearest to each of them
+        shared = {j: 0.0 for _, j in hits}
+        dense = free.segmentize(SAMPLE_M) if hasattr(free, "segmentize") else free
+        pts = [Point(c) for g in getattr(dense, "geoms", [dense]) for c in g.coords]
+        for pt in pts:
+            best = min(((sgeoms[j].distance(pt), j) for _, j in hits))
+            if best[0] <= STRETCH_MAX_M:
+                shared[best[1]] += SAMPLE_M
+        order = sorted(shared, key=lambda j: (-shared[j], stretches[j]["kystkode"]))
+        first = order[0]
+        others = [j for j in order[1:] if shared[j] > 0]
         rows.append({"kommune_kode": k["code"], "kommune_navn": k["name"],
-                     "kystkoder": ";".join(stretches[j]["kystkode"] for _, j in hits),
-                     "kystnavne": ";".join(stretches[j]["kystnavn"] for _, j in hits),
+                     "kystkode": stretches[first]["kystkode"],
+                     "kystnavn": stretches[first]["kystnavn"],
+                     "shared_coast_m": round(shared[first]),
+                     "other_kystkoder": ";".join(stretches[j]["kystkode"] for j in others),
+                     "other_kystnavne": ";".join(stretches[j]["kystnavn"] for j in others),
+                     "other_shared_coast_m": ";".join(str(round(shared[j])) for j in others),
                      "n_stretches": len(hits),
                      "coast_m": round(coast_m),
                      "nearest_stretch_m": round(hits[0][0]),
-                     "aggregation": "max"})
+                     "rule": "longest_shared_coastline"})
     rows.sort(key=lambda r: r["kommune_kode"])
     return rows, skipped, len(koms), len(stretches)
 
@@ -131,23 +152,24 @@ def main():
     rows, skipped, n_kom, n_str = build()
     print(f"{len(rows)} coastal of {n_kom} kommuner · {n_str} Klimaatlas stretches · "
           f"{len(skipped)} landlocked")
-    multi = [r for r in rows if r["n_stretches"] > 1]
-    print(f"{len(multi)} kommuner touch more than one stretch (value = MAX): "
-          + ", ".join(f"{r['kommune_navn']} {r['kystkoder']}" for r in multi[:12]))
+    multi = [r for r in rows if r["other_kystkoder"]]
+    print(f"{len(multi)} kommuner touch more than one stretch — the longest shared coastline wins, "
+          "the rest go to other_kystkoder")
     byc = {r["kommune_kode"]: r for r in rows}
     sk = {s[0]: s for s in skipped}
     print("\nmetro 19:")
-    print(f"  {'code':<6}{'kommune':<18}{'kystkoder':<12}{'coast m':>9}{'nearest m':>11}  note")
+    print(f"  {'code':<6}{'kommune':<18}{'coast':<7}{'other':<10}{'shared m':>10}{'coast m':>10}  note")
     for c in METRO19:
         if c in byc:
             r = byc[c]
-            print(f"  {c:<6}{r['kommune_navn']:<18}{r['kystkoder']:<12}{r['coast_m']:>9,}"
-                  f"{r['nearest_stretch_m']:>11,}")
+            print(f"  {c:<6}{r['kommune_navn']:<18}{r['kystkode']:<7}"
+                  f"{r['other_kystkoder'] or '—':<10}{r['shared_coast_m']:>10,}"
+                  f"{r['coast_m']:>10,}")
         else:
             s = sk.get(c)
             near = f"{s[3]:,.0f}" if s and s[3] else "—"
-            print(f"  {c:<6}{(s[1] if s else '?'):<18}{'—':<12}{(round(s[2]) if s else 0):>9,}"
-                  f"{near:>11}  landlocked — {s[4] if s else ''}")
+            print(f"  {c:<6}{(s[1] if s else '?'):<18}{'—':<7}{'—':<10}{0:>10}"
+                  f"{(round(s[2]) if s else 0):>10,}  landlocked — {s[4] if s else ''}")
     if not a.check:
         OUT.parent.mkdir(parents=True, exist_ok=True)
         with OUT.open("w", newline="") as fh:

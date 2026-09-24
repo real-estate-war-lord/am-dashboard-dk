@@ -108,25 +108,6 @@ def series(idx, col, scens, const_today, nd):
     return out
 
 
-def maxmerge(seriess):
-    """MAX across the stretches a kommune touches, horizon by horizon."""
-    if len(seriess) == 1:
-        return seriess[0]
-    out = {}
-    for hz in HORIZONS:
-        vals = [s.get(hz) for s in seriess if s.get(hz) is not None]
-        out[hz] = max(vals) if vals else None
-    rng = {}
-    for hz in ("2050", "2100"):
-        bands = [s.get("range", {}).get(hz) for s in seriess if s.get("range", {}).get(hz)]
-        if bands:
-            rng[hz] = {k: max(b[k] for b in bands if k in b)
-                       for k in ("p10", "p90", "low", "high") if any(k in b for b in bands)}
-    if rng:
-        out["range"] = rng
-    return out
-
-
 def build():
     names = kommune_names()
     coast_rows = jload(RAW / "klimaatlas" / "coast_values.json")
@@ -139,7 +120,11 @@ def build():
     if COAST_MAP.exists():
         with COAST_MAP.open() as fh:
             for r in csv.DictReader(fh):
-                coast_map[r["kommune_kode"]] = r["kystkoder"].split(";")
+                coast_map[r["kommune_kode"]] = {
+                    "kystkode": r["kystkode"], "kystnavn": r["kystnavn"],
+                    "other": [x for x in (r.get("other_kystkoder") or "").split(";") if x],
+                    "other_navne": [x for x in (r.get("other_kystnavne") or "").split(";") if x],
+                    "shared_coast_m": int(r["shared_coast_m"])}
     else:
         sys.exit(f"{COAST_MAP.relative_to(ROOT)} missing — run scripts/build_climate_coast_map.py")
 
@@ -168,17 +153,22 @@ def build():
     out = {}
     for code, name in sorted(names.items()):
         nkey = str(int(code))                       # Klimaatlas keys kommuner unpadded
-        rec = {"name": name, "coastal": code in coast_map}
-        if code in coast_map:
-            rec["kystkoder"] = coast_map[code]
+        cm = coast_map.get(code)
+        rec = {"name": name, "coastal": cm is not None}
+        if cm:
+            rec["kystkode"] = cm["kystkode"]
+            rec["kystnavn"] = cm["kystnavn"]
+            if cm["other"]:
+                rec["other_kystkoder"] = cm["other"]
+                rec["other_kystnavne"] = cm["other_navne"]
         for key, (_src, col, nd, const) in COAST_INDS.items():
-            if code not in coast_map:
+            if not cm:
                 rec[key] = {"today": None, "2050": None, "2100": None, "reason": NOT_COASTAL}
                 continue
-            got = [series(by_stretch.get(k, {}), col, SEA_SCEN, const, nd)
-                   for k in coast_map[code] if k in by_stretch]
-            rec[key] = maxmerge(got) if got else {"today": None, "2050": None, "2100": None,
-                                                  "reason": "no Klimaatlas stretch"}
+            idx = by_stretch.get(cm["kystkode"])
+            rec[key] = (series(idx, col, SEA_SCEN, const, nd) if idx
+                        else {"today": None, "2050": None, "2100": None,
+                              "reason": "no Klimaatlas stretch"})
         for key, (_src, col, nd, const) in RAIN_INDS.items():
             idx = by_kom_rain.get(nkey, {})
             rec[key] = (series(idx, col, RAIN_SCEN, const, nd) if idx
@@ -199,14 +189,12 @@ def build():
                                    "zone_km2": s.get("zone_km2")}
         else:
             # no zone at all (inland, or the coast stays dry at the 100-year level), or no BBR pull
-            why = (NOT_COASTAL if code not in coast_map
+            why = (NOT_COASTAL if not cm
                    else "no surge zone at the 100-year level" if s and not s.get("zone_km2")
                    else s.get("dwellings_note") if s and s.get("dwellings_note")
                    else NOT_COMPUTED)
             rec["surge_dw_pct"] = {"today": None, "2050": None, "2100": None, "reason": why,
                                    "zone_km2": (s or {}).get("zone_km2")}
-        rec["cloudburst_dw_pct"] = {"today": None, "2050": None, "2100": None,
-                                    "reason": NOT_COMPUTED}
         out[code] = rec
 
     meta = {"built": dt.date.today().isoformat(),
@@ -219,7 +207,9 @@ def build():
             "percentil": P50, "absolutaendring": ABS,
             "range": {"p10/p90": "same scenario, 10th and 90th percentile",
                       "low/high": "sea SSP1-2.6 (126) / SSP5-8.5 (585); rain RCP2.6 (26) / RCP8.5 (85)"},
-            "coastal_aggregation": "max across the stretches a kommune touches",
+            "coastal_rule": "the Klimaatlas stretch the kommune shares the longest coastline "
+                            "with; other touching stretches are listed in other_kystkoder and "
+                            "never combined into a number",
             "coastal_kommuner": sum(1 for r in out.values() if r["coastal"]),
             "fp": fp_meta.get("charts", {}),
             "risk_areas": {"kommuner": len(risk.get("kommuner") or []),

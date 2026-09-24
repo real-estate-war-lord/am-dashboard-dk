@@ -140,17 +140,23 @@ class CoastMap(unittest.TestCase):
         with (ROOT / "data" / "external" / "klimaatlas_coast_kommune.csv").open() as fh:
             cls.rows = {r["kommune_kode"]: r for r in csv.DictReader(fh)}
 
-    def test_copenhagen_is_on_sj7(self):
-        self.assertIn("SJ7", self.rows["0101"]["kystkoder"].split(";"))
+    def test_copenhagen_takes_sj7_and_lists_sj8(self):
+        """København's coastline is longest against SJ7; SJ8 is named, never averaged in."""
+        self.assertEqual(self.rows["0101"]["kystkode"], "SJ7")
+        self.assertEqual(self.rows["0101"]["other_kystkoder"], "SJ8")
 
     def test_koege_bugt_kommuner_are_on_sj8(self):
         for code in ("0167", "0153", "0183"):          # Hvidovre, Brøndby, Ishøj
-            self.assertEqual(self.rows[code]["kystkoder"], "SJ8")
+            self.assertEqual(self.rows[code]["kystkode"], "SJ8")
+            self.assertEqual(self.rows[code]["other_kystkoder"], "")
 
     def test_vallensbaek_is_coastal_by_the_2km_rule(self):
         """376 m of shore, 0 m from SJ8 — short, but real coast."""
         self.assertIn("0187", self.rows)
-        self.assertEqual(self.rows["0187"]["kystkoder"], "SJ8")
+        self.assertEqual(self.rows["0187"]["kystkode"], "SJ8")
+
+    def test_the_rule_is_recorded_in_every_row(self):
+        self.assertTrue(all(r["rule"] == "longest_shared_coastline" for r in self.rows.values()))
 
     def test_landlocked_kommuner_have_no_row(self):
         for code in ("0657", "0151", "0147"):          # Herning, Ballerup, Frederiksberg
@@ -159,7 +165,7 @@ class CoastMap(unittest.TestCase):
 
 class Registry(unittest.TestCase):
     CLIMATE = ["sealevel_cm", "surge100_cm", "surge_freq_x", "rain100_1h_mm", "cloudbursts_yr",
-               "weather_claims_1000", "flood_risk_area", "surge_dw_pct", "cloudburst_dw_pct"]
+               "weather_claims_1000", "flood_risk_area", "surge_dw_pct"]
     HORIZONS = ["today", "2050", "2100"]
 
     def test_every_climate_indicator_is_registered(self):
@@ -171,6 +177,10 @@ class Registry(unittest.TestCase):
             self.assertTrue(IND[k].get("note"), k)
             self.assertTrue(IND[k].get("source"), k)
             self.assertEqual(IND[k]["calc"], "climate", k)
+
+    def test_cloudburst_zones_are_out_of_this_release(self):
+        """Dropped with the bluespot raster: no source, so no indicator."""
+        self.assertNotIn("cloudburst_dw_pct", IND)
 
     def test_horizons_where_they_apply(self):
         for k in self.CLIMATE:
@@ -194,10 +204,15 @@ class ClimateIndex(unittest.TestCase):
         self.assertIsNone(h["today"])
         self.assertEqual(h["reason"], "not coastal")
 
-    def test_copenhagen_takes_the_max_of_its_stretches(self):
+    def test_copenhagen_uses_one_published_stretch(self):
+        """No arithmetic across stretches: the value is SJ7's own published figure."""
         k = self.d["kommune"]["0101"]
-        self.assertEqual(sorted(k["kystkoder"]), ["SJ7", "SJ8"])
-        self.assertGreaterEqual(k["surge100_cm"]["today"], 156.85)
+        self.assertEqual(k["kystkode"], "SJ7")
+        self.assertEqual(k["other_kystkoder"], ["SJ8"])
+        self.assertAlmostEqual(k["surge100_cm"]["today"], 156.85, places=1)
+
+    def test_no_cloudburst_zone_field_left_in_the_index(self):
+        self.assertFalse(any("cloudburst_dw_pct" in r for r in self.d["kommune"].values()))
 
     def test_rain_reaches_every_kommune(self):
         missing = [c for c, r in self.d["kommune"].items()
