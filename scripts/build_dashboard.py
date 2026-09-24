@@ -99,6 +99,37 @@ def check_js(paths):
     print(f"  · JavaScript parses ({', '.join(p.name for p in paths if p.exists())})")
 
 
+def climate_payload():
+    """What the page needs inline: the indicator index, the per-horizon exposure tables and the
+    risk-area names. The zone polygons stay on disk and are fetched per kommune for the viewport.
+    `kommune` in `zones` carries only zone_km2, which is what tells the page a file exists."""
+    idx = load(PROC / "climate" / "index.json")
+    if not idx:
+        return None
+    zones = {}
+    for h in ("today", "2070", "2120"):
+        zi = load(PROC / "climate" / f"surge_{h}" / "index.json") or {}
+        km = zi.get("kommune") or {}
+        zones[h] = {
+            "kommune": {k: v.get("zone_km2") for k, v in km.items() if v.get("zone_km2")},
+            "postnr": zi.get("postnr") or {},
+            "kvarter": zi.get("kvarter") or {},
+            "meta": {k: (zi.get("meta") or {}).get(k) for k in
+                     ("year", "period", "event", "source", "depth_class", "built", "zone_km2_national")},
+        }
+    ra = load(PROC / "climate" / "risk_areas.json") or {}
+    names, areas = {}, []
+    for f in ra.get("features", []):
+        pr = f.get("properties") or {}
+        areas.append({"id": pr.get("area_id"), "name": pr.get("area_name"), "km2": pr.get("area_km2"),
+                      "kommuner": pr.get("kommuner") or []})
+        for k in (pr.get("kommuner") or []):
+            names.setdefault(k, []).append(pr.get("area_name"))
+    return {"meta": idx.get("meta") or {}, "kommune": idx.get("kommune") or {},
+            "zones": zones, "risk_names": names, "risk_areas": areas,
+            "risk_meta": ra.get("meta") or {}}
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--data", default=str(PROC / "makro.json"))
@@ -118,6 +149,7 @@ def main():
     infra_index = load(PROC / "infra_index.json")
     public_index = load(PROC / "public_index.json")
     services_index = load(PROC / "services" / "index.json")
+    climate = climate_payload()
     built = (makro.get("meta") or {}).get("built") or dt.date.today().isoformat()
     data = {
         "meta": makro.get("meta", {"built": built, "sources": [], "attribution": []}),
@@ -142,6 +174,10 @@ def main():
         # services: the index only (as-of, vocabulary, per-kommune counts + bbox). The points
         # themselves load on demand from dist/services/<kommune>.json for whatever is in view.
         "services": services_index,
+        # climate: the indicator index (every indicator x horizon), the per-horizon exposure for
+        # kommuner, postal codes and quarters, and the risk-area names. The zone polygons themselves
+        # load on demand from dist/climate/surge_<horizon>/<kommune>.json, like services and micro.
+        "climate": climate,
     }
     payload = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</script", "<\\/script")
     html = (SRC / "index.html").read_text(encoding="utf-8")
