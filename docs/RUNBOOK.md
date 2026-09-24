@@ -44,6 +44,20 @@ make validate > validate.txt; grep -c "✗" validate.txt; grep "✗" validate.tx
 **Good:** the count is 0.
 **Expected the first time:** several ✗ lines for the codes marked `TODO_*` in `config/indicators.json` (EJ56, DNRENTM, BYGV33, UDB010, IFOR22, FOLK1E, INDKP101). Paste `validate.txt` in the chat — the fix is a config edit, then re-run until 0.
 
+`make validate` checks every table and value code against the live API and samples **2 areas per
+indicator** for the *Verify at source* links, so it stays a pre-commit check. The **full** sweep is
+its own target:
+
+```bash
+make links > links.txt; tail -3 links.txt
+```
+
+It fetches all **165** Outlook links — every one of the 98 municipalities and 67 Copenhagen
+quarters — and recomputes each displayed value from the cells the response actually returns, so a
+link that resolves but disagrees with the page is caught. It takes roughly **15 minutes** against
+Statistikbanken, which is why it is not part of `make validate`. **Run it before a release.**
+`make validate-links` is kept as a deprecated alias.
+
 ## Step 3 — Fetch (network, ~2 minutes)
 
 ```bash

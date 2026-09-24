@@ -1370,18 +1370,6 @@ details.indx .indx-body p{margin:0 0 3px}
 .maplegend.small{right:8px;bottom:8px;padding:6px 8px 5px;font-size:10px;min-width:120px}
 /* a legend box with nothing in it is never painted — no empty white bar over the map */
 .maplegend:empty{display:none}
-/* Area level chip — the zoom ladder's current rung. Bottom-left, clear of the zoom buttons
-   (top-left), the overlay legends (top-right) and the choropleth legend (bottom-right). */
-.lvlchip{position:absolute;left:12px;bottom:24px;z-index:800;display:flex;align-items:baseline;gap:7px;
-  background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:8px;padding:6px 10px 5px;
-  font-family:var(--mono);font-size:10.5px;color:var(--ink);pointer-events:none;
-  box-shadow:0 2px 8px rgba(20,28,24,.10);max-width:min(62%,340px)}
-.lvlchip b{font-family:var(--body);font-weight:600;font-size:12px;line-height:1.2;white-space:nowrap}
-.lvlchip span{color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lvlchip .nx{padding-left:7px;border-left:1px solid var(--line);font-style:italic}
-.lvlchip:empty{display:none}
-@media (max-width:640px){.lvlchip{left:8px;bottom:8px;font-size:9.5px;padding:5px 8px 4px}
-  .lvlchip .nx{display:none}}
 .maplegend.small .lgrow i{width:13px;height:10px;flex-basis:13px}
 #mapcard:fullscreen .maplegend,#mapcard.fs-fallback .maplegend{bottom:20px}
 .mklegend{display:none}
