@@ -187,12 +187,39 @@ function anParseLayers(q) {
    It lives in the map hash (pin=, pl=), so it survives a reload and every level change. */
 const TP_LABEL = "Test property";
 const TP_RINGS = [500, 1000, 1200];                                               /* metres — the dashed walk/bike rings */
-const TP = { lat: null, lon: null, label: TP_LABEL, res: null, msg: "", fit: false };
+const TP = { lat: null, lon: null, label: TP_LABEL, res: null, msg: "", fit: false, rad: 0 };
+/* Radius filter for a selected test property: the overlay layers (infra, public buildings,
+   services) are cut to what lies within `rad` metres of the pin. It is plain great-circle
+   arithmetic on published coordinates, and it lives in the hash (rad=), so it survives a
+   reload, a zoom and every rung of the area ladder. 0 means off. */
+const TP_RADII = [0, 500, 1000, 2000, 5000];
+const tpRadOn = () => TP.lat != null && TP.rad > 0;
+const tpWithin = (lat, lon) => !tpRadOn() || (lat != null && lon != null && havM(TP.lat, TP.lon, lat, lon) <= TP.rad);
+const tpRadLabel = m => m >= 1000 ? (m / 1000) + " km" : m + " m";
 const KOM = { list: null, err: false, p: null };   /* dist/geo/kommuner_lookup.json, fetched the first time a pin is dropped */
 const T = { q: "", level: "kommune", region: "", minPop: 0 };                     /* table view filters */
 const REGIONS = ["Hovedstaden", "Sjælland", "Syddanmark", "Midtjylland", "Nordjylland"];
-const LF = { map: null, center: [56.0, 10.5], zoom: 7 };
+const LF = { map: null, center: [56.0, 10.5], zoom: 7, autoMuni: null, autoMicro: false, microManual: false };
 const MICRO_ZOOM = 10;
+const BUILD_ZOOM = 14;
+/* The area ladder. The map subdivides itself as you zoom, the way the "Zoom to <kommune>" button
+   does on click: country → municipality → district (postal code, or quarter in København) →
+   buildings. Every rung is a level the publisher actually prints. There is no interpolated grid:
+   a number nobody published is not a figure this dashboard is allowed to draw. */
+const AREA_LADDER = [
+  { key: "country",      label: "Country",      what: "98 municipalities" },
+  { key: "municipality", label: "Municipality", what: "98 municipalities" },
+  { key: "district",     label: "District",     what: "postal codes" },
+  { key: "buildings",    label: "Buildings",    what: "individual buildings (BBR)" }];
+/* what is drawn right now, not merely what the zoom would allow */
+function areaLevel() {
+  if (microMode()) return "buildings";
+  const z = LF.map ? LF.map.getZoom() : LF.zoom;
+  if (MK.muni || z >= MICRO_ZOOM) return "district";
+  return z < 8 ? "country" : "municipality";
+}
+/* a rung the ladder entered by itself may be left by itself; one the user chose is left alone */
+const autoDrilled = () => !!MK.muni && LF.autoMuni === MK.muni;
 /* quarter indicators whose definition matches the national one closely enough to put København next to a quarter */
 const CPH_CMP = new Set(["growth", "young", "higher_ed", "renters", "almene", "avg_m2"]);
 const muniCmp = (e, key) => !!e.muni && (e.type !== "kvarter" || CPH_CMP.has(key) || !cphOwn(key));
@@ -228,7 +255,7 @@ function hashFor() {
   if (S.view === "makro" && MK.srv) { q.push("services=1"); q.push(...srvHashParts()); }
   if (S.view === "makro" && MK.focus) q.push(`focus=${encodeURIComponent(MK.focus)}`);
   /* the test-property pin rides along with the map hash so the link opens on the same spot */
-  if (S.view === "makro" && TP.lat != null) { q.push(`pin=${TP.lat.toFixed(5)},${TP.lon.toFixed(5)}`); if (TP.label && TP.label !== TP_LABEL) q.push(`pl=${encodeURIComponent(TP.label)}`); }
+  if (S.view === "makro" && TP.lat != null) { q.push(`pin=${TP.lat.toFixed(5)},${TP.lon.toFixed(5)}`); if (TP.label && TP.label !== TP_LABEL) q.push(`pl=${encodeURIComponent(TP.label)}`); if (TP.rad) q.push(`rad=${TP.rad}`); }
   let p;
   if (S.view === "area") { p = `area/${AR.type}/${AR.code}`; if (AR.group) q.push(`g=${encodeURIComponent(AR.group)}`); if (AR.sub !== "kvarter") q.push(`sub=${AR.sub}`); if (AR.tab !== "ind") q.push(`t=${AR.tab}`); }
   else if (S.view === "table") p = `table/${T.level}`;
@@ -272,7 +299,10 @@ function parseHash() {
     if (!KOM.list && !KOM.err) komLoad().then(() => { if (S.view === "analysis") renderKeep(); }); }
   else if (v === "charts") { S.view = "charts"; CH.ind = q.ind || CH.ind; CH.areas = q.a ? q.a.split(",").filter(Boolean) : CH.areas; CH.y0 = q.y0 || CH.y0; CH.y1 = q.y1 || CH.y1; CH.median = q.med !== "0"; CH.mode = q.mode || "auto"; CH.dist = q.dist || "size";
     CH.fq = q.fq === "q" ? "q" : "year"; CH.ov = q.ov ? q.ov.split(",").filter(Boolean) : []; CH.nat = q.nat !== "0"; }
-  else { S.view = "makro"; MK.muni = parts[1] && byCode[parts[1]] ? parts[1] : null; MK.cphView = parts[2] === "postnr" ? "postnr" : "kvarter";
+  else { S.view = "makro"; MK.muni = parts[1] && byCode[parts[1]] ? parts[1] : null;
+         /* a municipality the user chose is not the ladder’s to release */
+         if (MK.muni !== LF.autoMuni) { LF.autoMuni = null; LF.autoMicro = false; }
+         MK.cphView = parts[2] === "postnr" ? "postnr" : "kvarter";
          MK.micro = q.micro === "1" && microAvail(MK.muni); if (q.mind && MICRO_INDS.some(i => i.key === q.mind)) MK.mind = q.mind;
          MK.infra = q.infra === "1"; MK.pub = q.public === "1"; MK.srv = q.services === "1";
          pubParseFilter(q); srvParseFilter(q);
@@ -362,12 +392,16 @@ document.addEventListener("click", e => {
   if (g("[data-chpng]")) { chartPng(); return; }
   if (g("[data-chcsv]")) { chartCsv(); return; }
   if (g("[data-chclear]")) { CH.areas = []; syncHash(); renderKeep(); return; }
-  if ((el = g("[data-micro]"))) { MK.micro = el.dataset.micro === "1"; syncHash(); renderKeep(); return; }
+  if ((el = g("[data-tprad]"))) { TP.rad = TP_RADII.includes(Number(el.dataset.tprad)) ? Number(el.dataset.tprad) : 0;
+    syncHash(); mkRefreshTools();
+    if (LF.map) { lfInfraLayers(); if (MK.pub) { lfPublicLayers(true); lfPublicLabels(); } if (MK.srv) lfServicesLayers(true); tpLayers(); }
+    return; }
+  if ((el = g("[data-micro]"))) { MK.micro = el.dataset.micro === "1"; LF.microManual = true; LF.autoMicro = false; syncHash(); renderKeep(); return; }
   if (g("[data-infra]")) { MK.infra = !MK.infra; syncHash(); renderKeep(); return; }
   if ((el = g("[data-anlay]"))) { if (el.disabled) return; const k = el.dataset.anlay;
     if (k === "infra") ANL.infra = !ANL.infra; else if (k === "public") ANL.pub = !ANL.pub; else ANL.micro = !ANL.micro;
     syncHash(); renderKeep(); return; }
-  if (g("[data-public]")) { MK.pub = !MK.pub; syncHash(); renderKeep(); return; }
+  if (g("[data-public]")) { MK.pub = !MK.pub; LF.pubDrawn = null; syncHash(); renderKeep(); return; }
   if (g("[data-services]")) { MK.srv = !MK.srv; LF.srvDrawn = null; if (MK.srv) srvLoadVisible(); syncHash(); renderKeep(); return; }
   if ((el = g("[data-srvcat]"))) { const k = el.dataset.srvcat;
     if (e.shiftKey) { srvSetFilter(new Set([k])); return; }
@@ -399,7 +433,6 @@ document.addEventListener("click", e => {
   if ((el = g("[data-argroup]"))) { AR.group = el.dataset.argroup; syncHash(); renderKeep(); return; }
   if ((el = g("[data-artab]"))) { AR.tab = el.dataset.artab; syncHash(); renderKeep(); return; }
   if ((el = g("[data-arsub]"))) { AR.sub = el.dataset.arsub; syncHash(); renderKeep(); return; }
-  if ((el = g("[data-view]"))) { const h = viewHash(el.dataset.view); if (h) go(h); return; }
   if ((el = g("[data-indq]"))) { MK.ind = el.dataset.indq; if (!yearsFor(MK.ind).includes(MK.year)) MK.year = LATEST; syncHash(); renderKeep(); return; }
   if (g("[data-mftoggle]")) { UI.mfOpen = !UI.mfOpen; const p = document.getElementById("mfpanel"), b = g("[data-mftoggle]"); if (p) p.style.display = UI.mfOpen ? "" : "none"; if (b) b.classList.toggle("on", UI.mfOpen); return; }
   if ((el = g("[data-arind]"))) { MK.ind = el.dataset.arind; if (!yearsFor(MK.ind).includes(MK.year)) MK.year = LATEST; syncHash(); renderKeep(); return; }
@@ -546,8 +579,6 @@ function legendHtml(sc, ind, key, note) {
     (lowerBetter(ind.key || "") ? `<div class="lgnote">↓ lower is better · darkest = highest</div>` : "") +
     /* an Outlook legend says what it is and whose projection it is, in place of a good/bad note */
     (neutralDir(ind.key || "") && ind.proj ? `<div class="lgnote">${esc(projLegendNote(ind))}</div>` : "") +
-    /* one click from any Outlook legend into the saved view that frames the story */
-    (ind.proj && SAVED_VIEWS.length ? `<div class="lgnote"><button class="lk mini" data-view="${esc(SAVED_VIEWS[0].id)}" title="${esc(SAVED_VIEWS[0].hint)}">★ ${esc(SAVED_VIEWS[0].label)}</button></div>` : "") +
     (sc.diverging && sc.clamped ? `<div class="lgnote dim">top and bottom classes are open-ended</div>` : "") +
     `${note ? `<div class="lgnote">${note}</div>` : ""}`;
 }
@@ -570,30 +601,10 @@ function indSelect() {
   return `<select id="indsel" class="indsel" aria-label="Indicator">${groups.map(gname => `<optgroup label="${esc(gname)}">${L.filter(i => (i.group || "Other") === gname).map(i =>
     `<option value="${i.key}" ${MK.ind === i.key ? "selected" : ""}>${esc(optLabel(i))}</option>`).join("")}</optgroup>`).join("")}</select>`;
 }
-/* ---------- Saved views ----------
-   A preset is nothing but a hash: opening the link restores the view exactly, because every piece of
-   it already round-trips through parseHash (indicator, level, overlays, filters). Defined once here
-   so the chip and the legend link cannot drift apart. */
-const SAVED_VIEWS = [
-  { id: "growth-story", label: "Growth story",
-    hint: "Copenhagen by quarter, young adults 20–34 against the city, with infrastructure and public buildings on top",
-    hash: "map/101?ind=fc_20_34_rel&infra=1&public=1" },
-];
-const viewHash = id => (SAVED_VIEWS.find(v => v.id === id) || {}).hash || "";
-/* is the current view already this preset? compares the pieces that define it, not the string */
-function viewActive(v) {
-  const q = Object.fromEntries(new URLSearchParams(v.hash.split("?")[1] || ""));
-  return S.view === "makro" && String(MK.muni) === "101" && MK.ind === q.ind && cphMode()
-    && (!q.infra || MK.infra) && (!q.public || MK.pub);
-}
-function viewChips() {
-  if (!SAVED_VIEWS.length) return "";
-  return `<div class="savedviews">${SAVED_VIEWS.map(v => `<button class="iqb view ${viewActive(v) ? "on" : ""}" data-view="${esc(v.id)}" title="${esc(v.hint)}">★ ${esc(v.label)}</button>`).join("")}</div>`;
-}
 function indQuick() {
   /* the six figures people ask for first, one click each */
   const L = curInds(); const ks = QUICK_KEYS.map(k => L.find(i => i.key === k)).filter(Boolean);
-  return ks.length > 1 ? `<div class="iq">${ks.map(i => `<button class="iqb ${MK.ind === i.key ? "on" : ""}" data-indq="${i.key}" title="${esc(i.label)}">${esc(i.short || i.label)}</button>`).join("")}${viewChips()}</div>` : viewChips();
+  return ks.length > 1 ? `<div class="iq">${ks.map(i => `<button class="iqb ${MK.ind === i.key ? "on" : ""}" data-indq="${i.key}" title="${esc(i.label)}">${esc(i.short || i.label)}</button>`).join("")}</div>` : "";
 }
 /* searchable area box: municipalities open on the map, postal codes and quarters open their page */
 const AREA_OPTS = [{ t: "Denmark — whole country", h: "map", k: ["denmark", "danmark", "dk"] }];
@@ -791,6 +802,31 @@ function upcomingLine(level, code) {
   const show = up.slice(0, 3).map(p => `<button class="lk mini" data-project="${esc(p.id)}" title="${esc(p.name)}">${esc(p.label_short || p.name)}${p.open_year || p.open_window ? ` (${esc(openLabel(p))})` : ""}</button>`).join("");
   return `<span class="upcoming"><em>Upcoming</em>${show}${up.length > 3 ? `<button class="lk mini" data-go="pipeline">+${up.length - 3} more</button>` : ""}</span>`;
 }
+/* The map toolbar, so the zoom ladder can refresh it in place. Re-rendering the whole view
+   would re-run lfInit and tear the live map down in the middle of a zoom gesture. */
+function mkTools() {
+  const muni = MK.muni ? byCode[MK.muni] : null;
+  return `${areaSearch()}${tpBox()}${TP.lat != null ? `<div class="seg tprad" role="group" aria-label="Filter overlays by distance from the test property"><span class="segl">Within</span>${TP_RADII.map(m => `<button class="sg ${TP.rad === m ? "on" : ""}" data-tprad="${m}" title="${m ? `Infra projects, public buildings and services within ${esc(tpRadLabel(m))} of ${esc(TP.label || TP_LABEL)}` : "No distance filter"}">${m ? esc(tpRadLabel(m)) : "Any"}</button>`).join("")}</div>` : ""}${muni && microAvail(muni.code) ? `<div class="seg"><button class="sg ${!MK.micro ? "on" : ""}" data-micro="0">Areas</button><button class="sg ${MK.micro ? "on" : ""}" data-micro="1">Buildings (${nf(MICRO_IDX[String(Number(muni.code))].n, 0)})</button></div>` : ""}${muni && muni.code === CPH_MUNI && CPH && !microMode() ? `<div class="seg"><button class="sg ${MK.cphView !== "postnr" ? "on" : ""}" data-cphview="kvarter">Quarters (${CPH.areas.length})</button><button class="sg ${MK.cphView === "postnr" ? "on" : ""}" data-cphview="postnr">Postal codes</button></div>` : ""}${INFRA.length ? `<div class="seg"><button class="sg ${MK.infra ? "on" : ""}" data-infra title="Show planned and ongoing infrastructure projects on top of the map">Infra projects</button></div>` : ""}${PUB ? `<div class="seg"><button class="sg ${MK.pub ? "on" : ""}" data-public title="Public buildings from BBR: schools, daycare, health and culture${MK.muni && !pubAvail(MK.muni) ? " — no BBR pull for this municipality yet" : ""}">Public buildings</button></div>` : ""}${SRV ? `<div class="seg"><button class="sg ${MK.srv ? "on" : ""}" data-services title="Shops, places to eat, pharmacies and public-transport stops — OpenStreetMap and Rejseplanen">Services</button></div>` : ""}${microMode() ? mindSelect() : indSelect() + yearSelect()}${D.portfolio ? `<button class="lk mini ${MK.own ? "primary" : ""}" data-mkown>● Own properties</button>` : ""}<button class="lk" data-fs title="Full screen (Esc to exit)">⤢ Full screen</button>`;
+}
+function mkRefreshTools() {
+  const el = document.querySelector("#mapcard .tools"); if (el) el.innerHTML = mkTools();
+  const q = document.getElementById("mkquick");
+  if (q) q.innerHTML = microMode() ? "" : indQuick();
+  const ex = document.getElementById("mkexplain");
+  if (ex) ex.innerHTML = microMode() ? microExplain() : indExplain(curInd());
+  const st = document.getElementById("mkstrip"), mu = MK.muni ? byCode[MK.muni] : null;
+  if (st) st.innerHTML = mu && !microMode() ? muniStrip(mu) : "";
+  setLevelChip();
+}
+/* The level label: what the map is drawing now, and what one more zoom step would give. */
+function setLevelChip() {
+  const el = document.getElementById("mklevel"); if (!el) return;
+  const key = areaLevel(), m = AREA_LADDER.find(l => l.key === key) || AREA_LADDER[0];
+  const what = key === "district" ? (cphMode() ? "Copenhagen quarters" : "postal codes") : m.what;
+  const nxt = key === "country" || key === "municipality" ? "zoom in for postal codes"
+    : key === "district" ? (microAvail(MK.muni) ? "zoom in for buildings" : "") : "";
+  el.innerHTML = `<b>${esc(m.label)}</b><span>${esc(what)}</span>` + (nxt ? `<span class="nx">${esc(nxt)}</span>` : "");
+}
 function vMakro() {
   if (!AREAS.length || !MUNI.length) return `<div class="card"><p class="empty">No macro data built yet — run <code>make fetch</code>, <code>make geo</code> and <code>make build</code>.</p></div>`;
   const ind = curInd();
@@ -799,11 +835,11 @@ function vMakro() {
   return `
   <div class="card accent" id="mapcard">
     <div class="card-head tools-only">
-      <div class="tools">${areaSearch()}${tpBox()}${muni && microAvail(muni.code) ? `<div class="seg"><button class="sg ${!MK.micro ? "on" : ""}" data-micro="0">Areas</button><button class="sg ${MK.micro ? "on" : ""}" data-micro="1">Buildings (${nf(MICRO_IDX[String(Number(muni.code))].n, 0)})</button></div>` : ""}${muni && muni.code === CPH_MUNI && CPH && !microMode() ? `<div class="seg"><button class="sg ${MK.cphView !== "postnr" ? "on" : ""}" data-cphview="kvarter">Quarters (${CPH.areas.length})</button><button class="sg ${MK.cphView === "postnr" ? "on" : ""}" data-cphview="postnr">Postal codes</button></div>` : ""}${INFRA.length ? `<div class="seg"><button class="sg ${MK.infra ? "on" : ""}" data-infra title="Show planned and ongoing infrastructure projects on top of the map">Infra projects</button></div>` : ""}${PUB ? `<div class="seg"><button class="sg ${MK.pub ? "on" : ""}" data-public title="Public buildings from BBR: schools, daycare, health and culture${MK.muni && !pubAvail(MK.muni) ? " — no BBR pull for this municipality yet" : ""}">Public buildings</button></div>` : ""}${SRV ? `<div class="seg"><button class="sg ${MK.srv ? "on" : ""}" data-services title="Shops, places to eat, pharmacies and public-transport stops — OpenStreetMap and Rejseplanen">Services</button></div>` : ""}${microMode() ? mindSelect() : indSelect() + yearSelect()}${D.portfolio ? `<button class="lk mini ${MK.own ? "primary" : ""}" data-mkown>● Own properties</button>` : ""}<button class="lk" data-fs title="Full screen (Esc to exit)">⤢ Full screen</button></div>
-      ${microMode() ? "" : indQuick()}<div class="tperr" id="tperr" role="status" ${TP.msg ? "" : 'style="display:none"'}>${esc(TP.msg)}</div>${tpNote()}</div>
-    ${microMode() ? microExplain() : indExplain(ind)}
-    ${muni && !microMode() ? muniStrip(muni) : ""}
-    <div class="mapwrap"><div id="lfmap"></div><div class="maplegs"><div class="maplegend publiclegend" id="publiclegend"></div><div class="maplegend serviceslegend" id="serviceslegend"></div><div class="maplegend infralegend" id="infralegend"></div></div><div class="maplegend" id="maplegend"></div></div>
+      <div class="tools">${mkTools()}</div>
+      <div id="mkquick">${microMode() ? "" : indQuick()}</div><div class="tperr" id="tperr" role="status" ${TP.msg ? "" : 'style="display:none"'}>${esc(TP.msg)}</div>${tpNote()}</div>
+    <div id="mkexplain">${microMode() ? microExplain() : indExplain(ind)}</div>
+    <div id="mkstrip">${muni && !microMode() ? muniStrip(muni) : ""}</div>
+    <div class="mapwrap"><div id="lfmap"></div><div class="lvlchip" id="mklevel" title="Area level — set automatically by the zoom"></div><div class="maplegs"><div class="maplegend publiclegend" id="publiclegend"></div><div class="maplegend serviceslegend" id="serviceslegend"></div><div class="maplegend infralegend" id="infralegend"></div></div><div class="maplegend" id="maplegend"></div></div>
     ${srcNote(`<p class="cap">${muni ? "Click a polygon for its figures and a link to its page." : "Click a polygon for its figures; open a municipality with the search box above or from the popup. Table view lists everything side by side."} Colour classes: quintiles of the visible areas. Boundaries: DAGI, Klimadatastyrelsen (simplified); basemap OpenStreetMap.${MK.srv ? ` <b>Services:</b> ${esc(srvAttribLine())}.` : ""}</p>`)}
   </div>`;
 }
@@ -1167,8 +1203,8 @@ function vArea() {
       <div class="seg">${groups.map(g => `<button class="sg ${g === grp ? "on" : ""}" data-argroup="${esc(g)}">${esc(g)}</button>`).join("")}</div></div>
     <div class="hero wrap">${tiles.map(i => tileHtml(e, i, i.key === ind.key)).join("") || `<div><span>no data</span></div>`}</div>
   </div>
-  ${e.type === "kvarter" && e.o.kk ? kkCard(e) : ""}
   ${outlookCard(e)}
+  ${e.type === "kvarter" && e.o.kk ? kkCard(e) : ""}
   <div class="grid-2">
     <div class="card">
       <div class="card-head"><h3>Trend — ${esc(ind.label)}</h3><span class="hint">${esc(ind.unit || "")} · same sub-period each year</span></div>
@@ -1323,6 +1359,8 @@ function lfInfraLayers() {
   const lines = [], hits = [], stations = [];
   INFRA.forEach(f => {
     const p = f.properties;
+    /* a line or an area counts as within range when any part of it is */
+    if (tpRadOn() && !((featDistM(f, TP.lat, TP.lon) ?? Infinity) <= TP.rad)) return;
     if (isPt(f)) { stations.push(f); return; }
     const area = isArea(f);
     const style = area ? { ...infraStyle(p), weight: 1.2, fillColor: infraSt(p).color, fillOpacity: .14 } : infraStyle(p);
@@ -1532,8 +1570,9 @@ function tpDrop(lat, lon) {
 }
 function tpParse(q) {
   const m = (q.pin || "").match(/^(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)$/);
-  if (!m) { TP.lat = TP.lon = null; TP.res = null; return; }
+  if (!m) { TP.lat = TP.lon = null; TP.res = null; TP.rad = 0; return; }
   TP.lat = Number(m[1]); TP.lon = Number(m[2]); TP.label = q.pl || TP_LABEL;
+  TP.rad = TP_RADII.includes(Number(q.rad)) ? Number(q.rad) : 0;
   /* the exact kommune needs the ring file; until it lands the popup says "approx." and then corrects itself */
   if (!KOM.list && !KOM.err) komLoad().then(() => { if (S.view === "makro" && LF.map) tpLayers(); });
 }
@@ -1544,6 +1583,8 @@ function tpLayers() {
   const col = cssVar("--pin", "#33372C"), ll = [TP.lat, TP.lon];
   /* non-interactive rings, so a click still reaches the polygon underneath */
   const rings = TP_RINGS.map(m => L.circle(ll, { radius: m, color: col, weight: 1, opacity: .8, dashArray: "5 6", fill: false, interactive: false }));
+  /* the active filter radius gets a solid ring of its own — the dashed ones stay as the scale */
+  if (tpRadOn()) rings.push(L.circle(ll, { radius: TP.rad, color: col, weight: 1.6, opacity: .9, fill: true, fillOpacity: .05, interactive: false }));
   const mark = L.marker(ll, { icon: L.divIcon({ className: "tp-pin", iconSize: [22, 22], iconAnchor: [11, 11], html: "<i></i>" }), zIndexOffset: 1200, title: TP.label || TP_LABEL });
   mark.bindPopup(() => tpPopup(), { maxWidth: 520, maxHeight: 520, autoPanPadding: [24, 24] });
   LF.tpG = L.layerGroup(rings.concat([mark])).addTo(LF.map);
@@ -1562,6 +1603,7 @@ function tpPopup() {
     ${e ? headlineHtml(e) : ""}
     ${e ? `<span class="lfsec">${esc(e.typeLabel)} · ${esc(e.name)}</span>` : ""}
     <span class="dim">Rings: ${TP_RINGS.map(m => nf(m, 0) + " m").join(" · ")}</span>
+    ${tpRadOn() ? `<span class="dim">Overlays filtered to ${esc(tpRadLabel(TP.rad))} around this pin.</span>` : ""}
     <span class="lfact"><button class="lk mini primary" data-go="${analysisLink(TP.lat, TP.lon, TP.label)}">Analyse ›</button>
       <button class="lk mini" data-tp="copy">Copy link</button><button class="lk mini" data-tp="remove">Remove</button></span></div>`;
 }
@@ -2016,13 +2058,13 @@ function vAnalysis() {
     <div class="mapwrap anmapwrap${anLayerList().length ? " haslayers" : ""}"><div id="anmap"></div>
       <div class="maplegs"><div class="maplegend small publiclegend" id="anpublegend"></div><div class="maplegend small infralegend" id="aninfralegend"></div><div class="maplegend small" id="anmicrolegend"></div></div>
       <div class="maplegend small" id="anlegend"></div></div></div>
+  ${e ? anOutlookCard(e, r) : ""}
   ${e ? `<div class="card"><div class="card-head"><h3>Area profile — ${esc(e.typeLabel)} ${esc(e.name)} <span class="hq" title="${esc(hint)}">ⓘ</span></h3>
       <span class="hint">${profile.length} indicator${profile.length === 1 ? "" : "s"}${MK.year !== LATEST ? " · " + MK.year : ""}</span></div>
     ${anIndTable(e, r, profile)}</div>
   <div class="card"><div class="card-head"><h3>Safety</h3><span class="hint">${esc(SAFETY.length ? (SAFETY[0].unit || "") : "")} · municipality level${e.type === "kvarter" ? " plus the city's own bydel survey" : ""}</span></div>
     ${safety.length ? anIndTable(e, r, safety) : `<p class="empty">no safety figure for this area</p>`}
-    <p class="cap">Reported crime comes from Danmarks Statistik per municipality over a rolling four quarters; a postal code or quarter shows its municipality's figure (°).${e.type === "kvarter" ? ` Københavns Kommune's own safety survey publishes per bydel (^), so every quarter of ${esc(e.bydel || "the district")} carries the same number — a different source, period and geography from the national one.` : ""}</p></div>
-  ${anOutlookCard(e, r)}`
+    <p class="cap">Reported crime comes from Danmarks Statistik per municipality over a rolling four quarters; a postal code or quarter shows its municipality's figure (°).${e.type === "kvarter" ? ` Københavns Kommune's own safety survey publishes per bydel (^), so every quarter of ${esc(e.bydel || "the district")} carries the same number — a different source, period and geography from the national one.` : ""}</p></div>`
     : `<div class="card"><p class="empty">No area statistics cover this point.</p></div>`}
   ${anInfraCard(pt)}
   <div id="anpub">${anPubCard(pt, r)}</div>
@@ -2112,7 +2154,8 @@ function mfActive() { return (MF.minDw > 2 ? 1 : 0) + (MF.yFrom ? 1 : 0) + (MF.y
 function mfBtn() { const b = document.querySelector("[data-mftoggle]"); if (b) { const n = mfActive(); b.textContent = `Filters${n ? ` (${n} active)` : ""} ▾`; } }
 function microRows(code) {
   const d = MICRO[String(Number(code))]; if (!d) return [];
-  return d.b.filter(r => r[2] >= MF.minDw && (!MF.yFrom || (r[6] != null && r[6] >= Number(MF.yFrom))) && (!MF.yTo || (r[6] != null && r[6] <= Number(MF.yTo)))
+  /* r[0], r[1] are the building's lat/lon — the pin radius filters these like every other overlay */
+  return d.b.filter(r => tpWithin(r[0], r[1]) && r[2] >= MF.minDw && (!MF.yFrom || (r[6] != null && r[6] >= Number(MF.yFrom))) && (!MF.yTo || (r[6] != null && r[6] <= Number(MF.yTo)))
     && (!MF.type || String(r[8]) === MF.type) && (!MF.rentMin || (r[3] != null && r[3] >= MF.rentMin)));
 }
 function loadMicro(code) {
@@ -2173,9 +2216,37 @@ function lfMicroLayers() {
   LF.microG = L.layerGroup(marks).addTo(LF.map); LF.microMarks = marks;
   tpLayers();
   setLegend("maplegend", sc, ind, "micro:" + ind.key, "buildings with ≥ 2 dwellings · dot size = dwellings");
+  setLevelChip();
   lfInfraLayers();
   lfPublicLayers();
   if (cnt) cnt.textContent = `${nf(rows.length, 0)} of ${nf(d.meta.n, 0)} buildings · ${nf(rows.reduce((s_, r) => s_ + r[2], 0), 0)} dwellings`;
+}
+/* Keep the drawn granularity in step with the zoom, and with a pan that crosses a border.
+   Only rungs the ladder entered may be left by the ladder: an explicit drill-in (a "Zoom to …"
+   button, a popup link, /map/<code> in the URL) and an explicit Areas/Buildings choice both
+   outrank it, so the map never undoes what the user just asked for. Thresholds are asymmetric
+   so a half-step of zoom (zoomSnap 0.5) cannot flip the level back and forth.
+   Returns true when something changed and the layers need rebuilding. */
+function lfAutoLevel() {
+  if (!LF.map || S.view !== "makro" || LF.pendingFit) return false;
+  const z = LF.map.getZoom();
+  let changed = false;
+  if (z >= MICRO_ZOOM && (!MK.muni || autoDrilled())) {
+    /* adopt the municipality under the middle of the screen — the same drill the button does */
+    const c = LF.map.getCenter(), a = areaOf(AREAS, c.lat, c.lng), code = a && a.muni;
+    if (code && code !== MK.muni) { MK.muni = code; LF.autoMuni = code; LF.shownMuni = code; changed = true; }
+  } else if (autoDrilled() && z < MICRO_ZOOM - 0.5) {
+    MK.muni = null; LF.autoMuni = null; LF.shownMuni = null; LF.microManual = false;
+    if (LF.autoMicro) { MK.micro = false; LF.autoMicro = false; }
+    changed = true;
+  }
+  if (!LF.microManual) {
+    const avail = !!MK.muni && microAvail(MK.muni);
+    if (avail && !MK.micro && z >= BUILD_ZOOM) { MK.micro = true; LF.autoMicro = true; changed = true; }
+    else if (LF.autoMicro && MK.micro && (!avail || z < BUILD_ZOOM - 0.5)) { MK.micro = false; LF.autoMicro = false; changed = true; }
+  }
+  if (changed) { syncHash(); mkRefreshTools(); }
+  return changed;
 }
 function lfLayers() {
   if (LF.map && microMode()) { lfMicroLayers(); return; }
@@ -2210,6 +2281,7 @@ function lfLayers() {
   lfPublicLayers();
   lfServicesLayers();
   lfLabels();
+  setLevelChip();
   setLegend("maplegend", sc, ind, ind.key, micro ? (cphMode() ? "quarters" + (bydelLevel(ind) ? " · ^ one figure per bydel" : "") : "postal codes") : (ind.level === "postnr" && !MK.muni ? "municipalities · zoom in for postal codes" : "municipalities" + (fine ? ` · ° ${cphMode() ? "quarters" : "postal codes"} take the municipality value` : "")));
   if (LF.ownG) { LF.map.removeLayer(LF.ownG); LF.ownG = null; }
   if (MK.own && D.portfolio) {
@@ -2236,10 +2308,15 @@ function lfInit() {
      dot out — visible as grey-looking markers over a dark quintile and correct ones off it. */
   if (!map.getPane("srvpane")) { map.createPane("srvpane"); map.getPane("srvpane").style.zIndex = 450; }
   LF.srvCanvas = L.canvas({ pane: "srvpane", padding: .3 });
+  /* public buildings get the same treatment one step lower, so a services dot still draws on top */
+  if (!map.getPane("pubpane")) { map.createPane("pubpane"); map.getPane("pubpane").style.zIndex = 440; }
+  LF.pubCanvas = L.canvas({ pane: "pubpane", padding: .3 });
   L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 18, className: "basemap",
     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> · Boundaries: DAGI, Klimadatastyrelsen' }).addTo(map);
   map.on("moveend", () => { const c = map.getCenter(); LF.center = [c.lat, c.lng]; LF.zoom = map.getZoom();
-    if (MK.pub) { pubLoadVisible(); lfPublicLabels(); }
+    /* a pan can cross a municipality border while drilled in, so the ladder runs here too */
+    if (lfAutoLevel()) { lfLayers(); return; }
+    if (MK.pub) { lfPublicLayers(); lfPublicLabels(); }
     /* services draw only what is in the viewport, so a pan is a redraw, not just a load */
     if (MK.srv) lfServicesLayers(); });
   /* Leaflet stops click propagation inside popups, so page links in popups are wired here */
@@ -2255,13 +2332,16 @@ function lfInit() {
   map.on("zoomend", () => {
     /* rebuild polygons only when the display level changes — rebuilding on every pan would kill open popups */
     lfInfraLabels();
-    if (MK.pub) lfPublicLayers();                /* the zoom rule changes which public rows are drawn */
+    if (MK.pub) lfPublicLayers(true);            /* the zoom rule changes which public rows are drawn */
     if (MK.srv) lfServicesLayers(true);          /* likewise: each services category has its own zoom floor */
+    if (lfAutoLevel()) { lfLayers(); return; }
+    setLevelChip();
     if (microMode()) { (LF.microMarks || []).forEach(m => m.setRadius(microRadius(m._dw))); return; }
     const z = map.getZoom(), fine = !!MK.muni || z >= MICRO_ZOOM, lvl = (fine ? "micro" : z < 8 ? "national" : "macro") + (cphMode() ? "-cph" : "") + (MK.muni || "");
     if (lvl !== LF.level) lfLayers(); else if (fine) lfLabels();
   });
   lfLayers();
+  setLevelChip();
   applyPendingFit();
 }
 
@@ -2525,7 +2605,7 @@ function pubLoad(code) {
   if (!PUB || !pubAvail(k) || PUB_FILES[k] || PUB_FILES["_loading_" + k]) return;
   PUB_FILES["_loading_" + k] = true;
   fetch(`public/${String(k).padStart(4, "0")}.json`).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then(d => { PUB_FILES[k] = d; delete PUB_FILES["_loading_" + k]; if (MK.pub && LF.map) lfPublicLayers(); anMapOverlays(); anFill(); })
+    .then(d => { PUB_FILES[k] = d; delete PUB_FILES["_loading_" + k]; if (MK.pub && LF.map) lfPublicLayers(true); anMapOverlays(); anFill(); })
     .catch(() => { delete PUB_FILES["_loading_" + k]; PUB_FILES["_error_" + k] = true; });
 }
 /* what to draw: the municipality in view, else every loaded file — and at national zoom only the open cases */
@@ -2550,6 +2630,7 @@ const pubKindOn = kind => PF.kind === "both" || (PF.kind === "existing" ? kind =
 function pubSetFilter({ cats, kind }) {
   if (cats !== undefined) PF.cats = cats;
   if (kind !== undefined) PF.kind = kind;
+  LF.pubDrawn = null;              /* the view did not move, but what belongs on it changed */
   syncHash(); renderKeep();
 }
 /* every loaded building that passes the filter, before the zoom rule */
@@ -2564,7 +2645,7 @@ function pubAll() {
 const PUB_BIG_M2 = 1000;
 function pubZoom() { return LF.map ? LF.map.getZoom() : 7; }
 function pubRows() {
-  const rows = pubAll(), z = pubZoom();
+  const rows = tpRadOn() ? pubAll().filter(b => tpWithin(b.lat, b.lon)) : pubAll(), z = pubZoom();
   if (z < 9) return rows.filter(b => b.kind === "case");
   if (z < 13) return rows.filter(b => b.kind === "case" || (b.m2 || 0) >= PUB_BIG_M2);
   return rows;
@@ -2599,11 +2680,97 @@ function pubPopup(b) {
       ${area.length ? `<button class="lk mini" data-go="${withQ(pageOf(area[0]))}">${esc(area[0].name)} ›</button>` : ""}</span>
     <p class="cap dim">BBR ${esc(b.code)} · id ${esc(b.id.slice(0, 8))}… · BBR via Datafordeler, ${esc((PUB || {}).built || "")}</p></div>`;
 }
-function lfPublicLayers() {
+/* ---------- Public buildings: what makes it fast ----------
+   Measured before changing anything: at zoom 13 over Copenhagen the layer put **5 293 SVG paths**
+   into the DOM (2 639 buildings × a halo and a marker each) and took 180 ms to rebuild. Filtering
+   those rows took **1.2 ms** of that. So the cost was never the filter — it was constructing and
+   inserting DOM nodes, and that is what the three changes below attack:
+
+     · the plain dots move to the canvas renderer, in their own pane (the services layer already
+       draws more markers than this in ~16 ms that way);
+     · only what is inside the viewport is built, and only when the map leaves the padding;
+     · past PUB_CLUSTER_MAX markers the rows are clustered into a grid, so the count on screen has
+       a ceiling no matter how many buildings are loaded.
+
+   A Web Worker for the filtering was considered and rejected on the measurement: moving a 1.2 ms
+   array filter across a structured clone costs more than it saves. What did block the main thread
+   was marker construction, and clustering plus the viewport bound is what removes it. */
+const PUB_CLUSTER_MAX = 900;      /* more markers than this in view → draw a grid of clusters */
+const PUB_PAD = 0.15;             /* viewport padding, as a share of the view */
+
+function pubNeedsRedraw() {
+  if (!LF.pubDrawn || LF.pubDrawn.zoom !== LF.map.getZoom()) return true;
+  const v = LF.map.getBounds(), b = LF.pubDrawn.bounds;
+  return !(b.contains(v.getNorthEast()) && b.contains(v.getSouthWest()));
+}
+/* rows inside the padded viewport — the rest cannot be seen and is not built */
+function pubRowsInView() {
+  const rows = pubRows();
+  if (!LF.map) return rows;
+  const v = LF.map.getBounds().pad(PUB_PAD);
+  const s = v.getSouth(), n = v.getNorth(), w = v.getWest(), e = v.getEast();
+  return rows.filter(b => b.lat >= s && b.lat <= n && b.lon >= w && b.lon <= e);
+}
+/* a grid of cells at roughly 44 screen pixels, so cluster density looks the same at every zoom */
+function pubCluster(rows) {
+  const z = LF.map.getZoom();
+  /* 72 px cells, not 44: each cluster carries a permanent tooltip, which is a DOM node, so the
+     cell size is really a budget for how many of those exist. 72 px keeps it near 100 on a full
+     screen while still separating neighbourhoods. */
+  const cell = 72 / (256 * Math.pow(2, z)) * 360;          /* degrees of longitude per cell */
+  const latCell = cell * 0.62;                             /* roughly square on screen at DK latitudes */
+  const g = new Map();
+  rows.forEach(b => {
+    const k = `${Math.floor(b.lat / latCell)}:${Math.floor(b.lon / cell)}`;
+    let c = g.get(k);
+    if (!c) { c = { n: 0, lat: 0, lon: 0, cats: {} }; g.set(k, c); }
+    c.n++; c.lat += b.lat; c.lon += b.lon;
+    c.cats[b.cat] = (c.cats[b.cat] || 0) + 1;
+  });
+  return [...g.values()].map(c => ({ ...c, lat: c.lat / c.n, lon: c.lon / c.n }));
+}
+function pubClusterMarkers(cells, map) {
+  const marks = [];
+  cells.forEach(c => {
+    if (c.n === 1) return;                                  /* singletons stay real markers */
+    const top = Object.entries(c.cats).sort((a, b) => b[1] - a[1])[0][0];
+    const col = (PUB_CAT[top] || PUB_CAT.culture).color;
+    const r = Math.min(20, 8 + Math.log2(c.n) * 2.4);
+    const m = L.circleMarker([c.lat, c.lon], { pane: "pubpane", radius: r, color: "#FFFFFF", weight: 2,
+      fillColor: col, fillOpacity: .88, className: "pubcluster" });
+    /* only a cluster worth reading gets a number; the small ones are legible by size alone, and
+       every label is a DOM node this layer exists to avoid */
+    if (c.n >= 4) m.bindTooltip(String(c.n), { permanent: true, direction: "center", className: "pubclab" });
+    m.on("click", () => map.setView([c.lat, c.lon], Math.min(18, map.getZoom() + 2)));
+    marks.push(m);
+  });
+  return marks;
+}
+function lfPublicLayers(force) {
+  if (!LF.map) return;
+  if (MK.pub && PUB && !force && LF.pubG && !pubNeedsRedraw()) { pubLoadVisible(); return; }
   ["pubG", "pubLabG"].forEach(k => { if (LF[k] && LF.map) { LF.map.removeLayer(LF[k]); LF[k] = null; } });
-  if (!LF.map || !MK.pub || !PUB) { setPublicLegend(); return; }
+  if (!MK.pub || !PUB) { LF.pubDrawn = null; setPublicLegend(); return; }
   pubLoadVisible();
-  LF.pubG = L.layerGroup(pubMarkers(pubRows(), LF.map, gradeMode())).addTo(LF.map);
+  LF.pubDrawn = { zoom: LF.map.getZoom(), bounds: LF.map.getBounds().pad(PUB_PAD) };
+  const rows = pubRowsInView();
+  LF.pubN = rows.length;
+  LF.pubClustered = rows.length > PUB_CLUSTER_MAX;
+  if (LF.pubClustered) {
+    const cells = pubCluster(rows);
+    const singles = cells.filter(c => c.n === 1).length;
+    LF.pubCells = cells.length;
+    /* the singletons still deserve their popup, so they are drawn as ordinary markers */
+    const singleRows = [];
+    const cellOf = new Map(cells.filter(c => c.n === 1).map(c => [`${c.lat.toFixed(6)},${c.lon.toFixed(6)}`, true]));
+    rows.forEach(b => { if (cellOf.has(`${b.lat.toFixed(6)},${b.lon.toFixed(6)}`)) singleRows.push(b); });
+    LF.pubG = L.layerGroup(pubClusterMarkers(cells, LF.map)
+      .concat(pubMarkers(singleRows, LF.map, gradeMode()))).addTo(LF.map);
+    LF.pubSingles = singles;
+  } else {
+    LF.pubCells = 0;
+    LF.pubG = L.layerGroup(pubMarkers(rows, LF.map, gradeMode())).addTo(LF.map);
+  }
   lfPublicLabels();
   setPublicLegend();
 }
@@ -2620,13 +2787,15 @@ function pubMarkers(rows, map, gm) {
       if (gc) { fill = gc; fop = .95; stroke = "#2F3B55"; wt = 1.4; }
       else { fill = c.color; fop = .18; stroke = c.color; wt = 1; }
     }
-    const halo = L.circleMarker([b.lat, b.lon], { radius: 8, stroke: false, fillColor: "#FFFFFF", fillOpacity: .9, interactive: false });
-    const m = L.circleMarker([b.lat, b.lon], { radius: 6, color: stroke, weight: wt, opacity: .95, className: "infra-shape",
+    /* one canvas marker instead of an SVG halo + SVG marker: half the objects and no DOM node each.
+       The white ring that used to be a separate halo is now this marker's own stroke. */
+    const halo = null;
+    const m = L.circleMarker([b.lat, b.lon], { renderer: LF.pubCanvas || undefined, pane: LF.pubCanvas ? "pubpane" : undefined,
+      radius: 6, color: existing ? "#FFFFFF" : stroke, weight: existing ? 1.6 : wt, opacity: .95,
       fillColor: fill, fillOpacity: fop, dashArray: existing ? null : "3 3" });
-    m.on("mouseover", () => { m.setRadius(8); halo.setRadius(10); }).on("mouseout", () => { m.setRadius(6); halo.setRadius(8); });
     m.on("click", e => L.popup({ maxWidth: 420, autoPanPadding: [24, 24] }).setLatLng(e.latlng || [b.lat, b.lon]).setContent(pubPopup(b)).openOn(map));
     m._pub = b;
-    marks.push(halo, m);
+    marks.push(m);
   });
   return marks;
 }
@@ -2672,13 +2841,16 @@ function pubLegendHtml(rows, note, zoomNote, gm) {
       <div class="lgrow"><i style="background:${PUB_CAT.education.color};opacity:.18;border:1px solid ${PUB_CAT.education.color}"></i>no grade published</div>
       <div class="lgnote">${sc.n || 0} schools classed over the loaded municipalities. A school with no grade teaches no 9th grade, or the source suppressed it — never read it as a low grade. Kilde: Uddannelsesstatistik.dk</div>`;
   }
+  const loading = Object.keys(PUB_FILES).filter(k => k.startsWith("_loading_")).length;
   return `<div class="lgtitle">Public buildings<span>BBR ${esc((PUB || {}).built || "")} · ${note || `${(PUB || {}).kommuner ? PUB.kommuner.length : 0} municipalities`}${filtered ? ` · <b class="only" data-puball>All</b>` : ""}</span></div>
+    ${loading ? `<div class="lgrow pubload"><i class="skel"></i>loading ${loading} municipalit${loading === 1 ? "y" : "ies"}…</div>` : ""}
     ${Object.entries(PUB_CAT).map(([k, c]) => catRow(k, c)).join("")}
     ${kindRow}
     ${allOff ? `<div class="lgrow gk allhidden">All categories hidden · <b class="only" data-puball>Show all</b></div>` : ""}
     ${grade}
     <div class="lgnote">${allOff ? "nothing drawn"
-      : `${nf(n - cases, 0)} existing · ${nf(cases, 0)} open cases (permit ≤ ${(PUB || {}).recent_years} yr) drawn${zoomNote || ""}`}</div>`;
+      : `${nf(n - cases, 0)} existing · ${nf(cases, 0)} open cases (permit ≤ ${(PUB || {}).recent_years} yr) drawn${zoomNote || ""}`}</div>
+    ${LF.pubClustered ? `<div class="lgnote">${nf(LF.pubN || 0, 0)} in view, grouped into ${nf(LF.pubCells || 0, 0)} clusters — zoom in or click a cluster to open it</div>` : ""}`;
 }
 /* Fill one legend box, or hide it when its layer is off. The box is never left as an empty white bar:
    either it has content or it is display:none (and `.maplegend:empty` catches any path that misses this). */
@@ -2839,6 +3011,7 @@ function srvRows() {
     if (k.startsWith("_")) return;
     SRV_FILES[k].forEach(p => {
       if (!srvCatOn(p.cat)) return;
+      if (!tpWithin(p.lat, p.lon)) return;
       if (p.cat === "transport") { if (!srvModeOn(p.sub) || z < SRV_TGROUP[SRV_MODE[p.sub].group].zoom) return; }
       else if (z < SRV_CAT[p.cat].zoom) return;
       if (p.lat < s_ || p.lat > n_ || p.lon < w_ || p.lon > e_) return;

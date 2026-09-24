@@ -2463,8 +2463,7 @@
       "source": "Danmarks Statistik FRKM126 (municipal population projection, 2026 vintage), national control total FRDK126 — see docs/FORECAST.md",
       "warn": "A projection, not a measurement. DST's municipal projection assumes each municipality's recent fertility, mortality and migration behaviour continues; it carries no housing programme, so a large planned development does not appear in it.",
       "note": "Computed in scripts/build_forecast.py from data/processed/forecast.json: the 2026 vintage of DST's municipal projection, ages folded into 0–5, 6–16, 17–19, 20–34, 35–64, 65–79 and 80+. Christiansø (411) is not a municipality and has no value. Never read together with Københavns Kommune's own forecast, which is a different run — see docs/FORECAST.md. Denmark here is the sum of the same 98 municipalities, not a separately rounded national table; it agrees with FRDK126's published age detail to 0.001 pp (scripts/validate_forecast.py check 5). Read it as a share-of-cohort map: a positive value is a municipality losing 20–34-year-olds more slowly than Denmark, which for most of the top ten is what is actually happening.",
-      "note_short": "Measured against Denmark's own −7.1 %, not against zero — a positive value usually still means a shrinking cohort, just a slower one.",
-      "chip": true
+      "note_short": "Measured against Denmark's own −7.1 %, not against zero — a positive value usually still means a shrinking cohort, just a slower one."
     },
     {
       "key": "fc_20_34_abs",
