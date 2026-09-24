@@ -5,7 +5,7 @@ Four layers, fastest first. None of them touches the network except through the 
 | Layer | Command | What it covers |
 |---|---|---|
 | Python unit | `python3 -m unittest discover -s tests -p 'test_*.py'` | the build scripts' arithmetic (`test_safety.py`, `test_climate.py`) |
-| JS unit | `node --test tests/*.test.js` (or `make test-js`) | the pure modules: `climate_core.js`, `testprop.js`, `route_core.js` |
+| JS unit | `node --test tests/*.test.js` (or `make test-js`) | the pure modules: `climate_core.js`, `testprop.js`, `route_core.js`, `picker_core.js`, `export_core.js` |
 | Both | `make test` | the two above |
 | UI smoke | `make smoke` | every route × 3 viewports in a real browser: zero JS errors, DOM landmarks, screenshots |
 | UI acceptance | `make ac` | one test per acceptance criterion (AC) of `docs/v3/UI_SPEC_v3.md` |
@@ -66,3 +66,9 @@ unless `--network` is passed, and `ERRORS` holds the live `pageerror` / `console
 AC can assert on it. `report.json` and a screenshot per AC go to `--out`.
 
 CLI: `--url --phase-upto --only --viewports --out --headed --network`.
+
+Downloads: the export ACs (P7) read the files the `Export ▾` menu writes. The context is created
+with `accept_downloads=True`; `export_csv(page, kind)` opens the menu (idempotently — the trigger
+is a toggle, so it is never clicked twice), clicks one `[data-export]` item, asserts the UTF-8 BOM
+and returns `(filename, lines)`, caching one parse per file per viewport run (`areas_long` is
+~104 000 rows).

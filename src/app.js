@@ -172,7 +172,9 @@ const AR = { type: null, code: null, sub: "kvarter", show: new Set() };
 /* Population outlook opens itself on a municipality page and nothing opens on a postal code or a
    quarter (spec §9, pushback on wish 5). `show=` is written only when the reader changed that. */
 const arShowDefault = () => AR.type === "kommune" ? ["outlook"] : [];
-const UI = { indxOpen: false, mfOpen: false, layOpen: false, mmFull: false };     /* fold states that survive a re-render */
+/* fold states that survive a re-render. `xOpen` names *which* Export ▾ is open ("side" = the
+   sidebar footer, "page" = the Data or test-property header): one menu at a time, two triggers. */
+const UI = { indxOpen: false, mfOpen: false, layOpen: false, mmFull: false, xOpen: "" };
 const MKT = { src: false };                                                        /* market: sources panel open */
 const CH = { ind: (IND[0] || {}).key, areas: [], y0: "", y1: "", median: true, title: "", mode: "auto", dist: "size", fq: "year", ov: [], nat: true };   /* chart generator; fq = year | q, ov = overlay indicators, nat = Denmark line */
 const PR = { id: null };                                                          /* project datasheet */
@@ -469,9 +471,11 @@ function crumbs() {
   return { c, tail, kind };
 }
 /* page-level actions, on the right of the top bar. Full screen belongs to the page, not to the map
-   toolbar (spec §5.1) — which is also what brings the toolbar down to one row. */
+   toolbar (spec §5.1) — which is also what brings the toolbar down to one row. The Data section and
+   the test property carry the Export ▾ menu here (spec §4.9); the sidebar footer has the same one. */
 function pageActions() {
   if (S.view === "makro") return `<button class="lk" data-fs data-testid="map-full" title="Full screen (Esc to exit)">${document.fullscreenElement ? "⤡ Exit full screen" : "⤢ Full screen"}</button>`;
+  if (isData() || S.view === "analysis") return exportMenu("page");
   return "";
 }
 function renderTop() {
@@ -485,7 +489,7 @@ const RENDER = { makro: vMakro, table: vTable, area: vArea, charts: vCharts, mar
 function render() {
   /* every live map goes before the DOM it lives in does — see dropMap() */
   dropMaps();
-  renderNav(); renderTop();
+  renderNav(); renderTop(); renderFoot();
   const body = document.getElementById("body");
   body.innerHTML = (RENDER[S.view] || vMakro)();
   enableSort(body);
@@ -497,14 +501,17 @@ document.addEventListener("click", e => {
   let el;
   if ((el = g("[data-go]"))) { go(el.dataset.go); return; }
   if ((el = g("[data-tlevel]"))) { T.level = el.dataset.tlevel; if (!curInds().some(i => i.key === MK.ind)) MK.ind = curInds()[0].key; syncHash(); renderKeep(); return; }
-  if (g("[data-csv]")) { exportCsv(); return; }
-  if (g("[data-csv-pipe]")) { exportPipelineCsv(); return; }
+  /* Export ▾ (spec §4.9): one menu, two triggers, one handler for every item in it */
+  if ((el = g("[data-xpop]"))) { const w = el.closest(".xwrap"); xPopOpen(UI.xOpen === w.dataset.xat ? "" : w.dataset.xat, true); return; }
+  if ((el = g("[data-export]"))) { exportGo(el.dataset.export); return; }
+  if (g("[data-testid=export-menu]")) return;      /* a click inside the menu must not close it */
+  if (g("[data-csv]")) { exportGo("view"); return; }
+  if (g("[data-csv-pipe]")) { exportGo("projects"); return; }
   if (g("[data-back]")) { history.back(); return; }
   if ((el = g("[data-ancopy]"))) { tpAction("copy", el); return; }
   if ((el = g("[data-pipe]"))) { const f = INFRA_BY[el.dataset.pipe];
     go(f && f.properties.map !== false ? `map?ind=${encodeURIComponent(MK.ind)}&infra=1&focus=${encodeURIComponent(el.dataset.pipe)}` : `project/${el.dataset.pipe}`); return; }
   if ((el = g("[data-project]"))) { go(`project/${el.dataset.project}`); return; }
-  if (g("[data-xall]")) { exportAll(); return; }
   if (g("[data-mkown]")) { MK.own = !MK.own; renderKeep(); return; }
   if ((el = g("[data-cphview]"))) { MK.cphView = el.dataset.cphview; go(hashFor()); return; }
   if (g("[data-fs]")) { toggleFullscreen(); return; }
@@ -567,6 +574,7 @@ document.addEventListener("click", e => {
   /* a click anywhere else closes every popover, the way every other popover on the page behaves */
   const pk = indPopEl(); if (pk && pk.classList.contains("open")) indPopOpen(false, false);
   if (UI.layOpen) layPopOpen(false, false);
+  if (UI.xOpen) xPopOpen("", false);
   asrchOpen(false);
 });
 document.addEventListener("change", e => {
@@ -643,6 +651,7 @@ document.addEventListener("keydown", e => {
     if (e.key === "Escape") { e.preventDefault(); indPopOpen(false, true); return; }
   }
   if (e.key === "Escape" && UI.layOpen) { e.preventDefault(); layPopOpen(false, true); return; }
+  if (e.key === "Escape" && UI.xOpen) { e.preventDefault(); xPopOpen("", true); return; }
   /* Esc leaves the mini map's full screen before it can mean "back" (spec §4.6, §7) */
   if (e.key === "Escape" && UI.mmFull) { e.preventDefault(); mmFull(false); return; }
   /* the unified search (spec §5.1): ↑ ↓ move the highlighted result, Enter takes it — the first one
@@ -1476,7 +1485,7 @@ function vTable() {
       ${T.level !== "kvarter" ? `<select id="tregion" class="indsel"><option value="">All regions</option>${REGIONS.map(r => `<option value="${r}" ${T.region === r ? "selected" : ""}>${r}</option>`).join("")}</select>` : ""}
       <label class="hint">min. population <input id="tminpop" type="number" min="0" step="1000" value="${T.minPop}" style="width:90px"></label>
       <span class="hint" id="tcount">${tableRows().length} rows</span>
-      <button class="lk mini" data-csv>⤓ Export CSV</button>
+      <button class="lk mini" data-csv title="The table as it stands — every column with its table id and as-of in the header. Export ▾ has the long format and every other dataset.">⤓ This view (CSV)</button>
     </div>
     <div class="scrollx"><table class="tbl compact wraphead" data-testid="areas-table" data-sortable><thead><tr>
       <th>${T.level === "kvarter" ? "Quarter" : T.level === "postnr" ? "Area" : "Municipality"}</th><th>${T.level === "postnr" ? "Postal code" : "Code"}</th><th>${T.level === "kvarter" ? "District" : T.level === "postnr" ? "Municipality" : "Region"}</th><th class="num">Population</th>
@@ -1487,41 +1496,270 @@ function vTable() {
     ${srcNote()}
   </div>`;
 }
-function exportCsv() {
-  const cols = tableCols(true), rows = tableRows();
-  const head = [T.level === "kvarter" ? "quarter" : T.level === "postnr" ? "area" : "municipality", T.level === "postnr" ? "postal_code" : "code", T.level === "kvarter" ? "district" : T.level === "postnr" ? "municipality" : "region", "population"].concat(cols.map(i => i.key));
-  const lines = [head.join(";")].concat(rows.map(r => { const m = T.level === "postnr" ? (byCode[r.muni] || {}) : r;
-    return [r.name, T.level === "postnr" ? r.nr : r.code, T.level === "kvarter" ? (r.bydel || "") : T.level === "postnr" ? (m.name || "") : (r.region || ""), r.pop ?? ""].concat(cols.map(i => V(r, i.key) ?? (T.level === "postnr" || (T.level === "kvarter" && !cphOwn(i.key)) ? (V(T.level === "kvarter" ? byCode[CPH_MUNI] : m, i.key) ?? "") : ""))).map(v => String(v).replace(/;/g, ",")).join(";"); }));
-  const blob = new Blob(["﻿" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
-  const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
-  a.download = `am-dashboard-dk_${T.level}_${MK.year}_${(D.meta && D.meta.built) || "data"}.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-}
-
 function downloadCsv(lines, name) {
   const blob = new Blob(["\ufeff" + lines.join("\n")], { type: "text/csv;charset=utf-8" });
   const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
-function exportAll() {
-  /* one long-format CSV of everything the dashboard holds: every level, every indicator, every year, plus the macro series */
-  const cl = v => String(v == null ? "" : v).replace(/;/g, ",").replace(/\r?\n/g, " ");
-  const out = ["level;code;name;parent;region;population;year;indicator;label;unit;value;as_of"];
-  const emit = (level, o, code, name, parent, region, inds, asofOf) => {
-    inds.forEach(i => {
-      const yrs = new Set(Object.keys((o.hist && o.hist[i.key]) || {})); if (o[i.key] != null) yrs.add(LATEST);
-      [...yrs].sort().forEach(y => { const v = y === LATEST ? o[i.key] : o.hist[i.key][y]; if (v == null) return;
-        out.push([level, code, name, parent, region, o.pop ?? "", y, i.key, i.label, i.unit || "", v, asofOf(i, y)].map(cl).join(";")); });
+/* ---------- Export ▾ — one menu, one schema (spec §4.9, §5.5′) ----------
+   The row builders, the column sets, the source columns and the unit fix live in
+   src/export_core.js (pure, `node --test tests/export.test.js`). This side knows the data: which
+   areas exist, which observations an indicator has, and where a value is read from when the area
+   does not publish it itself. Every file the menu writes carries source, table id, verify URL,
+   as of, fetched and licence — that is what keeps a figure traceable once it is in a spreadsheet. */
+const EC = (typeof window !== "undefined" && window.EXPORT_CORE) || {};
+const exBuilt = () => (D.meta && D.meta.built) || "data";
+const exSrcList = () => ((D.meta && D.meta.sources) || []).concat((CPH && CPH.meta && CPH.meta.sources) || []);
+let EX_CAT = null;
+/* the catalogue, keyed exactly the way an indicator's `tables` list names it ("dst/FOLK1A") */
+function exCat() { if (!EX_CAT) { EX_CAT = {}; exSrcList().forEach(s => EX_CAT[s.key] = s); } return EX_CAT; }
+/* the stamp of one observation: the registry publishes one per level, and one per history year */
+function exAsof(i, lvl, year) {
+  const pick = x => typeof x === "string" ? x : (x && (x[lvl] || x.kommune || Object.values(x)[0])) || "";
+  const h = (year && i.hist_asof && i.hist_asof[year]) || null;
+  return String((h ? pick(h) : "") || pick(i.asof) || "").trim();
+}
+/* every period an indicator has for one area: its history, its projection window, or the one
+   snapshot the publisher stamped. An inherited figure is written for the latest period only — the
+   municipality's whole series is in the same file already, on its own rows. */
+function exPeriods(i, o, lvl, inherited) {
+  if (isClim(i.key)) return [];                      /* horizons are a pass of their own */
+  const latest = o[i.key];
+  if (i.proj) return latest == null ? [] : [{ period: `${i.proj.from}→${i.proj.to}`, kind: "projection", value: latest, asof: exAsof(i, lvl) }];
+  const h = (o.hist || {})[i.key] || {};
+  const ys = Object.keys(h).filter(y => h[y] != null);
+  if (latest == null && !ys.length) return [];
+  if (!ys.length) { const stamp = exAsof(i, lvl); return [{ period: stamp || LATEST, kind: "auto", value: latest, asof: stamp }]; }
+  const all = [...new Set(latest == null ? ys : ys.concat(LATEST))].sort();
+  const out = all.map(y => ({ period: y, kind: "year", value: y === LATEST && latest != null ? latest : h[y], asof: exAsof(i, lvl, y) }))
+                 .filter(p => p.value != null);
+  return inherited ? out.slice(-1) : out;
+}
+/* where a figure is read from when the area does not publish it: its municipality, marked
+   `value_type=inherited` with `inherited_from` — the rule the tiles and the tables follow (§2.4) */
+function exInherited(i, r) {
+  if (!r.muni || isClim(i.key)) return null;
+  if (r.o[i.key] != null || Object.keys((r.o.hist || {})[i.key] || {}).length) return null;
+  return r.muni[i.key] == null ? null : { o: r.muni, code: r.muni.code };
+}
+/* one <level> block of the long export, from an area-page style entity */
+function exEntityLevel(e, code) {
+  const lvl = e.type === "kommune" ? "municipality" : e.type === "postnr" ? "postal_code" : "copenhagen_quarter";
+  return { level: lvl, asofLevel: e.type, inds: e.inds || IND,
+           rows: [{ o: e.o, muni: e.muni || null, code: code || e.code, name: e.name,
+                    parent_code: e.muni ? e.muni.code : "", parent_name: e.muni ? e.muni.name : "Denmark",
+                    region: e.region || (e.muni || {}).region || "", population: e.o.pop }] };
+}
+/* the three levels of areas_long: 99 municipalities, 606 postal codes, 67 Copenhagen quarters */
+function exLevels() {
+  const nm = c => (byCode[String(Number(c || 0))] || {}).name || "";
+  const out = [{ level: "municipality", asofLevel: "kommune", inds: IND,
+      rows: MUNI.map(m => ({ o: m, code: m.code, name: m.name, parent_code: "", parent_name: "Denmark", region: m.region || "", population: m.pop })) },
+    { level: "postal_code", asofLevel: "postnr", inds: IND,
+      rows: AREAS.map(a => ({ o: a, muni: byCode[a.muni] || null, code: a.nr, name: a.name, parent_code: a.muni || "",
+                              parent_name: nm(a.muni), region: (byCode[a.muni] || {}).region || "", population: a.pop })) }];
+  if (CPH) out.push({ level: "copenhagen_quarter", asofLevel: "kvarter", inds: IND_Q,
+      rows: CPH.areas.map(q => ({ o: q, muni: byCode[CPH_MUNI] || null, code: q.code, name: q.name,
+                                  parent_code: CPH_MUNI, parent_name: nm(CPH_MUNI), region: "Hovedstaden", population: q.pop })) });
+  return out;
+}
+const exCtx = levels => ({ levels, cat: exCat(), built: exBuilt(), periods: exPeriods, inherited: exInherited });
+/* the Climate family is published at three horizons, not in years — its own pass, so the period
+   column says today / 2070 / 2120 and a future horizon is never labelled `actual` */
+function exClimRows(levels) {
+  if (!CLIM) return [];
+  const out = [];
+  levels.forEach(L => (L.inds || []).filter(i => isClim(i.key)).forEach(i => {
+    const hs = i.horizon && i.horizon.length ? i.horizon : ["today"];
+    L.rows.forEach(r => {
+      /* only the zone exposure is published per postal code and per quarter; the Klimaatlas
+         figures are the municipality's, and are written as inherited on the finer levels */
+      const own = L.level === "municipality" || i.key === "surge_dw_pct";
+      const inh = own ? null : (r.muni ? { o: r.muni, code: r.muni.code } : null);
+      if (!own && !inh) return;
+      hs.forEach(hz => { const v = climValue(own ? r.o : r.muni, i.key, hz);
+        if (v == null) return;
+        out.push(EC.areaRow({ level: L.level, row: r, ind: i, inherited: inh, cat: exCat(), built: exBuilt(),
+          obs: { period: hz, kind: "horizon", horizon: hz, value: v, asof: exAsof(i, "kommune") } })); });
     });
-  };
-  const asofNat = lvl => (i, y) => { const src = (y !== LATEST && i.hist_asof && i.hist_asof[y]) || i.asof || {}; return src[lvl] || src.kommune || ""; };
-  MUNI.forEach(m => emit("municipality", m, m.code, m.name, "Denmark", m.region || "", IND, asofNat("kommune")));
-  AREAS.forEach(a => { const m = byCode[a.muni] || {}; emit("postal_code", a, a.nr, a.name, m.name || "", m.region || "", IND.filter(i => i.level === "postnr"), asofNat("postnr")); });
-  if (CPH) CPH.areas.forEach(q => emit("copenhagen_quarter", q, q.code, q.name, q.bydel || "", "Hovedstaden", IND_CPH, (i, y) => (y !== LATEST && i.hist_asof && i.hist_asof[y]) || (i.asof && i.asof.kvarter) || ""));
-  INFRA_ALL.forEach(f => { const p = f.properties;
-    out.push(["project", p.id, p.name, p.agency || "", (p.kommuner || []).join(" "), "", p.open_year ?? p.open_window ?? "", p.type, p.status,
-              "mio. DKK", p.budget_mdkk ?? "", p.source_doc || p.source_url].map(cl).join(";")); });
-  const mac = D.macro || {}; Object.entries(mac.series || {}).forEach(([k, ser]) => { const lt = (mac.latest || {})[k] || {};
-    ser.forEach(pt => { if (pt.v != null) out.push(["macro", k, lt.label || k, "Denmark", "", "", pt.t, k, lt.label || k, lt.unit || "", pt.v, lt.src || ""].map(cl).join(";")); }); });
-  downloadCsv(out, `macro-dashboard-dk_all_${(D.meta && D.meta.built) || "data"}.csv`);
+  }));
+  return out;
+}
+const exAreaRows = levels => { const L = levels || exLevels(); return EC.areaRows(exCtx(L)).concat(exClimRows(L)); };
+const exProjectRows = () => EC.projectRows(INFRA_ALL.map(f => { const s = geomStats(f), p = f.properties;
+  return { p, geometry_kind: p.schematic ? "schematic" : isPt(f) ? "point" : isArea(f) ? "area" : "line",
+           length_km: s.km, stations: s.stations, municipalities: p.kommuner || [],
+           postal_codes: infraAreas(p.id, "postnr"), quarters: infraAreas(p.id, "kvarter") }; }));
+const exNationalRows = () => EC.nationalRows({ series: (D.macro || {}).series, latest: (D.macro || {}).latest, cat: exCat(), built: exBuilt() });
+const exSrcCtx = () => ({ sources: exSrcList(), built: exBuilt(), usedFor: x => srcUsedFor(x).text });
+const exSourceRecs = () => EC.sourceRecs(exSrcCtx());
+/* dwellings inside the published storm-surge extent, per level × horizon. The inline payload keeps
+   the municipal share and the zone area; the dwelling counts are published per postal code and per
+   quarter, so those two columns are filled there and stay empty for a municipality. */
+function exClimateRows() {
+  if (!CLIM) return [];
+  const ind = indOf("surge_dw_pct") || {}, as_of = exAsof(ind, "kommune"), rows = [];
+  (CLIM_HZ || ["today"]).forEach(hz => {
+    const z = climZones(hz), base = { horizon: hz, zone_year: CLIM_ZONE_YEAR[hz] || "", as_of };
+    MUNI.forEach(m => { const km = climKom(m.code) || {}, pct = (km.surge_dw_pct || {})[hz], km2 = (z.kommune || {})[pad4(m.code)];
+      if (pct == null && km2 == null) return;
+      rows.push({ ...base, level: "municipality", code: m.code, name: m.name, parent_name: "Denmark", pct, zone_km2: km2 }); });
+    Object.keys(z.postnr || {}).forEach(nr => { const e = z.postnr[nr], a = byNr[nr] || {}, m = byCode[a.muni] || {};
+      rows.push({ ...base, level: "postal_code", code: nr, name: a.name || "", parent_code: a.muni || "", parent_name: m.name || "",
+                  dwellings: e.dwellings, in_zone: e.dwellings_in_zone, pct: e.surge_dw_pct }); });
+    Object.keys(z.kvarter || {}).forEach(c => { const e = z.kvarter[c], q = byQ[c] || {};
+      rows.push({ ...base, level: "copenhagen_quarter", code: c, name: q.name || "", parent_code: CPH_MUNI,
+                  parent_name: (byCode[CPH_MUNI] || {}).name || "", dwellings: e.dwellings, in_zone: e.dwellings_in_zone, pct: e.surge_dw_pct }); });
+  });
+  return EC.climateRows({ rows, ind, cat: exCat(), built: exBuilt() });
+}
+/* the test property (spec §5.5′): the pin's three columns in front of every figure its quarter,
+   its postal code and its municipality publish — and a second file for what lies near it */
+function exPinLevels(r) {
+  const out = [];
+  if (r.kommune) out.push(exEntityLevel({ type: "kommune", o: r.kommune, name: r.kommune.name, region: r.kommune.region, inds: IND }, r.kommune.code));
+  if (r.postnr) out.push(exEntityLevel({ type: "postnr", o: r.postnr, name: r.postnr.name, inds: IND, muni: byCode[r.postnr.muni] || null }, r.postnr.nr));
+  if (r.kvarter) out.push(exEntityLevel({ type: "kvarter", o: r.kvarter, name: r.kvarter.name, region: "Hovedstaden", inds: IND_Q, muni: byCode[CPH_MUNI] || null }, r.kvarter.code));
+  return out;
+}
+function exNearbyRows(pt, r) {
+  const list = [], ring = anRing();
+  const bbrUrl = ((indOf("renters_bbr") || {}).src_page || [])[1] || "";
+  anInfraRows(pt).forEach(x => list.push({ kind: "infra", name: x.p.name, type: INFRA_TYPE[x.p.type] || x.p.type,
+    status: `${infraSt(x.p).label}${x.p.open_year || x.p.open_window ? " · opening " + openLabel(x.p) : ""}`,
+    distance_m: x.d, source: x.p.source_doc || "Curated infrastructure layer (docs/INFRA.md)", source_url: x.p.source_url || "" }));
+  const koms = anPubKoms(pt, r);
+  koms.flatMap(k => ((PUB_FILES[k] || {}).buildings || [])).map(b => ({ b, d: havM(pt.lat, pt.lon, b.lat, b.lon) }))
+    .filter(x => x.d <= ring && (x.b.kind === "existing" || x.b.recent)).sort((a, b) => a.d - b.d)
+    .forEach(x => list.push({ kind: "public", name: pubName(x.b), type: `${x.b.code} ${x.b.label}`,
+      status: x.b.kind === "existing" ? `existing${x.b.year ? " " + x.b.year : ""}` : `open case${x.b.permit ? " " + x.b.permit : ""}`,
+      distance_m: x.d, source: `BBR via Datafordeler, ${(PUB && PUB.built) || exBuilt()}`, source_url: bbrUrl }));
+  ((SCHOOLS || {}).schools || []).filter(s => koms.includes(s.kom) && s.lat != null)
+    .map(s => ({ s, d: havM(pt.lat, pt.lon, s.lat, s.lon) })).filter(x => x.d <= ring).sort((a, b) => a.d - b.d)
+    .forEach(x => list.push({ kind: "school", name: x.s.name, type: SCH_TYPE[x.s.type] || x.s.type,
+      status: `FP9 ${schV(x.s, "grade_avg") ?? "not published"} · ${schY(x.s, "grade_avg") || SCH_LATEST}`,
+      distance_m: x.d, source: `Uddannelsesstatistik.dk (STIL), retrieved ${(SCH_META || {}).retrieved || ""}`,
+      source_url: "https://uddannelsesstatistik.dk/" }));
+  return EC.nearbyRows(list);
+}
+/* the lazy files (public buildings, schools) arrive on demand, so an export waits for the ones its
+   file needs rather than writing a short file the reader cannot tell is short */
+function exWait(done, ms) {
+  return new Promise(res => { const t0 = Date.now();
+    (function tick() { if (done() || Date.now() - t0 > (ms || 6000)) return res(); setTimeout(tick, 120); })(); });
+}
+function exportProperty() {
+  const pt = anLoc(); if (!pt) return exToast("Test property", 0, "no pin yet — paste a Google Maps link first");
+  const r = anRes(); if (!r || r.error) return exToast("Test property", 0, (r && r.error) || "the pin is not located yet");
+  const label = AN.label || TP_LABEL, lead = [label, pt.lat, pt.lon], levels = exPinLevels(r);
+  const rows = EC.propertyRows({ ...exCtx(levels), label, lat: pt.lat, lon: pt.lon })
+    .concat(exClimRows(levels).map(x => lead.concat(x)));
+  exSave("test_property", EC.PROP_COLS, rows, `${esc(label)} · ${levels.length} level${levels.length === 1 ? "" : "s"}`);
+  const koms = anPubKoms(pt, r);
+  koms.forEach(pubLoad); schoolsLoad();
+  exWait(() => koms.every(k => PUB_FILES[k] || PUB_FILES["_error_" + k]) && (!SCH_META || SCHOOLS))
+    .then(() => exSave("test_property_nearby", EC.NEARBY_COLS, exNearbyRows(pt, r),
+      `within ${nf(anRing(), 0)} m · projects within ${nf(AN_INFRA_M / 1000, 0)} km`));
+}
+/* "This view" is whatever is on screen: the wide Areas table, one area's figures, the plotted
+   series, or the test property (spec §4.9) */
+const EX_VIEW = () => S.view === "analysis" ? "the test property" : S.view === "charts" ? "the plotted series"
+  : S.view === "area" ? "this area, long" : `${T.level === "kvarter" ? "Copenhagen quarters" : T.level === "postnr" ? "postal codes" : "municipalities"}, wide`;
+function exportView() {
+  if (S.view === "analysis") return exportProperty();
+  if (S.view === "charts") return exportChartRows();
+  if (S.view === "area") { const e = areaEntity();
+    if (e) return exSave(`area_${e.type}_${e.code}`, EC.AREA_COLS, exAreaRows([exEntityLevel(e)]), e.name); }
+  return exportWide();
+}
+/* the wide table keeps each column's provenance in its own header — a wide file has nowhere else to
+   put it, and a number without its source is not a figure this dashboard ships */
+function exWideHead(i) {
+  const u = EC.unitValue(i, null).unit, asof = exAsof(i, T.level) || exBuilt();
+  return `${i.key}${u ? ` (${u})` : ""} · ${EC.indSource(i, { cat: exCat(), built: exBuilt(), asof }).table_id} · as of ${asof}`;
+}
+function exportWide() {
+  const lvl = T.level, cols = tableCols(true), rows = tableRows();
+  const head = [lvl === "kvarter" ? "quarter" : lvl === "postnr" ? "area" : "municipality",
+                lvl === "postnr" ? "postal_code" : "code",
+                lvl === "kvarter" ? "district" : lvl === "postnr" ? "municipality" : "region",
+                "population"].concat(cols.map(exWideHead));
+  const out = rows.map(r => { const m = lvl === "postnr" ? (byCode[r.muni] || {}) : r;
+    return [r.name, lvl === "postnr" ? r.nr : r.code,
+            lvl === "kvarter" ? (r.bydel || "") : lvl === "postnr" ? (m.name || "") : (r.region || ""), r.pop]
+      .concat(cols.map(i => { const own = V(r, i.key);
+        const v = own != null ? own : lvl === "postnr" ? V(m, i.key) : lvl === "kvarter" && !cphOwn(i.key) ? V(byCode[CPH_MUNI], i.key) : null;
+        return EC.unitValue(i, v).value; })); });
+  return exSave(`areas_${lvl}_${MK.year}`, head, out, `${cols.length} indicators · wide`);
+}
+function exportChartRows() {
+  const inds = chartInds();
+  const levels = CH.areas.map(id => { const e = chEntity(id); return e ? exEntityLevel({ ...e, inds }, id.split(":")[1]) : null; }).filter(Boolean);
+  if (!levels.length) return exToast("Chart", 0, "add an area first");
+  return exSave(`chart_${chartInd().key}`, EC.AREA_COLS, exAreaRows(levels),
+    `${levels.length} area${levels.length === 1 ? "" : "s"} · ${inds.length} indicator${inds.length === 1 ? "" : "s"}`);
+}
+/* the menu: one component, rendered in the sidebar footer, in the Data header and in the test
+   property's header (spec §4.9). Every item downloads at once and says what it wrote. */
+const EX_ITEMS = [["view", "This view", EX_VIEW],
+                  ["areas", "All area data", () => "long · municipalities, postal codes, quarters"],
+                  ["projects", "Projects", () => `${INFRA_ALL.length} projects · own schema`],
+                  ["national", "National series", () => `${Object.keys((D.macro || {}).latest || {}).length} series · long`],
+                  ["sources", "Sources catalogue", () => `${exSrcList().length} sources · what Data › Sources shows`],
+                  ["climate", "Climate exposure", () => "dwellings in the surge zone · 3 horizons"],
+                  ["property", "Test property", () => anLoc() ? "the pin's figures + what is near it" : "no pin yet"]];
+const exAvail = k => k === "property" ? !!anLoc() : k === "climate" ? !!CLIM : true;
+function exportMenu(at) {
+  const open = UI.xOpen === at;
+  return `<div class="xwrap${open ? " open" : ""}" data-xat="${at}">
+    <button type="button" class="xbtn" data-testid="export-btn" data-xpop aria-expanded="${open}" aria-haspopup="dialog"
+      title="Download what is on screen, or any dataset, with its sources">⤓ Export<em aria-hidden="true">▾</em></button>
+    <div class="xpop" data-testid="export-menu" role="dialog" aria-label="Export data" ${open ? "" : "hidden"}>
+      <div class="lay-h">Download as CSV</div>
+      ${EX_ITEMS.map(([k, label, sub]) => `<button type="button" class="xitem" data-export="${k}"${exAvail(k) ? "" : " disabled"}>
+        <b>${esc(label)}</b><span>${esc(sub())}</span></button>`).join("")}
+      <p class="laynote">Every row carries its source, table id, as of and licence. Semicolon separated, <code>.</code> decimals, UTF-8 with BOM — Danish Excel opens it by double-click.</p>
+    </div></div>`;
+}
+function xPopOpen(at, refocus) {
+  const was = UI.xOpen;
+  UI.xOpen = at || "";
+  document.querySelectorAll(".xwrap").forEach(w => { const on = w.dataset.xat === UI.xOpen;
+    w.classList.toggle("open", on);
+    const b = w.querySelector("[data-testid=export-btn]"), p = w.querySelector("[data-testid=export-menu]");
+    if (p) p.hidden = !on;
+    if (b) { b.setAttribute("aria-expanded", on ? "true" : "false"); if (!on && refocus && w.dataset.xat === was) b.focus(); } });
+}
+/* the sidebar footer: the same menu, then what this build is (spec §4.1) */
+const APP_VERSION = "v3.0";
+function renderFoot() {
+  const el = document.getElementById("xfoot"); if (!el) return;
+  el.innerHTML = `${exportMenu("side")}<div class="xcap">built ${esc(exBuilt())} · ${APP_VERSION}</div>`;
+}
+let EX_T = 0;
+/* one line, never a modal: what was written and how much of it (spec §4.9) */
+function exToast(name, n, extra) {
+  let el = document.getElementById("xtoast");
+  if (!el) { el = document.createElement("div"); el.id = "xtoast"; el.className = "xtoast";
+    el.setAttribute("data-testid", "export-toast"); el.setAttribute("role", "status"); document.body.appendChild(el); }
+  el.innerHTML = `<b>${esc(name)}</b><span>${nf(n, 0)} row${n === 1 ? "" : "s"}${extra ? " · " + extra : ""}</span>`;
+  el.classList.add("on");
+  clearTimeout(EX_T); EX_T = setTimeout(() => { const t = document.getElementById("xtoast"); if (t) t.classList.remove("on"); }, 7000);
+}
+function exSave(stem, cols, rows, extra) {
+  const name = EC.fileName(stem, exBuilt());
+  downloadCsv(EC.csvLines(cols, rows), name);
+  exToast(name, rows.length, extra);
+  return rows.length;
+}
+function exportGo(kind) {
+  xPopOpen("");
+  if (kind === "view") return exportView();
+  if (kind === "areas") return exSave("areas_long", EC.AREA_COLS, exAreaRows(), "3 levels · every published period");
+  if (kind === "projects") return exSave("projects", EC.PROJECT_COLS, exProjectRows(), "Fingerplan, Anlægsstatus, agency documents");
+  if (kind === "national") return exSave("national_series", EC.AREA_COLS, exNationalRows(), "Denmark · month, quarter or year");
+  if (kind === "sources") return exSave("sources", EC.SOURCE_COLS, EC.sourceRows(exSrcCtx()), "publisher, tables, as of, licence");
+  if (kind === "climate") return exSave("climate_exposure", EC.CLIMATE_COLS, exClimateRows(), "Kystdirektoratet 100-year extents × BBR");
+  if (kind === "property") return exportProperty();
 }
 
 /* ---------- Area page (municipality · postal code · Copenhagen quarter) ---------- */
@@ -5051,7 +5289,7 @@ function vPipeline() {
       <select id="pptype" class="indsel"><option value="">All types</option>${types.map(x => `<option value="${x}" ${PIPE.type === x ? "selected" : ""}>${esc(INFRA_TYPE[x] || x)}</option>`).join("")}</select>
       <select id="ppstatus" class="indsel"><option value="">All statuses</option>${Object.keys(INFRA_ORDER).map(s => `<option value="${s}" ${PIPE.status === s ? "selected" : ""}>${esc(INFRA_ST[s].label)}</option>`).join("")}</select>
       <span class="hint">${rows.length} of ${INFRA_ALL.length} projects</span>
-      <button class="lk mini" data-csv-pipe>⤓ Export CSV</button></div></div>
+      <button class="lk mini" data-csv-pipe title="Every project in the layer, with the areas it serves and its source document — the same file Export ▾ › Projects writes">⤓ Projects (CSV)</button></div></div>
     <p class="cap">Sources: Fingerplan, Anlægsstatus and the agencies' own decision documents.</p>
     <div class="scrollx"><table class="tbl compact wraphead" data-testid="projects-table" data-sortable><thead><tr>
       <th>Project</th><th>Type</th><th>Status</th><th>Opening</th><th class="num">Budget<br><span class="dim">bn DKK</span></th><th>Agency</th><th>Municipalities</th></tr></thead>
@@ -5064,13 +5302,6 @@ function vPipeline() {
     <p class="cap">Every project in the layer, including the ones kept off the map (a nationwide programme has no alignment). Click a row to see it on the map, or to open its sheet when it has no alignment. Budgets are in the price level each source states — open a project for the caveat. Sources and method: <code>docs/INFRA.md</code>.</p>
   </div>`;
 }
-function exportPipelineCsv() {
-  const cl = v => String(v == null ? "" : v).replace(/;/g, ",").replace(/\r?\n/g, " ");
-  const head = ["id", "name", "type", "status", "open_year", "open_window", "open_year_original", "budget_mdkk", "agency", "kommuner", "schematic", "source_url", "source_doc", "updated", "notes"];
-  const lines = [head.join(";")].concat(pipeRows().map(f => head.map(k => cl(k === "kommuner" ? (f.properties.kommuner || []).join(" ") : f.properties[k])).join(";")));
-  downloadCsv(lines, `infra_pipeline_${(D.meta && D.meta.built) || "data"}.csv`);
-}
-
 
 /* ---------- Public building sheet (#public/<kommune>/<id>) and list panel (#publist/…) ---------- */
 function pubFind(kom, id) {
@@ -5221,16 +5452,10 @@ function vMarket() {
    The v2.6 accordion became a sortable table: Source · Publisher · Tables · As of · Fetched ·
    Licence · Used for · ↗. Nothing is invented — the publisher is read off the catalogue key, "used
    for" off the indicators that join to it, and an empty "Fetched" falls back to the build date with
-   a `build` tag rather than leaving the reader with a blank cell (AC-D4). */
-const SRC_PUB = { dst: "Danmarks Statistik", s20: "Finans Danmark", s30: "Københavns Kommune",
-  climate: "Danmarks Statistik", forecast: "Danmarks Statistik", net_dwellings: "Danmarks Statistik",
-  bbr: "BBR via Datafordeler", public: "BBR via Datafordeler", infra: "Curated layer (docs/INFRA.md)",
-  schools: "Uddannelsesstatistik.dk (STIL)", boligstat: "Social- og Boligstyrelsen",
-  lbf: "Landsbyggefonden", kk_tryghed: "Københavns Kommune", cph_forecast: "Københavns Kommune" };
-const srcPublisher = x => SRC_PUB[String(x.key || "").split("/")[0]] || String(x.label || "").split(/[,—]/)[0].trim() || "–";
-/* the table id when the key names one (`dst/FOLK1A` → FOLK1A), else the dataset's own name */
-const srcTableId = x => { const p = String(x.key || "").split("/"); return p.length > 1 ? p.slice(1).join("/") : p[0]; };
-/* The register and curated sources carry no table id, so no indicator joins to them through
+   a `build` tag rather than leaving the reader with a blank cell (AC-D4).
+   Since P7 the rows come from `EXPORT_CORE.sourceRecs()` — the very rows the Sources catalogue CSV
+   writes, so the table and the file can never disagree (spec §4.9, P7 item 3).
+   The register and curated sources carry no table id, so no indicator joins to them through
    `tables`. What they feed is documented in the repo (docs/PUBLIC_BUILDINGS.md, docs/INFRA.md,
    docs/SCHOOLS.md, config/indicators.json) — it is named here rather than left as a blank cell. */
 const SRC_USED_EXTRA = {
@@ -5253,19 +5478,19 @@ function srcUsedFor(x) {
   const names = inds.map(i => i.short || i.label);
   return { text: names.slice(0, 4).join(", ") + (names.length > 4 ? ` +${names.length - 4}` : ""), n: inds.length };
 }
+/* how many indicators join to this source — the count behind the "Used for" cell's title */
+const srcUsedN = key => IND.concat(IND_CPH).filter(i => (i.tables || []).includes(key)).length;
 function sourcesTable() {
-  const built = (D.meta && D.meta.built) || "";
-  const s = ((D.meta && D.meta.sources) || []).concat(CPH && CPH.meta ? CPH.meta.sources || [] : []);
   return `<div class="scrollx"><table class="tbl compact srctbl" data-testid="sources-table" data-sortable><thead><tr>
     <th>Source</th><th>Publisher</th><th>Tables</th><th>As of</th><th>Fetched</th><th>Licence</th><th>Used for</th><th data-nosort></th></tr></thead>
-    <tbody>${s.map(x => { const used = srcUsedFor(x), fetched = x.fetched || built;
+    <tbody>${exSourceRecs().map(x => { const n = srcUsedN(x.key);
       return `<tr><th title="${esc(x.label)}">${esc(x.label)}</th>
-        <td class="dim">${esc(srcPublisher(x))}</td>
-        <td class="dim"><code title="${esc(x.tables || "")}">${esc(srcTableId(x))}</code></td>
-        <td data-v="${esc(x.asof || "")}">${esc(x.asof || "–")}</td>
-        <td class="dim" data-v="${esc(fetched)}">${esc(fetched || "–")}${x.fetched ? "" : ` <span class="tag mini" title="the publisher's own fetch date is not recorded for this source — the dashboard build date is shown instead">build</span>`}</td>
+        <td class="dim">${esc(x.publisher || "–")}</td>
+        <td class="dim"><code title="${esc(x.tables)}">${esc(x.table_id)}</code></td>
+        <td data-v="${esc(x.as_of)}">${esc(x.as_of || "–")}</td>
+        <td class="dim" data-v="${esc(x.fetched)}">${esc(x.fetched || "–")}${x.build_fetched ? ` <span class="tag mini" title="the publisher's own fetch date is not recorded for this source — the dashboard build date is shown instead">build</span>` : ""}</td>
         <td class="dim">${esc(x.licence || "–")}</td>
-        <td class="dim" title="${esc(used.n ? `${used.n} indicator(s)` : "")}">${esc(used.text)}</td>
+        <td class="dim" title="${esc(n ? `${n} indicator(s)` : "")}">${esc(x.used_for || "–")}</td>
         <td>${x.url ? `<a class="lk mini" href="${esc(x.url)}" target="_blank" rel="noopener" title="Open the publisher's table information">↗</a>` : ""}</td></tr>`; }).join("")
       || `<tr><td colspan="8" class="empty">no sources recorded</td></tr>`}</tbody></table></div>`;
 }
@@ -5276,7 +5501,7 @@ function vSources() {
   return `<div class="card accent"><div class="card-head"><h3>Data sources and freshness</h3><span class="hint">built ${esc((D.meta && D.meta.built) || "–")} · click a column to sort</span></div>
     ${sourcesTable()}
     <p class="cap">${((D.meta && D.meta.attribution) || []).map(esc).join(" · ")}${CPH && CPH.meta && CPH.meta.attribution ? " · " + esc(CPH.meta.attribution) : ""}${SRV ? " · " + esc(SRV_ATTRIB.join(" · ")) : ""}</p>
-    <p class="cap">A <b>build</b> tag in Fetched means the source file carries no fetch date of its own; the date shown is when this dashboard was built. "Used for" lists the indicators that read the table — the register and curated layers (BBR, schools, infrastructure) describe their own content instead.</p></div>
+    <p class="cap">A <b>build</b> tag in Fetched means the source file carries no fetch date of its own; the date shown is when this dashboard was built. "Used for" lists the indicators that read the table — the register and curated layers (BBR, schools, infrastructure) describe their own content instead. These are the rows <b>Export ▾ › Sources catalogue</b> writes, column for column.</p></div>
   ${IND.some(i => i.proj) ? `<div class="card"><div class="card-head"><h3>Population outlook</h3><span class="hint">projections \u2014 read the caveat</span></div>
     <table class="tbl compact"><thead><tr><th>Source</th><th>Table</th><th>Window</th><th>Vintage</th><th>Fetched</th><th>Licence</th></tr></thead><tbody>
       ${[["forecast", "Danmarks Statistik", IND.find(i => i.proj && i.proj.publisher === "DST")],

@@ -113,6 +113,49 @@ def map_center(page, i=0):
     return page.evaluate("i => { const c = window.__maps[i].getCenter(); return [c.lat, c.lng]; }", i)
 
 
+# --- exports (P7) ---------------------------------------------------------------------------
+# One parse per file per viewport run: the areas_long build is ~100 000 rows and four ACs read it.
+CSV_CACHE = {}
+
+
+def open_export(page):
+    """Open the Export ▾ menu. The sidebar footer's copy is the first one in the DOM, and it is on
+    every route; a Data or test-property header adds a second trigger onto the same state."""
+    menu = page.locator("[data-testid=export-menu]").first
+    if not menu.is_visible():           # idempotent: the trigger toggles, so never click it twice
+        page.locator("[data-testid=export-btn]").first.click()
+        page.wait_for_timeout(250)
+    if not menu.is_visible():
+        why = page.evaluate("""() => ({ xOpen: UI.xOpen,
+          wraps: [...document.querySelectorAll('.xwrap')].map(w => w.dataset.xat + (w.classList.contains('open') ? ':open' : '')),
+          pops: [...document.querySelectorAll('[data-testid=export-menu]')].map(p => (p.hidden ? 'hidden ' : '') + getComputedStyle(p).display + ' ' + Math.round(p.getBoundingClientRect().width) + 'x' + Math.round(p.getBoundingClientRect().height)) })""")
+        raise AssertionError(f"clicking Export ▾ did not open [data-testid=export-menu]: {why}")
+    return menu
+
+
+def export_csv(page, kind, timeout=120000):
+    """Trigger one export and read the file back: (filename, [lines]). The app writes a Blob and
+    clicks an <a>, so the browser really downloads it and Playwright hands us the file."""
+    if kind in CSV_CACHE:
+        return CSV_CACHE[kind]
+    open_export(page)
+    with page.expect_download(timeout=timeout) as dl:
+        page.locator(f"[data-export={kind}]").first.click()
+    d = dl.value
+    raw = pathlib.Path(d.path()).read_bytes()
+    assert raw[:3] == b"\xef\xbb\xbf", f"{d.suggested_filename} does not start with a UTF-8 BOM"
+    lines = [ln for ln in raw.decode("utf-8-sig").split("\n") if ln.strip()]
+    out = (d.suggested_filename, lines)
+    CSV_CACHE[kind] = out
+    return out
+
+
+def csv_rows(lines):
+    """Header + rows as dicts. `;` never appears inside a cell, so no quoting to unpick."""
+    head = lines[0].split(";")
+    return head, [dict(zip(head, ln.split(";"))) for ln in lines[1:]]
+
+
 def drag(page, selector, dx, dy):
     """A real pointer drag across an element — Leaflet listens to the pointer, not to JS. The grab
     point sits off-centre so the drag never starts on the pin or on a marker."""
@@ -1297,6 +1340,204 @@ def ac_tpsec(page, base):
     assert not dupes, f"identical public-building rows were not grouped: {dupes[:3]}"
 
 
+# =============================================================================================
+# P7 — one export model, with sources on every row (spec §4.9, §5.5′)
+# =============================================================================================
+LONG_HEADER = ("level;code;name;parent_code;parent_name;region;population;indicator;label;unit;"
+               "period;period_type;value;value_type;inherited_from;direction;source;table_id;"
+               "source_url;as_of;fetched;licence")
+
+
+@ac("AC-X1", phase="P7")
+def ac_x1(page, base):
+    """Clicking [data-testid=export-btn] opens [data-testid=export-menu] with at least six
+    [data-export] items; triggering [data-export=areas] downloads a file whose first line is the
+    long schema of spec §4.9, and a one-line toast says what was written."""
+    goto(page, "data/areas/kommune?ind=growth", settle=700)
+    menu = open_export(page)
+    n = menu.locator("[data-export]").count()
+    assert n >= 6, f"the menu has {n} [data-export] item(s), spec §4.9 lists at least six"
+    for k in ["view", "areas", "projects", "national", "sources", "climate", "property"]:
+        assert menu.locator(f"[data-export={k}]").count() == 1, f"no [data-export={k}] item"
+    assert page.locator("[data-testid=export-menu]").first.get_attribute("role") == "dialog"
+    name, lines = export_csv(page, "areas")
+    assert lines[0] == LONG_HEADER, f"areas_long header:\n{lines[0]}\nexpected:\n{LONG_HEADER}"
+    assert name.startswith("areas_long_") and name.endswith(".csv"), name
+    assert len(lines) > 1000, f"areas_long has only {len(lines) - 1} row(s)"
+    toast = page.locator("[data-testid=export-toast]")
+    assert toast.count() == 1, "no export toast"
+    txt = (toast.inner_text() or "").replace("\n", " ")
+    assert name in txt and "row" in txt, f"the toast says {txt!r}, expected {name} and a row count"
+
+
+@ac("AC-X2", phase="P7")
+def ac_x2(page, base):
+    """In areas_long every row whose unit contains kDKK has |value| < 10 000 — the v2.6 export
+    labelled DKK values as kDKK (engineering brief §3.3). Adapted per the P7 phase file: an income
+    row is written in DKK, losslessly. Every `income` row on a municipality is `actual`."""
+    goto(page, "data/areas/kommune?ind=growth", settle=700)
+    _, lines = export_csv(page, "areas")
+    head, rows = csv_rows(lines)
+    bad = [r for r in rows if "kDKK" in r["unit"] and abs(float(r["value"] or 0)) >= 10000]
+    assert not bad, f"{len(bad)} kDKK row(s) with a DKK-sized value, e.g. {bad[0]}"
+    inc = [r for r in rows if r["indicator"] == "income" and r["level"] == "municipality"]
+    assert inc, "no income rows on municipalities"
+    for r in inc:
+        assert r["value_type"] == "actual", f"income is a published cell, not {r['value_type']}"
+        assert r["unit"].startswith("DKK"), f"income unit {r['unit']!r} — the values are stored in DKK"
+        assert abs(float(r["value"])) > 10000, "an income in DKK is a five- or six-figure number"
+
+
+@ac("AC-X3", phase="P7")
+def ac_x3(page, base):
+    """The projects file has no `indicator` column (its own schema, never an indicator row), and
+    areas_long has no `project` or `macro` level — the v2.6 export jammed both into one file."""
+    goto(page, "data/projects", settle=700)
+    name, plines = export_csv(page, "projects")
+    phead = plines[0].split(";")
+    assert name.startswith("projects_"), name
+    for c in ["indicator", "value", "unit", "period"]:
+        assert c not in phead, f"the projects file has an indicator column: {c}"
+    for c in ["id", "name", "type", "status", "opening", "budget_mdkk", "municipalities",
+              "postal_codes", "quarters", "geometry_kind", "source_url", "updated"]:
+        assert c in phead, f"the projects file is missing {c}"
+    assert len(plines) - 1 == page.evaluate("INFRA_ALL.length"), "one row per project in the layer"
+    _, alines = export_csv(page, "areas")
+    _, arows = csv_rows(alines)
+    levels = sorted({r["level"] for r in arows})
+    assert "project" not in levels and "macro" not in levels, levels
+    assert levels == ["copenhagen_quarter", "municipality", "postal_code"], levels
+
+
+@ac("AC-X4", phase="P7")
+def ac_x4(page, base):
+    """Every areas_long row has a non-empty source and as_of; every row on a postal code or a
+    quarter whose indicator is a municipality-level one is `inherited` and names the municipality
+    it was read from."""
+    goto(page, "data/areas/kommune?ind=growth", settle=700)
+    _, lines = export_csv(page, "areas")
+    head, rows = csv_rows(lines)
+    for c in ["source", "as_of", "table_id", "fetched"]:
+        blank = [r for r in rows if not (r[c] or "").strip()]
+        assert not blank, f"{len(blank)} row(s) with a blank {c}, e.g. {blank[0]}"
+    muni_keys = set(page.evaluate("IND.filter(i => i.level === 'kommune').map(i => i.key)"))
+    q_muni_keys = set(page.evaluate("IND_Q.filter(i => i.level === 'kommune').map(i => i.key)"))
+    # the one Climate figure that is published per postal code and per quarter, not inherited
+    zone_key = "surge_dw_pct"
+    fine = {"postal_code": muni_keys, "copenhagen_quarter": q_muni_keys}
+    for r in rows:
+        keys = fine.get(r["level"])
+        if keys and r["indicator"] in keys and r["indicator"] != zone_key:
+            assert r["value_type"] == "inherited", f"{r['level']} {r['code']} {r['indicator']} is {r['value_type']}"
+            assert r["inherited_from"], f"{r['level']} {r['code']} {r['indicator']} has no inherited_from"
+        if r["value_type"] == "inherited":
+            assert r["inherited_from"], f"inherited row without inherited_from: {r}"
+    inh = [r for r in rows if r["value_type"] == "inherited"]
+    assert len(inh) > 1000, f"only {len(inh)} inherited rows — the postal codes read 40-odd of them"
+    assert sorted({r["period_type"] for r in rows}) and \
+        {"year", "projection", "horizon", "snapshot"} <= {r["period_type"] for r in rows}, \
+        sorted({r["period_type"] for r in rows})
+
+
+@ac("AC-TP4", phase="P7")
+def ac_tp4(page, base):
+    """On #property?p=… the [data-export=property] download starts property_label;lat;lon;level;
+    code; and every row has a non-empty source (spec §5.5′)."""
+    goto(page, "property?p=55.6545,12.539:Test&ind=growth", settle=2400, wait="#anmap .leaflet-pane")
+    # two files: the pin's figures now, and what lies near it once the lazy layers have landed
+    got = []
+    page.on("download", lambda d: got.append(d))
+    open_export(page)
+    page.locator("[data-export=property]").first.click()
+    for _ in range(80):
+        page.wait_for_timeout(250)
+        if len(got) >= 2:
+            break
+    assert got, "[data-export=property] downloaded nothing"
+    main_dl = next(d for d in got if "nearby" not in d.suggested_filename)
+    name = main_dl.suggested_filename
+    raw = pathlib.Path(main_dl.path()).read_bytes()
+    assert raw[:3] == b"\xef\xbb\xbf", f"{name} does not start with a UTF-8 BOM"
+    lines = [ln for ln in raw.decode("utf-8-sig").split("\n") if ln.strip()]
+    assert name.startswith("test_property_"), name
+    assert lines[0].startswith("property_label;lat;lon;level;code;"), lines[0][:80]
+    assert lines[0] == "property_label;lat;lon;" + LONG_HEADER, lines[0]
+    head, rows = csv_rows(lines)
+    assert len(rows) > 50, f"only {len(rows)} row(s) for a Copenhagen pin"
+    for r in rows:
+        assert (r["source"] or "").strip(), f"blank source: {r}"
+        assert (r["as_of"] or "").strip(), f"blank as_of: {r}"
+        assert r["property_label"] == "Test", r["property_label"]
+        assert r["lat"] == "55.6545" and r["lon"] == "12.539", (r["lat"], r["lon"])
+    levels = {r["level"] for r in rows}
+    assert levels == {"municipality", "postal_code", "copenhagen_quarter"}, levels
+    # the quarter and the postal code read the municipality's figures as inherited
+    inh = [r for r in rows if r["value_type"] == "inherited"]
+    assert inh and all(r["inherited_from"] for r in inh)
+    # and the second file: what lies near the pin, one row per feature, each with its source
+    near = next((d for d in got if "nearby" in d.suggested_filename), None)
+    assert near is not None, f"no test_property_nearby file, only {[d.suggested_filename for d in got]}"
+    lines2 = [ln for ln in pathlib.Path(near.path()).read_bytes().decode("utf-8-sig").split("\n") if ln.strip()]
+    assert lines2[0] == "kind;name;type;status;distance_m;source;source_url", lines2[0]
+    kinds = {ln.split(";")[0] for ln in lines2[1:]}
+    assert "infra" in kinds, kinds
+    for ln in lines2[1:]:
+        c = ln.split(";")
+        assert c[5].strip(), f"a nearby row without a source: {ln}"
+
+
+@ac("AC-XMENU", phase="P7")
+def ac_xmenu(page, base):
+    """P7-local: one menu, three places to open it from, one open at a time; Esc closes it; the
+    v2.6 single-CSV sidebar button and its four-line explanation are gone; and Data › Sources shows
+    exactly the rows the Sources catalogue file writes (P7 item 3)."""
+    # 1. the sidebar footer has the menu and the build line on every route, and nothing else
+    goto(page, "map?ind=growth", settle=600)
+    assert page.locator("[data-xall]").count() == 0, "the v2.6 single-CSV export button is still there"
+    foot = (page.locator("#xfoot").inner_text() or "")
+    assert "Everything in one CSV" not in foot, "the four-line sidebar explanation is still there"
+    assert page.evaluate("(D.meta && D.meta.built) || ''") in foot, f"the footer does not name the build: {foot!r}"
+    assert page.locator("#xfoot [data-testid=export-btn]").count() == 1
+    # 2. Esc closes it and hands focus back to the trigger
+    open_export(page)
+    page.keyboard.press("Escape")
+    page.wait_for_timeout(200)
+    assert not page.locator("[data-testid=export-menu]").first.is_visible(), "Escape did not close the menu"
+    assert page.evaluate("document.activeElement === document.querySelector('#xfoot [data-testid=export-btn]')"), \
+        "Escape did not return focus to the Export ▾ button"
+    # 3. the Data header and the test-property header carry the same menu, and only one opens
+    goto(page, "data/areas/kommune?ind=growth", settle=700)
+    assert page.locator(".hd-act [data-testid=export-btn]").count() == 1, "no Export ▾ in the Data header"
+    page.locator(".hd-act [data-testid=export-btn]").click()
+    page.wait_for_timeout(250)
+    vis = page.eval_on_selector_all("[data-testid=export-menu]", "els => els.filter(e => !e.hidden).length")
+    assert vis == 1, f"{vis} menus open at once — one trigger, one menu"
+    # 4. Sources: the table and the file are the same catalogue
+    goto(page, "data/sources", settle=800)
+    shown = page.locator("[data-testid=sources-table] tbody tr").count()
+    name, lines = export_csv(page, "sources")
+    assert name.startswith("sources_"), name
+    assert lines[0] == "key;label;publisher;tables;as_of;fetched;url;licence;used_for", lines[0]
+    assert len(lines) - 1 == shown, f"the table shows {shown} sources, the file writes {len(lines) - 1}"
+    head, rows = csv_rows(lines)
+    for r in rows:
+        assert (r["publisher"] or "").strip() and (r["fetched"] or "").strip(), f"blank publisher or fetched: {r}"
+    # 5. the other two files exist and carry their sources
+    _, nat = export_csv(page, "national")
+    assert nat[0] == LONG_HEADER, nat[0]
+    nhead, nrows = csv_rows(nat)
+    assert {r["period_type"] for r in nrows} <= {"month", "quarter", "year"}, {r["period_type"] for r in nrows}
+    for r in nrows[:200]:
+        assert (r["source"] or "").strip() and (r["as_of"] or "").strip()
+    _, clim = export_csv(page, "climate")
+    assert clim[0].startswith("level;code;name;parent_code;parent_name;horizon;zone_year;dwellings;"), clim[0]
+    chead, crows = csv_rows(clim)
+    assert {r["horizon"] for r in crows} == {"today", "2070", "2120"}, {r["horizon"] for r in crows}
+    for r in crows:
+        assert (r["source"] or "").strip() and (r["as_of"] or "").strip(), f"blank source: {r}"
+        assert r["value_type"] in ("derived", "projection"), r["value_type"]
+
+
 # ---------------------------------------------------------------------------------------------
 def main():
     ap = argparse.ArgumentParser()
@@ -1331,7 +1572,9 @@ def main():
             if not here:
                 continue
             w, h = VIEWPORTS[vname]
-            ctx = browser.new_context(viewport={"width": w, "height": h}, device_scale_factor=1)
+            # accept_downloads: the export ACs read the files the menu writes (P7)
+            ctx = browser.new_context(viewport={"width": w, "height": h}, device_scale_factor=1,
+                                      accept_downloads=True)
             if not args.network:
                 host = re.sub(r"^https?://", "", args.url).split("/")[0]
                 ctx.route("**/*", lambda route: route.continue_() if host in route.request.url else route.abort())

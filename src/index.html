@@ -15,10 +15,7 @@
   <aside data-testid="sidebar">
     <div class="brand"><h2>Macro Dashboard</h2></div>
     <div id="nav"></div>
-    <div class="side-foot">
-      <button class="xbtn" data-testid="export-btn" data-xall>⤓ Export data</button>
-      <div class="xcap">Everything in one CSV (long format: level; code; name; parent; year; indicator; value) — paste into Claude or open in Excel.</div>
-    </div>
+    <div class="side-foot" id="xfoot"></div>
   </aside>
   <main id="main">
     <div class="topbar"><div id="hd"></div></div>
@@ -31,6 +28,7 @@
 <script>{{CLIMATE_JS}}</script>
 <script>{{ROUTE_JS}}</script>
 <script>{{PICKER_JS}}</script>
+<script>{{EXPORT_JS}}</script>
 <script>{{APP_JS}}</script>
 </body>
 </html>

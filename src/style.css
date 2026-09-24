@@ -48,8 +48,6 @@ aside{background:var(--side);color:var(--side-ink);display:flex;flex-direction:c
 .nav-item .ni-n{position:absolute;top:13px;right:14px;font-family:var(--mono);font-size:11.5px;color:#7C7F73}
 .side-foot{margin-top:auto;padding:14px 20px 18px;border-top:1px solid var(--side2);font-size:11px;color:var(--side-muted);line-height:1.5}
 .side-foot b{color:var(--side-ink);font-family:var(--body);font-weight:600}
-.side-foot label{display:block;margin:10px 0 4px;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase}
-#remu{width:100%;background:var(--side2);border:1px solid #2C3A32;color:var(--side-ink);font-family:var(--mono);font-size:10.5px;padding:5px 7px}
 
 main{overflow-y:auto;display:flex;flex-direction:column}
 .topbar{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line);padding:18px 26px 14px}
@@ -2074,3 +2072,47 @@ details.mstrip .mstrip-act{margin-top:10px}
   .tpbox{flex-wrap:wrap}
   .tpbox .tpq{min-width:0;flex:1 1 200px}
 }
+
+/* ---- P7: Export ▾ (spec §4.9). One menu, three triggers, one open at a time. The sidebar's copy
+   keeps the dark side-panel look and opens upwards (its button sits at the bottom of the viewport);
+   a header copy looks like every other toolbar control and opens down from its right edge. */
+.xwrap{position:relative;z-index:1210}
+.xwrap[data-xat=page]{display:inline-flex}
+.xwrap[data-xat=page] .xbtn{display:inline-flex;align-items:center;gap:6px;width:auto;min-height:var(--ctl-h);
+  padding:5px 10px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;
+  font-family:var(--body);font-size:13px;color:var(--ink);white-space:nowrap}
+.xwrap[data-xat=page] .xbtn:hover{border-color:var(--ink)}
+.xwrap[data-xat=page].open .xbtn{border-color:var(--ink);background:var(--panel)}
+.xbtn em{font-style:normal;font-size:10px;color:var(--muted)}
+.xbtn:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+.xpop{position:absolute;top:calc(100% + 6px);left:0;width:min(300px,88vw);max-height:70vh;overflow-y:auto;
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;text-align:left;
+  box-shadow:0 14px 40px rgba(20,28,24,.18);padding:2px 0 4px}
+.xpop[hidden]{display:none}
+/* the sidebar's copy opens upwards and stays inside the panel — `aside` scrolls, so anything wider
+   than it would simply be cut off — and wears the dark side-panel palette rather than paper */
+.xwrap[data-xat=side] .xpop{top:auto;bottom:calc(100% + 6px);left:0;right:0;width:auto;
+  background:var(--side2);border-color:#2C3A32;box-shadow:0 -10px 30px rgba(0,0,0,.35)}
+.xwrap[data-xat=side] .xitem{color:var(--side-ink);font-size:12.5px;padding:5px 10px}
+.xwrap[data-xat=side] .xitem:hover{background:#2C3A32}
+.xwrap[data-xat=side] .xitem span,.xwrap[data-xat=side] .lay-h,.xwrap[data-xat=side] .laynote{color:var(--side-muted)}
+.xwrap[data-xat=side] .xpop .laynote{border-top-color:#2C3A32}
+.xwrap[data-xat=page] .xpop{left:auto;right:0;width:min(330px,88vw)}
+.xitem{display:block;width:100%;padding:6px 12px;border:0;background:none;cursor:pointer;text-align:left;
+  font-family:var(--body);font-size:13px;color:var(--ink)}
+.xitem:hover{background:var(--panel2)}
+.xitem:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+.xitem b{display:block;font-weight:500}
+.xitem span{font-family:var(--mono);font-size:9.5px;color:var(--muted)}
+.xitem[disabled]{opacity:.55;cursor:default}
+.xitem[disabled]:hover{background:none}
+.xpop .laynote{margin:4px 0 0;padding:5px 12px 0;border-top:1px solid var(--line)}
+/* the status line of an export: one line, bottom-left, never a modal (spec §2.5) */
+.xtoast{position:fixed;left:16px;bottom:16px;z-index:1500;max-width:min(420px,calc(100vw - 32px));
+  padding:8px 12px;border:1px solid var(--line);border-radius:9px;background:var(--panel);
+  box-shadow:0 12px 30px rgba(20,28,24,.2);opacity:0;transform:translateY(6px);pointer-events:none;
+  transition:opacity .18s,transform .18s}
+.xtoast.on{opacity:1;transform:none}
+.xtoast b{display:block;font-family:var(--mono);font-size:11.5px;color:var(--ink)}
+.xtoast span{font-family:var(--mono);font-size:10px;color:var(--cap-ink)}
+@media (max-width:600px){.xwrap[data-xat=page] .xpop{right:auto;left:0}}

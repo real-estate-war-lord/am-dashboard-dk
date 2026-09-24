@@ -700,3 +700,113 @@ re-checked by the suite and still passes. AC-I1 and AC-I4 (P3) now also run on `
 - **P8 (responsive):** the test property's toolbar puts `Layers ▾` and the radius in a `.tp-right`
   block that becomes a full-width row below 600 px; the study row is the same component the area
   page uses, so whatever P8 does to `.studyrow` applies to both.
+
+---
+
+## P7 — One export model, with sources on every row
+
+Commit: `v3.0 P7: one export model, Export ▾ menu and sources on every row`
+Gate: green — build, **116 node tests**, 42 python tests, 150/150 route×viewport smoke checks with
+**0 JS errors**, **55/55 acceptance criteria** (3 P1 + 8 P2 + 9 P3 + 10 P4 + 12 P5 + 7 P6 + 6 P7),
+budgets (app.js 446 KB / 450 KB, style.css 139 KB / 140 KB).
+
+### What was built
+
+**1. `src/export_core.js`** (IIFE → `window.EXPORT_CORE`, pure, wired into `src/index.html` and
+`scripts/build_dashboard.py` as `{{EXPORT_JS}}`, 28 `node --test` cases in `tests/export.test.js`).
+It owns everything about a file that is a function of the registry and the source catalogue alone:
+- the **column sets** — one long schema for areas, national series and the test property
+  (`level … licence`, spec §4.9 verbatim), and an own schema for projects, the sources catalogue,
+  the climate exposure and the test property's `nearby` file;
+- the **source columns** of one row (`source, table_id, source_url, as_of, fetched, licence`),
+  filled in one fixed order: `tables` → `proj` → `climate_src` → `src_page` → a `KK…` id parsed out
+  of the source string (the quarter registry carries it nowhere else, ENG_BRIEF §3.2) → a DST id
+  named in prose → `n/a (register/curated)`. **No row has a blank `source`, `as_of`, `table_id` or
+  `fetched`** (AC-X4);
+- the **unit fix**: a `fmt: kdkk` indicator is stored in DKK, so the file writes the raw number and
+  says `DKK / yr`; any other row whose unit says kDKK with a value ≥ 10 000 is converted, so the
+  label always matches the number (AC-X2);
+- `period_type` (year · quarter · month · school_year · window · snapshot · horizon · projection,
+  read off the publisher's own period label) and `value_type` (actual · projection · inherited ·
+  derived, read off the registry);
+- the **CSV rules**: UTF-8 BOM, `;`, `.` decimals, no grouping, no separator or newline inside a
+  cell, header first, one comment-free file.
+
+**2. Seven files, one menu.** `Export ▾` (`export-btn` / `export-menu`, `role=dialog`) renders in
+the **sidebar footer** (which also gained the build/version line of spec §4.1), in the **Data
+header** and in the **test-property header**; one is open at a time (`UI.xOpen` names which).
+Items: `view · areas · projects · national · sources · climate · property`.
+- `areas_long_<date>.csv` — **104 028 rows**: 99 municipalities, 606 postal codes, 67 quarters ×
+  every indicator × every published period, plus the Climate family at its three horizons. A
+  municipality figure read on a finer level is one `inherited` row with `inherited_from` set.
+- `projects_<date>.csv` — 51 rows, own schema, plus the postal codes and quarters each project
+  serves and its geometry kind, length and station count.
+- `national_series_<date>.csv`, `sources_<date>.csv`, `climate_exposure_<date>.csv` (level ×
+  horizon: dwellings, dwellings in zone, share, zone km²), `test_property_<date>.csv` (the pin's
+  three columns in front of the long schema, every level it sits in) **+
+  `test_property_nearby_<date>.csv`** (`kind, name, type, status, distance_m, source, source_url`),
+  and `This view` (the wide Areas table, one area's figures, or the plotted series).
+- A one-line **toast** (`export-toast`) says what was written: `areas_long_2026-09-24.csv · 104 028
+  rows · 3 levels · every published period`. The lazy public-building and school files are awaited
+  before the `nearby` file is written.
+
+**3. The v2.6 export paths are gone.** `exportAll()` (the single long CSV that jammed projects and
+macro series into indicator columns), `exportCsv()` and `exportPipelineCsv()` are deleted, with the
+sidebar's four-line explanation. The Areas and Projects toolbar buttons call the same builders
+(`This view (CSV)`, `Projects (CSV)`). **Data › Sources renders `EXPORT_CORE.sourceRecs()`** — the
+rows the catalogue file writes — so the table and the file cannot disagree; `SRC_PUB`,
+`srcPublisher` and `srcTableId` went with it.
+
+### ACs delivered
+AC-X1, AC-X2 (adapted as the phase file asks: kDKK rows are < 10 000 *because* an income row is
+written in DKK), AC-X3, AC-X4, AC-TP4 — all MUST — plus the phase-local **AC-XMENU** (one menu in
+three places, Esc, the v2.6 button gone, and Data › Sources ≡ the sources file). Registered under
+`phase="P7"` in `tests/ui_ac.py`.
+
+### Deviations
+- **Inherited figures are written for the latest period only** (own figures keep their full
+  history). The municipality's series is in the same file on its own rows; repeating it under 606
+  postal codes would have tripled the file to say nothing new. In `DECISIONS.md`.
+- **The wide "This view" file carries provenance in its column headers**
+  (`growth (% / yr) · FOLK1A POSTNR1 · as of 2025→2026`). §4.9 asks for that export to stay wide
+  *and* for every file to carry its sources; a wide layout has nowhere else to put them.
+- **Charts keeps its own `⤓ Data CSV`** (the picture's own table, including quarters and the BBR
+  distributions); `Export ▾ › This view` writes the plotted series in the long schema.
+- **Copenhagen quarters have no Climate rows in `areas_long`** — the quarter registry publishes no
+  Climate indicator (the P4 limitation). Their zone exposure *is* in `climate_exposure`, which
+  reads the per-horizon index directly.
+- **`dwellings` / `dwellings_in_zone` are empty for a municipality** in `climate_exposure`: the
+  inline payload keeps the municipal share and the zone area only (the counts are per postal code
+  and per quarter). The share and the zone area are there, and the source columns are filled.
+- Services are not in the `nearby` file: the test property's layers are infra, public buildings and
+  BBR buildings (P6), so there is no service list on that page to export.
+
+### Known issues / open items
+- `style.css` is at **139 KB of the 140 KB budget** (≈ 1.0 KB left). P8 rebuilds the responsive
+  shell and will need room: the v2.6 Finnish-commented legacy block (`src/style.css` lines 76–1110,
+  mostly unused by the DK app) is where a daytime clean-up would find several KB. P7 reclaimed the
+  two dead sidebar rules (`.side-foot label`, `#remu`).
+- `app.js` is at 446 KB of 450 KB (≈ 14 KB left) — new pure logic belongs in a `*_core.js` file.
+- The sidebar's Export ▾ popover is sized to the 240 px panel because `aside` scrolls and would cut
+  anything wider off. When P8 turns the sidebar into a 52 px top bar with a drawer, that menu wants
+  re-checking (the header copy is unaffected).
+- Horizontal overflow at 390 px is still a note on every route; **P8 flips `OVERFLOW_FATAL = True`**.
+- Data tasks unchanged: the KK vs BBR "built 2010+" gap, the surge keys' horizon-in-the-`desc`, and
+  `cph.json` indicators carrying no `tables` (the export parses the `KK…` id out of the prose).
+
+### What the next phase must know
+- **Every new file goes through `EXPORT_CORE`**, and every builder gets a `node --test` case. app.js
+  supplies the data and two callbacks (`periods(i, o, level, inherited)` and `inherited(i, row)`);
+  nothing about a column, a unit or a source belongs in app.js.
+- **`exportGo(kind)` is the one entry point** (`[data-export=<kind>]`), `exSave(stem, cols, rows,
+  extra)` the one writer: it names the file with the data's build date, adds the BOM through
+  `downloadCsv()` and shows the toast. A new dataset is one `EX_ITEMS` row plus one `exportGo`
+  branch.
+- **`UI.xOpen` is `"side" | "page" | ""`** — the trigger toggles, so anything that opens the menu
+  programmatically must check first (the AC helper `open_export()` does).
+- **P8/P9:** `[data-testid=export-btn]` and `[data-testid=export-menu]` exist twice on the Data and
+  test-property routes (one per trigger, §10 names both ids); scope a locator to `.hd-act` or
+  `#xfoot`, or take `.first`, rather than asserting there is only one.
+- **P9 (docs):** the file names, the schemas and the "every row carries its source" line belong in
+  `README.md` / `CHANGELOG.md`; the column list is in `docs/v3/UI_SPEC_v3.md` §4.9 and in the header
+  of `src/export_core.js`.
