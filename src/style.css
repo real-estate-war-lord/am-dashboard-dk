@@ -1202,28 +1202,8 @@ aside{background:linear-gradient(178deg,#131C16 0%,#0D140F 100%)}
 .crumb{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .artags{display:flex;gap:6px;flex-wrap:wrap}
 .artags .tag{color:var(--ink2);border-color:var(--line)}
-.hero.wrap{grid-template-columns:repeat(7,minmax(0,1fr));background:var(--panel);gap:0}
-@media (max-width:1250px){.hero.wrap{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media (max-width:800px){.hero.wrap{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.hero.wrap>div{border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
-.hero .tile{cursor:pointer;transition:background .12s}
-.hero .tile:hover{background:var(--panel2)}
-.hero .tile.on{box-shadow:inset 0 3px 0 var(--ink);background:#F0F4EE}
-.hero .tile{padding:11px 10px 9px;min-height:0}
-.hero .tile .tl{font-size:9px;letter-spacing:.06em;min-height:26px;line-height:1.35}
-.hero .tile .tv{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;margin-top:4px}
-.hero .tile .tv b{font-size:19px;margin:0;display:inline;letter-spacing:-.03em}
-.hero .tile .tv i{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--ink2)}
-.hero .tile .tspark{width:100%;height:60px;display:block;margin-top:6px;overflow:visible}
-.hero .tile .tspark .ax{font-size:8.5px}
-.hero .tile .tm{display:grid;gap:2px;margin-top:4px;font-family:var(--mono);font-size:9.5px;color:var(--muted)}
-.hero .tile .tm i{font-style:normal;font-weight:600}
-.hero .tile .rk{display:flex;align-items:center;gap:6px;color:var(--ink2)}
-.rkbar{position:relative;display:inline-block;width:46px;height:5px;background:var(--line);border-radius:3px;flex:0 0 46px}
-.rkbar i{position:absolute;top:-2px;width:3px;height:9px;margin-left:-1px;background:var(--ink);border-radius:1px}
-.hero .tile .up{color:var(--good)}.hero .tile .dn{color:var(--bad)}
-.hero .tile em i{font-style:normal;font-weight:600}
-#armap{height:380px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);position:relative;z-index:0;isolation:isolate}
+/* the v2.6 "Key figures" 12-tab tile grid (.hero.wrap, .hero .tile, .tspark, .rkbar) and the old
+   #armap height went with the v3.0 area page — see the P5 block at the end of this file */
 .tbl .go{color:var(--dim);font-size:13px;font-weight:400;margin-left:2px}
 .back button+.dim{margin:0 4px}
 @media (max-width:1100px){.mstrip-k{margin-left:0}}
@@ -1246,14 +1226,9 @@ aside{background:linear-gradient(178deg,#131C16 0%,#0D140F 100%)}
 .app{grid-template-columns:var(--sidew) 1fr}
 aside{width:var(--sidew)}
 #lfmap{height:clamp(380px,calc(100vh - 250px),760px)}        /* the map fits the window: no scrolling to see the legend */
-#armap{height:clamp(300px,calc(100vh - 560px),420px)}
 .asrch input{min-width:min(300px,38vw)}
 .indsel{max-width:min(360px,44vw)}
 .card-head .tools{max-width:100%}
-.hero.wrap{grid-template-columns:repeat(7,minmax(0,1fr))}
-@media (max-width:1500px){.hero.wrap{grid-template-columns:repeat(5,minmax(0,1fr))}}
-@media (max-width:1180px){.hero.wrap{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media (max-width:820px){.hero.wrap{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:1400px){
   :root{--sidew:212px}
   body{font-size:13px}
@@ -1269,7 +1244,6 @@ aside{width:var(--sidew)}
   .tbl.compact th,.tbl.compact td{padding:4px 6px;font-size:11px}
   .mstrip{gap:12px;padding:8px 12px}.mstrip-k{gap:12px}
   .arhead h2{font-size:24px}
-  .hero .tile .tv b{font-size:18px}
 }
 @media (max-width:1180px){
   :root{--sidew:180px}
@@ -1284,7 +1258,6 @@ aside{width:var(--sidew)}
 @media (max-width:900px){
   :root{--sidew:100%}
   aside{width:auto}
-  .hero.wrap{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 /* Windows: scrollbars take 17 px — keep them from pushing content and from overlapping the map */
 main{scrollbar-gutter:stable}
@@ -1366,8 +1339,8 @@ details.indx .indx-body p{margin:0 0 3px}
 .maplegend.small .lgrow i{width:13px;height:10px;flex-basis:13px}
 #mapcard:fullscreen .maplegend,#mapcard.fs-fallback .maplegend{bottom:20px}
 .mklegend{display:none}
-/* area page header: headline row */
-.arhead .hl{flex-basis:100%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:12px}
+/* headline row: still the sheets' figure row (project, public building, school, climate); the area
+   page's own tiles are the .tiles / .hltile component of the P5 block at the end of this file */
 .hlc{background:var(--panel);border:0;text-align:left;padding:10px 14px 9px;cursor:pointer;font:inherit;display:flex;flex-direction:column;gap:2px;min-width:0}
 .hlc:hover{background:var(--panel2)}
 .hlc.on{background:#F0F4EE;box-shadow:inset 0 3px 0 var(--ink)}
@@ -1377,11 +1350,7 @@ details.indx .indx-body p{margin:0 0 3px}
 .hlc em i{font-style:normal;font-weight:600}
 .hlc .up{color:var(--good)}.hlc .dn{color:var(--bad)}
 .arhead h2{margin-top:0}
-@media (max-width:1180px){.arhead .hl{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media (max-width:820px){.arhead .hl{grid-template-columns:repeat(2,minmax(0,1fr))}}
-/* tiles: one context line, chart link in the corner */
-.hero .tile .tm{display:flex;flex-wrap:wrap;gap:2px 10px}
-.hero .tile{position:relative}
+/* the ↗ "open in Charts" corner button of a table row */
 .tch{position:absolute;top:6px;right:6px;border:0;background:none;color:var(--muted);font-size:12px;line-height:1;padding:3px 5px;border-radius:5px;cursor:pointer;opacity:0;transition:opacity .12s}
 .tile:hover .tch,tr:hover .tch,.tch:focus{opacity:1}
 .tch:hover{color:var(--ink);background:var(--panel)}
@@ -1954,4 +1923,142 @@ details.mstrip .mstrip-act{margin-top:10px}
 @media (max-width:900px){
   #maplegs{left:12px;right:12px;align-items:stretch;max-height:46%}
   #maplegs .maplegend{max-width:none}
+}
+
+/* ================= v3.0 P5 — the area page: tiles, the study row, the toggles (spec §5.2) ========
+   Header card + five tiles, one toolbar row, the study row (chart panel | mini map, same height by
+   being two stretched grid items), four <details>. No new visual vocabulary: the tiles are the old
+   headline row with the rank in the subline, the panel is the old Trend card, the mini map is the
+   old Neighbours card with the legend moved inside it. */
+
+/* ---- HeadlineTiles (§4.7): five, 84 px tall, clickable ---- */
+.tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.arhead .tiles{flex-basis:100%;margin-top:var(--s3)}
+.tiles.wrap{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-top:var(--s2)}
+.hltile{background:var(--panel);border:0;text-align:left;padding:9px 13px 8px;cursor:pointer;font:inherit;
+  display:flex;flex-direction:column;gap:1px;min-width:0;min-height:var(--tile-h);position:relative;
+  transition:background .12s}
+.hltile:hover{background:var(--panel2)}
+.hltile.on{background:#F0F4EE;box-shadow:inset 0 3px 0 var(--ink)}
+.hltile:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+.hltile .tl{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hltile b{font-family:var(--disp);font-size:var(--fs-tile-val);letter-spacing:-.03em;line-height:1.12;font-weight:700;
+  font-variant-numeric:tabular-nums;margin-top:auto}
+.hltile b.proj{color:var(--proj)}
+.hltile b.inh{color:var(--inh);font-weight:600}
+.hltile em{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--ink2);line-height:1.35}
+.hltile em i{font-style:normal;font-weight:600}
+.hltile .up{color:var(--good)}.hltile .dn{color:var(--bad)}
+.hltile.inh{background:var(--inh-bg)}
+.hltile.inh:hover{background:#EDEDE8}
+.inhlab{font-family:var(--mono);font-size:9.5px;color:var(--inh)}
+.hltile .tpill{position:absolute;top:7px;right:8px;font-size:8.5px;padding:0 4px}
+@media (max-width:1250px){.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:800px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ---- the one toolbar row: picker · period · chips ---- */
+.artools{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2) var(--s3)}
+/* chips on a row of their own, as on the map toolbar: the horizon caption breaks any shared row */
+.artools .indchips{flex:1 0 100%}
+
+/* ---- the study row (§5.2, AC-P1): 60 / 40, two stretched grid items = equal height ---- */
+.studyrow{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:var(--card-gap);
+  align-items:stretch;min-height:380px}
+.studyrow>*{min-width:0}
+.card.panel{display:flex;flex-direction:column}
+.card.panel .card-head{margin-bottom:var(--s2)}
+.card.panel .panel-b{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;min-height:0}
+.card.panel .panel-b>svg{width:100%;height:auto}
+.panel-foot{margin-top:var(--s3)}
+.panel-def{margin-top:2px;max-width:var(--prose)}
+/* the headline row: the figure, then Δ y/y · rank · vs median as mono keys */
+.panel-hd{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;padding-bottom:var(--s2);
+  border-bottom:1px solid var(--line2)}
+.panel-hd .pv{font-family:var(--disp);font-size:34px;line-height:1.05;letter-spacing:-.035em;font-weight:700;
+  font-variant-numeric:tabular-nums}
+.panel-hd .pv.proj{color:var(--proj)}
+.panel-hd .pv.inh{color:var(--inh)}
+.panel-hd .pk{font-family:var(--mono);font-size:11px;color:var(--ink2);white-space:nowrap}
+.panel-hd .pk i{font-style:normal;font-weight:600}
+.panel-hd .up{color:var(--good)}.panel-hd .dn{color:var(--bad)}
+.panel-hd.none{font-family:var(--mono);font-size:12px;color:var(--ink2);border-bottom:1px solid var(--line2);
+  padding-bottom:var(--s2);margin:0}
+/* the empty / snapshot state card (§4.10) */
+.statecard{font-family:var(--mono);font-size:11.5px;color:var(--ink);background:var(--panel2);
+  border:1px solid var(--line);border-radius:7px;padding:7px 10px;margin:var(--s2) 0}
+/* the distribution strip and the climate bars */
+.diststrip{margin:var(--s2) 0}
+.diststrip .dtick{stroke:#B6BBB2;stroke-width:1.1}
+.diststrip .dmed{stroke:#5C5F52;stroke-width:1.6;stroke-dasharray:4 3}
+.diststrip .ddot{fill:var(--k1);stroke:#FFF;stroke-width:1.6}
+.diststrip .dlab{font-weight:600;fill:var(--ink)}
+.climbars .cbar{opacity:.88}
+.climbars .cbar.on{opacity:1;stroke:var(--ink);stroke-width:1.2}
+.climbars .cbv{font-weight:600;fill:var(--ink)}
+.climbars .whisk{stroke:#3B4A63;stroke-width:1.4}
+.climbars .cmed{stroke:#5C5F52;stroke-width:1.5;stroke-dasharray:5 4}
+.bleg i.lgdash{height:2px;background:#5C5F52}
+.bleg i.lgwhisk{height:10px;width:2px;flex-basis:2px;background:#3B4A63;margin:0 4px}
+
+/* ---- MiniMap (§4.6): the map fills the row, the legend and the ⤢ live inside it ---- */
+.minimap{position:relative;border:1px solid var(--line);border-radius:10px;background:var(--panel2);
+  overflow:hidden;isolation:isolate;z-index:0;min-height:320px}
+.minimap .mm-map{position:absolute;inset:0}
+.minimap .mm-leg{right:10px;bottom:10px;max-width:60%}
+/* the note runs along the top, between the zoom control and the ⤢ — the legend owns the bottom */
+.minimap .mm-note{position:absolute;left:48px;right:48px;top:10px;z-index:800;
+  background:rgba(255,255,255,.93);border:1px solid var(--line);border-radius:7px;padding:4px 8px;
+  font-family:var(--mono);font-size:10px;line-height:1.4;color:var(--ink);pointer-events:none}
+/* the chips exist only inside the full-screen overlay, which covers the page's own toolbar */
+.minimap .mm-chips:empty{display:none}
+.minimap .mm-chiprow{position:absolute;left:12px;bottom:12px;z-index:900;max-width:calc(100% - 260px);
+  background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:9px;padding:6px 8px}
+.minimap .mm-full{position:absolute;top:10px;right:10px;z-index:900;width:28px;height:28px;padding:0;
+  display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:6px;
+  background:rgba(255,255,255,.95);color:var(--ink);font-size:13px;line-height:1;cursor:pointer}
+.minimap .mm-full:hover{border-color:var(--ink)}
+.minimap .mm-full:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+/* full screen: a fixed overlay over the page, Esc or ✕ to leave (AC-MM2). The spec says z-index 100;
+   it has to clear the IndicatorPicker's 1200, or the picker button floats over the map. */
+.minimap.is-full{position:fixed;inset:0;z-index:1400;border-radius:0;border:0;min-height:0}
+.minimap.is-full .mm-note{right:auto;max-width:min(520px,calc(100% - 160px))}
+
+/* ---- the four toggles (§5.2): open state lives in show= ---- */
+.arsec{padding:0}
+.arsec>summary{cursor:pointer;list-style:none;display:flex;align-items:baseline;gap:var(--s3);flex-wrap:wrap;
+  padding:12px 17px}
+.arsec>summary::-webkit-details-marker{display:none}
+.arsec>summary::before{content:"\25B8";font-size:10px;color:var(--muted);line-height:1.6}
+.arsec[open]>summary::before{content:"\25BE"}
+.arsec>summary:hover .arsec-t{color:var(--k1)}
+.arsec-t{font-family:var(--disp);font-size:var(--fs-card-title);font-weight:700;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--ink)}
+.arsec>summary .hint{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-left:auto;text-align:right}
+.arsec>summary .tag{font-style:normal}
+.arsec-b{padding:0 17px 17px;border-top:1px solid var(--line2);padding-top:var(--s3)}
+.arsub{margin-top:var(--s5);padding-top:var(--s3);border-top:1px solid var(--line2)}
+.arsec-b .tag-muni{font-family:var(--mono);font-size:9px;letter-spacing:.06em;color:var(--inh);margin-left:5px}
+.tbl tr.inh td:nth-child(2){color:var(--inh)}
+.tbl tr.proj td:nth-child(2){color:var(--proj)}
+.tbl tr.on>th{box-shadow:inset 3px 0 0 var(--k1)}
+/* the grouped popover: the rows live inside their group, so the header can stick to it */
+.indsec[hidden]{display:none}
+
+/* ---- responsive (§6): 58/42 at 1366, stacked below 1025 ---- */
+@media (max-width:1536px){.studyrow{min-height:344px}}
+@media (max-width:1250px){.studyrow{grid-template-columns:minmax(0,1.22fr) minmax(0,1fr);min-height:320px}}
+@media (max-width:1024px){
+  .studyrow{grid-template-columns:1fr;min-height:0}
+  .studyrow>*{min-height:320px}
+}
+@media (max-width:600px){
+  .studyrow{gap:var(--s3)}
+  .studyrow>*{min-height:300px}
+  .minimap{min-height:300px}
+  .arsec>summary{padding:10px 12px}
+  .arsec-b{padding:var(--s3) 12px 12px}
+  .panel-hd .pv{font-size:28px}
+  .minimap .mm-note{display:none}
 }

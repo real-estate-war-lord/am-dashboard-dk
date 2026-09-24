@@ -145,11 +145,24 @@ test("climate=1 and the layer flags convert in one pass, and only once", () => {
   assert.strictEqual(h, "map/101?ind=surge_dw_pct&lay=infra");
   assert.strictEqual(R.toV3(h, { isClim }), h);
 });
+test("the area page's tab and tile-group keys become show= (spec §5.2)", () => {
+  /* the lower tab bar: "Housing stock (BBR)" and "All indicators" both live inside All figures now */
+  assert.strictEqual(R.toV3("#area/kommune/751?ind=unemp&t=bbr"), "area/kommune/751?ind=unemp&show=figures");
+  assert.strictEqual(R.toV3("#area/kommune/101?ind=growth&t=ind"), "area/kommune/101?ind=growth&show=figures");
+  assert.strictEqual(R.toV3("#area/kommune/101?t=sub"), "area/kommune/101?show=sub");
+  /* g= named a tile group of a block that no longer exists: it is dropped, not translated */
+  assert.strictEqual(R.toV3("#area/postnr/2450?ind=growth&g=Rents"), "area/postnr/2450?ind=growth");
+  assert.strictEqual(R.toV3("#area/kvarter/20602?g=Rents&t=sub"), "area/kvarter/20602?show=sub");
+  /* a link that already names show= keeps it, and sub= (which still exists) rides along */
+  assert.strictEqual(R.toV3("#area/kommune/101?show=outlook,figures&t=bbr"), "area/kommune/101?show=outlook,figures");
+  assert.strictEqual(R.toV3("#area/kommune/101?ind=growth&sub=postnr&show=sub"), "area/kommune/101?ind=growth&sub=postnr&show=sub");
+});
 test("toV3 is idempotent — it can run on every hashchange", () => {
   ["#table/postnr?ind=growth", "#pipeline", "#market?src=1", "#sources", "#analysis?a=55.6545,12.539&la=T",
    "#compare?a=kommune:101&b=kommune:751", "#map?ind=growth&climate=1", "#map?ind=sealevel_cm&climate=1",
    "#area/kommune/101", "#charts?ind=growth&a=kommune:101,kommune:751", "#property?p=55.6545,12.539:T",
    "#map/101?infra=1&public=1&services=1", "#map?lay=infra&public=1", "#map?ind=growth&infra=0",
+   "#area/kommune/751?ind=unemp&t=bbr", "#area/kommune/101?g=Rents&t=sub", "#area/kommune/101?show=none",
    "#", "#map/101"].forEach(h => {
     const once = R.toV3(h, { isClim });
     assert.strictEqual(R.toV3(once, { isClim }), once, h);

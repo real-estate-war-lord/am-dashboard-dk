@@ -48,6 +48,35 @@ test("grouped() tolerates an empty list and a custom order", () => {
     ["Income & jobs", "Demographics"]);
 });
 
+/* ---------- the "From the municipality" sub-heading (spec §4.2, AC-I5) ---------- */
+test("groupedLevel() without a level test is exactly grouped()", () => {
+  assert.deepStrictEqual(P.groupedLevel(ALL).map(g => g.name), P.grouped(ALL).map(g => g.name));
+  assert.deepStrictEqual(P.groupedLevel(ALL, undefined, null).map(g => g.name), P.grouped(ALL).map(g => g.name));
+});
+test("groupedLevel() moves the inherited rows into one sub-heading at the end", () => {
+  /* a postal-code page: the kommune-level figures are the municipality's, the postnr ones its own */
+  const inh = i => ["unemp", "rent_private"].includes(i.key);
+  const g = P.groupedLevel(ALL, undefined, inh);
+  assert.strictEqual(g[g.length - 1].name, P.MUNI_GROUP);
+  assert.deepStrictEqual(g[g.length - 1].inds.map(i => i.key), ["unemp", "rent_private"]);
+  /* and they are no longer listed under their own groups, which disappear when nothing is left */
+  assert.ok(!g.slice(0, -1).some(x => x.name === "Rents"));
+  assert.ok(!g.slice(0, -1).some(x => x.name === "Income & jobs"));
+  /* every indicator is still there exactly once */
+  assert.deepStrictEqual(g.flatMap(x => x.inds.map(i => i.key)).sort(), ALL.map(i => i.key).sort());
+});
+test("groupedLevel() adds no sub-heading on a page that inherits nothing", () => {
+  const g = P.groupedLevel(ALL, undefined, () => false);
+  assert.ok(!g.some(x => x.name === P.MUNI_GROUP));
+  assert.deepStrictEqual(g.map(x => x.name), P.grouped(ALL).map(x => x.name));
+});
+test("the inherited sub-heading carries no period pill of its own", () => {
+  const g = P.groupedLevel(ALL, undefined, i => i.key === "surge_dw_pct");
+  const muni = g[g.length - 1];
+  assert.strictEqual(muni.name, P.MUNI_GROUP);
+  assert.strictEqual(muni.pill, "");
+});
+
 /* ---------- search ---------- */
 test("an empty query matches everything", () => {
   assert.strictEqual(P.filter(ALL, "").length, ALL.length);

@@ -6,7 +6,7 @@
 
      old (v2.6, shared in emails and slide decks) …… table/kommune · pipeline · market · sources
                                                       analysis?a=55.6,12.5&la=X · compare?a=…&b=…
-                                                      map/101?climate=1
+                                                      map/101?climate=1 · area/kommune/101?t=bbr&g=Rents
      new (v3.0, what the app emits from P2 on) …….… data/areas/kommune · data/projects ·
                                                       data/national · data/sources ·
                                                       property?p=55.6,12.5:X · area/kommune/101 ·
@@ -154,6 +154,21 @@ function layerFlags(query) {
   return q;
 }
 
+/* The area page's lower tab bar and its tile-group segments became four <details> sections whose
+   open state is one key (spec §5.2): `t=bbr|sub|ind` named the open tab, `g=<group>` the open tile
+   group of a "Key figures" block that no longer exists. `t=` becomes the section it opened, `g=` is
+   dropped. A link that already spells `show=` keeps it, so this stays idempotent. */
+const AREA_TAB_SHOW = { ind: "figures", bbr: "figures", sub: "sub" };
+function areaTabs(query) {
+  const q = Object.assign({}, query);
+  const has = k => Object.prototype.hasOwnProperty.call(q, k);
+  if (!has("t") && !has("g")) return q;
+  const want = AREA_TAB_SHOW[q.t];
+  delete q.t; delete q.g;
+  if (want && !q.show) q.show = want;
+  return q;
+}
+
 /* old hash → the canonical v3 hash. Idempotent: toV3(toV3(h)) === toV3(h) for every h. */
 function toV3(hash, opts) {
   const o = opts || {};
@@ -162,6 +177,7 @@ function toV3(hash, opts) {
   const fn = Object.prototype.hasOwnProperty.call(ALIASES, head) ? ALIASES[head] : null;
   if (fn) { const r = fn(parts, query); return buildHash(r.path, r.query); }
   if (head === "map") return buildHash(parts.join("/") || "map", layerFlags(climateFlag(query, o.isClim)));
+  if (head === "area") return buildHash(parts.join("/"), areaTabs(query));
   return buildHash(parts.join("/") || "map", query);
 }
 
@@ -194,7 +210,7 @@ function toInternal(hash, opts) {
 }
 
 const API = { CLIM_FALLBACK_IND, ALIASES, splitHash, buildHash, parseLatLon, round5,
-              propParse, propSerialise, climateFlag, layerFlags, toV3, toInternal };
+              propParse, propSerialise, climateFlag, layerFlags, areaTabs, toV3, toInternal };
 if (typeof window !== "undefined") window.ROUTE_CORE = API;
 if (typeof module !== "undefined" && module.exports) module.exports = API;
 

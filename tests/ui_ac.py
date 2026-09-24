@@ -67,7 +67,9 @@ def goto(page, hash_, settle=900, wait=None):
     page.wait_for_timeout(150)
     if wait:
         try:
-            page.wait_for_selector(wait, timeout=15000)
+            # state="attached", as tests/ui_smoke.py does: a Leaflet pane has no size of its own, so
+            # the default "visible" wait always burns its full 15 s and then passes anyway.
+            page.wait_for_selector(wait, state="attached", timeout=15000)
         except Exception:
             pass
     page.wait_for_timeout(settle)
@@ -344,9 +346,10 @@ def ac_u1(page, base):
 # =============================================================================================
 # P3 — the shared IndicatorPicker, the chips row and the PeriodControl
 # =============================================================================================
-# The three routes that had adopted the shared picker when P3 landed. The area page and the test
-# property keep their own selectors until P5/P6 and are added to this list by those phases.
-PICKER_ROUTES = ["map?ind=growth", "data/areas/kommune?ind=growth", "charts?ind=growth&a=kommune:101"]
+# Every route that has adopted the shared picker. P3 brought the map, Data › Areas and Charts;
+# P5 added the area page. The test property keeps its v2.6 selectors until P6, which extends this.
+PICKER_ROUTES = ["map?ind=growth", "data/areas/kommune?ind=growth", "charts?ind=growth&a=kommune:101",
+                 "area/kommune/101?ind=growth"]
 
 
 def pick_rows(page):
@@ -818,6 +821,293 @@ def ac_s3(page, base):
     box = page.locator("[data-testid=map]").bounding_box()
     assert box["y"] <= 320, f"the drilled map starts {box['y']:.0f} px down"
     assert box["y"] + 300 <= 768, f"less than 300 px of the drilled map is on the first screen (top {box['y']:.0f})"
+
+
+# =============================================================================================
+# P5 — the area page rebuilt around the study row
+# =============================================================================================
+AREA = "area/kommune/101?ind=growth"
+
+
+def box_of(page, selector):
+    b = page.locator(selector).first.bounding_box()
+    assert b, f"no bounding box for {selector}"
+    return b
+
+
+@ac("AC-P1", phase="P5")
+def ac_p1(page, base):
+    """The study row is the chart panel and the mini map, side by side, the same height — and the
+    v2.6 KEY FIGURES block is gone (spec §5.2, §8)."""
+    goto(page, AREA, settle=1800, wait="#armap .leaflet-pane")
+    body = page.inner_text("#body")
+    assert "KEY FIGURES" not in body.upper(), "the KEY FIGURES block is still on the page"
+    # siblings inside the row, panel first
+    kids = page.evaluate("""() => [...document.querySelector('[data-testid=study-row]').children]
+        .map(e => e.dataset.testid || e.tagName)""")
+    assert kids == ["chart-panel", "minimap"], f"the study row's children are {kids}"
+    row, panel, mm = box_of(page, "[data-testid=study-row]"), box_of(page, "[data-testid=chart-panel]"), box_of(page, "[data-testid=minimap]")
+    assert abs(panel["height"] - mm["height"]) <= 2, \
+        f"panel {panel['height']:.1f} px vs mini map {mm['height']:.1f} px — the spec wants ±2"
+    assert panel["x"] + panel["width"] <= mm["x"] + 1, "the panel is not left of the map"
+    pw, mw = panel["width"] / row["width"] * 100, mm["width"] / row["width"] * 100
+    assert 55 <= pw <= 65, f"the panel is {pw:.1f} % of the row, the spec wants 55–65"
+    assert 35 <= mw <= 45, f"the mini map is {mw:.1f} % of the row, the spec wants 35–45"
+    # the separate Trend and Neighbours cards are gone with it — one panel, one map
+    assert page.locator("[data-testid=chart-panel]").count() == 1
+    assert page.locator("[data-testid=minimap]").count() == 1
+
+
+@ac("AC-P2", phase="P5")
+def ac_p2(page, base):
+    """Population outlook opens itself on a municipality page and not on a postal code; toggling a
+    section writes show=, and a link carrying show= opens what it names (spec §5.2, §3.2)."""
+    goto(page, AREA, settle=1500)
+    assert page.evaluate("document.querySelector('[data-testid=sec-outlook]').open"), \
+        "Population outlook is closed on a municipality page"
+    assert not page.evaluate("document.querySelector('[data-testid=sec-figures]').open")
+    # opening a second one writes it into the hash
+    page.click("[data-testid=sec-figures] summary")
+    page.wait_for_timeout(500)
+    h = cur_hash(page)
+    assert "show=" in h and "figures" in h.split("show=")[1].split("&")[0], f"toggling did not reach the hash: {h!r}"
+    # closing the one that opens itself is a state of its own, not "the default"
+    page.click("[data-testid=sec-outlook] summary")
+    page.click("[data-testid=sec-figures] summary")
+    page.wait_for_timeout(500)
+    assert "show=none" in cur_hash(page), f"closing every section gave {cur_hash(page)!r}"
+
+    goto(page, "area/postnr/2450?ind=growth", settle=1500)
+    assert page.locator("[data-testid=sec-outlook]").count() == 0 or \
+        not page.evaluate("document.querySelector('[data-testid=sec-outlook]').open"), \
+        "Population outlook opened itself on a postal-code page"
+    goto(page, "area/postnr/2450?ind=growth&show=figures", settle=1500)
+    assert page.evaluate("document.querySelector('[data-testid=sec-figures]').open"), \
+        "?show=figures did not open All figures"
+
+
+@ac("AC-P3", phase="P5")
+def ac_p3(page, base):
+    """The panel draws what the indicator family has: three horizon bars for Climate (with the
+    horizon control beside it), the outlook chart for a projection (spec §5.2)."""
+    goto(page, "area/kommune/101?ind=surge_dw_pct", settle=1800)
+    bars = page.locator("[data-testid=chart-panel] [data-testid=clim-bars] [data-bar]")
+    assert bars.count() == 3, f"expected 3 horizon bars, got {bars.count()}"
+    hz = page.evaluate("""[...document.querySelectorAll('[data-testid=clim-bars] [data-bar]')].map(e => e.dataset.hz)""")
+    assert hz == ["today", "2070", "2120"], f"the bars are {hz}"
+    assert page.locator("[data-testid=period-hz]").first.is_visible(), "no horizon control beside a Climate indicator"
+    assert page.locator("[data-testid=period-year]").count() == 0, "a year selector next to a Climate indicator"
+    assert "Climate sheet" in page.inner_text("[data-testid=chart-panel]")
+
+    goto(page, "area/kommune/101?ind=fc_growth", settle=1800)
+    assert page.locator("[data-testid=chart-panel] [data-testid=outlook-chart]").count() == 1, \
+        "an Outlook indicator does not draw the outlook chart"
+    assert page.locator("[data-testid=period-proj]").count() == 1, "no projection badge"
+    assert page.locator("[data-testid=clim-bars]").count() == 0
+
+
+@ac("AC-P4", phase="P5")
+def ac_p4(page, base):
+    """Choosing an indicator updates the panel and the mini map in place: the heading and the legend
+    title change, the scroll position does not, and it works inside the full-screen map too."""
+    goto(page, AREA, settle=1800, wait="#armap .leaflet-pane")
+    page.evaluate("document.getElementById('main').scrollTop = 220")
+    page.wait_for_timeout(200)
+    before = dict(top=page.evaluate("document.getElementById('main').scrollTop"),
+                  title=page.inner_text("[data-testid=panel-title]"),
+                  leg=page.inner_text("[data-testid=minimap] .lgtitle"),
+                  map=page.evaluate("window.__maps.length"))
+    del ERRORS[:]
+    page.click("[data-testid=ind-chips] .chip[data-ind=unemp]")
+    page.wait_for_timeout(900)
+    after = dict(top=page.evaluate("document.getElementById('main').scrollTop"),
+                 title=page.inner_text("[data-testid=panel-title]"),
+                 leg=page.inner_text("[data-testid=minimap] .lgtitle"))
+    assert after["title"] != before["title"], f"the panel heading did not change: {after['title']!r}"
+    assert after["leg"] != before["leg"], f"the mini-map legend title did not change: {after['leg']!r}"
+    assert abs(after["top"] - before["top"]) <= 2, \
+        f"the page scrolled {abs(after['top'] - before['top'])} px — this must be an update in place"
+    assert "ind=unemp" in cur_hash(page)
+    # in place means the map was never rebuilt
+    assert page.evaluate("window.__maps.length") == before["map"] == 1
+    assert not ERRORS, f"pageerror while updating in place: {ERRORS[:2]}"
+
+    # …and the same while the mini map is full screen (spec §5.2 item 4). The overlay covers the
+    # page's own toolbar, so the chips it needs come with it — [data-testid=minimap-chips].
+    page.click("[data-testid=minimap-full]")
+    page.wait_for_timeout(500)
+    assert page.evaluate("document.querySelector('[data-testid=minimap]').classList.contains('is-full')")
+    t1 = page.inner_text("[data-testid=minimap] .lgtitle")
+    chip = page.locator("[data-testid=minimap-chips] .chip[data-ind=renters]")
+    assert chip.count() == 1, "the full-screen map offers no way to choose another indicator"
+    chip.click()
+    page.wait_for_timeout(900)
+    assert page.evaluate("document.querySelector('[data-testid=minimap]').classList.contains('is-full')"), \
+        "picking an indicator dropped out of full screen"
+    assert page.inner_text("[data-testid=minimap] .lgtitle") != t1, "the full-screen map did not follow the pick"
+    assert "ind=renters" in cur_hash(page)
+    assert page.evaluate("window.__maps.length") == 1, "the map was rebuilt inside full screen"
+    page.keyboard.press("Escape")
+    page.wait_for_timeout(400)
+    assert not page.evaluate("document.querySelector('[data-testid=minimap]').classList.contains('is-full')")
+
+
+@ac("AC-P5", phase="P5", viewport="390x844")
+def ac_p5(page, base):
+    """At phone width the panel stacks above the map, each keeps its height, and nothing in the study
+    row is wider than the column it sits in (spec §6).
+
+    The page-level "no horizontal overflow at 390" of AC-R1 is the app shell's, not this row's: the
+    ≤900 px media query still gives the sidebar a full-width grid column, which is P8's rebuild. What
+    is checked here is that the study row adds none of its own. (A Leaflet container always reports
+    scrollWidth > clientWidth — it paints tiles past its edges — so the map is judged on its wrapper,
+    which clips them.)
+    """
+    goto(page, AREA, settle=2000, wait="#armap .leaflet-pane")
+    panel, mm = box_of(page, "[data-testid=chart-panel]"), box_of(page, "[data-testid=minimap]")
+    assert panel["y"] + panel["height"] <= mm["y"] + 2, "the panel is not above the map"
+    assert panel["height"] >= 300, f"the panel is {panel['height']:.0f} px tall, the spec wants 300"
+    assert mm["height"] >= 300, f"the mini map is {mm['height']:.0f} px tall, the spec wants 300"
+    over = page.evaluate("""() => {
+      const row = document.querySelector('[data-testid=study-row]');
+      const els = [row, ...row.children].filter(e => e.scrollWidth > e.clientWidth + 2);
+      return { bad: els.map(e => (e.dataset.testid || e.tagName) + ' ' + e.scrollWidth + '>' + e.clientWidth),
+               rowW: row.getBoundingClientRect().width,
+               hostW: document.getElementById('body').clientWidth }; }""")
+    assert not over["bad"], f"the study row or one of its two halves scrolls sideways: {over['bad']}"
+    assert over["rowW"] <= over["hostW"] + 2, \
+        f"the study row is {over['rowW']:.0f} px inside a {over['hostW']:.0f} px column"
+
+
+@ac("AC-H1", phase="P5")
+def ac_h1(page, base):
+    """On a postal-code page the tiles whose figure is the municipality's say so, and the ones with
+    a figure of their own do not (spec §4.7, §1 decision 7)."""
+    goto(page, "area/postnr/2450?ind=growth", settle=1500)
+    for key in ["rent_private", "unemp", "renters"]:
+        t = page.locator(f"[data-testid=tile-{key}]")
+        assert t.count() == 1, f"no tile for {key}"
+        cls = t.first.get_attribute("class") or ""
+        assert "inh" in cls.split(), f"tile-{key} is not marked inherited: class={cls!r}"
+        assert "municipality figure" in t.first.inner_text(), f"tile-{key} does not say whose figure it is"
+    own = page.locator("[data-testid=tile-growth]")
+    assert own.count() == 1
+    assert "inh" not in (own.first.get_attribute("class") or "").split(), "the area's own figure is marked inherited"
+    assert "municipality figure" not in own.first.inner_text()
+    # a lone ° is never the whole explanation any more (spec §1 decision 7)
+    assert "°" not in page.inner_text("[data-testid=tiles]")
+
+
+@ac("AC-H2", phase="P5")
+def ac_h2(page, base):
+    """A tile is a way of choosing an indicator: clicking it writes ind= and moves the picker."""
+    goto(page, AREA, settle=1500)
+    page.click("[data-testid=tile-unemp]")
+    page.wait_for_timeout(800)
+    assert "ind=unemp" in cur_hash(page), f"the tile did not write ind=unemp: {cur_hash(page)!r}"
+    btn = page.inner_text("[data-testid=ind-picker-btn]").strip()
+    assert btn.startswith("Unemployment"), f"the picker button says {btn!r}"
+    assert "on" in (page.get_attribute("[data-testid=tile-unemp]", "class") or "").split(), \
+        "the chosen tile is not marked active"
+
+
+@ac("AC-I5", phase="P5")
+def ac_i5(page, base):
+    """On a postal-code page the municipality's indicators are listed under one sub-heading in the
+    picker, each carrying the muni tag — never scattered through the twelve groups (spec §4.2)."""
+    goto(page, "area/postnr/2450?ind=growth", settle=1500)
+    page.click("[data-testid=ind-picker-btn]")
+    page.wait_for_timeout(300)
+    sec = page.locator('[data-testid=ind-picker-pop] [data-group="From the municipality"]')
+    assert sec.count() == 1, "there is no 'From the municipality' group on a postal-code page"
+    keys = page.evaluate("""() => [...document.querySelectorAll('[data-group="From the municipality"] .indrow')]
+        .map(r => ({ key: r.dataset.ind, tag: !!r.querySelector('.tag-muni') }))""")
+    assert keys, "the group is empty"
+    for r in keys:
+        assert r["tag"], f"row {r['key']!r} is in the municipality group without a .tag-muni"
+    inside = {r["key"] for r in keys}
+    for k in ["unemp", "rent_private", "renters"]:
+        assert k in inside, f"{k} is a municipality-level figure here but is not in the group"
+    # and an indicator the postal code publishes itself stays where it belongs
+    grp = page.evaluate("""() => { const r = document.querySelector('.indrow[data-ind=growth]');
+        return r ? r.closest('[data-group]').dataset.group : null; }""")
+    assert grp == "Demographics", f"growth is a postal-code figure but sits under {grp!r}"
+    page.keyboard.press("Escape")
+    page.wait_for_timeout(200)
+    # on a municipality page nothing is inherited, so the sub-heading is not there at all
+    goto(page, AREA, settle=1200)
+    page.click("[data-testid=ind-picker-btn]")
+    page.wait_for_timeout(300)
+    assert page.locator('[data-testid=ind-picker-pop] [data-group="From the municipality"]').count() == 0
+    page.keyboard.press("Escape")
+
+
+@ac("AC-E2", phase="P5")
+def ac_e2(page, base):
+    """An indicator published once has no trend to draw: the panel says so and puts the area on a
+    distribution strip against its peers instead (spec §4.10, §5.2)."""
+    goto(page, "area/kommune/101?ind=renters_bbr", settle=1800)
+    assert page.locator("[data-testid=chart-panel] [data-testid=state-nohistory]").count() == 1, \
+        "no state-nohistory in the panel"
+    assert page.locator("[data-testid=chart-panel] [data-testid=dist-strip]").count() == 1, \
+        "no distribution strip"
+    txt = page.inner_text("[data-testid=state-nohistory]")
+    assert "BBR" in txt, f"the state card does not name the as-of: {txt!r}"
+    # nothing is drawn as a trend
+    assert page.locator("[data-testid=chart-panel] svg.chart:not(.diststrip)").count() == 0, \
+        "a line chart was drawn for an indicator with no history"
+
+
+@ac("AC-MM1", phase="P5")
+def ac_mm1(page, base):
+    """The area page's mini map drags — 120 px of pointer moves its centre (spec §4.6)."""
+    goto(page, AREA, settle=1800, wait="#armap .leaflet-pane")
+    assert page.evaluate("LF.amap.dragging.enabled()"), "the mini map is not draggable"
+    before = map_center(page)
+    drag(page, "[data-testid=minimap] .leaflet-container", 120, 0)
+    after = map_center(page)
+    assert abs(after[0] - before[0]) + abs(after[1] - before[1]) > 1e-5, \
+        f"a 120 px drag did not move the centre: {before} → {after}"
+    # and it is still the same page: a drag or a zoom never changes the selection
+    assert cur_path(page) == "area/kommune/101", f"dragging navigated to {cur_hash(page)!r}"
+    page.evaluate("window.__maps[0].setZoom(11)")
+    page.wait_for_timeout(700)
+    assert cur_path(page) == "area/kommune/101" and page.evaluate("AR.code") == "101", \
+        "zooming the mini map changed the selection"
+
+
+@ac("AC-MM2", phase="P5")
+def ac_mm2(page, base):
+    """⤢ makes the mini map a full-screen overlay and Escape gives the page back (spec §4.6)."""
+    goto(page, AREA, settle=1800, wait="#armap .leaflet-pane")
+    small = box_of(page, "[data-testid=minimap]")
+    page.click("[data-testid=minimap-full]")
+    page.wait_for_timeout(600)
+    cls = page.get_attribute("[data-testid=minimap]", "class") or ""
+    assert "is-full" in cls.split(), f"⤢ did not put the map full screen: class={cls!r}"
+    full = box_of(page, "[data-testid=minimap]")
+    vw, vh = page.evaluate("[window.innerWidth, window.innerHeight]")
+    assert full["width"] >= vw * 0.9 and full["height"] >= vh * 0.9, \
+        f"full screen is {full['width']:.0f}×{full['height']:.0f} of {vw}×{vh}"
+    # the map itself was told about its new size, not just the box around it
+    size = page.evaluate("() => { const s = LF.amap.getSize(); return [s.x, s.y]; }")
+    assert size[0] >= vw * 0.9 and size[1] >= vh * 0.9, f"invalidateSize() did not run: map is {size}"
+    page.keyboard.press("Escape")
+    page.wait_for_timeout(600)
+    back = box_of(page, "[data-testid=minimap]")
+    assert "is-full" not in (page.get_attribute("[data-testid=minimap]", "class") or "").split()
+    assert abs(back["width"] - small["width"]) <= 2, f"Escape did not restore the box: {back['width']} vs {small['width']}"
+
+
+@ac("AC-R2", phase="P5", viewport="1366x768")
+def ac_r2(page, base):
+    """At 1366×768 the chart | map row starts inside the first screen — the header, the tiles and one
+    toolbar row are all that may come before it (spec §6)."""
+    goto(page, AREA, settle=1800, wait="#armap .leaflet-pane")
+    row = box_of(page, "[data-testid=study-row]")
+    assert row["y"] < 768, f"the study row starts {row['y']:.0f} px down, below the fold"
+    assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth + 2"), \
+        "the area page scrolls sideways at 1366"
 
 
 # ---------------------------------------------------------------------------------------------

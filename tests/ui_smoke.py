@@ -98,11 +98,17 @@ ROUTES = [
     dict(id="map_micro",      hash="map/101?ind=growth&micro=1&mind=rented_pct", land=["#lfmap", "#mindsel"], state="microMode()"),
     # the pin's radius filter moved into Layers ▾, where it only appears when there is a pin (P4)
     dict(id="map_pin",        hash="map?ind=growth&pin=55.64250,12.53850&pl=Sydhavn&rad=1000", land=["#lfmap", "[data-layer=radius]"], state="TP.lat!=null && TP.rad===1000"),
-    # --- area pages ---
-    dict(id="area_kommune",   hash="area/kommune/101?ind=growth",            land=[".arhead h2!", "#armap .leaflet-pane", "#arlegend!", ".hero"], state="S.view==='area' && !!LF.amap && window.__maps.length===1"),
-    dict(id="area_postnr",    hash="area/postnr/2450?ind=growth",            land=[".arhead h2!", "#armap"], state="AR.type==='postnr'"),
-    dict(id="area_kvarter",   hash="area/kvarter/20602?ind=growth",          land=[".arhead h2!", "#armap"], state="AR.type==='kvarter'"),
-    dict(id="area_aarhus",    hash="area/kommune/751?ind=unemp&t=bbr",       land=[".arhead h2!"], state="AR.code==='751'"),
+    # --- area pages (v3.0 P5: header → tiles → picker → study row → four <details>) ---
+    dict(id="area_kommune",   hash="area/kommune/101?ind=growth",            land=[".arhead h2!", "#armap .leaflet-pane", "#arlegend!", "[data-testid=tiles]!", "[data-testid=study-row]!", "[data-testid=chart-panel]!", "[data-testid=minimap]!", "[data-testid=minimap-full]", "[data-testid=ind-picker-btn]!", "[data-testid=ind-chips]!", "[data-testid=sec-figures]!", "[data-testid=sec-info]!"], state="S.view==='area' && !!LF.amap && window.__maps.length===1 && LF.amap.dragging.enabled() && document.querySelector('[data-testid=sec-outlook]').open"),
+    dict(id="area_postnr",    hash="area/postnr/2450?ind=growth",            land=[".arhead h2!", "#armap", "[data-testid=study-row]!", "[data-testid=tile-unemp].inh"], state="AR.type==='postnr' && !document.querySelector('[data-testid=sec-outlook]')"),
+    dict(id="area_kvarter",   hash="area/kvarter/20602?ind=growth",          land=[".arhead h2!", "#armap", "[data-testid=chart-panel]!"], state="AR.type==='kvarter'"),
+    # the four quarters where KK and BBR disagree by more than 15 pp get the ENG_BRIEF §3.4 caveat
+    dict(id="area_kvarter_gap", hash="area/kvarter/20504?show=figures",      land=["[data-testid=sec-figures][open]", "[data-testid=newstock-note]!"], state="AR.code==='20504' && AR.show.has('figures')"),
+    dict(id="area_snapshot",  hash="area/kommune/101?ind=renters_bbr",       land=["[data-testid=state-nohistory]!", "[data-testid=dist-strip]"], state="curInd().key==='renters_bbr'"),
+    dict(id="area_clim",      hash="area/kommune/101?ind=surge_dw_pct&hz=2070", land=["[data-testid=clim-bars]", "[data-testid=period-hz]!"], state="HZ.h==='2070' && curInd().key==='surge_dw_pct'"),
+    dict(id="area_outlook",   hash="area/kommune/101?ind=fc_growth",         land=["[data-testid=outlook-chart]!", "[data-testid=period-proj]!"], state="curInd().key==='fc_growth'"),
+    # the v2.6 lower tab bar and tile groups became one show= key — the old link still opens the table
+    dict(id="area_aarhus",    hash="area/kommune/751?ind=unemp&t=bbr&g=Rents", land=[".arhead h2!", "[data-testid=sec-figures][open]"], state="AR.code==='751'", redirect="area/kommune/751?ind=unemp&show=figures"),
     # --- Data section (v3.0 spellings) ---
     # `redirect` = the hash the app must end up on. A route with one is a redirect test: the OLD
     # spellings below never leave this list, they are how a link shared from v2.6 stays alive.

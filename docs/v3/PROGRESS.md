@@ -448,3 +448,132 @@ still only move the camera). All registered in `tests/ui_ac.py` under `phase="P4
   toolbar vocabulary; the area page has no feature layers, so it needs the picker and period only.
 - **The top bar has an actions slot now** (`pageActions()` in `renderTop()`, `.hd-act`). P7's
   `Export ▾` on the Data header and P5's page-level buttons belong there rather than in a card head.
+
+---
+
+## P5 — The area page rebuilt around the study row
+
+Commit: `v3.0 P5: area page rebuilt around the study row`
+Gate: green — build, 88 node tests (83 + 5 new picker/route tests), 42 python tests, 141/141
+route×viewport smoke checks with **0 JS errors**, 42/42 acceptance criteria (3 P1 + 8 P2 + 9 P3 +
+10 P4 + 12 P5), budgets (app.js 407 KB / 450 KB, style.css 136 KB / 140 KB).
+
+### What was built
+
+**1. The page is four things in a column** (spec §5.2): `#artop` (header card — title, pills,
+`Show on map` · `↗ Chart` · `Buildings ›` — the five headline tiles, then one toolbar row
+`[Indicator ▾][Period]` with the chips under it), the **study row**, and `#arsecs` (four
+`<details>`). The v2.6 **KEY FIGURES** block (12 group segments × a tile grid), the separate
+**Trend** and **Neighbours** cards and the lower tab bar are deleted, with `AR.group`, `AR.tab`,
+`tileSpark()`, `outlookCard()`'s card wrapper and the `data-argroup` / `data-artab` / `data-arind`
+handlers. Area-page ids are now the picker's own `data-ind`, so a tile, a table row and a chip are
+one control.
+
+**2. HeadlineTiles** (`headlineHtml()` → `data-testid=tiles`, one `tile-<key>` per tile, §4.7):
+mono label, the figure, `Δ y/y · #n of N` under it, 84 px, a real `<button>`. A tile whose figure is
+the municipality's gets `.inh`, the inherited palette and the words **municipality figure** instead
+of a rank — never a lone `°` (§1 decision 7). A projection tile carries a `Projection` pill. The
+component is shared: the test property's header and the map's pin popup render the same tiles
+(the popup passes `{bare:true}`, so there is one `[data-testid=tiles]` per page, not one per marker).
+
+**3. `studyRow(entity, opts)`** — the reusable component the phase file asks for, and what P6 points
+at the pin's finest area. It reads nothing off `AR` or the hash: `opts` carries `gap`, `mapId`,
+`legendId`, `mapKey` and the one-line `note` over the map.
+- **`chartPanel(e, opts)`** (`chart-panel`): a heading that names the indicator (`panel-title`), one
+  headline row — value · Δ y/y · `#n of N` · vs median, plus a `Projection` / horizon pill and, on an
+  inherited figure, "København (municipality figure)" — then the body, then `source · table · as of ·
+  Verify ↗` and the definition. Four bodies: **History** (this area solid, its municipality solid,
+  the peer median dashed and, on a municipality page, Denmark's own national figure dashed),
+  **Snapshot** (`state-nohistory` + a `dist-strip`: one tick per peer with a figure, the median
+  marked, this area a labelled dot), **Outlook** (`outlook-chart`), **Climate** (`clim-bars`: three
+  horizon bars with the publisher's low–high whisker, the municipalities' median as a dashed tick,
+  and a `Climate sheet ›` link). Nothing is drawn between the horizons.
+- **`miniMap(opts)`** (`minimap`, §4.6): draggable, scroll zoom, `+ −` top-left, the legend inside,
+  the note along the top, and `⤢` (`minimap-full`) → a fixed overlay, `✕` or Esc to close,
+  `invalidateSize()` after each transition. The selected area keeps its 2 px outline; clicking a
+  neighbour opens its page; zooming never selects.
+
+**4. The indicator changes in place.** `pickInd()`, `climSetHz()` and the year select call
+`areaRefresh()` before falling back to `renderKeep()`. It replaces `#artop`, the chart panel and
+`#arsecs`, and repaints the polygons through the new **`arMapPaint(fit)`** on the map that is
+already there — so the scroll position, the reader's pan and zoom and the full-screen overlay all
+survive (AC-P4). `arMapInit()` now only builds the map and calls `arMapPaint(true)` once.
+
+**5. Four toggles, one URL key.** `sec-outlook` · `sec-figures` · `sec-sub` · `sec-info`, open state
+in `show=` (`none` when the reader closed everything). Default: municipality → `outlook` open,
+postal code and quarter → nothing. *All figures* is the full indicator table (§4.8: inherited rows
+`.inh` + a `muni` tag instead of `°`, projection rows a pill, the active row `.hi.on`) with the BBR
+housing-stock distributions, and on a quarter page the Safety survey and the KK-vs-DST forecast note,
+as sub-headings under it.
+
+**6. The picker groups inherited indicators.** `picker_core.groupedLevel(list, order, isInherited)`
+(new, pure, 4 node tests) puts every row whose figure is the municipality's under one **From the
+municipality** sub-heading at the end; the popover's rows now live *inside* their `[data-group]`
+container so the group can be hidden with them (AC-I5). The area page is the fourth route on the
+shared picker (`PICKER_ROUTES` in `tests/ui_ac.py`).
+
+**7. The KK vs BBR "built 2010+" gap** (ENG_BRIEF §3.4) is surfaced on the four Copenhagen quarters
+where the two shares differ by more than 15 pp: the two rows are renamed (`indLabel()` →
+"Dwellings commissioned 2010+ (KK, dwelling)" / "Dwellings in buildings built 2010+ (BBR, building
+year)") and a one-line caveat (`data-testid=newstock-note`) says the first counts the dwelling's
+commissioning year and the second the building's construction year. **Labels only — no data change.**
+
+**8. `route_core.areaTabs()`** turns the v2.6 `t=` / `g=` into `show=` (idempotent, 2 new node
+tests), so `#area/kommune/751?ind=unemp&t=bbr` still lands on the indicator table.
+
+**9. Two smaller fixes that fell out of the rebuild.** `ePeers(e, key)` / `ePeerLabel(e, key)` name
+the pool a figure belongs to — the page's own level, or the municipalities when the value on screen
+is the municipality's — and `tileStats()`, `areaChart()` and the distribution strip all compare
+against it, so an inherited figure is no longer measured against 606 postal codes that do not
+publish it. And `tests/ui_ac.py`'s `goto(..., wait=…)` waits for `state="attached"` like
+`tests/ui_smoke.py` does: a Leaflet pane has no size, so the default "visible" wait burned its full
+15 s on every map AC and then passed anyway (~90 s a run).
+
+### ACs delivered
+AC-P1, AC-P2, AC-P3, AC-P4, AC-P5, AC-H1, AC-H2, AC-I5, AC-E2, AC-MM1, AC-MM2, AC-R2 — all MUST,
+all registered in `tests/ui_ac.py` under `phase="P5"`. AC-I1 and AC-I4 (P3) now also run on
+`#area/kommune/101`.
+
+### Deviations
+- **AC-P5 is asserted on the study row, not on the page.** Horizontal overflow at 390 px is the
+  v2.6 shell defect P8 owns; the row and its two halves are checked against the column they sit in.
+  See `DECISIONS.md` — a Leaflet container always reports `scrollWidth > clientWidth`.
+- **The full-screen overlay is `z-index:1400`, not §4.6's `100`** — the picker is 1200 — and it
+  carries its own chips row (`minimap-chips`), because it covers the page's toolbar and the phase
+  file requires an indicator change to work while the map is full screen.
+- **The BBR distributions are a sub-heading of All figures**, not a fifth toggle: §5.2 lists four.
+- **The header actions stay in the header card**, where §5.2 draws them, rather than in the top
+  bar's actions slot P4 introduced.
+- The history line gained a fourth series (Denmark's own national figure) on municipality pages;
+  §5.2 asks for "Denmark (dashed green, municipalities only)" beside the peer median, and the two
+  are different things, so the legend names both.
+
+### Known issues / open items
+- Horizontal overflow at 390 px is still a note on every route (v2.6 defect); **P8 flips
+  `OVERFLOW_FATAL = True` in `tests/ui_smoke.py`**. At 390 the area page's column is ~232 px wide
+  because the ≤900 px media query gives the sidebar a full-width grid column — everything in the
+  study row is laid out correctly inside that column, it is the column that is wrong.
+- `style.css` is at 136 KB of the 140 KB budget. P6–P9 have ~4 KB; the v2.6 Finnish-commented
+  legacy block (lines 76–1110, mostly unused by the DK app) is where a daytime clean-up would find
+  room.
+- The KK vs BBR gap and the surge keys' horizon-in-the-`desc` are both still data tasks.
+
+### What the next phase must know
+- **`studyRow(entity, opts)` is P6's.** Hand it `tpEntity(r)` (the pin's quarter → postal code →
+  municipality) and `{ mapId: "anmap", legendId: "anlegend", mapKey: "anmap", note: … }`. The map
+  key must be in `LF_MAPS`; `data-mapkey` on the wrapper is how `mmFull()` finds the instance to
+  call `invalidateSize()` on. Do **not** write a second chart panel.
+- **`headlineHtml(e)` is the §4.7 tile component** and already emits `tile-<key>` + `data-ind`, so
+  AC-TP3 ("clicking `tile-unemp` sets `ind=unemp` and changes the mini-map legend title") is a
+  matter of wiring the test property's own refresh, not of new markup. `{bare:true}` leaves the test
+  id off for a copy inside a popup.
+- **An in-place update is `areaRefresh()`-shaped**: replace the parts, never the map. P6 wants the
+  same for the test property — the pattern is one `#<id>` per region of the page plus
+  `arMapPaint()`-style repainting, and `UI.mmFull` already survives it.
+- **`AR.show` / `show=`** is the fold-state pattern for §5.5′'s `tp-sec-<name>` sections: one
+  `AR_SECS`-style list, a `<details data-sec=…>` per section, one branch in the `toggle` listener,
+  one `arShowParts()`-style serialiser in `hashFor()`.
+- `pickInherits(i, level)` + `PC.groupedLevel()` is the whole of "From the municipality" — a view
+  that shows a finer level than the figure gets it for free once `pickLevel()` knows the level.
+- `srcNoteBody(extra)` is the source catalogue without the `<details>` around it; `srcNote()` is
+  still the wrapped version every other view uses.

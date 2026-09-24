@@ -31,6 +31,11 @@ const GROUP_PILL = { Outlook: "Projection", Climate: "Horizon" };
 
 const groupOf = i => (i && i.group) || OTHER;
 
+/* Inherited values are visibly inherited (spec §1 decision 7): on a postal-code or quarter page the
+   indicators whose figure is the municipality's are listed under one sub-heading at the end of the
+   popover rather than scattered, dimmed, through the twelve groups. */
+const MUNI_GROUP = "From the municipality";
+
 /* [{name, pill, inds}] in GROUP_ORDER, groups with no indicator left out, "Other" last. */
 function grouped(list, order) {
   const L = list || [], ord = order || GROUP_ORDER;
@@ -42,6 +47,19 @@ function grouped(list, order) {
     pill: GROUP_PILL[name] || "",
     inds: L.filter(i => name === OTHER ? !known(i) : groupOf(i) === name),
   }));
+}
+
+/* grouped(), plus the "From the municipality" sub-heading for the rows whose figure is inherited at
+   the level on screen (spec §4.2, AC-I5). `isInherited(i)` is the caller's level test — picker_core
+   knows nothing about which view is on screen. Without it this is exactly grouped(). */
+function groupedLevel(list, order, isInherited) {
+  const L = list || [];
+  if (typeof isInherited !== "function") return grouped(L, order);
+  const inh = L.filter(i => isInherited(i));
+  if (!inh.length) return grouped(L, order);
+  const gs = grouped(L.filter(i => !isInherited(i)), order);
+  gs.push({ name: MUNI_GROUP, pill: "", inds: inh });
+  return gs;
 }
 
 /* ---------- search ---------- */
@@ -92,8 +110,8 @@ function step(cur, delta, n) {
   return Math.max(0, Math.min(n - 1, c + delta));
 }
 
-const API = { GROUP_ORDER, GROUP_PILL, OTHER, PERIOD_KEY, groupOf, grouped, matches, filter,
-              periodMode, availTag, step };
+const API = { GROUP_ORDER, GROUP_PILL, OTHER, MUNI_GROUP, PERIOD_KEY, groupOf, grouped, groupedLevel,
+              matches, filter, periodMode, availTag, step };
 if (typeof window !== "undefined") window.PICKER_CORE = API;
 if (typeof module !== "undefined" && module.exports) module.exports = API;
 
