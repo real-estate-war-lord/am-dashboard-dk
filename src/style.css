@@ -1462,7 +1462,7 @@ th .thn{display:inline}
 .maplegend .pubtog.off{opacity:.38;text-decoration:line-through}
 .maplegend .only{font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-left:auto;padding-left:6px;cursor:pointer}
 .maplegend .only:hover{color:var(--ink);text-decoration:underline}
-.maplegend .lgrow.gk .pubtog{display:inline-flex;align-items:center;gap:4px}
+.maplegend .lgrow.gk .pubtog,.maplegend .lgrow.gk>span{display:inline-flex;align-items:center;gap:4px}
 /* every category stays listed, so an off one needs a way back: greyed, struck through, hollow swatch */
 .maplegend .lgrow.gk.allhidden{color:var(--ink);margin-top:5px;white-space:normal;line-height:1.35}
 .maplegend .lgrow.gk.allhidden .only{margin-left:0;padding-left:0;color:var(--ink);text-decoration:underline}
@@ -1829,4 +1829,129 @@ table[data-testid=sources-table] code{font-family:var(--mono);font-size:10px}
   .indpop{width:calc(100vw - 32px);max-width:calc(100vw - 32px)}
   .indrow .ir-d{display:none}
   .indrow .ir-t{flex-basis:48px}
+}
+
+/* ================= v3.0 P4 — Map: Layers ▾, unified search, legend stack (spec §4.4, §4.5, §5.1) ===
+   The map toolbar was five overlay buttons, two search boxes, two jump buttons, a privacy paragraph
+   and a full-screen button across three rows. It is one row now:
+     [search] [Layers ▾] [Indicator ▾] [Period]   + the drilled-state segments
+   with the chips under it and the info strip under that, which is what puts the map inside the first
+   screen at 1366×768 (AC-S3). Full screen moved to the top bar, the overlay toggles and their
+   category filters into the Layers popover, the jumps into the search dropdown, and the privacy
+   sentence into the search box's "?" tooltip. */
+
+/* the top bar carries page-level actions on its right */
+#hd{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--s3)}
+#hd .crumbs{flex:1 1 auto;min-width:0}
+.hd-act{display:flex;align-items:center;gap:var(--s2);flex:0 0 auto;padding-bottom:2px}
+
+/* the toolbar's two rows */
+#mapcard .tools{display:flex;flex-direction:column;align-items:stretch;gap:6px;max-width:100%}
+.trow{display:flex;align-items:center;gap:var(--s2);flex-wrap:wrap;min-width:0}
+.trow.chiprow:empty{display:none}
+/* the info strip is one line on the map, where every pixel above the fold belongs to the map */
+#mapcard details.indx{margin-bottom:8px}
+#mapcard details.indx>summary{padding:5px 12px;font-size:12px}
+#mapcard details.indx>summary b{font-size:13px}
+#mapcard .card-head.tools-only{margin-bottom:8px}
+
+/* ---- the unified search: one combobox for an area and for a location (spec §5.1) ---- */
+.asrch{position:relative;z-index:1210;display:inline-flex;align-items:center;gap:4px;min-width:0}
+/* an input, not a select: no chevron, a text caret, and room for a magnifier instead */
+.asrch input{min-width:min(320px,34vw);min-height:var(--ctl-h);cursor:text;font-size:11.5px;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12'><circle cx='5' cy='5' r='4' fill='none' stroke='%238A8C81' stroke-width='1.4'/><path d='M8 8l3.5 3.5' stroke='%238A8C81' stroke-width='1.4' stroke-linecap='round'/></svg>");
+  background-position:left 9px center;padding:5px 10px 5px 26px}
+.asrch input::-webkit-search-cancel-button{cursor:pointer}
+.asrchpop{position:absolute;top:calc(100% + 6px);left:0;width:min(440px,86vw);max-height:60vh;overflow-y:auto;
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 14px 40px rgba(20,28,24,.18);padding:4px 0}
+.asrchpop[hidden]{display:none}
+.as-jump{display:flex;align-items:center;gap:6px;padding:7px 12px 6px;border-bottom:1px solid var(--line);
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.as-jump button{appearance:none;border:1px solid var(--line);background:var(--panel2);border-radius:999px;
+  padding:2px 10px;cursor:pointer;font-family:var(--mono);font-size:10px;letter-spacing:.04em;text-transform:none;color:var(--ink2)}
+.as-jump button:hover{border-color:var(--ink);color:var(--ink)}
+.as-jump i{font-style:normal;color:var(--line2)}
+.as-row{display:flex;align-items:baseline;gap:8px;width:100%;padding:5px 12px 6px;border:0;background:none;
+  cursor:pointer;text-align:left;font-family:var(--body);font-size:13px;color:var(--ink)}
+.as-row:hover,.as-row.act{background:var(--panel2)}
+.as-row b{font-weight:500;white-space:nowrap}
+.as-row span{font-family:var(--mono);font-size:9.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.as-row.as-coord b{color:var(--k1)}
+.as-hint{padding:9px 12px 10px;font-family:var(--mono);font-size:10px;line-height:1.45;color:var(--cap-ink)}
+.as-hint b{font-weight:500;color:var(--ink2)}
+
+/* ---- Layers ▾ (spec §4.4) ---- */
+.layers{position:relative;z-index:1205;display:inline-flex}
+.lay-btn{display:inline-flex;align-items:center;gap:6px;min-height:var(--ctl-h);padding:5px 10px;
+  border:1px solid var(--line);border-radius:8px;background:var(--panel2);cursor:pointer;
+  font-family:var(--body);font-size:13px;color:var(--ink);white-space:nowrap}
+.lay-btn:hover{border-color:var(--ink)}
+.lay-btn:focus-visible{outline:none;box-shadow:var(--focus-ring);border-color:var(--ink)}
+.layers.open .lay-btn{border-color:var(--ink);background:var(--panel)}
+.lay-btn .lay-n{font-family:var(--mono);font-size:10.5px;font-weight:500;color:var(--k1)}
+.lay-btn em{font-style:normal;color:var(--muted);font-size:10px}
+.laypop{position:absolute;top:calc(100% + 6px);left:0;width:min(400px,88vw);max-height:70vh;overflow-y:auto;
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 14px 40px rgba(20,28,24,.18);padding:2px 0 6px}
+.laypop[hidden]{display:none}
+.lay-h{padding:9px 12px 3px;font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--muted)}
+.layrow{padding:1px 0 3px}
+.layrow.on{background:var(--inh-bg)}
+.laytog{display:flex;align-items:baseline;gap:8px;width:100%;padding:5px 12px 5px 10px;border:0;background:none;
+  cursor:pointer;text-align:left;font-family:var(--body);font-size:13px;color:var(--ink)}
+.laytog:hover{background:var(--panel2)}
+.laytog:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+.laytog b{font-weight:500;white-space:nowrap}
+.laytog span{font-family:var(--mono);font-size:9.5px;color:var(--muted);margin-left:auto;text-align:right;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.laybox{flex:0 0 14px;width:14px;height:14px;align-self:center;border:1px solid var(--line2);border-radius:3px;
+  background:var(--panel);font-style:normal;font-size:10px;line-height:13px;text-align:center;color:#fff}
+.layrow.on .laybox{background:var(--ink);border-color:var(--ink)}
+.laynote{margin:0;padding:0 12px 4px 32px;font-family:var(--mono);font-size:9.5px;line-height:1.4;color:var(--cap-ink)}
+.layfil{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:2px 12px 6px 32px}
+.layf{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:999px;
+  padding:2px 9px;background:var(--panel2);cursor:pointer;font-family:var(--mono);font-size:10px;color:var(--ink2)}
+.layf:hover{border-color:var(--ink);color:var(--ink)}
+.layf:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+.layf.off{opacity:.5;text-decoration:line-through}
+.layf.all{border-color:var(--ink);color:var(--ink)}
+.layf i{width:9px;height:9px;flex:0 0 9px;border-radius:50%}
+.layf em{font-style:normal;font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:#B07A1E}
+.layf-sep{flex:0 0 1px;align-self:stretch;min-height:16px;background:var(--line);margin:1px 3px}
+
+/* ---- the drilled municipality card, now collapsible (spec §5.1) ----
+   The summary is the line the reader needs to see: who this is and its five headline figures. The
+   projects / public / climate / outlook blocks and the two page links open on click. */
+details.mstrip{display:block;padding:0;align-items:stretch}
+details.mstrip>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:8px 14px}
+details.mstrip>summary::-webkit-details-marker{display:none}
+details.mstrip>summary:hover{background:var(--panel)}
+details.mstrip .mstrip-more{font-style:normal;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted);white-space:nowrap}
+details.mstrip>summary:hover .mstrip-more{color:var(--ink)}
+details.mstrip .mstrip-more::before{content:"▸ "}
+details.mstrip[open]>summary .mstrip-more::before{content:"▾ "}
+details.mstrip .mstrip-body{padding:2px 14px 11px;border-top:1px solid var(--line)}
+details.mstrip .mstrip-body>.upcoming:first-child{margin-top:8px}
+details.mstrip .mstrip-act{margin-top:10px}
+
+/* ---- the legend stack (spec §4.5, AC-LG1) ----
+   Bottom-right, newest on top (column-reverse over the DOM order indicator → zones → infra →
+   public → services), 8 px apart so two cards can never overlap. The stack is capped at 60 % of the
+   map's height and wraps into a second column (wrap-reverse keeps the indicator legend in the
+   corner); lgFit() folds the topmost feature legend to its title if even that is not enough. */
+#maplegs{top:auto;bottom:12px;right:12px;left:auto;flex-flow:column-reverse wrap-reverse;align-items:flex-end;
+  align-content:flex-start;gap:var(--s2);max-height:60%;max-width:calc(100% - 24px);overflow:visible;pointer-events:none}
+#maplegs .maplegend{pointer-events:none;max-width:220px}
+/* a key plus a "zoom in" state can be wider than the card: let the state drop to its own line
+   rather than run out through the right edge (the text itself still never breaks mid-word) */
+#maplegs .maplegend .lgrow{flex-wrap:wrap}
+/* only the fold control takes a click now — the filters that used to live in here moved to Layers ▾ */
+#maplegs .maplegend .lgtitle[data-legfold]{pointer-events:auto}
+.maplegend.afold .lgtitle{margin-bottom:0}
+.maplegend.afold .lgrow,.maplegend.afold .lgnote,.maplegend.afold .lgsub,.maplegend.afold .lgtitle span{display:none}
+.maplegend.afold .lgtitle[data-legfold]::after{content:"+"}
+@media (max-width:900px){
+  #maplegs{left:12px;right:12px;align-items:stretch;max-height:46%}
+  #maplegs .maplegend{max-width:none}
 }

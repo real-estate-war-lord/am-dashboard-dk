@@ -342,3 +342,109 @@ is P5's, as the phase file says.
 - **If a gate ever fails on every route at once, read the first line of the smoke output.** It now
   says which dashboard the URL was serving. `our_url()` recovers by serving `dist/` itself, so a
   phase should never go red for someone else's server again.
+
+---
+
+## P4 — Map: Climate as an indicator family, Layers ▾, the unified search, the legend stack
+
+Commit: `v3.0 P4: Climate as an indicator, Layers menu, unified search, one-row map toolbar`
+Gate: green — build, 83 node tests, 42 python tests, 129/129 route×viewport smoke checks with **0 JS
+errors**, 30/30 acceptance criteria (3 from P1 + 8 from P2 + 9 from P3 + 10 from P4), budgets
+(app.js 387 KB / 450 KB, style.css 130 KB / 140 KB).
+
+### What was built
+
+**1. Climate is an indicator family, not an overlay** (spec §1 decision 3). `MK.clim`, the
+`Climate risk` toolbar button, the `climate=1` key, the `clim=` filter and the floating filter card
+are gone. `climOn()` is now `CLIM && S.view === "makro" && isClim(MK.ind) && MK.zones`: choosing any
+Climate indicator draws the official risk areas plus the storm-surge extent for the active horizon
+(zoom ≥ 10 for the zones) as a **context layer** under the fill, with its own keys-only legend card
+(`data-testid=legend-zones`) and one `[data-layer=zones]` row in the Layers menu to hide it
+(`zones=0`). A non-Climate indicator has neither. `#map?…&climate=1` redirects to
+`ind=surge_dw_pct` through `route_core` (P2's `keepClimateFlag` option, its app.js call site and its
+node test are deleted, as P2 said this phase would do). The Climate chip stays in the chips row.
+
+**2. `Layers ▾`** (`layersMenu()`, `data-testid=layers-btn` / `layers-pop`, count badge
+`Layers · n`). Feature layers = Infra projects · Public buildings · Services, each with the
+category / kind filters that used to live inside its floating legend (`data-pubcat`, `data-pubkind`,
+`data-srvcat`, `data-srvmode` and the `All` resets keep their handlers, they just moved). Context =
+the Climate zones (only while a Climate indicator is) and the test-property radius (only while there
+is a pin); `D.portfolio`'s "Own properties" toggle moved here too. `MAP_LAYERS` is the one list;
+`mapLayerToggle()` the one handler. The menu survives a re-render (`UI.layOpen`) so two ticks need
+one trip to the button, and closes on Esc, on an outside click and on any navigation.
+
+**3. One URL key for the layers.** `lay=infra,public,services`, written by `hashFor()` and read by
+`parseHash()`. The v2.6 flags are converted in `route_core.layerFlags()` (idempotent, 8 new node
+tests) — so old links keep working and there is still one serialiser.
+
+**4. The toolbar is one row** (`mkTools()` → `[data-row=1]` and `[data-row=2]`):
+`[search][Layers ▾][Indicator ▾][Period]` plus the drilled-state segments, chips below, info strip
+below that. Full screen moved to the top bar right (`pageActions()` in `renderTop()`,
+`data-testid=map-full`). The paste box, the privacy paragraph, the two jump buttons and the four
+overlay buttons all left. **Map top at 1366×768: 186 px** (was ~330), height 518 px.
+
+**5. The unified search** (`data-testid=search`) is a real combobox, not a `<datalist>`: municipality
+/ postal code / quarter by name or code **and** Google Maps links or `lat, lon` through the same
+`parseLocation()` the test property uses. A location produces a `search-coord` row — "Open as test
+property" → `#property?p=…`. "Jump to: Denmark · Copenhagen" sits at the top of the dropdown and only
+moves the camera (the C / D shortcuts are unchanged). ↑ ↓ move, Enter takes the highlighted row or
+the first one, Esc closes. The privacy sentence is the `?` tooltip on the box.
+
+**6. The legend stack** (`#maplegs`, spec §4.5). All five legends are now one bottom-right stack:
+indicator (`legend`), zones (`legend-zones`), infra / public / services (`legend-*`). They are
+**keys only** — every filter moved to the Layers menu — and a legend container is rendered only for a
+live layer. `lgFit()` keeps the stack inside the map, inside 60 % of its height and at most two
+cards wide, folding the topmost feature legend to its title when it has to (AC-LG1).
+
+**7. The drilled municipality card is collapsible** (spec §5.1), closed by default, state in
+`localStorage.mstrip`. The identity line and the five headline figures stay in the summary.
+
+**8. Outlook draws in purple** (`RAMP_GROUP` in `mkShade()`, AC-M4) — on the map, in Charts and on
+the area page alike. Climate was already blue.
+
+### ACs delivered
+AC-L1, AC-L2, AC-L3, AC-LG1, AC-M1, AC-M2, AC-M3 (read `#properties` as `#property`, amendment A2),
+AC-M4, AC-S3 — all MUST — plus the phase-local **AC-P4SR** (the jumps moved into the dropdown and
+still only move the camera). All registered in `tests/ui_ac.py` under `phase="P4"`.
+
+### Deviations
+- **The Outlook ramp is two purples, not one** — every Outlook indicator is `scale: diverging`, so a
+  single hue would throw the sign of the projection away. See `DECISIONS.md`.
+- **`clim=` is deleted rather than kept**: the risk areas and the surge extent are one context layer
+  with one switch now. An old link carrying `clim=areas` shows both parts instead of one.
+- **AC-S3's drilled-state assertion is mine, not the spec's** (the AC only names `#map`). It asserts
+  the drilled map starts ≤ 320 px down with ≥ 300 px on the first screen; it is 302 px.
+- **AC-LG1 uses Aarhus, not Copenhagen** — see the limitation below.
+- `pubLegendHtml`'s `only` links and the `data-pubonly` handler are gone: shift-click on a category
+  in the Layers menu still isolates it, and "only" was a legend affordance.
+
+### Known issues / open items
+- **A Climate indicator does not survive drilling into Copenhagen in quarter mode.**
+  `data/processed/cph.json` carries no Climate keys, so `curInds()` swaps the indicator (and with it
+  the zones) on `#map/101`. v2.6 behaviour, surfaced not fixed — it needs quarter-level climate
+  figures in the build. Daytime data task, logged in `DECISIONS.md`.
+- Horizontal overflow at 390 px is still a note on every route (v2.6 defect); **P8 flips
+  `OVERFLOW_FATAL = True`**. The new popovers are width-capped to the viewport and do not add to it.
+- `mkRefreshTools()` still rebuilds the toolbar's innerHTML on the zoom ladder, so a zoom closes an
+  open search dropdown (the Layers menu survives it — `UI.layOpen` is re-rendered open).
+- The Layers menu's feature rows are switches, not links: there is no "open this layer's list" from
+  the menu. The card segments (`data-publist`) are still the way into the public-building list.
+
+### What the next phase must know
+- **`climOn()` is the one test for "are the zones on screen"** and it is bound to the active
+  indicator. Anything that wants to draw or count zones outside the macro map (the test property,
+  the climate sheet) must not use it — they have their own state (`ANL.climate`, `CS.code`).
+- **`lay=` on the map and `lay=` on the test property mean different things** (`infra,public,services`
+  vs `infra,public,micro,climate`). `route_core.layerFlags()` only runs on the `map` head.
+- **`layersMenu()` is where a new map layer goes**: one entry in `MAP_LAYERS` (label, `on()`,
+  `avail()`, `sub()`, optional `filters()`), one branch in `mapLayerToggle()`, one legend container
+  in `vMakro()` and one id in `LG_FOLD_ORDER`. Do not add a toolbar button.
+- **The legend containers are conditional.** `setXLegend()` returns early when its box is not in the
+  DOM, so a layer that draws without its container gets no legend — render the container in
+  `vMakro()` in the same commit.
+- **`areaSearch()` / `asrchRows()` is the one search.** A new kind of result (an address, a project)
+  is a branch in `asrchRows()`, not a second box. `data-testid=search` is the input itself.
+- P5 (area page) and P6 (test property) inherit `indPicker` + `periodControl` + `layersMenu` as the
+  toolbar vocabulary; the area page has no feature layers, so it needs the picker and period only.
+- **The top bar has an actions slot now** (`pageActions()` in `renderTop()`, `.hd-act`). P7's
+  `Export ▾` on the Data header and P5's page-level buttons belong there rather than in a card head.

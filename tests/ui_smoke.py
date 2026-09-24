@@ -83,15 +83,21 @@ ROUTES = [
     # __maps === 1 everywhere a view owns a map: the lifecycle invariant of v3.0 P1 — one live
     # Leaflet instance at a time, the previous one dropped before #body is replaced.
     # the shared IndicatorPicker + PeriodControl replaced #indsel / the year select in v3.0 P3.
-    dict(id="map",            hash="map?ind=growth",                         land=["#lfmap .leaflet-pane", "#maplegend!", "[data-testid=ind-picker-btn]!", "[data-testid=ind-chips]!", "[data-testid=period-year]", "#nav"], state="S.view==='makro' && !!LF.map && window.__maps.length===1"),
+    # the v3.0 toolbar is one row: [search][Layers ▾][Indicator ▾][Period], chips under it (P4).
+    dict(id="map",            hash="map?ind=growth",                         land=["#lfmap .leaflet-pane", "[data-testid=legend]!", "[data-testid=search]", "[data-testid=layers-btn]!", "[data-testid=ind-picker-btn]!", "[data-testid=ind-chips]!", "[data-testid=period-year]", "[data-testid=map-full]", "#nav"], state="S.view==='makro' && !!LF.map && window.__maps.length===1 && document.querySelector('[data-testid=map-toolbar] [data-row]').children.length<=6"),
     dict(id="map_proj",       hash="map?ind=fc_growth",                      land=["#maplegend!", "[data-testid=period-proj]!"], state="curInd().key==='fc_growth' && !document.querySelector('[data-testid=period-year]')"),
     dict(id="map_muni",       hash="map/101?ind=growth",                     land=["#lfmap .leaflet-overlay-pane", "#mkstrip!"], state="MK.muni==='101' && !!LF.areaG"),
     dict(id="map_postnr",     hash="map/101/postnr?ind=renters",             land=["#lfmap"], state="MK.cphView==='postnr'"),
-    dict(id="map_overlays",   hash="map/101?ind=growth&infra=1&public=1&services=1", land=["#infralegend!", "#publiclegend!", "#serviceslegend!"], wait="#serviceslegend .lg-body, #serviceslegend *", state="MK.infra && MK.pub && MK.srv"),
-    dict(id="map_climate",    hash="map?ind=surge_dw_pct&hz=2070&climate=1", land=["#climatelegend!"], state="MK.clim && HZ.h==='2070' && curInd().key==='surge_dw_pct'"),
-    dict(id="map_climate_ind", hash="map?ind=sealevel_cm&hz=2120",           land=["#maplegend!"], state="curInd().key==='sealevel_cm' && HZ.h==='2120'"),
+    # the three feature layers are one `lay=` list now; the v2.6 flags redirect onto it (P4)
+    dict(id="map_layers",     hash="map/101?ind=growth&lay=infra,public,services", land=["[data-testid=legend-infra]!", "[data-testid=legend-public]!", "[data-testid=legend-services]!"], wait="#serviceslegend *", state="MK.infra && MK.pub && MK.srv"),
+    dict(id="map_overlays",   hash="map/101?ind=growth&infra=1&public=1&services=1", land=["#infralegend!", "#publiclegend!", "#serviceslegend!"], wait="#serviceslegend *", state="MK.infra && MK.pub && MK.srv", redirect="map/101?lay=infra,public,services"),
+    # Climate is an indicator family: `climate=1` becomes its indicator and the zones draw themselves
+    dict(id="map_climate",    hash="map?ind=surge_dw_pct&hz=2070&climate=1", land=["[data-testid=legend-zones]!"], state="HZ.h==='2070' && curInd().key==='surge_dw_pct' && MK.zones && climOn()", redirect="map?ind=surge_dw_pct&hz=2070"),
+    dict(id="map_climate_ind", hash="map?ind=sealevel_cm&hz=2120",           land=["#maplegend!", "[data-testid=legend-zones]!"], state="curInd().key==='sealevel_cm' && HZ.h==='2120'"),
+    dict(id="map_zones_off",  hash="map?ind=surge_dw_pct&zones=0",           land=["#maplegend!"], state="!MK.zones && !climOn() && !document.querySelector('[data-testid=legend-zones]')"),
     dict(id="map_micro",      hash="map/101?ind=growth&micro=1&mind=rented_pct", land=["#lfmap", "#mindsel"], state="microMode()"),
-    dict(id="map_pin",        hash="map?ind=growth&pin=55.64250,12.53850&pl=Sydhavn&rad=1000", land=["#lfmap"], state="TP.lat!=null && TP.rad===1000"),
+    # the pin's radius filter moved into Layers ▾, where it only appears when there is a pin (P4)
+    dict(id="map_pin",        hash="map?ind=growth&pin=55.64250,12.53850&pl=Sydhavn&rad=1000", land=["#lfmap", "[data-layer=radius]"], state="TP.lat!=null && TP.rad===1000"),
     # --- area pages ---
     dict(id="area_kommune",   hash="area/kommune/101?ind=growth",            land=[".arhead h2!", "#armap .leaflet-pane", "#arlegend!", ".hero"], state="S.view==='area' && !!LF.amap && window.__maps.length===1"),
     dict(id="area_postnr",    hash="area/postnr/2450?ind=growth",            land=[".arhead h2!", "#armap"], state="AR.type==='postnr'"),

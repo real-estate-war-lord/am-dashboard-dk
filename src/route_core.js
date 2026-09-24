@@ -134,16 +134,34 @@ function climateFlag(query, isClim) {
   return q;
 }
 
-/* old hash → the canonical v3 hash. Idempotent: toV3(toV3(h)) === toV3(h) for every h.
-   `opts.keepClimateFlag` leaves `climate=1` alone: the overlay is still a working toggle until the
-   phase that turns Climate into an indicator family lands, and converting it early would delete it. */
+/* The three map overlays became one `Layers ▾` menu (spec §4.4), so their three flags became one
+   comma list: `infra=1&public=1&services=1` → `lay=infra,public,services`. A link that already
+   spells `lay=` keeps what it names and the flags only add to it, so this stays idempotent. */
+const LAY_FLAGS = [["infra", "infra"], ["public", "public"], ["services", "services"]];
+function layerFlags(query) {
+  const q = Object.assign({}, query);
+  const on = String(q.lay == null ? "" : q.lay).split(",").filter(Boolean);
+  let had = false;
+  LAY_FLAGS.forEach(([flag, name]) => {
+    if (!Object.prototype.hasOwnProperty.call(q, flag)) return;
+    had = true;
+    if (q[flag] === "1" && on.indexOf(name) < 0) on.push(name);
+    delete q[flag];
+  });
+  if (!had) return q;
+  if (on.length) q.lay = on.join(",");
+  else delete q.lay;
+  return q;
+}
+
+/* old hash → the canonical v3 hash. Idempotent: toV3(toV3(h)) === toV3(h) for every h. */
 function toV3(hash, opts) {
   const o = opts || {};
   const { parts, query } = splitHash(hash);
   const head = parts[0] || "map";
   const fn = Object.prototype.hasOwnProperty.call(ALIASES, head) ? ALIASES[head] : null;
   if (fn) { const r = fn(parts, query); return buildHash(r.path, r.query); }
-  if (head === "map" && !o.keepClimateFlag) return buildHash(parts.join("/") || "map", climateFlag(query, o.isClim));
+  if (head === "map") return buildHash(parts.join("/") || "map", layerFlags(climateFlag(query, o.isClim)));
   return buildHash(parts.join("/") || "map", query);
 }
 
@@ -176,7 +194,7 @@ function toInternal(hash, opts) {
 }
 
 const API = { CLIM_FALLBACK_IND, ALIASES, splitHash, buildHash, parseLatLon, round5,
-              propParse, propSerialise, climateFlag, toV3, toInternal };
+              propParse, propSerialise, climateFlag, layerFlags, toV3, toInternal };
 if (typeof window !== "undefined") window.ROUTE_CORE = API;
 if (typeof module !== "undefined" && module.exports) module.exports = API;
 

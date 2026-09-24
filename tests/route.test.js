@@ -125,18 +125,31 @@ test("a bare Data link is spelled out in full — #data → #data/areas/kommune 
   assert.strictEqual(R.toV3("#data/areas/kvarter"), "data/areas/kvarter");
   ["projects", "national", "sources"].forEach(t => assert.strictEqual(R.toV3("#data/" + t), "data/" + t));
 });
-test("keepClimateFlag leaves climate=1 alone (the overlay is still a working toggle)", () => {
-  const o = { isClim, keepClimateFlag: true };
-  assert.strictEqual(R.toV3("#map?ind=growth&climate=1&clim=areas,surge", o), "map?ind=growth&climate=1&clim=areas,surge");
-  assert.strictEqual(R.toV3(R.toV3("#map?ind=growth&climate=1", o), o), "map?ind=growth&climate=1");
-  /* it changes nothing else: the Data and property aliases still fire */
-  assert.strictEqual(R.toV3("#table/postnr", o), "data/areas/postnr");
-  assert.strictEqual(R.toV3("#analysis?a=55.6545,12.539&la=T", o), "property?p=55.6545,12.539:T");
+test("the three overlay flags become one lay= list (spec §4.4)", () => {
+  assert.strictEqual(R.toV3("#map/101?ind=growth&infra=1&public=1&services=1"), "map/101?ind=growth&lay=infra,public,services");
+  assert.strictEqual(R.toV3("#map?ind=growth&public=1"), "map?ind=growth&lay=public");
+  /* a flag that is off drops out, and with nothing on the key is not written at all */
+  assert.strictEqual(R.toV3("#map?ind=growth&infra=0&public=0"), "map?ind=growth");
+  /* a link that already names lay= keeps it; the flags only add */
+  assert.strictEqual(R.toV3("#map?lay=services&infra=1"), "map?lay=services,infra");
+  assert.strictEqual(R.toV3("#map?lay=infra,public"), "map?lay=infra,public");
+  /* the sub-filters ride along untouched — only the on/off flags moved */
+  assert.strictEqual(R.toV3("#map?ind=growth&public=1&pub=edu,health&pubkind=existing"),
+                     "map?ind=growth&pub=edu,health&pubkind=existing&lay=public");
+  /* `lay=` on the property route means something else and is left alone */
+  assert.strictEqual(R.toV3("#property?p=55.6545,12.539&lay=infra,public,climate"),
+                     "property?p=55.6545,12.539&lay=infra,public,climate");
+});
+test("climate=1 and the layer flags convert in one pass, and only once", () => {
+  const h = R.toV3("#map/101?ind=growth&climate=1&infra=1", { isClim });
+  assert.strictEqual(h, "map/101?ind=surge_dw_pct&lay=infra");
+  assert.strictEqual(R.toV3(h, { isClim }), h);
 });
 test("toV3 is idempotent — it can run on every hashchange", () => {
   ["#table/postnr?ind=growth", "#pipeline", "#market?src=1", "#sources", "#analysis?a=55.6545,12.539&la=T",
    "#compare?a=kommune:101&b=kommune:751", "#map?ind=growth&climate=1", "#map?ind=sealevel_cm&climate=1",
    "#area/kommune/101", "#charts?ind=growth&a=kommune:101,kommune:751", "#property?p=55.6545,12.539:T",
+   "#map/101?infra=1&public=1&services=1", "#map?lay=infra&public=1", "#map?ind=growth&infra=0",
    "#", "#map/101"].forEach(h => {
     const once = R.toV3(h, { isClim });
     assert.strictEqual(R.toV3(once, { isClim }), once, h);

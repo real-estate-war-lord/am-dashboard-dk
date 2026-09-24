@@ -557,6 +557,269 @@ def ac_c2(page, base):
     assert not ERRORS, f"pageerror on a Climate chart: {ERRORS[:2]}"
 
 
+# =============================================================================================
+# P4 — Map: Climate as an indicator family, Layers ▾, the unified search, the legend stack
+# =============================================================================================
+def rects(page, selector):
+    """The visible boxes for a selector — a display:none legend reports a zero box at 0,0 and would
+    otherwise read as "outside the map"."""
+    return page.evaluate("""sel => [...document.querySelectorAll(sel)]
+        .filter(e => e.getClientRects().length > 0)
+        .map(e => { const r = e.getBoundingClientRect();
+          return { id: e.dataset.testid || e.id, x: r.x, y: r.y, w: r.width, h: r.height,
+                   right: r.right, bottom: r.bottom }; })""", selector)
+
+
+def lay_open(page):
+    """Open the Layers menu and leave it open (it survives a re-render through UI.layOpen)."""
+    if not page.locator("[data-testid=layers-pop]").is_visible():
+        page.click("[data-testid=layers-btn]")
+        page.wait_for_timeout(250)
+    assert page.locator("[data-testid=layers-pop]").is_visible(), "the Layers menu did not open"
+
+
+@ac("AC-L1", phase="P4")
+def ac_l1(page, base):
+    """The Climate risk button is gone, Layers ▾ is there in its place, and the toolbar's first row
+    holds no more than six controls (spec §4.4, §5.1)."""
+    goto(page, "map?ind=growth", settle=1100)
+    for label in ["Climate risk", "Infra projects", "Public buildings", "Services"]:
+        n = page.evaluate("""t => [...document.querySelectorAll('#body button, #body .sg, #hd button')]
+            .filter(e => !e.closest('[data-testid=layers-pop]') && (e.textContent || '').trim() === t).length""", label)
+        assert n == 0, f"{label!r} is still a control outside the Layers menu ({n} found)"
+    assert page.locator("[data-testid=layers-btn]").count() == 1, "there is no Layers button"
+    row1 = page.locator("[data-testid=map-toolbar] [data-row='1']")
+    assert row1.count() == 1, "the toolbar has no first row"
+    n = page.evaluate("document.querySelector('[data-testid=map-toolbar] [data-row=\"1\"]').children.length")
+    assert n <= 6, f"the toolbar's first row has {n} children, the spec allows 6"
+    # …and the toolbar is two rows in all: controls, then the chips
+    rows = page.locator("[data-testid=map-toolbar] [data-row]").count()
+    assert rows == 2, f"the toolbar has {rows} rows, expected 2 (controls + chips)"
+
+
+@ac("AC-L2", phase="P4")
+def ac_l2(page, base):
+    """Ticking a feature layer in the menu writes it into lay= and its legend appears on the map."""
+    goto(page, "map/101?ind=growth", settle=1200)
+    assert "lay=" not in cur_hash(page), f"a fresh map has no layers on: {cur_hash(page)!r}"
+    assert page.locator("[data-testid=legend-infra]").count() == 0
+    lay_open(page)
+    box = page.locator("[data-layer=infra]")
+    assert box.count() == 1, "the menu has no infra row"
+    assert box.first.get_attribute("aria-checked") == "false"
+    box.first.click()
+    page.wait_for_timeout(1200)
+    assert "lay=infra" in cur_hash(page), f"the tick did not reach the hash: {cur_hash(page)!r}"
+    leg = page.locator("[data-testid=legend-infra]")
+    assert leg.count() == 1 and leg.first.is_visible(), "the infra legend did not appear"
+    # the menu stayed open and now says what it is showing
+    assert page.locator("[data-layer=infra]").first.get_attribute("aria-checked") == "true"
+    assert "1" in (page.locator("[data-testid=layers-btn]").inner_text() or ""), "the count badge does not say 1"
+    # …and ticking it off takes both away again
+    page.click("[data-layer=infra]")
+    page.wait_for_timeout(1000)
+    assert "lay=" not in cur_hash(page), f"the layer survived being switched off: {cur_hash(page)!r}"
+    assert page.locator("[data-testid=legend-infra]").count() == 0
+
+
+@ac("AC-L3", phase="P4")
+def ac_l3(page, base):
+    """A Climate indicator brings the storm-surge zones with it as a context layer, with their own
+    legend and a ticked row in the menu. A non-Climate indicator has neither (spec §1 decision 3)."""
+    goto(page, "map?ind=surge_dw_pct", settle=1500)
+    leg = page.locator("[data-testid=legend-zones]")
+    assert leg.count() == 1 and leg.first.is_visible(), "no zones legend for a Climate indicator"
+    assert page.evaluate("climOn()"), "the zones are not being drawn"
+    lay_open(page)
+    row = page.locator("[data-layer=zones]")
+    assert row.count() == 1, "the menu has no zones row"
+    assert row.first.get_attribute("aria-checked") == "true", "the zones row is not ticked"
+    # ticking it off writes zones=0 and takes the legend away, without leaving the Climate family
+    row.first.click()
+    page.wait_for_timeout(1100)
+    assert "zones=0" in cur_hash(page), f"hiding the zones is not in the hash: {cur_hash(page)!r}"
+    assert page.locator("[data-testid=legend-zones]").count() == 0
+    assert page.evaluate("curInd().key") == "surge_dw_pct", "hiding the zones changed the indicator"
+    # a non-Climate indicator has neither the legend nor the row
+    goto(page, "map?ind=growth", settle=1300)
+    assert page.locator("[data-testid=legend-zones]").count() == 0, "a growth map still shows a zones legend"
+    lay_open(page)
+    assert page.locator("[data-layer=zones]").count() == 0, "a growth map still offers the zones row"
+    # the v2.6 overlay link lands on the Climate indicator instead (route_core)
+    goto(page, "map?ind=growth&climate=1", settle=1400)
+    assert page.evaluate("curInd().key") == "surge_dw_pct", f"climate=1 did not convert: {cur_hash(page)!r}"
+    assert page.locator("[data-testid=legend-zones]").first.is_visible()
+
+
+@ac("AC-LG1", phase="P4")
+def ac_lg1(page, base):
+    """Every legend card sits inside the map, none overlaps another, and the stack keeps to the
+    bottom 60 % of the map's height (spec §4.5)."""
+    # Aarhus, not Copenhagen: in quarter mode the registry has no Climate keys, so curInds() would
+    # swap the indicator out from under the test (v2.6 behaviour — see docs/v3/DECISIONS.md).
+    goto(page, "map/751?ind=surge_dw_pct&lay=infra,public,services", settle=2500, wait="#serviceslegend *")
+    boxes = rects(page, "[data-testid^=legend]")
+    ids = sorted(b["id"] for b in boxes)
+    assert ids == ["legend", "legend-infra", "legend-public", "legend-services", "legend-zones"], \
+        f"the five legends are not all on the map: {ids}"
+    m = rects(page, "[data-testid=map]")
+    assert len(m) == 1, "no map box"
+    m = m[0]
+    top = m["bottom"] - m["h"] * 0.6
+    for b in boxes:
+        assert b["x"] >= m["x"] - 1 and b["right"] <= m["right"] + 1 and \
+               b["y"] >= m["y"] - 1 and b["bottom"] <= m["bottom"] + 1, f"{b['id']} is outside the map: {b} vs {m}"
+        assert b["y"] >= top - 1, f"{b['id']} reaches above 60 % of the map height ({b['y']:.0f} < {top:.0f})"
+    for i, a in enumerate(boxes):
+        for c in boxes[i + 1:]:
+            over = not (a["right"] <= c["x"] + 1 or c["right"] <= a["x"] + 1
+                        or a["bottom"] <= c["y"] + 1 or c["bottom"] <= a["y"] + 1)
+            assert not over, f"{a['id']} overlaps {c['id']}: {a} / {c}"
+    # keys only: the filters moved to Layers ▾, so no legend carries a toggle any more
+    assert page.evaluate("""!document.querySelector('[data-testid^=legend] [data-pubcat],'
+        + '[data-testid^=legend] [data-srvcat], [data-testid^=legend] [data-climlay]')"""), \
+        "a legend still carries its filter buttons"
+
+
+@ac("AC-M1", phase="P4")
+def ac_m1(page, base):
+    """The toolbar's first row is search, Layers ▾, the picker and the period control, in that
+    order, and the second search box and the privacy paragraph are gone (spec §5.1)."""
+    goto(page, "map?ind=growth", settle=1200)
+    order = page.evaluate("""() => {
+      const kids = [...document.querySelector('[data-testid=map-toolbar] [data-row="1"]').children];
+      const at = sel => kids.findIndex(k => k.matches(sel) || k.querySelector(sel));
+      return ['[data-testid=search]', '[data-testid=layers-btn]', '[data-testid=ind-picker]', '[data-testid=period]'].map(at);
+    }""")
+    assert order == [0, 1, 2, 3], f"the first row's controls are in the order {order}, expected [0, 1, 2, 3]"
+    # one search box, and no paste box or privacy sentence left on the map
+    assert page.locator("[data-testid=search]").count() == 1
+    assert page.locator("#body #tpq").count() == 0, "the second 'Paste Google Maps link' box is still there"
+    body = page.locator("#body").inner_text()
+    for gone in ["Paste Google Maps link", "Processed in your browser"]:
+        assert gone not in body, f"{gone!r} is still visible on the map"
+    # the privacy sentence lives in the search box's ? tooltip instead
+    assert "Processed in your browser" in page.evaluate(
+        "document.querySelector('.asrch .tptipc').textContent"), "the privacy note is not in the tooltip"
+    # full screen is a page action in the top bar, not a toolbar control
+    assert page.locator("#hd [data-testid=map-full]").count() == 1, "the full-screen button is not in the top bar"
+
+
+@ac("AC-M2", phase="P4")
+def ac_m2(page, base):
+    """A postal code typed into the search and taken with Enter opens its page — the v2.6 behaviour,
+    through the new combobox."""
+    goto(page, "map?ind=growth", settle=1000)
+    page.fill("[data-testid=search]", "2450")
+    page.wait_for_timeout(400)
+    rows = texts(page, ".asrch .as-row")
+    assert rows and "2450" in rows[0], f"the first result for 2450 is {rows[:2]}"
+    page.press("[data-testid=search]", "Enter")
+    page.wait_for_timeout(1200)
+    assert cur_path(page) == "area/postnr/2450", f"Enter landed on {cur_hash(page)!r}"
+    # a name works the same way
+    goto(page, "map?ind=growth", settle=900)
+    page.fill("[data-testid=search]", "Aarhus")
+    page.wait_for_timeout(400)
+    page.press("[data-testid=search]", "Enter")
+    page.wait_for_timeout(1200)
+    assert cur_path(page) == "map/751", f"a municipality name landed on {cur_hash(page)!r}"
+    assert page.evaluate("MK.muni") == "751"
+
+
+@ac("AC-M3", phase="P4")
+def ac_m3(page, base):
+    """Coordinates typed into the same box offer to open the spot as a test property, and the click
+    goes to #property?p=lat,lon (spec §5.1; read #properties as #property, amendment A2)."""
+    goto(page, "map?ind=growth", settle=1000)
+    page.fill("[data-testid=search]", "55.6545, 12.539")
+    page.wait_for_timeout(400)
+    coord = page.locator("[data-testid=search-coord]")
+    assert coord.count() == 1, "coordinates produced no search-coord result"
+    assert "test property" in coord.first.inner_text().lower(), coord.first.inner_text()
+    coord.first.click()
+    page.wait_for_timeout(1400)
+    assert cur_hash(page).startswith("property?p=55.6545,12.539"), f"the coord result landed on {cur_hash(page)!r}"
+    # a Google Maps link is read by the same box
+    goto(page, "map?ind=growth", settle=900)
+    page.fill("[data-testid=search]", "https://www.google.com/maps/@55.6761,12.5683,15z")
+    page.wait_for_timeout(400)
+    assert page.locator("[data-testid=search-coord]").count() == 1, "a Maps link produced no coord result"
+    page.press("[data-testid=search]", "Enter")
+    page.wait_for_timeout(1400)
+    assert cur_hash(page).startswith("property?p=55.6761,12.5683"), f"the link landed on {cur_hash(page)!r}"
+
+
+@ac("AC-P4SR", phase="P4")
+def ac_p4sr(page, base):
+    """P4-local: the two jump buttons moved into the search dropdown and still only move the camera —
+    zooming is not selecting (spec §5.1, §0). The C / D shortcuts are unchanged."""
+    goto(page, "map?ind=growth", settle=1200)
+    assert page.locator(".asrch .as-jump").count() == 0 or not page.locator(".asrchpop").is_visible(), \
+        "the dropdown starts closed"
+    page.click("[data-testid=search]")
+    page.wait_for_timeout(400)
+    jumps = texts(page, ".asrch .as-jump button")
+    assert jumps == ["Copenhagen", "Denmark"], f"the Jump to row offers {jumps}"
+    before = cur_hash(page)
+    z0 = page.evaluate("window.__maps[0].getZoom()")
+    page.click(".asrch .as-jump button[data-mapjump=cph]")
+    page.wait_for_timeout(900)
+    assert page.evaluate("window.__maps[0].getZoom()") > z0, "the Copenhagen jump did not move the camera"
+    assert cur_hash(page) == before, f"a jump changed the selection: {before!r} → {cur_hash(page)!r}"
+    assert page.evaluate("MK.muni") is None, "a jump selected a municipality"
+    # the keyboard shortcut does the same thing, and does not type into the search box
+    page.evaluate("document.activeElement.blur()")
+    page.keyboard.press("d")
+    page.wait_for_timeout(800)
+    assert page.evaluate("window.__maps[0].getZoom()") <= z0 + 0.5, "the D shortcut did not go back to Denmark"
+    assert cur_hash(page) == before
+    # …and it leaves the dropdown alone when the caret is in it
+    page.click("[data-testid=search]")
+    page.type("[data-testid=search]", "c")
+    page.wait_for_timeout(400)
+    assert page.eval_on_selector("[data-testid=search]", "e => e.value") == "c", \
+        "a letter typed into the search box was eaten by the map shortcut"
+
+
+@ac("AC-M4", phase="P4")
+def ac_m4(page, base):
+    """An Outlook indicator draws in purple and says it is a projection; Climate draws in blue. A
+    projection must never be mistaken for an observed figure (spec §2.1, §2.4)."""
+    goto(page, "map?ind=fc_growth", settle=1500)
+    bins = page.evaluate("""() => [...document.querySelectorAll('[data-testid=legend] .lgrow i')]
+        .map(e => getComputedStyle(e).backgroundColor)
+        .map(s => (s.match(/[\\d.]+/g) || []).slice(0, 3).map(Number))
+        .filter(c => c.length === 3)""")
+    assert len(bins) >= 4, f"the legend has too few swatches to read: {bins}"
+    r, g, b = bins[0]          # the darkest class is the first row of the legend
+    assert b > r and b > g, f"the darkest Outlook bin is not purple: rgb({r},{g},{b})"
+    strip = page.locator("#mkexplain").inner_text()
+    assert "Projection" in strip, f"the info strip does not say Projection: {strip[:160]!r}"
+    # Climate keeps the blue ramp
+    goto(page, "map?ind=sealevel_cm", settle=1500)
+    cb = page.evaluate("""() => { const e = document.querySelector('[data-testid=legend] .lgrow i');
+        return (getComputedStyle(e).backgroundColor.match(/[\\d.]+/g) || []).slice(0, 3).map(Number); }""")
+    assert cb[2] > cb[0] and cb[2] > cb[1], f"the darkest Climate bin is not blue: {cb}"
+
+
+@ac("AC-S3", phase="P4", viewport="1366x768")
+def ac_s3(page, base):
+    """At 1366×768 the map itself starts inside the first screen and keeps its height — one toolbar
+    row is what buys the ~70 px this needs (spec §4.1, §5.1)."""
+    goto(page, "map?ind=growth", settle=1600)
+    box = page.locator("[data-testid=map]").bounding_box()
+    assert box, "no map box"
+    assert box["y"] <= 200, f"the map starts {box['y']:.0f} px down, the spec allows 200"
+    assert box["height"] >= 480, f"the map is only {box['height']:.0f} px tall, the spec wants 480"
+    # and the drilled state keeps its extra segments and its municipality card without pushing the
+    # map off the first screen — the card is collapsed by default (spec §5.1)
+    goto(page, "map/101?ind=growth", settle=1600)
+    box = page.locator("[data-testid=map]").bounding_box()
+    assert box["y"] <= 320, f"the drilled map starts {box['y']:.0f} px down"
+    assert box["y"] + 300 <= 768, f"less than 300 px of the drilled map is on the first screen (top {box['y']:.0f})"
+
+
 # ---------------------------------------------------------------------------------------------
 def main():
     ap = argparse.ArgumentParser()

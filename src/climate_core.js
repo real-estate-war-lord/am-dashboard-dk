@@ -69,20 +69,14 @@ function hzLabel(h) {
   return `${hzShort(k)} — zones: Kystdirektoratet ${CLIM_ZONE_YEAR[k]} · figures: ${CLIM_FIG[k]}`;
 }
 
-/* ---------- which parts of the overlay are drawn (clim=) ---------- */
-/* no parameter at all means both layers; `clim=none` means the reader switched both off and is
-   a state worth keeping, so it round-trips rather than falling back to the default */
-function climFilterParse(q) {
-  const raw = String(((q || {}).clim) || "").trim();
-  if (!raw) return new Set(Object.keys(CLIM_LAY));
-  return new Set(raw.split(",").filter(k => Object.prototype.hasOwnProperty.call(CLIM_LAY, k)));
-}
-const climFilterSerialise = show => [`clim=${[...(show || [])].join(",") || "none"}`];
+/* v3.0 P4: `clim=` (which half of the overlay was drawn) is gone with the overlay itself. The two
+   parts are one context layer now, on whenever a Climate indicator is and hidden with `zones=0`
+   (spec §1 decision 3, §4.4) — so there is one thing to switch, not two. */
 
 /* the page gets it as a global (the build inlines this file straight above app.js); node gets it
    as a module. One file, two consumers, no second copy of any of it. */
 const API = { CLIM_HZ, CLIM_ZONE_YEAR, CLIM_FIG, CLIM_LAY, pipLL, gjHit, inZone,
-              hzValid, hzParse, hzSerialise, hzShort, hzLabel, climFilterParse, climFilterSerialise };
+              hzValid, hzParse, hzSerialise, hzShort, hzLabel };
 if (typeof window !== "undefined") window.CLIMATE_CORE = API;
 if (typeof module !== "undefined" && module.exports) module.exports = API;
 
