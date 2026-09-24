@@ -62,7 +62,8 @@ const IND_Q = IND_CPH.concat(SAFETY.filter(i => !cphOwn(i.key)));
 /* quarter-layer indicators that are published per district (bydel), not per quarter: the KK survey's crime and
    safety shares, and unemployment — their values carry ^ instead of the ° of a municipality value */
 const bydelLevel = i => !!i && !!i.geo_level && i.geo_level !== "kvarter";
-const bydelMark = i => bydelLevel(i) ? " ^" : "";
+const BYDEL_NOTE = "figure published for the whole bydel (district), not for this quarter";
+const bydelMark = i => bydelLevel(i) ? ` <abbr class="bmark" title="${BYDEL_NOTE}">^</abbr>` : "";
 const indOf = key => IND.concat(IND_CPH).find(i => i.key === key) || null;
 const lowerBetter = key => { const i = indOf(key); return !!i && i.direction === "lower_better"; };
 /* `neutral` is a third direction beside higher_better / lower_better: neither end is better, so the
@@ -220,7 +221,9 @@ const TP = { lat: null, lon: null, label: TP_LABEL, res: null, msg: "", fit: fal
 const TP_RADII = [0, 500, 1000, 2000, 5000];
 const tpRadOn = () => TP.lat != null && TP.rad > 0;
 const tpWithin = (lat, lon) => !tpRadOn() || (lat != null && lon != null && havM(TP.lat, TP.lon, lat, lon) <= TP.rad);
-const tpRadLabel = m => m >= 1000 ? (m / 1000) + " km" : m + " m";
+/* da-DK on screen (spec §2.4): 1 200 m is "1,2 km", never "1.2 km" — a `.` there reads as a thousands
+   separator to the Danish reader this dashboard is for */
+const tpRadLabel = m => m >= 1000 ? (m % 1000 ? nf(m / 1000, 1) : m / 1000) + " km" : m + " m";
 const KOM = { list: null, err: false, p: null };   /* dist/geo/kommuner_lookup.json, fetched the first time a pin is dropped */
 const T = { q: "", level: "kommune", region: "", minPop: 0 };                     /* table view filters */
 const REGIONS = ["Hovedstaden", "Sjælland", "Syddanmark", "Midtjylland", "Nordjylland"];
@@ -1331,7 +1334,7 @@ function outlookFor(koms, kvas) {
       <td class="num">${srcLink((gi.proj || {}).src, srcCode(o, lvl), "Verify")}</td></tr>`).join("");
   const table = (title, pr, body, caveat) => `<div class="olblock">
     <p class="cap"><b>${esc(title)}</b> · <span class="tag proj">Projection ${esc(pr.from)}→${esc(pr.to)}</span> ${esc(pr.publisher)} ${esc(pr.vintage)}${pr.table ? ` · ${esc(pr.table)}` : ""}</p>
-    <table class="tbl compact"><thead><tr><th>Area</th><th class="num">Population ${esc(pr.to)}</th><th class="num">20–34</th><th class="num">Source</th></tr></thead><tbody>${body}</tbody></table>
+    <div class="scrollx"><table class="tbl compact"><thead><tr><th>Area</th><th class="num">Population ${esc(pr.to)}</th><th class="num">20–34</th><th class="num">Source</th></tr></thead><tbody>${body}</tbody></table></div>
     ${caveat ? `<p class="cap warnline">⚠ ${esc(caveat)}</p>` : ""}</div>`;
   const kr = gK && yK ? rows(koms || [], gK, yK, "kommune") : "";
   if (kr) blocks.push(table("Municipality", gK.proj || {}, kr, ""));
@@ -2947,8 +2950,10 @@ function anRow(e, i, r) {
      n % of the peers", no better/worse wording and no favourable-end fill (docs/FORECAST.md §3). */
   const barTitle = nu ? `higher than ${nf(pc ? pc.p : 0, 0)} % of the ${pc ? pc.n : 0} ${peers} — neither end is better`
     : `better than ${nf(pc ? pc.p : 0, 0)} % of the ${pc ? pc.n : 0} ${peers}${lb ? " — lower is better here" : ""}`;
-  return `<tr${nu ? ' class="anneutral"' : ""}><th><span class="thn">${esc(i.label)} <span class="dim">${esc(i.unit || "")}</span></span>${i.proj ? `<span class="tag proj mini">${esc(i.proj.publisher)} ${esc(i.proj.vintage)}</span>` : ""}<button class="tch" data-go="${chartLink(i.key, e.type, e.code)}" title="Open in Charts">↗</button></th>
-    ${fmtCell(i, cur.v, !cur.own, e.type === "kvarter" ? bydelMark(i) : "")}
+  /* an inherited row is marked the way the area page's All figures marks one (spec §4.8, §2.4):
+     `.inh` on the row plus a `muni` tag that names whose figure it is — never a lone ° */
+  return `<tr class="${nu ? "anneutral" : ""}${cur.own ? "" : " inh"}"><th><span class="thn">${esc(i.label)} <span class="dim">${esc(i.unit || "")}</span></span>${cur.own ? "" : `<span class="tag-muni" title="the municipality's figure, shown at this level">muni</span>`}${i.proj ? `<span class="tag proj mini">${esc(i.proj.publisher)} ${esc(i.proj.vintage)}</span>` : ""}<button class="tch" data-go="${chartLink(i.key, e.type, e.code)}" title="Open in Charts">↗</button></th>
+    ${fmtCell(i, cur.v, false, e.type === "kvarter" && cur.own ? bydelMark(i) : "")}
     <td class="ansrc">${cur.own ? indSrcLink(i, e.type === "postnr" ? e.o.nr : srcCode(e.o, e.type), "Verify", e.type)
                                 : indSrcLink(i, (r.kommune || {}).code, "Verify", "kommune")}</td>
     <td class="anbc" data-v="${pc ? pc.p.toFixed(1) : ""}">${pc
@@ -3268,7 +3273,7 @@ function anSchBody(pt, r) {
   const body = rows.length ? `<div class="scrollx"><table class="tbl compact" data-sortable><thead><tr><th>School</th><th>Type</th><th class="num">Distance</th><th class="num">FP9 grade</th><th class="num">vs expected</th><th>School year</th></tr></thead>
     <tbody>${rows.map(x => { const s = x.s, d = schV(s, "soc_ref_diff"), sig = schSig(schV(s, "soc_ref_significant"));
       return `<tr class="clickrow" data-school="${esc(s.nr)}"><th><span class="thn">${esc(s.name)} <span class="go">\u203a</span></span></th>
-        <td class="dim">${esc(SCH_TYPE[s.type] || s.type)}</td><td class="num" data-v="${Math.round(x.d)}">${anDist(x.d)}</td>
+        <td class="dim nw">${esc(SCH_TYPE[s.type] || s.type)}</td><td class="num" data-v="${Math.round(x.d)}">${anDist(x.d)}</td>
         <td class="num" data-v="${schV(s, "grade_avg") ?? ""}">${schCell(schV(s, "grade_avg"), schGrade)}</td>
         <td class="num" data-v="${d ?? ""}">${d == null ? `<span class="dim" title="${SUPPRESSED}">\u2013</span>` : schDiff(d) + (sig ? ` <em class="schsig">\u2713 ${esc(sig)}</em>` : ` <em class="dim">\u2248 as expected</em>`)}</td>
         <td class="dim">${esc(schY(s, "grade_avg") || schY(s, "pupils_total") || SCH_LATEST)}</td></tr>`; }).join("")}</tbody></table></div>`
@@ -3320,10 +3325,13 @@ function anEmpty() {
     <p class="anlead">Paste a Google Maps link or <code>lat, lon</code> to read one address against every layer.</p>
     <p class="cap">For example <button class="lk mini" data-go="property?p=55.6545,12.539">https://www.google.com/maps/@55.6545,12.539,17z</button> — the page then reads the pin's area statistics, the safety figures, every infrastructure project within ${nf(AN_INFRA_M / 1000, 0)} km and the public buildings and schools inside the radius you choose. The map's search box takes the same links and coordinates.</p></div>`;
 }
-/* one short line over the mini map, the counterpart of the area page's arMapNote() */
+/* One short line over the mini map, the counterpart of the area page's arMapNote(). Short is the
+   point: spelled out, the three dashed rings and the solid one wrapped it onto two lines at every
+   width, so the ring scale lives in the tooltip and the line names the fill and the place. */
 function tpMapNote(r) {
   const ind = curInd();
-  return `<span title="Panning and zooming this map never change which property the page is about — a new pin is a pasted link, nothing else.">${esc(ind.short || ind.label)} <span class="dim">· rings ${TP_RINGS.map(m => nf(m, 0) + " m").join(" · ")}, solid ${esc(tpRadLabel(anRing()))}${r && r.kommune ? ` · ${esc(r.kommune.name)}` : ""}</span></span>`;
+  const rings = `dashed rings at ${TP_RINGS.map(tpRadLabel).join(" · ")}; the solid ring is the ${tpRadLabel(anRing())} radius the sections count inside.`;
+  return `<span title="${esc(rings)} Panning and zooming this map never change which property the page is about — a new pin is a pasted link, nothing else.">${esc(ind.short || ind.label)} <span class="dim">· ${esc(tpRadLabel(anRing()))} radius${r && r.kommune ? ` · ${esc(r.kommune.name)}` : ""}</span></span>`;
 }
 /* the overlay legends that live inside the mini map, above the indicator one (spec §4.5, §4.6) */
 const TP_MAP_LEGENDS = `<div class="maplegend small publiclegend" id="anpublegend"></div><div class="maplegend small infralegend" id="aninfralegend"></div><div class="maplegend small" id="anmicrolegend"></div>`;
@@ -3339,7 +3347,7 @@ function tpSections(pt, r, e) {
   const profile = e ? e.inds.filter(i => (i.group || "") !== "Safety" && eVal(e, i.key).v != null) : [];
   const safety = e ? e.inds.filter(i => (i.group || "") === "Safety" && eVal(e, i.key).v != null) : [];
   const koms = anPubKoms(pt, r);
-  const hint = `° = municipality value where no finer statistic exists${e && e.type === "kvarter" ? " · ^ = figure published for the whole bydel" : ""} · the percentile bar fills toward "better", so a low value fills it where lower is better${profile.some(i => neutralDir(i.key)) ? "; Outlook rows are neutral and the bar simply reads as a position among peers" : ""} · ↗ opens the indicator in Charts.`;
+  const hint = `A muni row is the municipality's figure, shown here because no finer statistic exists${e && e.type === "kvarter" ? " · ^ = figure published for the whole bydel, not the quarter" : ""} · the percentile bar fills toward "better", so a low value fills it where lower is better${profile.some(i => neutralDir(i.key)) ? "; Outlook rows are neutral and the bar simply reads as a position among peers" : ""} · ↗ opens the indicator in Charts.`;
   const ol = anOutlookSrc(e, r);
   const inf = anInfraRows(pt);
   const out = [];
@@ -3351,7 +3359,7 @@ function tpSections(pt, r, e) {
     out.push(tpSec("safety", "Safety",
       `<span class="dim">${esc(SAFETY.length ? (SAFETY[0].unit || "") : "")} · municipality level${e.type === "kvarter" ? " plus the city's own bydel survey" : ""}</span>`,
       `${safety.length ? anIndTable(e, r, safety) : `<p class="empty">no safety figure for this area</p>`}
-       <p class="cap">Reported crime comes from Danmarks Statistik per municipality over a rolling four quarters; a postal code or quarter shows its municipality's figure (°).${e.type === "kvarter" ? ` Københavns Kommune's own safety survey publishes per bydel (^), so every quarter of ${esc(e.bydel || "the district")} carries the same number — a different source, period and geography from the national one.` : ""}</p>`));
+       <p class="cap">Reported crime comes from Danmarks Statistik per municipality over a rolling four quarters; a postal code or quarter shows its municipality's figure, tagged <b>muni</b>.${e.type === "kvarter" ? ` Københavns Kommune's own safety survey publishes per bydel (^), so every quarter of ${esc(e.bydel || "the district")} carries the same number — a different source, period and geography from the national one.` : ""}</p>`));
   } else {
     out.push(tpSec("profile", "Area profile", "", `<p class="empty">No area statistics cover this point.</p>`));
   }
@@ -3368,7 +3376,7 @@ function tpSections(pt, r, e) {
   if (clim) out.push(tpSec("climate", "Climate",
     `<span class="tag clim">${esc(hzShort(HZ.h))}</span> <span class="dim">Kystdirektoratet 100-year extents${r.kommune ? " · " + esc(r.kommune.name) : ""}</span>`,
     `<div id="anclim">${clim}</div>`));
-  out.push(tpSec("sources", "Sources &amp; as of",
+  out.push(tpSec("sources", "Sources & as of",
     `<span class="dim">everything this page read · built ${esc((D.meta && D.meta.built) || "–")}</span>`,
     anSources(e, r, profile.concat(safety), koms.length > 0, koms.length > 0 && !!SCH_META)));
   return out.join("");
@@ -5266,7 +5274,7 @@ function vSchoolList() {
     <div class="scrollx"><table class="tbl compact" data-sortable><thead><tr><th>School</th><th>Type</th><th class="num">FP9 grade</th><th class="num">vs expected</th><th class="num">Well-being</th><th class="num">Pupils</th><th class="num">Class size</th></tr></thead>
       <tbody>${sorted.map(s => { const d = schV(s, "soc_ref_diff"), sig = schSig(schV(s, "soc_ref_significant")); return `<tr class="clickrow" data-school="${esc(s.nr)}">
         <th><span class="thn">${esc(s.name)} <span class="go">\u203a</span></span></th>
-        <td class="dim">${esc(SCH_TYPE[s.type] || s.type)}</td>
+        <td class="dim nw">${esc(SCH_TYPE[s.type] || s.type)}</td>
         <td class="num" data-v="${schV(s, "grade_avg") ?? ""}">${schCell(schV(s, "grade_avg"), schGrade)}</td>
         <td class="num" data-v="${d ?? ""}">${d == null ? `<span class="dim" title="${SUPPRESSED}">–</span>` : schDiff(d) + (sig ? ` <em class="schsig">✓</em>` : "")}</td>
         <td class="num" data-v="${schV(s, "trivsel_general") ?? ""}">${schCell(schV(s, "trivsel_general"), v => nf(v, 1))}</td>

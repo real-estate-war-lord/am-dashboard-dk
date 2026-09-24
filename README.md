@@ -8,16 +8,114 @@ An open-data market map for residential asset management in Denmark: 36 indicato
 
 ## What you get
 
-- **Macro map** — choropleth by municipality (five quintile colour classes, legend on the map), zoom in for postal codes (and Copenhagen quarters); breadcrumb navigation, area search, grouped indicator selector with quick chips and a folded explanation (definition, source table, period, coverage, caveats), year selector 2016–2026. Popups show the selected indicator with its rank and four headline figures, link to the area page, the buildings layer and the chart generator, and fold all values underneath.
-- **Area pages** — every municipality, postal code and Copenhagen quarter has its own page (`#area/<type>/<code>`): headline row (five key figures with y/y and rank), key-figure tiles by theme with sparklines against the median; trend chart vs municipality and median; context map with clickable neighbours; tabs for all indicators, the BBR housing stock and sub-areas; ↗ opens any figure in Charts.
-- **Table** — everything side by side (municipalities / postal codes / quarters) with search, region filter, minimum population, sorting and CSV export.
-- **Housing stock from BBR** — the building register itself, aggregated per postal code and Copenhagen quarter: tenure, unoccupied share, sizes, age, building type (free Datafordeler API key needed to refresh; the aggregated file is committed).
-- **Buildings (Micro)** — inside a municipality, every residential building with 2+ dwellings as a dot: address, BFE property number, tenure, size, year built, rooms; find by address, filter and export. Loaded per municipality on demand.
-- **Charts** — chart generator: indicator × areas × years, median line and Denmark reference line, PNG and CSV export, shareable URL; each indicator's axis starts at its first year (crime: 2007), rolling-quarter series can be shown quarterly, related indicators can be overlaid, and series breaks are marked.
-- **Export data** (sidebar) — one long-format CSV of every level, indicator and year plus the macro series, ready for analysis in Claude, Python or Excel.
-- **Test property** — paste a Google Maps link or a `lat, lon` pair and get a one-property Analysis sheet (`#analysis`): where it is (kommune · postal code · Copenhagen quarter), the area profile with a direction-aware percentile bar against every area of the same level, safety, every infrastructure project within 3 km with its computed distance, the public buildings and schools within 1 000 m, and the sources with their as-of stamps. The mini map carries the same layer pills as the Macro map — Infra projects · Public buildings · Buildings — with the same legends, filters and popups; its choropleth follows whichever headline tile is selected. Shareable URL (`&lay=`, `&ind=`, `&pub=`); the pin travels between the map and the sheet.
-- **Market** — KPI tiles and series for the national picture.
-- **Sources** — folded under Market: every table with its "updated" stamp, plus indicator definitions.
+Four destinations — `Map · Data · Charts · Test property` — and one way of working in all of them:
+pick an indicator once and every surface follows it. Interface reference (routes, redirects,
+components, export schema, test commands): [`docs/UI_V3.md`](docs/UI_V3.md).
+
+- **Map** (`#map[/<kommune>[/postnr]]`) — choropleth by municipality (five quantile classes, keys-only
+  legends bottom right), zoom in for postal codes and Copenhagen quarters. One toolbar row:
+  `[search] [Layers ▾] [Indicator ▾] [period]`, quick chips under it, then the info strip (label,
+  level, unit, as of, `ⓘ details`). The search box takes an area name, a postal code, a quarter, a
+  Google Maps link **or** `lat, lon`. `Layers ▾` holds the three feature layers — Infra projects ·
+  Public buildings · Services — with their category filters. Zooming never changes what is selected.
+- **Indicator picker and period control** — one component each, on the map, the area page, Data ›
+  Areas, Charts and the test property. The picker searches across label, short name, group and unit,
+  groups the registry twelve ways, marks `↓ lower is better`, and lists indicators you are only
+  seeing because the municipality publishes them under *From the municipality*. The period control
+  renders whichever period the indicator actually has: a year, the `Today · 2070 · 2120` horizons,
+  a `Projection 2026→2040` badge, or an `as of` badge.
+- **Area pages** (`#area/kommune/101` · `#area/postnr/2450` · `#area/kvarter/20101`) — header, five
+  headline tiles, the picker, then the **study row**: a chart panel beside a draggable mini map with
+  a full-screen `⤢`. The panel draws a line chart with the parent and the peer median, or a peer
+  distribution strip when the indicator is a snapshot, or the outlook chart, or three climate
+  horizons with the publisher's low–high range. Under it four foldable sections — *Population
+  outlook · All figures · Sub-areas · Data information* — whose open state is in the URL.
+- **Test property** (`#property?p=<lat>,<lon>[:label]`) — paste a Google Maps link or a `lat, lon`
+  pair and read one address against every layer: the same study row pointed at the pin's finest
+  published area (quarter > postal code > municipality, named as a `read as` tag), its own
+  `Layers ▾`, a radius select (500 m · 1 km · 2 km · 5 km) that drives both the ring on the map and
+  the counts below, and eight foldable sections — outlook, area profile, safety, infrastructure
+  nearby, public buildings and schools inside the ring, climate, sources. The link is the state and
+  the location never leaves the browser.
+- **Data** — the tabular home of every dataset, with `Export ▾` in its header.
+  *Areas* (`#data/areas/<level>`): every municipality, postal code or quarter side by side, filtered
+  by search, region and minimum population, sorted by the active indicator's column.
+  *Projects* (`#data/projects`): the infrastructure pipeline with its filters.
+  *National series* (`#data/national`): the 13 macro series as a table — latest, period, y/y, source,
+  a five-year sparkline — with four headline tiles above it.
+  *Sources* (`#data/sources`): every source with its publisher, tables, as-of, fetch date, licence
+  and what it feeds. This table is generated from the same rows the sources CSV writes.
+- **Charts** (`#charts?…`) — indicator × areas × years, median and Denmark reference lines, PNG and
+  CSV export, shareable URL. A Climate indicator plots the three horizons as bars with range
+  whiskers; an Outlook one goes dashed and purple after the last observed year.
+- **Housing stock from BBR** — the building register aggregated per postal code and Copenhagen
+  quarter: tenure, unoccupied share, sizes, age, building type (a free Datafordeler key is needed to
+  refresh; the aggregated file is committed).
+- **Buildings** — inside a municipality, every residential building with 2+ dwellings as a dot:
+  address, BFE number, tenure, size, year built, rooms. Loaded per municipality on demand.
+- **Detail sheets** — project, public building, school and climate, each reached from the content
+  rather than from the nav, each with a tile row, a mini map and its sources.
+
+### Navigation and URLs
+
+```
+MACRO DASHBOARD
+ MARKET INTELLIGENCE
+  Map            #map[/<kommune>[/postnr]]
+  Data           #data/areas/<level> · #data/projects · #data/national · #data/sources
+  Charts         #charts?…
+ ANALYSIS
+  Test property  #property?p=<lat>,<lon>[:label]
+ ── footer ──  Export ▾ · built <date> · v3.0
+```
+
+Below 1025 px the sidebar becomes a 52 px top bar with a `☰` drawer and the page scrolls natively.
+
+The URL is the state, and a key is written only when it differs from the default: `ind` (indicator),
+`y` (year) or `hz` (`today|2070|2120`), `lay` (feature layers), `zones=0`, `p` (the pin), `rad`
+(radius), `show` (which sections are open), plus each view's own filters. `hashFor()` is the only
+serialiser and `parseHash()` the only parser, so *Copy link* always reproduces exactly what you see.
+
+**Every v2.6 link still works.** `#table/<level>` → `#data/areas/<level>`, `#pipeline` →
+`#data/projects`, `#market` → `#data/national`, `#market?src=1` and `#sources` → `#data/sources`,
+`#analysis?a=&la=` → `#property?p=`, `#compare?a=&b=` → the first area's own page, the old
+`infra=1&public=1&services=1` flags → `lay=`, `climate=1` → the storm-surge indicator, `t=`/`g=` →
+`show=`. Each redirect is a test that runs at four viewports on every build.
+
+### Export
+
+`Export ▾` sits in the sidebar footer, the Data header and the test-property header. Seven files,
+and **every row carries its source, table id, verify URL, as of, fetched date and licence**:
+
+| Item | File |
+|---|---|
+| This view (CSV) | `<view>_<date>.csv` — what is on screen, wide, provenance in each column header |
+| All area data | `areas_long_<date>.csv` — 104 028 rows: 3 levels × every indicator × every published period |
+| Projects | `projects_<date>.csv` — own schema, never mixed into indicator columns |
+| National series | `national_series_<date>.csv` |
+| Sources catalogue | `sources_<date>.csv` |
+| Climate exposure | `climate_exposure_<date>.csv` — level × horizon |
+| Test property | `test_property_<date>.csv` + `test_property_nearby_<date>.csv` |
+
+Long schema: `level, code, name, parent_code, parent_name, region, population, indicator, label,
+unit, period, period_type, value, value_type, inherited_from, direction, source, table_id,
+source_url, as_of, fetched, licence`. `period_type` ∈ `year | quarter | month | school_year | window
+| snapshot | horizon | projection`; `value_type` ∈ `actual | projection | inherited | derived`, with
+`inherited_from` naming the municipality a figure was read down from. UTF-8 with BOM, `;` separator,
+`.` decimals, no thousands grouping — Danish Excel opens every file by double-click.
+
+### Numbers, and how a figure says what it is
+
+- `da-DK` on screen (`70.156 DKK`, `+0,4 pp`), `.` decimals and no grouping in every CSV.
+- A change of a share is `pp`, a change of a level is `%`.
+- Rank is `#n of N` everywhere, and the `title` says which peers ("of 77 municipalities with a
+  figure").
+- `–` means the publisher has no figure; `n/c` means it is not computed at this level. Never `0`.
+- A **projection** is purple, dashed, and carries a `Projection` pill — it can never be mistaken for
+  an actual. A **climate** figure is blue and always names both calendars (the zone's year and the
+  Klimaatlas period).
+- A figure the area does not publish itself is dimmed and labelled **municipality figure** on a tile,
+  tagged **muni** in a table, and listed under *From the municipality* in the picker.
 
 ### Safety
 
@@ -27,7 +125,7 @@ Reported crime from Statistics Denmark (STRAF11, quarterly from 2007; STRAF22, a
 
 ### Infrastructure pipeline
 
-An *Infra projects* overlay on the map: 51 curated projects that will change accessibility — metro and light rail, motorways, bridges and tunnels, hospitals, BRT lines, campuses, state buildings and urban-development areas. Line style shows the status (study · decided · under construction · opened), a click opens the project's datasheet with its budget, opening year, length and the areas it serves, and the **Pipeline** view lists them all with filters and CSV export. Area cards show the three nearest upcoming projects. Budgets and years come from each project's own official source and are left empty when that source does not state them; geometry drawn by hand is marked as a schematic corridor. Method and sources: [`docs/INFRA.md`](docs/INFRA.md).
+An *Infra projects* overlay on the map: 51 curated projects that will change accessibility — metro and light rail, motorways, bridges and tunnels, hospitals, BRT lines, campuses, state buildings and urban-development areas. Line style shows the status (study · decided · under construction · opened), a click opens the project's datasheet with its budget, opening year, length and the areas it serves, and **Data › Projects** lists them all with filters and CSV export. Area cards show the three nearest upcoming projects. Budgets and years come from each project's own official source and are left empty when that source does not state them; geometry drawn by hand is marked as a schematic corridor. Method and sources: [`docs/INFRA.md`](docs/INFRA.md).
 
 ![Infrastructure overlay — planned metro, roads and development areas over the crime choropleth in Copenhagen](docs/screenshot-infra.png)
 
@@ -43,11 +141,11 @@ Every Education building that sits on a school's site carries that school's figu
 
 ![School quality — Frederiksberg with the public layer filtered to Education, markers coloured by FP9 grade average](docs/screenshot-schools.jpg)
 
-### Test property and the Analysis sheet
+### Test property — one address against every layer
 
-Paste a Google Maps link — or a plain `55.67610, 12.56830` — into the box on the map toolbar and the dashboard pins that point, drills to its municipality at postal-code level and draws 500 / 1 000 / 1 200 m rings around it; *Analyse ›* opens the **Analysis sheet** (`#analysis?a=<lat>,<lon>`), one address read against every layer at once: where it is (kommune · postal code · Copenhagen quarter, from the kommune's own boundary rings rather than from its postal code, so a Frederiksberg address is not labelled København), the full area profile with a direction-aware percentile bar against every area of the same level, safety, every infrastructure project within 3 km with its distance **computed from the geometry** — a station point, the nearest point of a line, 0 m inside a development area — the public buildings and schools within 1 000 m including the ones across a municipality border, and a sources card built from what that pin actually read. The mini map carries the same three layer pills as the Macro map with the same legends, filters and popups, and its choropleth follows whichever headline tile you click. The link is the state: `&lay=`, `&ind=`, `&pub=` and the pin itself travel in it, so *Copy link* reproduces the view and Back returns to the map with the pin intact. It all runs in the browser — the link is parsed, never followed, which is also why short `maps.app.goo.gl` links are refused by name instead of guessed at, and why the box says the location is stored only in the page URL. **Coverage: national, except public buildings and schools (Copenhagen metro set).** Method, formats, distances and caveats: [`docs/ANALYSIS.md`](docs/ANALYSIS.md).
+Paste a Google Maps link — or a plain `55.67610, 12.56830` — into the map's search box or into the box at the top of **Test property**, and the dashboard pins that point, drills to its municipality at postal-code level and draws 500 / 1 000 / 1 200 m rings around it; *Open as test property* opens **`#property?p=<lat>,<lon>[:label]`**, one address read against every layer at once: where it is (kommune · postal code · Copenhagen quarter, from the kommune's own boundary rings rather than from its postal code, so a Frederiksberg address is not labelled København), the full area profile with a direction-aware percentile bar against every area of the same level, safety, every infrastructure project within 3 km with its distance **computed from the geometry** — a station point, the nearest point of a line, 0 m inside a development area — the public buildings and schools inside the radius you choose (500 m · 1 km · 2 km · 5 km) including the ones across a municipality border, and a sources section built from what that pin actually read. The mini map drags, zooms and goes full screen, and carries the same layers as the Macro map through the same `Layers ▾` menu; its choropleth follows whichever indicator the picker — or a click on a headline tile — names. The link is the state: `&ind=`, `&lay=`, `&rad=`, `&show=` and the pin itself travel in it, so *Copy link* reproduces the view and Back returns to the map with the pin intact. It all runs in the browser — the link is parsed, never followed, which is also why short `maps.app.goo.gl` links are refused by name instead of guessed at, and why the box says the location is stored only in the page URL. **Coverage: national, except public buildings and schools (Copenhagen metro set).** Method, formats, distances and caveats: [`docs/ANALYSIS.md`](docs/ANALYSIS.md).
 
-![Analysis sheet — a test property in 2450 København SV with the infra and public-building overlays on the mini map](docs/screenshot-analysis.jpg)
+![Test property — a pin in 2450 København SV with the infra and public-building overlays on the mini map](docs/screenshot-analysis.jpg)
 
 ### Services — shops, food, pharmacies and transport stops
 
@@ -97,8 +195,16 @@ make fetch      # ~36 pulls to data/raw (no key)
 make build      # raw → data/processed → dist/index.html
 make serve      # http://localhost:8080
 make test       # unit tests (python + node --test)
+make smoke      # UI: every route × 4 viewports — landmarks, redirects, 0 JS errors, 0 overflow
+make ac         # UI: the v3.0 acceptance suite, one check per spec criterion
 make links      # full source-link sweep: all 165 Outlook links (slow, ~15 min — not in make validate)
 ```
+
+`make smoke` and `make ac` need a server on :8080 (`make serve`); both check the page title first and
+serve `dist/` themselves if something else owns that port. They are the UI's regression net: 38
+routes at 1440×900, 1536×864, 1366×768 and 390×844, every v2.6 redirect among them, and one
+acceptance check per criterion in [`docs/v3/UI_SPEC_v3.md`](docs/v3/UI_SPEC_v3.md). See
+[`docs/UI_V3.md`](docs/UI_V3.md) §6 for the raw commands and their flags.
 
 `make validate` is the pre-commit check and stays quick. The **full** source-link sweep —
 every one of the 98 municipalities and 67 Copenhagen quarters fetched and its displayed value
@@ -114,12 +220,13 @@ Every push to `main` rebuilds and deploys to GitHub Pages; on the 3rd of each mo
 
 | doc | read it when |
 |---|---|
+| [`docs/UI_V3.md`](docs/UI_V3.md) | the interface — routes and redirects, URL keys, components, export schema, the responsive matrix, the test commands |
 | [`docs/RUNBOOK.md`](docs/RUNBOOK.md) | you are about to run something — steps, expected output, troubleshooting |
 | [`docs/DATA_FOLDERS.md`](docs/DATA_FOLDERS.md) | where a file belongs, what is committed, how a number is traced to its source |
 | [`docs/DATA_MAP.md`](docs/DATA_MAP.md) | source catalogue, Finnish → Danish indicator mapping, verification log |
 | [`docs/BUILD_PLAN.md`](docs/BUILD_PLAN.md) | phases done and the roadmap |
 | [`docs/SCHOOLS.md`](docs/SCHOOLS.md) | school quality — cube codes, the BBR join, discretion rules, cadence |
-| [`docs/ANALYSIS.md`](docs/ANALYSIS.md) | the test-property pin and the Analysis sheet — link formats, kommune resolution, distances, coverage, privacy |
+| [`docs/ANALYSIS.md`](docs/ANALYSIS.md) | the test-property pin — link formats, kommune resolution, distances, coverage, privacy |
 | [`docs/SERVICES.md`](docs/SERVICES.md) | the services layer — sources, categories, zoom floors, clustering rules, refresh |
 | [`docs/CLIMATE.md`](docs/CLIMATE.md) | the climate risk layer — sources, the two calendars, the coast and risk-area rules, exposure, what was left out |
 | [`docs/FORECAST.md`](docs/FORECAST.md) | the population outlook — sources, the hard-data rule, what is shown and what is research |
@@ -143,7 +250,7 @@ The UI is a port of a Finnish asset-management dashboard's market section: same 
 - The public-buildings layer covers the Copenhagen metro set only, and BBR is owner-reported: floor area, use and status are as reported, not as surveyed. An open building case is not a construction schedule.
 - The outlook is a projection, not a measurement: it carries each area's recent fertility, mortality and migration forward and contains no housing programme, so a large planned development is not in it. DST's run and Københavns Kommune's run disagree by 2.2 % for Copenhagen by 2040 and are never combined.
 - The services layer is as complete as OpenStreetMap is in that place, and that varies: Copenhagen is densely mapped, rural Jutland is not. Transport stops are the live timetable, so a stop is where you can catch something, not how often.
-- The Analysis sheet's distances are to mapped geometry, not walking routes, and its infra list is the curated layer — an existing station that is not a project in it will not appear. Short `maps.app.goo.gl` links cannot be resolved in a browser; paste the long URL.
+- The test property's distances are to mapped geometry, not walking routes, and its infra list is the curated layer — an existing station that is not a project in it will not appear. Short `maps.app.goo.gl` links cannot be resolved in a browser; paste the long URL.
 - The infrastructure layer is a curated list, not a register: it holds the projects named in `docs/INFRA.md` and nothing else, and ten of its geometries are schematic corridors drawn by hand.
 - Crime figures are reported offences by place of offence, per municipality only; they exclude the traffic law, break in 2007 and on 1 July 2013 (sexual offences), and DST writes suppressed cells as 0, so a zero on a small island may be suppressed.
 
@@ -151,7 +258,7 @@ The UI is a port of a Finnish asset-management dashboard's market section: same 
 
 Code: MIT. Data: each source's own terms (all permit reuse with attribution). When you reuse the data or the map, credit: *Danmarks Statistik (incl. crime statistics STRAF11/STRAF22) · Indeholder data fra Klimadatastyrelsen (BBR, DAR) · Københavns Kommune, Tryghedsundersøgelsen / Københavns Politi · Plan- og Landdistriktsstyrelsen (Fingerplan 2019) · Transportministeriet (Anlægsstatus) · the regions, Movia and Bygningsstyrelsen for their own projects · © OpenStreetMap contributors (ODbL) · Finans Danmark, Boligmarkedsstatistikken · Social- og Boligstyrelsen, boligstat.dk · Landsbyggefonden · Indeholder data fra Klimadatastyrelsen (DAGI) · Danmarks Nationalbank · Kilde: Uddannelsesstatistik.dk (Børne- og Undervisningsministeriet / STIL), retrieved 2026-09-23 · Institutionsregisteret, STIL · Danmarks Statistik FRKM126 / FRDK126 (municipal population projection) · Københavns Kommune KKFR2026 (befolkningsfremskrivning).*
 
-The services layer adds two of its own, carried on every popup, in the map footer while the layer is on, and in Market › Sources:
+The services layer adds two of its own, carried on every popup, in the map footer while the layer is on, and in Data › Sources:
 
 - **© OpenStreetMap contributors, ODbL** — shops, eating places and pharmacies (Denmark extract processed by Geofabrik GmbH)
 - **Rejseplanen, CC BY 4.0** — metro, S-train, rail, light-rail and bus stops

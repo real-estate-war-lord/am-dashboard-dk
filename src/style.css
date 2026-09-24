@@ -124,29 +124,8 @@ main{overflow-y:auto;display:flex;flex-direction:column}
 .today{display:flex;flex-direction:column;gap:2px}
 .today .rract{margin-top:4px;padding:8px 11px;font-size:12.5px}
 .today .rract em{font-style:normal;color:var(--ink2)}
-/* ---- toggle-lista: rivi kertoo mitä, avaus kertoo miksi ja mitä tehdä ---- */
-.tg{border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--panel)}
-.tg+.tg{margin-top:8px}
-.tgi{border-bottom:1px solid var(--line2)}
-.tgi:last-child{border-bottom:0}
-.tgi>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:11px 14px;font-size:13px}
-.tgi>summary::-webkit-details-marker{display:none}
-.tgi>summary:hover{background:var(--panel2)}
-.tgi[open]>summary{background:var(--panel2);border-bottom:1px solid var(--line2)}
-.tgi .tgt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tgi .tgt b{font-weight:600;font-family:var(--body)}
-.tgi .tgv{font-family:var(--mono);font-size:12.5px;color:var(--ink);white-space:nowrap}
-.tgi .tgv.bad{color:var(--bad)}.tgi .tgv.good{color:var(--good)}
-.tgi .tgx{font-family:var(--mono);font-size:15px;color:var(--dim);line-height:1;transition:transform .15s}
-.tgi[open] .tgx{transform:rotate(90deg)}
-.tgb{padding:2px 14px 14px 38px;font-size:12.5px;color:var(--ink2);line-height:1.6}
-.tgb b{font-family:var(--body)}
-.tghead{display:flex;align-items:center;gap:10px;padding:9px 14px;background:var(--panel2);border-bottom:1px solid var(--line2);
-  font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.tghead .tgn{margin-left:auto;color:var(--ink)}
-.tgmore{display:block;width:100%;text-align:center;background:none;border:0;border-top:1px solid var(--line2);
-  padding:9px;font-family:var(--mono);font-size:11px;color:var(--muted);cursor:pointer}
-.tgmore:hover{color:var(--ink);background:var(--panel2)}
+/* (v2.6 legacy `.tg / .tgi / .tgb / .tghead / .tgmore` toggle list deleted in P9 — not one of those
+   class names occurs in any src/*.js or in src/index.html.) */
 /* ---- kaksi yleiskuvaa: tapahtui / tapahtumassa ---- */
 .ovcols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 @media (max-width:1100px){.ovcols{grid-template-columns:1fr}}
@@ -183,16 +162,7 @@ main{overflow-y:auto;display:flex;flex-direction:column}
 .phead .ph-r{display:flex;flex-direction:column;align-items:flex-end;gap:9px}
 .ag-bad{background:#B0331B}.ag-warn{background:#C08A24}.ag-neu{background:#B9BCB2}.ag-good{background:#1C6B5C}
 /* hälytysryhmä: otsikkorivi jonka alta löydöslista aukeaa */
-/* taitettava kortti */
-.card.fold{padding:0}
-.card.fold>summary{list-style:none;cursor:pointer;margin:0;padding:17px 20px;border-bottom:0}
-.card.fold>summary::-webkit-details-marker{display:none}
-.card.fold>summary:hover{background:var(--panel2)}
-.card.fold[open]>summary{border-bottom:1px solid var(--line2)}
-.card.fold>summary .tgx{margin-left:auto;font-family:var(--mono);font-size:15px;color:var(--dim);line-height:1;transition:transform .15s}
-.card.fold[open]>summary .tgx{transform:rotate(90deg)}
-.card.fold .foldb{padding:14px 20px 19px}
-.card.fold .foldb>.tbl:first-child,.card.fold .foldb>.hero:first-child{margin-top:0}
+/* (v2.6 legacy `.card.fold` / `.foldb` deleted in P9 — the v3.0 foldable card is `.card.arsec`.) */
 .hero.hero3{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media (max-width:1100px){.hero.hero3{grid-template-columns:1fr 1fr}}
 .back{margin-bottom:2px}
@@ -642,6 +612,10 @@ aside{width:250px}
 .hero .vdrow{padding-top:8px}
 .hero .mini-bar{margin-top:auto}
 .hero b{font-size:29px}
+/* Data › National series: the four labels are publisher names and some of them take two lines, so
+   the figure is pushed to the foot of the tile — otherwise the values in one row sit on two
+   different baselines and the row reads as broken. */
+.hero-nat b{margin-top:auto}
 .tw{height:210px}
 .grid-2>.card{display:flex;flex-direction:column}
 .grid-2>.card>.tbl:last-child,.grid-2>.card>p.cap:last-child{margin-top:auto}
@@ -708,8 +682,6 @@ aside{width:250px}
    (aiemmin overflow:clip leikkasi oikeat sarakkeet pois 1400 px:n leveydellä) */
 .card>.tbl,.card>.scrollx>.tbl{max-width:100%}
 .card:has(>.tbl){overflow-x:auto}
-.card.fold .foldb{overflow-x:auto}
-.card.fold .foldb>.tbl{min-width:0}
 .scrollx table tr>th:first-child{position:sticky;left:0;background:var(--panel);z-index:2}
 .scrollx table thead tr>th:first-child{z-index:3}
 .tbl.wraphead thead th{white-space:nowrap;line-height:1.3;vertical-align:bottom;font-size:8.5px}
@@ -1420,8 +1392,10 @@ th .thn{display:inline}
 .tppop .cap{margin:2px 0 0}
 
 /* ---------- Analysis sheet: one property against every layer ---------- */
-/* the title is an input, so the identity column needs a basis of its own — a bare input shrinks to ~20 characters */
-.anhead .arid{flex:1 1 420px;min-width:0}
+/* the identity block is a row of its own (spec §5.5′). It has to claim the whole line: `.tpnote`
+   above it is capped at 760 px, so a basis narrow enough to fit beside that cap put the title and
+   its action row in two columns with a hole between them from ~1500 px up. */
+.anhead .arid{flex:1 1 100%;min-width:0}
 .anhead .anlab{font-family:var(--disp);font-size:30px;font-weight:700;letter-spacing:-.03em;color:var(--ink);
   display:block;width:100%;border:1px solid transparent;border-radius:8px;background:transparent;padding:2px 7px;margin:0 0 8px -7px}
 .anhead .anlab:hover{border-color:var(--line)}
@@ -1623,7 +1597,9 @@ table[data-testid=sources-table] code{font-family:var(--mono);font-size:10px}
 /* the chips row: QUICK_KEYS at this level, the active one filled. `.chip` is shared with the Charts
    entity chips, so the indicator chips reset the 4 px left border those carry. */
 .indchips{display:flex;gap:var(--s1);flex-wrap:wrap;margin:0}
-.indchips .chip{border-left-width:1px;border-radius:999px;padding:0 10px;min-height:var(--chip-h);
+/* nowrap: the row scrolls sideways below 1025 px, so a chip must never break its own label in two —
+   "Rent (priv.)" on two lines made the row ragged and broke the 24 px chip height of §2.2 */
+.indchips .chip{border-left-width:1px;border-radius:999px;padding:0 10px;min-height:var(--chip-h);white-space:nowrap;
   font-family:var(--mono);font-size:10.5px;color:var(--ink2);background:var(--panel);cursor:pointer}
 .indchips .chip:hover{border-color:var(--ink);color:var(--ink)}
 .indchips .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
@@ -1755,7 +1731,9 @@ details.mstrip .mstrip-act{margin-top:10px}
    public → services), 8 px apart so two cards can never overlap. The stack is capped at 60 % of the
    map's height and wraps into a second column (wrap-reverse keeps the indicator legend in the
    corner); lgFit() folds the topmost feature legend to its title if even that is not enough. */
-#maplegs{top:auto;bottom:12px;right:12px;left:auto;flex-flow:column-reverse wrap-reverse;align-items:flex-end;
+/* bottom:26px, not 12: Leaflet's own attribution control sits in this corner and the credit line
+   (OpenStreetMap, DAGI) must stay readable — at 12 px the legend card's foot ran through it. */
+#maplegs{top:auto;bottom:26px;right:12px;left:auto;flex-flow:column-reverse wrap-reverse;align-items:flex-end;
   align-content:flex-start;gap:var(--s2);max-height:60%;max-width:calc(100% - 24px);overflow:visible;pointer-events:none}
 #maplegs .maplegend{pointer-events:none;max-width:220px}
 /* a key plus a "zoom in" state can be wider than the card: let the state drop to its own line
@@ -1800,6 +1778,9 @@ details.mstrip .mstrip-act{margin-top:10px}
 .hltile.inh{background:var(--inh-bg)}
 .hltile.inh:hover{background:#EDEDE8}
 .inhlab{font-family:var(--mono);font-size:9.5px;color:var(--inh)}
+/* the ^ that marks a bydel figure on a quarter: a glyph nobody can read is no marker at all, so it
+   carries its sentence in a title rather than the browser's default dotted underline */
+abbr.bmark{text-decoration:none;border-bottom:0;cursor:help;color:var(--muted)}
 .hltile .tpill{position:absolute;top:7px;right:8px;font-size:8.5px;padding:0 4px}
 @media (max-width:1250px){.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:800px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -1876,8 +1857,10 @@ details.mstrip .mstrip-act{margin-top:10px}
 .arsec>summary{cursor:pointer;list-style:none;display:flex;align-items:baseline;gap:var(--s3);flex-wrap:wrap;
   padding:12px 17px}
 .arsec>summary::-webkit-details-marker{display:none}
-.arsec>summary::before{content:"\25B8";font-size:10px;color:var(--muted);line-height:1.6}
-.arsec[open]>summary::before{content:"\25BE"}
+/* the triangle belongs to the title, not to the row: as a flex item of its own it stayed behind on
+   line 1 whenever a long section name wrapped, leaving a marker with nothing next to it */
+.arsec>summary .arsec-t::before{content:"\25B8";font-size:10px;color:var(--muted);letter-spacing:0;margin-right:var(--s2)}
+.arsec[open]>summary .arsec-t::before{content:"\25BE"}
 .arsec>summary:hover .arsec-t{color:var(--k1)}
 .arsec-t{font-family:var(--disp);font-size:var(--fs-card-title);font-weight:700;letter-spacing:.11em;
   text-transform:uppercase;color:var(--ink)}
@@ -1911,9 +1894,13 @@ details.mstrip .mstrip-act{margin-top:10px}
 
 /* ---- P6 · Test property (§5.5′): the same study row, one pin ---- */
 /* the legends stack inside the mini map, bottom right, the ⤢ keeps the top right to itself */
-.minimap .maplegs{top:auto;bottom:10px;right:10px;max-height:60%;max-width:66%;gap:6px;
+/* bottom:24px for the same reason as #maplegs: a tiled mini map credits OpenStreetMap down there */
+.minimap .maplegs{top:auto;bottom:24px;right:10px;max-height:60%;max-width:66%;gap:6px;
   pointer-events:auto;scrollbar-width:thin}
 .minimap .maplegs .mm-leg{position:static;right:auto;bottom:auto;max-width:none}
+/* below 900 px the shared .maplegs rule stretches the stack to left:12px, where it runs into the
+   + − ⌖ control column; 52 px clears it and the card still has the width of the map to itself */
+@media (max-width:900px){.minimap .maplegs{left:52px}}
 /* Layers ▾ and the radius sit at the right end of the one toolbar row */
 .artools .tp-right{margin-left:auto;display:flex;align-items:center;gap:var(--s2)}
 .radsel{display:inline-flex;align-items:center;gap:6px}
@@ -2032,6 +2019,12 @@ details.mstrip .mstrip-act{margin-top:10px}
     background:var(--panel);box-shadow:1px 0 0 var(--line2)}
   .scrollx>.tbl thead th:first-child{z-index:3}
   .scrollx>.tbl tbody tr:hover>th:first-child,.scrollx>.tbl tbody tr:hover>td:first-child{background:var(--panel2)}
+  /* A table with no intrinsic width shrinks to its container by wrapping cells, so once the card is
+     this narrow a short categorical column gets squeezed into ~20 px and wraps one word per line:
+     "Outlook around this project"'s per-area verify link, and the school lists' "Private / free
+     school" on three lines in every one of 135 rows. Let those two keep their width — the table is
+     then wider than the card, which is when .scrollx above does its job. */
+  .olblock .tbl td:last-child,.tbl td.nw{white-space:nowrap}
 }
 @media (max-width:600px){
   #lfmap{height:max(55vh,320px)}
@@ -2052,8 +2045,12 @@ details.mstrip .mstrip-act{margin-top:10px}
   .tiles:not(.wrap)>*:last-child:nth-child(3n+2){grid-column:span 2}
 }
 @media (max-width:800px){
-  .tiles:not(.wrap)>*:last-child{grid-column:auto}
-  .tiles:not(.wrap)>*:last-child:nth-child(2n+1){grid-column:span 2}
+  /* `.wrap` (the sheet and outlook tile rows) is auto-fit above this width, which collapses a track
+     nobody uses — but not the hole an odd last tile leaves in a two-column last row. Pin it to two
+     and give that tile the rest of its row, the same rule the five headline tiles follow. */
+  .tiles.wrap{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tiles>*:last-child{grid-column:auto}
+  .tiles>*:last-child:nth-child(2n+1){grid-column:span 2}
 }
 
 /* ---- §4.10 empty / loading / error states: mono caption + one action, never a modal ---- */

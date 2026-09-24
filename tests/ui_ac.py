@@ -34,7 +34,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from ui_smoke import our_url  # noqa: E402
 
 PHASES = ["P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9"]
-VIEWPORTS = {"1440x900": (1440, 900), "1366x768": (1366, 768), "390x844": (390, 844)}
+VIEWPORTS = {"1440x900": (1440, 900), "1536x864": (1536, 864), "1366x768": (1366, 768), "390x844": (390, 844)}
 DEFAULT_VP = "1440x900"
 
 # Console noise that is not the app's fault (tile/font requests fail when the network is blocked).
@@ -1815,6 +1815,155 @@ def ac_g1(page, base):
         strayed = [f"{r}: {t[:90]!r}" for r, t in quoted if t not in blob]
         assert not strayed, ("text the app wrote itself says score / weighted / index of — "
                              + " | ".join(strayed[:6]))
+
+
+# =============================================================================================
+# P9 — final QA: the defects the fresh-eyes pass found, each one pinned so it cannot come back
+# =============================================================================================
+@ac("AC-Q1", phase="P9")
+def ac_q1(page, base):
+    """A legend never sits on top of the map's attribution. The OpenStreetMap / DAGI credit is a
+    licence condition and it lives in the same bottom-right corner as the legend stack, so the two
+    boxes must not intersect — on the macro map or on a mini map with tiles under it."""
+    for route, stack in [("map?ind=growth", "#maplegs"),
+                         ("property?p=55.6545,12.539", ".minimap .maplegs")]:
+        goto(page, route, settle=1600, wait=".leaflet-container")
+        page.wait_for_timeout(700)
+        legs = rects(page, stack + " .maplegend")
+        attr = rects(page, ".leaflet-control-attribution")
+        assert legs, f"{route}: no legend card inside {stack}"
+        if not attr:
+            continue                                    # a map with no tile layer credits nobody
+        a = attr[0]
+        for lg in legs:
+            overlap = (min(lg["right"], a["right"]) - max(lg["x"], a["x"]) > 1
+                       and min(lg["bottom"], a["bottom"]) - max(lg["y"], a["y"]) > 1)
+            assert not overlap, (f"{route}: the legend {lg['id']!r} covers the map attribution "
+                                 f"(legend {lg['y']:.0f}–{lg['bottom']:.0f}, attribution "
+                                 f"{a['y']:.0f}–{a['bottom']:.0f})")
+
+
+@ac("AC-Q2", phase="P9", viewport="1536x864")
+def ac_q2(page, base):
+    """The test-property header is one column at every width. `.tpnote` above the identity block is
+    capped at 760 px, so a narrow flex basis on the identity block let the two share a line from
+    ~1500 px up: the title floated to the right of the privacy sentence, away from its own action
+    row, with a hole between them. Title, actions and tiles all start at the same x."""
+    goto(page, "property?p=55.6545,12.539", settle=1800, wait="[data-testid=tiles]")
+    page.wait_for_timeout(500)
+    lefts = {}
+    for name, sel in [("title", ".anhead .arid"), ("actions", ".anhead .arid ~ .tools"),
+                      ("tiles", ".anhead [data-testid=tiles]")]:
+        b = page.locator(sel).first.bounding_box()
+        assert b, f"no {name} block in the test-property header ({sel})"
+        lefts[name] = b["x"]
+    spread = max(lefts.values()) - min(lefts.values())
+    assert spread <= 2, f"the header is not one column — left edges {lefts}"
+    card = box_of(page, ".anhead")
+    idb = box_of(page, ".anhead .arid")
+    assert idb["width"] >= card["width"] * .8, (
+        f"the identity block takes {idb['width']:.0f} of {card['width']:.0f} px — it is sharing its "
+        "line with the privacy note again")
+
+
+@ac("AC-Q3", phase="P9", viewport="390x844")
+def ac_q3(page, base):
+    """No tile row leaves a bare grid cell showing the separator colour through. The 1 px gaps are
+    the card's background, so an unfilled cell reads as a grey slab — P8 fixed that for the five
+    headline tiles and this extends it to `.tiles.wrap` (the sheet and Population-outlook rows),
+    which is `auto-fit` and leaves a hole whenever an odd last tile lands in a two-column row."""
+    for route, opener in [("area/kommune/101?ind=growth&show=outlook", None),
+                          ("climate/0167?hz=2070", None),
+                          ("project/m5-phase-1", None)]:
+        goto(page, route, settle=1800, wait="[data-testid=tiles]")
+        if opener:
+            page.click(opener)
+            page.wait_for_timeout(300)
+        page.wait_for_timeout(400)
+        bad = page.evaluate("""() => {
+          const out = [];
+          for (const g of document.querySelectorAll('.tiles')) {
+            const r = g.getBoundingClientRect();
+            if (r.width < 1) continue;
+            const kids = [...g.children].filter(e => e.getClientRects().length > 0);
+            if (!kids.length) continue;
+            const last = kids[kids.length - 1].getBoundingClientRect();
+            /* the last tile must either share its row with a tile to its right, or reach the end */
+            const sameRow = kids.some(e => e !== kids[kids.length - 1] &&
+              Math.abs(e.getBoundingClientRect().top - last.top) < 2 &&
+              e.getBoundingClientRect().left > last.left);
+            if (!sameRow && last.right < r.right - 2)
+              out.push(`${g.dataset.testid || g.className} last tile ends at ${Math.round(last.right)} of ${Math.round(r.right)}`);
+          }
+          return out;
+        }""")
+        assert not bad, f"{route}: a tile row has an empty cell — " + " | ".join(bad)
+
+
+@ac("AC-Q4", phase="P9")
+def ac_q4(page, base):
+    """An inherited figure is marked the same way on every row-per-indicator table: `.inh` on the
+    row and a `muni` tag that says whose figure it is (spec §4.8, §2.4 "never a lone °"). The test
+    property's Area profile still used the v2.6 ° while the area page's All figures used the tag.
+
+    The pin is in Aarhus, so its finest published area is a postal code and the municipality-level
+    indicators (unemployment, tenure, crime) are read down onto it — a Copenhagen quarter publishes
+    its own figure for nearly everything and would have nothing inherited to check."""
+    goto(page, "property?p=56.15700,10.21000&show=profile", settle=2600, wait="[data-testid=tp-sec-profile]")
+    page.wait_for_timeout(900)
+    rows = page.evaluate("""() => {
+      const t = document.querySelector('[data-testid=tp-sec-profile] table');
+      if (!t) return null;
+      return [...t.querySelectorAll('tbody tr')].map(tr => ({
+        inh: tr.classList.contains('inh'),
+        tag: !!tr.querySelector('.tag-muni'),
+        val: (tr.querySelector('td.num') || {}).textContent || '' }));
+    }""")
+    assert rows, "no Area profile table on the test property"
+    assert any(r["inh"] for r in rows), "no inherited row on a Copenhagen quarter's Area profile"
+    for r in rows:
+        assert r["inh"] == r["tag"], f"an inherited row without its muni tag (or the reverse): {r}"
+        assert "°" not in r["val"], f"a value cell still carries a bare ° : {r['val']!r}"
+
+
+@ac("AC-Q5", phase="P9")
+def ac_q5(page, base):
+    """No double-escaped HTML entity reaches the reader. `Sources &amp; as of` shipped as the test
+    property's last section heading because the label was escaped twice; one grep over the visible
+    text of every MUST route is cheaper than remembering not to do it again."""
+    rx = re.compile(r"&(amp|lt|gt|quot|#\d+);")
+    js = """(() => {
+      const out = [], w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      for (let n = w.nextNode(); n; n = w.nextNode()) {
+        const p = n.parentElement;
+        if (!p || p.closest('script,style,title')) continue;
+        const r = p.getBoundingClientRect();
+        if (r.width < 1 && r.height < 1) continue;
+        const t = (n.nodeValue || '').trim();
+        if (t) out.push(t);
+      }
+      return out;
+    })()"""
+    hits = []
+    for route in MUST_ROUTES + ["climate/0167", "project/m5-phase-1", "property?p=55.6545,12.539&show=sources"]:
+        goto(page, route, settle=1200)
+        for t in page.evaluate(js):
+            if rx.search(t):
+                hits.append(f"{route}: {t[:90]!r}")
+    assert not hits, "escaped HTML shown as text — " + " | ".join(hits[:6])
+
+
+@ac("AC-Q6", phase="P9", viewport="390x844")
+def ac_q6(page, base):
+    """A chip never breaks its own label in two. The chips row scrolls sideways below 1025 px, so a
+    wrapping chip ("Rent (priv.)") made the row ragged and broke the 24 px chip height of §2.2."""
+    for route in ["map?ind=growth", "area/kommune/101?ind=growth",
+                  "data/areas/kommune?ind=growth", "charts?ind=growth&a=kommune:101"]:
+        goto(page, route, settle=1200, wait="[data-testid=ind-chips]")
+        tall = page.evaluate("""() => [...document.querySelectorAll('[data-testid=ind-chips] .chip')]
+          .filter(c => c.getClientRects().length > 1 || c.getBoundingClientRect().height > 30)
+          .map(c => `${(c.textContent || '').trim()} ${Math.round(c.getBoundingClientRect().height)}px`)""")
+        assert not tall, f"{route}: a chip wrapped onto two lines — " + " | ".join(tall)
 
 
 # ---------------------------------------------------------------------------------------------

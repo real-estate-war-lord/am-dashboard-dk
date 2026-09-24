@@ -31,8 +31,9 @@ test:       ## every unit test (python + js)
 	$(PY) -m unittest discover -s tests -p 'test_*.py' && $(MAKE) test-js
 ui-check:   ## drive dist/index.html headless and assert on the app's own state (needs Chrome)
 	$(PY) scripts/ui_check.py
-smoke:      ## every route x 3 viewports: 0 JS errors, DOM landmarks, screenshots (needs `make serve` on :8080)
-	$(UIPY) tests/ui_smoke.py --url $(UIURL) --no-network --phase adhoc --out logs/shots
+smoke:      ## every route x 4 viewports: 0 JS errors, 0 overflow, DOM landmarks, redirects, shots (needs `make serve` on :8080)
+	$(UIPY) tests/ui_smoke.py --url $(UIURL) --no-network --phase adhoc --out logs/shots \
+	        --viewports 1440x900,1536x864,1366x768,390x844
 ac:         ## the UI spec's acceptance criteria, one test per AC id (needs `make serve` on :8080)
 	$(UIPY) tests/ui_ac.py --url $(UIURL) --out logs/ac
 validate-forecast: ## the Outlook layer's own checks (hard-data audit, reconciliations, backtest)

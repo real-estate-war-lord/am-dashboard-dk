@@ -70,6 +70,21 @@ AC can assert on it. `report.json` and a screenshot per AC go to `--out`.
 
 CLI: `--url --phase-upto --only --viewports --out --headed --network`.
 
+Two conventions worth knowing before you add one:
+
+- **`OVERFLOW_FATAL = True`** in `ui_smoke.py`. Since P8 rebuilt the responsive shell, an element
+  that makes the page scroll sideways fails the run at **every** viewport, not only at phone width.
+  One shared expression (`ui_smoke.OVERFLOW_JS`, imported by `ui_ac.py` for AC-R1) decides it and
+  names the offending element in the message. A Leaflet container always reports
+  `scrollWidth > clientWidth`, so it is excluded by name — judge a map on the wrapper that clips it.
+- **AC-G1 is asserted in two halves** ("no score / weighted / index of"). First: none of the
+  dashboard's *own* words — button, heading, `th`, tile label, tag, chip, legend title — matches the
+  phrase. Second: any remaining visible match must be a verbatim substring of the built registry,
+  i.e. the publisher's own prose (two DST descriptions use "score" as a verb, and
+  Uddannelsesstatistik publishes the FP9 grade "pupil-weighted"). `data/` is out of the overnight
+  run's reach, and rewording a publisher to satisfy a UI rule would be the wrong fix. Nothing is
+  exempted by name — the four places where app.js itself said "weighted" were reworded instead.
+
 Downloads: the export ACs (P7) read the files the `Export ▾` menu writes. The context is created
 with `accept_downloads=True`; `export_csv(page, kind)` opens the menu (idempotently — the trigger
 is a toggle, so it is never clicked twice), clicks one `[data-export]` item, asserts the UTF-8 BOM

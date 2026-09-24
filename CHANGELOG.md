@@ -1,5 +1,140 @@
 # Changelog
 
+## v3.0 — 2026-09-25
+
+The interface, rebuilt around one idea: **study one indicator at a time, and let every surface agree
+about it.** One indicator picker, one period control, one layers menu, one export model, one number
+format — on the map, on an area page, in the Data tables, in Charts and on the test property. Same
+data, same sources, same palette; a different thing to sit in front of.
+
+### What a reader will notice first
+
+- **Four destinations, not seven.** `Map · Data · Charts · Test property`. *Market* and *Pipeline*
+  are now tabs inside **Data** (`Areas · Projects · National series · Sources`), and Sources is a
+  sortable table rather than an accordion. Nothing was deleted — only the way in moved. **Every old
+  link still works** (the table below).
+- **One indicator picker everywhere.** A button that says `label · unit`, a popover with a search
+  box, twelve groups, `↓ lower is better` where it applies, and an availability tag per row
+  (`2016–`, `snapshot`, `horizons`, `2026→2040`, `muni`). ↑ ↓ Enter Esc. The quick chips sit under
+  it and the active one is filled. Whatever you pick drives the map fill, the chart panel, the
+  highlighted table column and the mini map — nothing is selected in two places any more.
+- **One period control with four faces.** A year select for a historical indicator, the
+  `Today · 2070 · 2120` segments for a Climate one, a static `Projection 2026→2040 · DST 2026 ·
+  FRKM126` badge for an Outlook one, and an `as of …` badge for a snapshot. No year select next to a
+  2040 figure — that read as an actual.
+- **Climate is an indicator family, not an overlay.** The *Climate risk* button is gone. Choose any
+  Climate indicator and the storm-surge zones and official risk areas draw themselves as a context
+  layer for the horizon you chose, with their own legend and their own off switch (`zones=0`).
+- **`Layers ▾` replaces five toolbar buttons.** Infra projects · Public buildings · Services, with
+  the category filters that used to live inside each floating legend. The legends on the map are now
+  keys only, in one stack that can never overlap itself or run off the map.
+- **The map toolbar is one row.** `[search] [Layers ▾] [Indicator ▾] [period]`, chips under it, the
+  info strip under that. At 1366×768 the map starts 186 px down the page instead of ~330, and the
+  search box takes area names, postal codes, quarter names, Google Maps links **and** `lat, lon` —
+  one box, not two.
+- **The area page is a study row.** Header → five headline tiles → picker → **chart panel beside a
+  draggable mini map** → four foldable sections (*Population outlook · All figures · Sub-areas ·
+  Data information*). The 12-tab **KEY FIGURES** block (48 cards) and the separate *Trend* and
+  *Neighbours* cards are gone; the chart panel does all three jobs and shows a line chart, a peer
+  distribution strip, the outlook chart or the three climate horizons depending on what you picked.
+  Changing the indicator updates in place — your scroll position, your pan and your zoom survive it.
+- **The test property is the same study row, anchored on a pin.** `#property?p=55.6545,12.539:Label`
+  — one address read against every layer, with its own `Layers ▾`, a radius select (500 m · 1 km ·
+  2 km · 5 km) that drives both the ring on the map and the counts below it, and eight foldable
+  sections. The mini map drags and has a full-screen `⤢`.
+- **Inherited figures say so.** A municipality figure shown on a postal code or a quarter is dimmed,
+  labelled **municipality figure** on a tile and tagged **muni** in a table, and the picker lists
+  those indicators under *From the municipality*. Never a bare `°` on a headline figure again.
+- **One `Export ▾` menu**, in the sidebar footer, the Data header and the test-property header.
+  Seven files, one long schema, and **every row carries its source, table id, verify URL, as of,
+  fetched date and licence**. The v2.6 single CSV that jammed projects and macro series into
+  indicator columns is gone, and so is the `kDKK` label on a DKK value.
+- **It is a layout at every width.** 1440, 1536, 1366 and 390 are all first-class: below 1025 px the
+  sidebar becomes a 52 px bar with a drawer, the page scrolls natively, toolbars stack, tables
+  scroll inside their card with the first column pinned, and **nothing makes the page scroll
+  sideways** — that is a test failure now, not a note.
+
+### Removed
+
+| Gone | Where it went |
+|---|---|
+| `Market` nav item and its four big charts | Data › National series — a table with sparklines, plus the four headline tiles |
+| `Pipeline` nav item | Data › Projects |
+| `Compare` (view, nav item, every button) | deleted — `#compare` redirects to the first area's own page |
+| `Climate risk` overlay button and its filter card | Climate indicators + the context zones layer |
+| `Infra projects` / `Public buildings` / `Services` toolbar buttons | `Layers ▾` |
+| `Copenhagen` / `Denmark` jump buttons | the search dropdown's "Jump to" row |
+| the second "Paste Google Maps link" box on the map | the unified search |
+| the area page's KEY FIGURES block, Trend card and Neighbours card | the study row |
+| the horizon control in the area / climate headers | the shared period control |
+| the sidebar's single-CSV button and its four-line explanation | `Export ▾` |
+| the two rank formats (`#n / N` and `#n of N`) | one: `#n of N`, with a `title` naming the peers |
+| the empty grey tile filler on the detail sheets | not rendered |
+| the privacy sentence repeated on every map | the `?` tooltip on the search box and the test property |
+
+### Old links
+
+`hashFor()` is the only serialiser and `parseHash()` the only parser; a v2.6 link is rewritten once,
+on load, and the address bar then shows the canonical spelling. Each of these is a route in
+`tests/ui_smoke.py` and is loaded at four viewports on every run.
+
+| Old | New |
+|---|---|
+| `#table/<level>` | `#data/areas/<level>` |
+| `#pipeline[?ptype=&pstatus=]` | `#data/projects[?…]` |
+| `#market` | `#data/national` |
+| `#market?src=1` · `#sources` | `#data/sources` |
+| `#data` · `#data/areas` | `#data/areas/kommune` |
+| `#analysis?a=<lat>,<lon>&la=<label>` | `#property?p=<lat>,<lon>:<label>` |
+| `#compare?a=<type>:<code>&b=…` | `#area/<type>/<code>` of the **a** side |
+| `#map?…&infra=1&public=1&services=1` | `#map?…&lay=infra,public,services` |
+| `#map?…&climate=1` | `#map?…&ind=surge_dw_pct` |
+| `#area/…?t=bbr\|ind\|sub&g=…` | `#area/…?show=figures\|sub` |
+
+### Export schema
+
+Long format for areas, national series and the test property:
+
+```
+level, code, name, parent_code, parent_name, region, population,
+indicator, label, unit, period, period_type, value, value_type,
+inherited_from, direction, source, table_id, source_url, as_of, fetched, licence
+```
+
+`period_type` ∈ `year | quarter | month | school_year | window | snapshot | horizon | projection`;
+`value_type` ∈ `actual | projection | inherited | derived`. Projects, the sources catalogue, the
+climate exposure and the test property's *nearby* file have their own schemas — a project is never
+written into indicator columns. UTF-8 with BOM, `;` separator, `.` decimals, no thousands grouping:
+Danish Excel opens every one of them by double-click. `areas_long` is 104 028 rows.
+
+### Deferred
+
+- **The portfolio** — several pins on one map, a portfolio table, median / min / max. The URL codec
+  is already list-capable (`p=a;b` parses), so this needs a view that loops, not a format change.
+- **Pinned chips** (the `+` chip and its localStorage), `Columns ▾` on Data › Areas, a national
+  series as a Charts entity, the sub-areas sparkline column, the `/` shortcut, full screen on the
+  main map card — queued, not dropped.
+- **Everything (.zip)** export, PNG export of the study row, a print stylesheet, saved portfolios.
+
+### Known issues
+
+- The **Housing stock (BBR)** indicators draw a blue ramp close to the Climate blue. The hue is
+  per-indicator in the registry and the two are never in one legend, but it wants a daytime pass.
+- `#publist` does not yet group duplicate BBR rows by (name, use code) with a count — the test
+  property's "Public buildings within the ring" does.
+- Two data definitions are surfaced rather than resolved: the KK vs BBR "dwellings built 2010+" gap
+  (a caveat on the four Copenhagen quarters where the two differ by more than 15 pp) and the surge
+  indicators' description, which names the default horizon inside its own sentence.
+- Copenhagen's quarter registry publishes no Climate figure, so a Climate indicator on `#map/101`
+  switches to the postal-code view, where the figure exists.
+- The accessibility AC is a DOM check, not axe-core — the library is not vendored and the build
+  installs nothing.
+
+The full defect list from the final QA pass, with what was fixed and what was left, is in
+[`docs/v3/QA.md`](docs/v3/QA.md). The interface reference is [`docs/UI_V3.md`](docs/UI_V3.md).
+
+---
+
 ## v2.6 — 2026-09-24
 
 The climate risk layer: what the sea is projected to do to an area, from the authorities' own

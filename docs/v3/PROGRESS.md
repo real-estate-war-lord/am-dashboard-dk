@@ -945,3 +945,114 @@ AC-S1, AC-S2, AC-R1, AC-SH1, AC-SH2, AC-A1, AC-A2, AC-G1 — all MUST, all regis
   driven by the picker's active indicator (the climate sheet).
 - P9 (docs): the responsive matrix, the drawer, the `state-*` ids and the number rules belong in
   `README.md`; `OVERFLOW_FATAL` and the two-half AC-G1 belong in `tests/README.md`.
+
+---
+
+## P9 — Final QA with fresh eyes, the docs, release readiness
+
+Commit: `v3.0 P9: final QA pass, the v3.0 docs and the release notes`
+Gate: green — build, 116 node tests, 42 python tests, 150/150 route×viewport smoke checks with **0
+JS errors and 0 horizontal overflow**, **69/69 acceptance criteria** (3 P1 + 8 P2 + 9 P3 + 10 P4 +
+12 P5 + 7 P6 + 6 P7 + 8 P8 + 6 P9), budgets (app.js 446 KiB / 450, style.css 136 KiB / 140).
+
+### What was done
+
+**1. The baseline gate was already green** — 63/63 ACs, 150/150 smoke, budgets inside. Everything
+P9 changed is a *visual* or *consistency* defect that no test was looking for, which is the point of
+the phase. Each one now has an AC of its own.
+
+**2. The visual review.** `tests/ui_smoke.py --full-page` over 38 routes × **four** viewports
+(1536×864 added for this run) — every screenshot read with an image tool. Desktop "full page" is the
+viewport, because `#main` is the scroll container above 1024 px, so everything below the fold was
+read at 390 where the page scrolls natively and the same content is stacked. The whole list with
+severities is **`docs/v3/QA.md`**. The thirteen that were fixed:
+
+- **The legend stack covered Leaflet's attribution on every map** (`#maplegs` `bottom:12px`,
+  `.minimap .maplegs` `10px`). The OpenStreetMap / DAGI credit ran through the legend card's foot
+  and was unreadable — and it is a licence condition, not decoration. Now 26 px / 24 px, and below
+  900 px the mini map's stack moves to `left:52px` so it clears the `+ − ⌖` control column.
+- **The test-property header split into two columns from ~1500 px up.** `.tpnote` is capped at
+  760 px, so a 420 px flex basis on the identity block let the privacy sentence and the title share
+  a line: the title floated right, its action row stayed left, a hole opened between them. Invisible
+  at 1366 and 1440 — which is exactly why 1536 was added. `.anhead .arid{flex:1 1 100%}`.
+- **`Sources &amp; as of`** — the test property's last section heading was escaped twice.
+- **`.tiles.wrap` left a grey slab** at ≤ 800 px (Population outlook, every sheet tile row): it is
+  `auto-fit`, which collapses an unused *track* but not the hole an odd last tile leaves in a
+  two-column last row. P8 fixed this for `.tiles`; the fill rule now covers both.
+- **The test property's Area profile marked an inherited figure with a lone `°`** while the area
+  page's All figures used `.inh` + a `muni` tag — two tables of the same shape, two conventions
+  (spec §4.8, §2.4). The section's ⓘ hint and the Safety caption were reworded with it.
+- Data › National series hero tiles sat on two baselines when a label took two lines
+  (`.hero-nat b{margin-top:auto}`); a chip broke its own label in two below 1025 px
+  (`white-space:nowrap`); the test property's mini-map note wrapped at every width (shortened, the
+  ring scale moved into its tooltip); the `▸` section marker was a flex item of its own and stayed
+  behind when a long section name wrapped (`.arsec-t::before` now); the project sheet's *Outlook
+  around this project* table was not in a `.scrollx`; the `^` bydel marker was a bare glyph on the
+  headline tiles (an `<abbr title>` now); `tpRadLabel(1200)` said `1.2 km` under a da-DK UI.
+
+**3. The consistency audit.** Five indicators (growth, unemp, renters_bbr, surge_dw_pct, fc_growth)
+read across the map legend, the picker button, the chips, the chart panel heading, Data › Areas'
+column header, the test property and the export header: same label, short form, unit, rank format,
+as-of and source string. The old code paths the phase file names — `indsel`, `data-climate`,
+`vCompare`/`cmpRow`/`CMP`, `exportAll`, `exportCsv`, `exportPipelineCsv`, `lineChart`, `tileSpark`,
+`indQuick`/`data-indq`, `AR.group`/`AR.tab`, `SRC_PUB`, `data-anlay`, `data-xall`, "KEY FIGURES",
+the `Climate risk` button — **are all gone**. The two survivors are a CSS class (`.indsel`, the
+shared `<select>` skin, not the deleted `#indsel` element) and the climate *sheet's* own title.
+Two more contiguous v2.6 CSS blocks were verified dead and deleted (the `.tg*` toggle list and
+`.card.fold`/`.foldb`, ≈ 2.1 KB); the rest is logged in QA.md as O7, because it is tangled into
+shared selector lists and wants a real review rather than a last-night deletion.
+
+**4. Old links.** Every redirect in the table was loaded at all four viewports. They are `redirect=`
+routes in `tests/ui_smoke.py`, so this is checked on every run and not once.
+
+**5. Docs.** `CHANGELOG.md` gained a `## v3.0 — 2026-09-25` section (what a reader notices first,
+what was removed and where it went, the redirect table, the export schema, what is deferred, known
+issues). `README.md`'s "What you get" was rewritten around the four destinations and gained
+**Navigation and URLs**, **Export** and **Numbers** sections plus the UI test commands; the stale
+`#analysis` / Market / Pipeline references are gone. **`docs/UI_V3.md`** is new: routes and
+redirects, every URL key, the component table with its test ids, the helper modules, the export
+model, the responsive matrix and the test commands. `docs/v3/QA.md` is the defect list.
+`docs/v3/RELEASE_NOTES_FI.md` is the owner's morning summary in Finnish — what to look at first, the
+five biggest changes, what was deferred and why, and the one command that publishes. `make smoke`
+now runs all four viewports. The visible version string was already `v3.0` (`APP_VERSION`, sidebar
+footer).
+
+### ACs delivered
+**AC-Q1** (no legend over a map's attribution), **AC-Q2** (the test-property header is one column at
+1536), **AC-Q3** (no tile row leaves a bare grid cell, at 390), **AC-Q4** (an inherited row is
+`.inh` + `muni`, never a bare `°`), **AC-Q5** (no escaped HTML entity shown as text on any MUST
+route), **AC-Q6** (no chip wraps onto two lines, at 390). All registered under `phase="P9"`.
+Every MUST AC from P1–P8 still passes; none was weakened or removed.
+
+### Deviations
+- **The P9 ACs are new ids, not spec ids.** The phase's own AC is "every earlier MUST green, smoke
+  green at four viewports, no blocker in QA.md" — all three hold — and a regression found by eye
+  deserves a test of its own rather than being bolted onto someone else's criterion.
+- **AC-Q4 uses an Aarhus pin**, not the Copenhagen one the other test-property ACs use: a Copenhagen
+  quarter publishes its own figure for nearly everything, so there would be no inherited row to
+  check. The Aarhus pin's finest area is a postal code, where unemployment, tenure and crime are the
+  municipality's.
+- **`1536x864` is now in `tests/ui_ac.py`'s VIEWPORTS** (it was already in `tests/ui_smoke.py`'s).
+  It is still not in `./overnight.sh gate`'s `--viewports`, which is outside this run's allowed
+  files; AC-R1 walks all four widths itself and AC-Q2 runs at 1536.
+- **The BBR group's blue ramp was left alone** (QA.md O1). The hue is per-indicator in
+  `config/indicators.json`, which this run may not touch, and the spec's actual rule — observed and
+  climate ramps never in one legend — holds. Recolouring twenty indicators unreviewed on the last
+  night is the larger risk. Daytime data task.
+- **Data › Areas keeps the `°` on an inherited cell** (QA.md O4): that table is one row per area and
+  one column per indicator, so only the *cell* is inherited and a per-row tag cannot say it. The
+  glyph is explained in the caption under the table, and every row-per-indicator table uses the tag.
+
+### Known issues / open items
+All of them are in `docs/v3/QA.md` under "Open — not blockers": the BBR/Climate blue, `#publist`
+grouping (a SHOULD), the `climate_index` row's `–` as-of, the `°` in the wide Areas table, the
+`PRICE/M²` tile wrapping its unit at 390, the project sheet's legend size at 390, the remaining dead
+legacy CSS, the two data tasks, and AC-A1 not being real axe-core. **Nothing is marked `blocker`.**
+
+### What comes next
+- `./overnight.sh release` merges `v3.0-ui` → `main`, tags `v3.0` and pushes; Pages deploys.
+- The SHOULD list in spec §9 is the first follow-up, and amendment A2's "paste several Google Maps
+  links and they all appear on the map" needs a view that loops — `route_core.propParse` already
+  returns every item and `p=a;b` already parses.
+- `scripts/ui_check.py` still drives `#compare` and will fail its compare group until someone
+  removes that block. It is outside this run's allowed files and is not part of the gate.
