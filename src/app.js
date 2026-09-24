@@ -107,6 +107,13 @@ function pickSrc(i, level) {
 }
 function indSrcLink(i, code, label, level) {
   if (!i) return "";
+  /* every Climate figure is published for a kommune or its coastal stretch, so a postal code or a
+     quarter verifies against the kommune it sits in, never against a code its publisher has never seen */
+  if (isClim(i.key)) {
+    const lv = level || "kommune";
+    const kom = lv === "postnr" ? ((byNr[code] || {}).muni) : lv === "kvarter" ? CPH_MUNI : code;
+    return climSrcLink(i, kom || MK.muni || "", label);
+  }
   const q = pickSrc(i, level || "kommune") || ((i.proj || {}).src);
   if (q && code != null && code !== "") return srcLink(q, code, label);
   if (i.src_page) return `<a class="srclink" href="${esc(i.src_page[1])}" target="_blank" rel="noopener"
@@ -2250,7 +2257,7 @@ function lfLayers() {
   lfPublicLayers();
   lfServicesLayers();
   lfLabels();
-  setLegend("maplegend", sc, ind, ind.key, micro ? (cphMode() ? "quarters" + (bydelLevel(ind) ? " · ^ one figure per bydel" : "") : "postal codes") : (ind.level === "postnr" && !MK.muni ? "municipalities · zoom in for postal codes" : "municipalities" + (fine ? ` · ° ${cphMode() ? "quarters" : "postal codes"} take the municipality value` : "")));
+  setLegend("maplegend", sc, ind, ind.key, isClim(ind.key) ? climLegendNote(ind) : micro ? (cphMode() ? "quarters" + (bydelLevel(ind) ? " · ^ one figure per bydel" : "") : "postal codes") : (ind.level === "postnr" && !MK.muni ? "municipalities · zoom in for postal codes" : "municipalities" + (fine ? ` · ° ${cphMode() ? "quarters" : "postal codes"} take the municipality value` : "")));
   if (LF.ownG) { LF.map.removeLayer(LF.ownG); LF.ownG = null; }
   if (MK.own && D.portfolio) {
     const marks = D.portfolio.properties.filter(p => p.lat != null).map(p => {
@@ -3398,6 +3405,44 @@ function setClimateLegend() {
   el.style.display = "";
   el.innerHTML = climLegendHtml();
   lgApplyFold(el);
+}
+
+/* ---- Verify at source, the climate layer's own kinds ----
+   The recipe lives in the registry (`climate_src`), so this builds the publisher's own query
+   rather than a hard-coded URL, and scripts/check_source_links.py builds the identical one from
+   the same block — a drift between the page and the checker would show up there. */
+function climSrcUrl(i, kom) {
+  const q = i && i.climate_src; if (!q) return "";
+  if (q.kind === "dataset" || q.kind === "service") return q.url || "";
+  if (q.kind === "service_layer") return `${q.service}/${(q.layer || {})[HZ.h]}`;
+  if (q.kind !== "arcgis" || !kom) return "";
+  const km = climKom(kom);
+  /* the sea indicators are published per coastal stretch, the rain ones per kommune */
+  const area = q.area_field === "kystkode" ? (km && km.kystkode) : String(Number(kom));
+  if (!area) return "";
+  const h = (q.horizon || {})[HZ.h] || {};
+  const where = Object.entries(Object.assign({}, q.where, h))
+    .map(([k, v]) => `${k}=${v}`).concat(`${q.area_field}='${String(area).trim()}'`).join(" AND ");
+  return `${q.service}?where=${encodeURIComponent(where)}`
+    + `&outFields=${encodeURIComponent((q.out_fields || ["*"]).join(","))}&returnGeometry=false&f=html`;
+}
+function climSrcLink(i, kom, label) {
+  const u = climSrcUrl(i, kom); if (!u) return "";
+  const q = i.climate_src, who = q.publisher || "the publisher";
+  const what = q.kind === "arcgis" ? `the published cells this value is read from, at the ${hzShort(HZ.h)} horizon`
+    : q.kind === "service_layer" ? `the published ${CLIM_ZONE_YEAR[HZ.h]} flood-extent layer this share is counted inside`
+    : q.kind === "dataset" ? "the publisher's own dataset behind this figure"
+    : "the publisher's own service";
+  return `<a class="srclink" href="${esc(u)}" target="_blank" rel="noopener"
+    title="Open ${esc(what)} — straight from ${esc(who)}">${esc(label || "Verify at source")} ↗ <span class="dim">(${esc(who)})</span></a>`;
+}
+/* the legend's note for a Climate indicator: the horizon in full, and what a grey area means */
+function climLegendNote(ind) {
+  const pool = curPool();
+  const miss = {};
+  pool.forEach(o => { if (V(o, ind.key) == null) { const r = climReason(o, ind.key); miss[r] = (miss[r] || 0) + 1; } });
+  const parts = Object.entries(miss).map(([r, n]) => `${n} ${esc(r)}`);
+  return `${esc(hzShort(HZ.h))} · ${esc(CLIM_FIG[HZ.h])}` + (parts.length ? ` · no figure: ${parts.join(", ")}` : "");
 }
 
 /* ---- the popup block: what the climate layer knows about the area under the click ---- */

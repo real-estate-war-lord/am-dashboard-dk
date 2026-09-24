@@ -191,6 +191,110 @@ def check_sample(inds, areas_by_level, n):
     return rows, bad
 
 
+# ---------------------------------------------------------------- climate
+CLIM_P = PROC / "climate" / "index.json"
+
+
+def clim_url(q, area, horizon):
+    """The same string src/app.js builds from `climate_src` — kept literal so the two can be compared."""
+    kind = q.get("kind")
+    if kind in ("dataset", "service"):
+        return q.get("url", "")
+    if kind == "service_layer":
+        return f"{q['service']}/{(q.get('layer') or {}).get(horizon)}"
+    if kind != "arcgis" or not area:
+        return ""
+    where = dict(q.get("where") or {})
+    where.update((q.get("horizon") or {}).get(horizon) or {})
+    clauses = [f"{k}={v}" for k, v in where.items()] + [f"{q['area_field']}='{str(area).strip()}'"]
+    return (f"{q['service']}?where={urllib.parse.quote(' AND '.join(clauses))}"
+            f"&outFields={urllib.parse.quote(','.join(q.get('out_fields') or ['*']))}"
+            "&returnGeometry=false&f=json")
+
+
+def check_climate(inds, full, sample):
+    """Every Climate indicator, at all three horizons: the link is fetched and — where the publisher
+    answers with the cell itself — the displayed figure is recomputed from the response."""
+    idx = json.loads(CLIM_P.read_text(encoding="utf-8")) if CLIM_P.exists() else None
+    if not idx:
+        log("   · no data/processed/climate/index.json — skipped")
+        return 0
+    kom = idx["kommune"]
+    rows, bad = [], []
+    for i in inds:
+        q = i.get("climate_src")
+        if not q:
+            bad.append((i["key"], "no climate_src block", 0))
+            continue
+        kind = q["kind"]
+        if kind in ("service", "service_layer", "dataset"):
+            # a layer or a dataset, not a per-area cell: reachability, and for the dataset the value
+            urls = ([clim_url(q, None, h) for h in ("today", "2070", "2120")]
+                    if kind == "service_layer" else [clim_url(q, None, "today")])
+            ok_all, note = True, ""
+            for u in dict.fromkeys(urls):
+                # an ArcGIS endpoint with no query part answers HTML to a browser and 400 to a
+                # bare request — ask it for json, which is the same resource the link opens
+                st, body = get(u + ("?f=json" if "?" not in u and kind != "dataset" else ""))
+                if st not in (200, 301, 302, 307, 308):
+                    ok_all = False
+                    bad.append((i["key"], u[:60], st))
+                elif kind == "dataset":
+                    hit = miss = 0
+                    for r in csv.DictReader(io.StringIO(body)):
+                        name = (r.get(q["match"]) or "").strip()
+                        code = next((c for c, v in kom.items() if v["name"].strip().lower() == name.lower()), None)
+                        cell = (kom.get(code) or {}).get(i["key"]) if code else None
+                        if cell is None or cell.get("today") is None:
+                            continue
+                        try:
+                            v = round(float((r.get(q["column"]) or "").replace(",", ".")), q.get("round", 1))
+                        except ValueError:
+                            continue
+                        if abs(cell["today"] - v) <= 0.011:
+                            hit += 1
+                        else:
+                            miss += 1
+                            bad.append((i["key"], code, cell["today"], v))
+                    note = f"{hit} values agree, {miss} differ"
+            rows.append((i["key"], kind, note or f"{len(set(urls))} URL(s)", 200, ok_all))
+            continue
+        # arcgis: the published cell, per coastal stretch or per kommune, at all three horizons
+        pool = [(c, v) for c, v in kom.items() if (v.get(i["key"]) or {}).get("today") is not None]
+        if not full:
+            pool = pool[:sample]
+        seen, agree = 0, 0
+        for code, v in pool:
+            area = v.get("kystkode") if q["area_field"] == "kystkode" else str(int(code))
+            if not area:
+                continue
+            for h in ("today", "2070", "2120"):
+                want = (v.get(i["key"]) or {}).get(h)
+                if want is None:
+                    continue
+                st, body = get(clim_url(q, area, h))
+                seen += 1
+                if st != 200:
+                    bad.append((i["key"], code, h, st))
+                    continue
+                try:
+                    feats = json.loads(body).get("features") or []
+                    got = round(float(feats[0]["attributes"][q["field"]]), q.get("round", 1))
+                except Exception:                                    # noqa: BLE001
+                    bad.append((i["key"], code, h, "no cell in the response"))
+                    continue
+                if abs(want - got) > 0.011:
+                    bad.append((i["key"], code, h, want, got))
+                else:
+                    agree += 1
+        rows.append((i["key"], f"klimaatlas/{q['field']}", f"{agree}/{seen} cells agree", 200, agree == seen))
+    for key, what, detail, st, ok in rows:
+        log(f"   {'✓' if ok else '✗'} {key:<24} {what:<28} {detail}")
+    for b in bad:
+        log(f"      ✗ {b}")
+    return 1 if bad else 0
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--sample", type=int, default=5)
@@ -208,7 +312,7 @@ def main():
     api = [i for i in mk["indicators"] if i.get("src_verify") or (i.get("proj") or {}).get("src")]
     page = [i for i in mk["indicators"] if i.get("src_page")]
     none = [i for i in mk["indicators"] if not i.get("src_verify") and not i.get("src_page")
-            and not (i.get("proj") or {}).get("src")]
+            and not (i.get("proj") or {}).get("src") and not i.get("climate_src")]
     log(f"  {len(api)} indicators link to a per-area StatBank query")
     log(f"  {len(page)} link to the publisher's page (no per-area API)")
     log(f"  {len(none)} have no link" + (f" — {', '.join(i['key'] for i in none)}" if none else ""))
@@ -232,13 +336,20 @@ def main():
 
     log(f"\n2. Every other indicator — {args.sample} links each")
     rows, bad = check_sample([i for i in mk["indicators"] if i["key"] not in
-                              {k for k in mind if (mind[k].get("proj") or {}).get("src")}],
+                              {k for k in mind if (mind[k].get("proj") or {}).get("src")}
+                              and not i.get("climate_src")],
                              {"kommune": mk["municipalities"], "postnr": mk["areas"]}, args.sample)
     for key, what, detail, st, ok in rows:
         log(f"   {'✓' if ok else '✗'} {key:<24} {what:<16} {detail}")
     fails += bool(bad)
     for b in bad:
         log(f"      ✗ {b}")
+
+    clim = [i for i in mk["indicators"] if i.get("group") == "Climate"]
+    if clim:
+        log(f"\n3. Climate — {len(clim)} indicators, all three horizons"
+            + ("" if not args.quick else f" (sample of {args.sample} areas)"))
+        fails += check_climate(clim, not args.quick, args.sample)
 
     log("\n" + ("✗ link check FAILED" if fails else "✓ every link resolves and agrees with the page"))
     return 1 if fails else 0
