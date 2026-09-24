@@ -39,9 +39,12 @@ means "and not empty"), optionally `wait`, `settle` and `state`.
 `#analysis?a=…`, `#compare?a=…` are the redirect test: links shared from v2.6 must keep landing on
 the right view for as long as the dashboard exists.
 
-`OVERFLOW_FATAL` is `False` until P8: horizontal overflow at 390 px is a known v2.6 defect on every
-route, so it is reported as a note instead of failing the run. P8 rebuilds the responsive shell and
-flips the flag.
+`OVERFLOW_FATAL` is `True` since P8 rebuilt the responsive shell: **no route may make the document
+(or `#main`) wider than the viewport at any width** — 390, 1366, 1440 and 1536 (spec §6, AC-R1).
+The check is one expression, `OVERFLOW_JS`, which `tests/ui_ac.py` imports so a regression cannot
+pass one runner and fail the other; when it trips it names the offending elements and their
+left/right edges, so the failure line is usually the fix. Leaflet containers are excluded by name —
+one always reports `scrollWidth > clientWidth`.
 
 CLI: `--url --out --phase --only --viewports --headed --allow-errors --no-network --full-page`.
 

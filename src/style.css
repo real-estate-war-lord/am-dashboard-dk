@@ -183,22 +183,6 @@ main{overflow-y:auto;display:flex;flex-direction:column}
 .phead .ph-r{display:flex;flex-direction:column;align-items:flex-end;gap:9px}
 .ag-bad{background:#B0331B}.ag-warn{background:#C08A24}.ag-neu{background:#B9BCB2}.ag-good{background:#1C6B5C}
 /* hälytysryhmä: otsikkorivi jonka alta löydöslista aukeaa */
-.tgroup{border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:9px;background:var(--panel)}
-.tgroup>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:12px 14px;
-  background:var(--panel2);font-size:13.5px;font-weight:600}
-.tgroup>summary::-webkit-details-marker{display:none}
-.tgroup>summary:hover{background:#F2F2EE}
-.tgroup[open]>summary{border-bottom:1px solid var(--line2)}
-.tgroup .tgn2{font-family:var(--mono);font-size:15px;margin-left:auto}
-.tgroup .tgv2{font-family:var(--mono);font-size:12px;color:var(--muted);font-weight:400}
-.tgroup .tg{border:0;border-radius:0}
-.tgroup .tgx{font-weight:400}
-.portbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.tgsub{display:flex;flex-direction:column;gap:4px;margin-top:2px}
-.tgsr{display:flex;align-items:baseline;gap:10px;padding:5px 0;border-bottom:1px solid var(--line2)}
-.tgsr:last-child{border-bottom:0}
-.tgsr>span{flex:1;min-width:0}
-.tgsr>b{font-family:var(--mono);font-size:12px;white-space:nowrap}
 /* taitettava kortti */
 .card.fold{padding:0}
 .card.fold>summary{list-style:none;cursor:pointer;margin:0;padding:17px 20px;border-bottom:0}
@@ -323,20 +307,6 @@ td.hc.ht0,td.hc.ht1,td.hc.ht2,td.hc.ht3,td.hc.ht4{background:var(--hb);color:var
 .hb span{font-family:var(--mono);font-size:10px;color:var(--ink2)}
 .hb em{display:block;font-style:normal;font-family:var(--mono);font-size:9.5px;color:var(--muted)}
 .tenure{display:flex;gap:8px;align-items:end;margin-top:12px}
-.tn{flex:1;text-align:center}
-.tn i{display:block;background:var(--b3);width:100%}
-.tn span{font-family:var(--mono);font-size:10.5px}
-.tn em{display:block;font-style:normal;font-family:var(--mono);font-size:9px;color:var(--muted)}
-.mix{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;align-items:end;padding:10px 0 0}
-.mix-col{text-align:center;display:flex;flex-direction:column;justify-content:flex-end}
-.mix-stack{display:flex;flex-direction:column-reverse;width:100%;margin:4px 0 5px}
-.mix-stack i{display:block;width:100%;min-height:2px}
-.mc0{background:#8E9C93}.mc1{background:var(--b2)}.mc2{background:var(--bad)}.mc3{background:#5D4A75}
-.mix-tot{font-family:var(--mono);font-size:10.5px;color:var(--ink2)}
-.mix-eur{font-family:var(--mono);font-size:9px;color:var(--muted)}
-.mix-lab{font-family:var(--mono);font-size:9px;color:var(--dim)}
-.mix-legend{display:flex;flex-wrap:wrap;gap:4px 16px;margin-top:10px;font-size:11px;color:var(--ink2)}
-.mix-legend span{display:flex;align-items:center;gap:6px}.mix-legend i{width:10px;height:10px;display:block}
 
 .reasons{margin-top:4px}
 .rrow{display:grid;grid-template-columns:minmax(130px,1.2fr) 3fr 34px 40px;gap:9px;align-items:center;padding:2px 0}
@@ -358,19 +328,6 @@ td.hc.ht0,td.hc.ht1,td.hc.ht2,td.hc.ht3,td.hc.ht4{background:var(--hb);color:var
 .w-mid{font-size:11.5px;color:var(--muted);margin-top:2px}
 .w-why{font-size:12px;color:var(--ink2);margin-top:3px}
 
-.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-top:10px}
-.pcard{text-align:left;background:var(--panel2);border:1px solid var(--line);border-top:3px solid var(--muted);padding:12px;cursor:pointer;font:inherit}
-.pcard.red{border-top-color:var(--red)}.pcard.amber{border-top-color:var(--amber)}.pcard.green{border-top-color:var(--green)}
-.pcard:hover{border-color:var(--ink)}
-.pc-head{display:flex;align-items:center;gap:7px}
-.pc-head b{font-size:14px;font-family:var(--body)}
-.pc-city{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--muted)}
-.pc-addr{display:flex;gap:6px;align-items:baseline;margin:2px 0 0;font-size:11.5px;color:var(--ink2)}
-.pc-addr span{font-family:var(--mono);font-size:10px;color:var(--muted)}
-.pc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px 10px;margin-top:11px}
-.pc-grid span{display:block;font-family:var(--mono);font-size:8px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);line-height:1.25;min-height:20px}
-.pc-grid b{font-size:12.5px}
-.pc-spark{margin-top:9px;color:var(--ink2)}
 .pc-spark .spark{height:34px}
 .pc-spark em{display:block;margin-top:3px}
 .pc-spark em{font-style:normal;font-family:var(--mono);font-size:9px;color:var(--muted)}
@@ -414,20 +371,6 @@ td.hc.ht0,td.hc.ht1,td.hc.ht2,td.hc.ht3,td.hc.ht4{background:var(--hb);color:var
 
 .tools{display:flex;gap:8px;flex-wrap:wrap}
 .pv{font-family:var(--mono);font-size:9.5px;font-weight:600;opacity:.58;letter-spacing:-.2px}
-.chwrap{position:relative}
-.chtools{position:absolute;top:0;right:0;display:flex;gap:4px}
-.ps{display:inline-flex;align-items:center;gap:3px;font-family:var(--mono);font-size:10px;margin-right:6px}
-.ps em{font-style:normal;color:var(--muted)}
-.tw-bars i{position:relative}
-.tw-bars i b{position:absolute;top:-13px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:8.5px;color:var(--ink2);font-weight:500}
-.wk{display:flex;gap:8px;align-items:end;margin-top:10px;min-height:110px}
-.wkc{flex:1;text-align:center;display:flex;flex-direction:column;justify-content:flex-end}
-.wkc i{display:block;background:var(--b4);width:100%}
-.wkc span{font-family:var(--mono);font-size:11px}
-.wkc em{display:block;font-style:normal;font-family:var(--mono);font-size:9px;color:var(--muted)}
-.sortth{cursor:pointer;user-select:none}
-.sortth:hover{color:var(--ink)}
-.sortth.on{color:var(--ink);font-weight:700}
 .na{color:var(--dim)}
 .dot.q1{background:var(--red)}.dot.q2{background:#D2703F}.dot.q3{background:var(--amber)}.dot.q4{background:var(--green)}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px}
@@ -450,11 +393,9 @@ td.hc.ht0,td.hc.ht1,td.hc.ht2,td.hc.ht3,td.hc.ht4{background:var(--hb);color:var
 aside::-webkit-scrollbar-thumb{background:#2C3A32}
 ::-webkit-scrollbar-track{background:transparent}
 @media (max-width:1200px){.grid-2{grid-template-columns:1fr}}
+/* the one-column shell below 1025 px is the P8 block at the end of this file (spec §4.1, §6) */
 @media (max-width:900px){
-  body{overflow:auto}.app{grid-template-columns:1fr;height:auto}main{overflow:visible}
-  .topbar{position:static}#body{padding:12px}
   .mini-stats,.mini-stats.tight,.bigstats{grid-template-columns:1fr 1fr}
-  .card{padding:12px;overflow-x:auto}.pc-grid{grid-template-columns:repeat(3,1fr)}
 }
 
 /* ---- info-merkki ja tooltip ---- */
@@ -686,26 +627,6 @@ aside{width:250px}
 .mb-good{background:var(--good)}.mb-bad{background:var(--bad)}.mb-warn{background:var(--warn)}
 .mb-bad2{background:var(--bad2)}.mb-neu{background:#C6CDC3}
 
-.pc-act{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:9px;padding-top:9px;border-top:1px solid var(--line2)}
-.pc-up{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--good);font-weight:600}
-.pcard{padding:13px}
-.pc-grid{grid-template-columns:repeat(3,1fr)}
-.vbanner{display:flex;align-items:center;gap:20px;padding:14px 18px;border-top:3px solid var(--muted)}
-.vbanner.vb-good{border-top-color:var(--good);background:#F2F8F5}
-.vbanner.vb-bad{border-top-color:var(--bad);background:#FCF3F0}
-.vbanner.vb-warn{border-top-color:var(--warn);background:#FDF7EC}
-.vbanner.vb-bad2{border-top-color:var(--bad2);background:#FAEDE8}
-.vb-l{display:flex;align-items:center;gap:14px}
-.vb-ico{font-family:var(--mono);font-size:20px;font-weight:700;width:38px;height:38px;flex:0 0 38px;
-  display:flex;align-items:center;justify-content:center;border:2px solid currentColor;border-radius:50%}
-.vb-good .vb-ico{color:var(--good)}.vb-bad .vb-ico{color:var(--bad)}
-.vb-warn .vb-ico{color:var(--warn)}.vb-bad2 .vb-ico{color:var(--bad2)}
-.vb-l b{font-family:var(--disp);font-size:19px;letter-spacing:-.02em;display:block}
-.vb-l p{margin:2px 0 0;font-size:13px;color:var(--ink2);max-width:74ch}
-.vb-r{margin-left:auto;text-align:right;flex:0 0 auto}
-.vb-r span{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.vb-r b{font-family:var(--mono);font-size:24px;letter-spacing:-.02em;display:block}
-.vb-r em{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--muted)}
 
 #side-kpi{grid-template-columns:1fr 1fr}
 #side-kpi>div.wide{grid-column:1 / -1}
@@ -809,24 +730,6 @@ aside{width:250px}
 .simpresets .sg{flex:1}
 
 /* ---- Makro-kartta ---- */
-.mkwrap{display:grid;grid-template-columns:1.15fr 1fr;gap:18px;align-items:start}
-.mkmap svg{width:100%;height:auto;display:block}
-.mk-t{cursor:pointer}
-.mk-t path{stroke:var(--panel);stroke-width:2.5;stroke-linejoin:round;transition:filter .12s}
-.mk-t:hover path{filter:brightness(.94);stroke:var(--ink)}
-.mk-name{font-family:var(--body);font-size:14px;font-weight:600}
-.mk-t2{stroke:#FFFFFF;stroke-width:1.1;stroke-linejoin:round;cursor:pointer}
-.mk-t2:hover{stroke:#141C18;stroke-width:1.6}
-.mk-name2{font-family:var(--body);font-size:11.5px;font-weight:600}
-.mk-own circle{fill:#FFFFFF;stroke:#141C18;stroke-width:2}
-.mk-ownlab{font-family:var(--body);font-size:10.5px;font-weight:600;fill:#141C18;
-  paint-order:stroke;stroke:#FFFFFF;stroke-width:3px;stroke-linejoin:round}
-.mk-val{font-family:var(--mono);font-size:11.5px}
-.mk-mark circle{fill:#fff;stroke:#1E2B24;stroke-width:1.5}
-.mk-mark text{font-family:var(--mono);font-size:10px;font-weight:600;fill:#1E2B24}
-.mklegend{display:flex;align-items:center;gap:6px;margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--muted);white-space:nowrap}
-.mklegend span{white-space:nowrap}
-.mklegend i{width:26px;height:10px;display:inline-block;border-radius:2px}
 @media (max-width:1200px){.mkwrap{grid-template-columns:1fr}}
 
 .simval{font-family:var(--mono);font-size:12px;color:var(--ink)}
@@ -844,19 +747,6 @@ tr.svd-done .lk.mini.svd{opacity:1}
 @media (max-width:1100px){.simgrid{grid-template-columns:1fr}}
 
 /* capex */
-.cxy{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;align-items:end;height:150px;margin-top:8px}
-.cxy-col{display:flex;flex-direction:column;justify-content:flex-end;height:100%;text-align:center}
-.cxy-bars{display:flex;align-items:flex-end;justify-content:center;gap:2px;height:100%}
-.cxy-bars i{display:block;width:11px;min-height:2px}
-.cx-est{background:var(--k2)} .cx-act{background:var(--k1)} .cx-pts{background:var(--k3)}
-.cxy-v{font-family:var(--mono);font-size:9.5px;color:var(--ink2);margin-top:4px}
-.cxy-l{font-family:var(--mono);font-size:9.5px;color:var(--muted)}
-.cxbar{height:8px;background:var(--line2);width:100%;min-width:60px}
-.cxbar i{display:block;height:100%}
-.cxstat{display:grid;gap:10px}
-.cxs{padding:8px 10px;background:var(--panel2);border:1px solid var(--line2)}
-.cxs b{display:block;font-size:18px;margin:4px 0 1px}
-.cxs em{font-style:normal;font-size:11px;color:var(--muted);display:block;margin-bottom:6px}
 #cxq{font:inherit;font-size:12.5px;padding:5px 10px;border:1px solid var(--line);background:var(--panel);min-width:180px}
 .tbl td em.dim{font-style:normal}
 
@@ -1003,19 +893,6 @@ aside{background:linear-gradient(178deg,#131C16 0%,#0D140F 100%)}
 
 
 /* capex */
-.cxy{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;align-items:end;height:150px;margin-top:8px}
-.cxy-col{display:flex;flex-direction:column;justify-content:flex-end;height:100%;text-align:center}
-.cxy-bars{display:flex;align-items:flex-end;justify-content:center;gap:2px;height:100%}
-.cxy-bars i{display:block;width:11px;min-height:2px}
-.cx-est{background:var(--k2)} .cx-act{background:var(--k1)} .cx-pts{background:var(--k3)}
-.cxy-v{font-family:var(--mono);font-size:9.5px;color:var(--ink2);margin-top:4px}
-.cxy-l{font-family:var(--mono);font-size:9.5px;color:var(--muted)}
-.cxbar{height:8px;background:var(--line2);width:100%;min-width:60px}
-.cxbar i{display:block;height:100%}
-.cxstat{display:grid;gap:10px}
-.cxs{padding:8px 10px;background:var(--panel2);border:1px solid var(--line2)}
-.cxs b{display:block;font-size:18px;margin:4px 0 1px}
-.cxs em{font-style:normal;font-size:11px;color:var(--muted);display:block;margin-bottom:6px}
 #cxq{font:inherit;font-size:12.5px;padding:5px 10px;border:1px solid var(--line);background:var(--panel);min-width:180px}
 .tbl td em.dim{font-style:normal}
 
@@ -1062,19 +939,6 @@ aside{background:linear-gradient(178deg,#131C16 0%,#0D140F 100%)}
 
 
 /* capex */
-.cxy{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;align-items:end;height:150px;margin-top:8px}
-.cxy-col{display:flex;flex-direction:column;justify-content:flex-end;height:100%;text-align:center}
-.cxy-bars{display:flex;align-items:flex-end;justify-content:center;gap:2px;height:100%}
-.cxy-bars i{display:block;width:11px;min-height:2px}
-.cx-est{background:var(--k2)} .cx-act{background:var(--k1)} .cx-pts{background:var(--k3)}
-.cxy-v{font-family:var(--mono);font-size:9.5px;color:var(--ink2);margin-top:4px}
-.cxy-l{font-family:var(--mono);font-size:9.5px;color:var(--muted)}
-.cxbar{height:8px;background:var(--line2);width:100%;min-width:60px}
-.cxbar i{display:block;height:100%}
-.cxstat{display:grid;gap:10px}
-.cxs{padding:8px 10px;background:var(--panel2);border:1px solid var(--line2)}
-.cxs b{display:block;font-size:18px;margin:4px 0 1px}
-.cxs em{font-style:normal;font-size:11px;color:var(--muted);display:block;margin-bottom:6px}
 #cxq{font:inherit;font-size:12.5px;padding:5px 10px;border:1px solid var(--line);background:var(--panel);min-width:180px}
 .tbl td em.dim{font-style:normal}
 
@@ -1220,7 +1084,8 @@ aside{background:linear-gradient(178deg,#131C16 0%,#0D140F 100%)}
 .dinfo>summary:hover{color:var(--ink)}
 
 /* ---- v1.3.1: responsive scaling for laptops with 125–150 % display scaling (Windows) ---- */
-:root{--sidew:250px}
+/* 240 px at every desktop width (spec §4.1: "was 268; 240 recovers 28 px for 1366 laptops") */
+:root{--sidew:240px}
 .app{grid-template-columns:var(--sidew) 1fr}
 aside{width:var(--sidew)}
 #lfmap{height:clamp(380px,calc(100vh - 250px),760px)}        /* the map fits the window: no scrolling to see the legend */
@@ -1228,7 +1093,6 @@ aside{width:var(--sidew)}
 .indsel{max-width:min(360px,44vw)}
 .card-head .tools{max-width:100%}
 @media (max-width:1400px){
-  :root{--sidew:212px}
   body{font-size:13px}
   .brand{padding:16px 14px 10px}.brand h2{font-size:14px}
   .nav-glab{padding:16px 12px 6px}
@@ -1244,18 +1108,12 @@ aside{width:var(--sidew)}
   .arhead h2{font-size:24px}
 }
 @media (max-width:1180px){
-  :root{--sidew:180px}
-  .nav-item em{display:none}
   .topbar h1{font-size:22px}
   .grid-2{grid-template-columns:1fr}
 }
 @media (max-height:760px){
   #lfmap{height:clamp(340px,calc(100vh - 230px),760px)}
   .indx p:not(.dim){display:inline}
-}
-@media (max-width:900px){
-  :root{--sidew:100%}
-  aside{width:auto}
 }
 /* Windows: scrollbars take 17 px — keep them from pushing content and from overlapping the map */
 main{scrollbar-gutter:stable}
@@ -1781,7 +1639,8 @@ table[data-testid=sources-table] code{font-family:var(--mono);font-size:10px}
 .tbl thead th.on{color:var(--ink);border-bottom:2px solid var(--k1);background:var(--inh-bg)}
 
 @media (max-width:600px){
-  .indpick,.indpick-btn{width:100%;max-width:100%}
+  .indpick{flex:1 1 100%;width:auto;max-width:100%}
+  .indpick-btn{width:100%;max-width:100%}
   .indpop{width:calc(100vw - 32px);max-width:calc(100vw - 32px)}
   .indrow .ir-d{display:none}
   .indrow .ir-t{flex-basis:48px}
@@ -2116,3 +1975,121 @@ details.mstrip .mstrip-act{margin-top:10px}
 .xtoast b{display:block;font-family:var(--mono);font-size:11.5px;color:var(--ink)}
 .xtoast span{font-family:var(--mono);font-size:10px;color:var(--cap-ink)}
 @media (max-width:600px){.xwrap[data-xat=page] .xpop{right:auto;left:0}}
+
+/* ================= v3.0 P8 — the responsive shell, states and the number rules =================
+   Spec §4.1 (shell), §6 (responsive matrix), §2.4 (number rules), §4.10 (states), §7 (a11y).
+   Responsive is a layout here, not a patch: ≥1025 px the grid is `240px 1fr` and the page does not
+   scroll (the panes do); ≤1024 px there is one column, a 52 px bar with a drawer, and the page
+   scrolls natively. Nothing may make the document wider than the viewport at any width (AC-R1). */
+
+/* ---- the 52 px bar and the drawer (≤1024 px only; both are inert above it) ---- */
+.mtop{display:none}
+.drawer{display:contents}
+.scrim{display:none}
+
+@media (max-width:1024px){
+  body{overflow:auto}
+  .app{display:block;height:auto;min-height:100%}
+  main{overflow:visible;scrollbar-gutter:auto}
+  .mtop{display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:1300;height:52px;
+    padding:0 12px;background:var(--side);color:var(--side-ink);border-bottom:1px solid var(--side2)}
+  .navtog{flex:0 0 auto;width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+    background:none;border:1px solid var(--side2);border-radius:9px;color:var(--side-ink);
+    font-size:17px;line-height:1;cursor:pointer;padding:0}
+  .navtog:hover{background:var(--side2)}
+  .mbrand{font-family:var(--mono);font-size:10px;letter-spacing:.17em;text-transform:uppercase;
+    color:#F2F3EE;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mview{margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:.09em;
+    text-transform:uppercase;color:var(--side-muted);white-space:nowrap}
+  /* closed = visibility:hidden, so <aside> is neither visible, focusable nor in the a11y tree */
+  .drawer{display:block;position:fixed;inset:0;z-index:1400;visibility:hidden}
+  .drawer.open{visibility:visible}
+  .drawer>aside{position:absolute;left:0;top:0;bottom:0;width:280px;max-width:86vw;
+    transform:translateX(-100%);transition:transform .18s ease;box-shadow:0 0 40px rgba(0,0,0,.35)}
+  .drawer.open>aside{transform:none}
+  .scrim{display:block;position:absolute;inset:0;width:100%;border:0;padding:0;cursor:pointer;
+    background:rgba(20,28,24,.42);opacity:0;transition:opacity .18s ease}
+  .drawer.open .scrim{opacity:1}
+  body.nav-open{overflow:hidden}
+  /* the breadcrumb bar sits under the 52 px bar and stays inside the §6 budget of 96 px */
+  .topbar{position:sticky;top:52px;padding:9px var(--gutter-m) 8px}
+  .crumbs{font-size:12.5px;gap:4px}
+  .crumbs b{font-size:16px}
+  #body{padding:12px var(--gutter-m) 56px;gap:var(--s3)}
+  .card{padding:var(--card-pad-m) var(--card-pad-m) 14px}
+  /* toolbars stack; the chips scroll sideways inside their own row, never widening the page */
+  /* an explicit width, not `stretch`: nested inside two flex columns the toolbar row was sized to
+     its max-content (597 px at 390 px wide) and then clipped by the card, so nothing ever wrapped */
+  .trow,.artools{flex-wrap:wrap;width:100%;max-width:100%}
+  .indchips{flex:1 0 100%;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
+  /* a wrapped segmented control shows its 1 px-gap background through the empty end of the last
+     row — it scrolls sideways instead, like the chips */
+  .seg{flex-wrap:nowrap;overflow-x:auto;max-width:100%;scrollbar-width:none}
+  .seg .sg{white-space:nowrap;flex:0 0 auto}
+  /* tables scroll inside their card, first column pinned (§6) */
+  .scrollx{overflow-x:auto;overscroll-behavior-x:contain}
+  .scrollx>.tbl th:first-child,.scrollx>.tbl td:first-child{position:sticky;left:0;z-index:1;
+    background:var(--panel);box-shadow:1px 0 0 var(--line2)}
+  .scrollx>.tbl thead th:first-child{z-index:3}
+  .scrollx>.tbl tbody tr:hover>th:first-child,.scrollx>.tbl tbody tr:hover>td:first-child{background:var(--panel2)}
+}
+@media (max-width:600px){
+  #lfmap{height:max(55vh,320px)}
+  /* the map goes edge to edge inside its card: at 390 px the two paddings would otherwise leave it
+     56 px narrower than the column, and a map is the one thing on the page that wants every pixel */
+  #mapcard .mapwrap{margin-left:calc(-1 * var(--card-pad-m));margin-right:calc(-1 * var(--card-pad-m));width:auto}
+  .topbar{padding:8px 12px 7px}
+  .crumbs .dim{flex-basis:100%;margin-left:0;padding-bottom:0}
+  #hd{flex-wrap:wrap;row-gap:6px}
+  .hd-act{flex:1 0 100%;justify-content:flex-start}
+}
+
+/* ---- §6 tiles: 5 → 3+2 → 2, and never a bare grid cell showing the separator colour through.
+   The 1 px gaps are the card's background, so an unfilled cell reads as a grey slab: the last tile
+   spans the rest of its row when it would otherwise sit there alone. ---- */
+@media (max-width:1250px){
+  .tiles:not(.wrap)>*:last-child:nth-child(3n+1){grid-column:span 3}
+  .tiles:not(.wrap)>*:last-child:nth-child(3n+2){grid-column:span 2}
+}
+@media (max-width:800px){
+  .tiles:not(.wrap)>*:last-child{grid-column:auto}
+  .tiles:not(.wrap)>*:last-child:nth-child(2n+1){grid-column:span 2}
+}
+
+/* ---- §4.10 empty / loading / error states: mono caption + one action, never a modal ---- */
+.statecard{display:flex;flex-direction:column;gap:var(--s2);align-items:flex-start;
+  padding:var(--s4);border:1px dashed var(--line);border-radius:9px;background:var(--panel2)}
+.statecard b{font-family:var(--body);font-size:13.5px;font-weight:600;color:var(--ink)}
+.statecard p{margin:0;font-family:var(--mono);font-size:11px;color:var(--cap-ink);max-width:var(--prose)}
+.statecard[data-kind=error]{background:var(--danger-bg);border-color:#E7C9C0;border-style:solid}
+.statecard[data-kind=loading]{border-style:solid}
+.statecard .skel{display:grid;gap:6px;width:min(320px,100%)}
+.statecard .skel i{display:block;height:9px;border-radius:3px;background:var(--line2)}
+.statecard .skel i:nth-child(2){width:78%}.statecard .skel i:nth-child(3){width:54%}
+
+/* ---- §2.4 number rules: the classes every surface shares ---- */
+.rk{white-space:nowrap}
+.tag.smallbase{color:#8A5C12;border-color:#E3D3AE;background:var(--warn-bg)}
+.pctsecond{color:var(--cap-ink);font-family:var(--mono);font-weight:400}
+.nc{color:var(--dim);font-family:var(--mono)}
+
+/* ---- §7 accessibility: one focus ring, and 11 px captions off --muted ----
+   No `border-radius` in the focus rule: an element that changes shape when it is focused is a
+   worse affordance than one whose ring follows its own corners. Captions on the dark side panel
+   (`.xcap`) keep `--side-muted` — `--cap-ink` is a paper-background colour and would *lose*
+   contrast there. */
+:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+.cap,.hint,.laynote,.mm-note,.indnone{color:var(--cap-ink)}
+
+/* ---- §6 the legend stack folds into one "Legend ▾" pill on a phone ---- */
+.lgtog{display:none}
+@media (max-width:600px){
+  /* clear of Leaflet's attribution bar, which wraps to two lines at this width */
+  #maplegs{left:12px;right:auto;bottom:34px;max-height:62%;align-items:flex-start}
+  .lgtog{display:inline-flex;align-items:center;gap:6px;order:-1;align-self:flex-start;
+    padding:5px 10px;border:1px solid var(--line);border-radius:999px;background:var(--panel);
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--ink);cursor:pointer;box-shadow:0 4px 14px rgba(20,28,24,.16)}
+  #maplegs:not(.open)>.maplegend{display:none}
+  #maplegs.open{right:12px}
+}

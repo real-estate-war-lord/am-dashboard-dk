@@ -12,11 +12,22 @@
 </head>
 <body>
 <div class="app">
-  <aside data-testid="sidebar">
-    <div class="brand"><h2>Macro Dashboard</h2></div>
-    <div id="nav"></div>
-    <div class="side-foot" id="xfoot"></div>
-  </aside>
+  <!-- ≤1024 px the sidebar is a 52 px bar with a drawer behind ☰ (spec §4.1); ≥1025 px the bar is
+       hidden, .drawer is display:contents and <aside> is the grid's first column, as before. -->
+  <div class="mtop" data-testid="topbar-mobile">
+    <button class="navtog" id="navtog" data-nav-toggle data-testid="nav-toggle"
+            aria-expanded="false" aria-controls="navdrawer" aria-label="Open the navigation">☰</button>
+    <span class="mbrand">Macro Dashboard</span>
+    <span class="mview" id="mview"></span>
+  </div>
+  <div class="drawer" id="navdrawer" data-testid="nav-drawer" role="dialog" aria-modal="true" aria-label="Navigation">
+    <button class="scrim" data-nav-close tabindex="-1" aria-label="Close the navigation"></button>
+    <aside data-testid="sidebar">
+      <div class="brand"><h2>Macro Dashboard</h2></div>
+      <div id="nav"></div>
+      <div class="side-foot" id="xfoot"></div>
+    </aside>
+  </div>
   <main id="main">
     <div class="topbar"><div id="hd"></div></div>
     <div id="body"></div>

@@ -1538,6 +1538,285 @@ def ac_xmenu(page, base):
         assert r["value_type"] in ("derived", "projection"), r["value_type"]
 
 
+# =============================================================================================
+# P8 — the responsive shell, the sheets, the number rules and accessibility
+#      (spec §4.1, §6, §2.4, §5.7, §4.10, §7)
+# =============================================================================================
+
+# Every MUST route, as AC-R1 and AC-G1 read them (Compare is deleted — amendment A1 — and
+# #properties is the single-pin #property — amendment A2).
+MUST_ROUTES = [
+    "map?ind=growth",
+    "area/kommune/101?ind=growth",
+    "area/postnr/2450?ind=growth",
+    "data/areas/kommune?ind=growth",
+    "data/projects",
+    "data/national",
+    "data/sources",
+    "charts?ind=growth&a=kommune:101",
+    "property?p=55.6545,12.539",
+]
+
+# The one expression that decides "this page scrolls sideways", shared with tests/ui_smoke.py so a
+# regression cannot pass one runner and fail the other.
+from ui_smoke import OVERFLOW_JS  # noqa: E402
+
+
+@ac("AC-S1", phase="P8", viewport="390x844")
+def ac_s1(page, base):
+    """At 390×844 the sidebar is gone, the 52 px bar is there, the page does not scroll sideways
+    and the map still fills the column."""
+    goto(page, "map?ind=growth", settle=900, wait="#lfmap .leaflet-pane")
+    assert not page.locator("[data-testid=sidebar]").is_visible(), "the sidebar is still visible at 390 px"
+    assert page.locator("[data-testid=topbar-mobile]").is_visible(), "no 52 px top bar at 390 px"
+    sw = page.evaluate("document.body.scrollWidth")
+    assert sw <= 390, f"document.body.scrollWidth is {sw}, the viewport is 390"
+    box = page.locator("[data-testid=map]").bounding_box()
+    assert box and box["width"] >= 350, f"the map is {box and box['width']} px wide"
+    assert box["x"] >= -1 and box["x"] + box["width"] <= 391, f"the map sticks out: {box}"
+    bar = page.locator("[data-testid=topbar-mobile]").bounding_box()
+    assert 48 <= bar["height"] <= 56, f"the mobile bar is {bar['height']} px tall, spec says 52"
+    # the card clips (`overflow-x:clip`), so a control wider than its column never reaches the
+    # page-level overflow check — it just loses its right-hand end. Check it here instead.
+    # A row that scrolls sideways on purpose (the chips, the level segments) is exempt: its
+    # children are *supposed* to run past the card, that is what makes them reachable.
+    over = page.evaluate("""(() => {
+      const card = document.getElementById('mapcard'); if (!card) return 'no #mapcard';
+      const c = card.getBoundingClientRect(), out = [];
+      const scrolls = e => { for (let p = e.parentElement; p && p !== card; p = p.parentElement) {
+        if (/auto|scroll/.test(getComputedStyle(p).overflowX)) return true; } return false; };
+      for (const e of card.querySelectorAll('[data-testid=map-toolbar] *, #mkexplain *')) {
+        const r = e.getBoundingClientRect();
+        if (r.width > 0 && r.right > c.right - 1 && !scrolls(e)) {
+          out.push((e.tagName.toLowerCase() + (typeof e.className === 'string' && e.className
+            ? '.' + e.className.trim().split(/\\s+/).join('.') : '')).slice(0, 40)
+            + ' ' + Math.round(r.left) + '..' + Math.round(r.right) + ' of ' + Math.round(c.right));
+        }
+      }
+      return out.slice(0, 4).join(' · ');
+    })()""")
+    assert not over, f"a toolbar control runs past the map card: {over}"
+
+
+@ac("AC-S2", phase="P8", viewport="390x844")
+def ac_s2(page, base):
+    """☰ opens the drawer, Escape closes it, focus goes back to the toggle — and while it is open
+    Tab stays inside it."""
+    goto(page, "map?ind=growth", settle=700)
+    tog = page.locator("[data-testid=nav-toggle]")
+    assert tog.get_attribute("aria-expanded") == "false", "the toggle does not start collapsed"
+    assert not page.locator("[data-testid=nav-drawer]").is_visible(), "the drawer starts open"
+    tog.click()
+    page.wait_for_timeout(350)
+    assert page.locator("[data-testid=nav-drawer]").is_visible(), "☰ did not open the drawer"
+    assert page.locator("[data-testid=sidebar]").is_visible(), "the drawer is open but its panel is not"
+    assert tog.get_attribute("aria-expanded") == "true", "aria-expanded did not follow the drawer"
+    assert page.evaluate("document.querySelector('[data-testid=nav-drawer]').contains(document.activeElement)"), \
+        "focus did not move into the drawer"
+    # the trap: Tab twenty times and focus is still inside
+    for _ in range(20):
+        page.keyboard.press("Tab")
+    assert page.evaluate("document.querySelector('[data-testid=nav-drawer]').contains(document.activeElement)"), \
+        "Tab escaped the open drawer"
+    page.keyboard.press("Escape")
+    page.wait_for_timeout(350)
+    assert not page.locator("[data-testid=nav-drawer]").is_visible(), "Escape did not close the drawer"
+    assert page.evaluate("document.activeElement === document.querySelector('[data-testid=nav-toggle]')"), \
+        "focus did not return to ☰"
+
+
+@ac("AC-R1", phase="P8")
+def ac_r1(page, base):
+    """No route makes the document wider than the viewport at 1366×768, 1536×864, 1440×900 or
+    390×844, and none of them throws."""
+    bad = []
+    try:
+        for w, h in [(1366, 768), (1536, 864), (1440, 900), (390, 844)]:
+            page.set_viewport_size({"width": w, "height": h})
+            for r in MUST_ROUTES:
+                goto(page, r, settle=900)
+                over = page.evaluate(OVERFLOW_JS)
+                if over:
+                    bad.append(f"{w}x{h} {r}: {over}")
+    finally:
+        page.set_viewport_size({"width": 1440, "height": 900})
+    assert not bad, "horizontal overflow — " + " | ".join(bad[:6])
+    assert not ERRORS, f"pageerror(s) while walking the routes: {ERRORS[:3]}"
+
+
+@ac("AC-SH1", phase="P8")
+def ac_sh1(page, base):
+    """The four detail sheets render a §4.7 tile row and no empty grey filler tile."""
+    pid = page.evaluate("(INFRA_ALL[0] || {properties:{id:''}}).properties.id")
+    bid = page.evaluate("""(() => { const f = PUB_FILES['101']; if (!f) return '';
+        const b = (f.buildings || [])[0]; return b ? String(b.id) : ''; })()""")
+    if not bid:
+        page.evaluate("pubLoad('101')")
+        page.wait_for_timeout(1500)
+        bid = page.evaluate("""(() => { const f = PUB_FILES['101'];
+            const b = f && (f.buildings || [])[0]; return b ? String(b.id) : ''; })()""")
+    assert bid, "no public building loaded for København — cannot check the sheet"
+    nr = page.evaluate("Object.keys(SCH_BY || {})[0] || ''")
+    routes = [f"project/{pid}", f"public/101/{bid}", "climate/0101"] + ([f"school/{nr}"] if nr else [])
+    for r in routes:
+        goto(page, r, settle=1400)
+        n = page.locator("[data-testid=tiles]").count()
+        assert n == 1, f"{r}: {n} tile rows, expected exactly one (spec §5.7)"
+        cells = page.eval_on_selector_all("[data-testid=tiles] > *",
+                                          "els => els.map(e => (e.textContent || '').trim())")
+        assert cells, f"{r}: the tile row is empty"
+        assert all(c for c in cells), f"{r}: an empty filler tile is still rendered — {cells}"
+        assert page.locator(".tile.empty, .hlc:empty, .hltile:empty").count() == 0, f"{r}: empty tile element"
+
+
+@ac("AC-SH2", phase="P8")
+def ac_sh2(page, base):
+    """The climate sheet uses the shared PeriodControl, and "Show the zones on the map" lands on
+    the municipality's map with the surge indicator at the horizon that was showing."""
+    goto(page, "climate/0101?hz=2070", settle=1600)
+    assert page.locator("[data-testid=period][data-mode=horizon]").count() == 1, \
+        "the climate sheet does not render the shared PeriodControl"
+    assert page.locator("[data-testid=period-hz]").count() == 1, "no horizon segments on the climate sheet"
+    btn = page.get_by_role("button", name=re.compile("Show the zones on the map"))
+    assert btn.count() == 1, "no 'Show the zones on the map' button"
+    btn.first.click()
+    page.wait_for_timeout(900)
+    h = cur_hash(page)
+    assert h.startswith("map/101"), f"landed on {h!r}, expected a hash starting map/101"
+    assert "ind=surge_dw_pct" in h, f"the surge indicator is not in {h!r}"
+    assert "hz=2070" in h, f"the horizon did not travel with the link: {h!r}"
+    assert page.locator("[data-testid=legend-zones]").count() == 1, "the zones are not on the map"
+
+
+@ac("AC-A1", phase="P8")
+def ac_a1(page, base):
+    """Offline stand-in for axe-core (no network installs during the run, and
+    src/vendor/axe.min.js is not in the repo): every visible control has an accessible name, every
+    popover trigger carries aria-expanded, and no icon is a bare glyph without a text alternative."""
+    js = """(() => {
+      const bad = [];
+      const vis = e => { const r = e.getBoundingClientRect();
+        return r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden'; };
+      const id = e => e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') +
+        (e.getAttribute('data-testid') ? '[' + e.getAttribute('data-testid') + ']' : '') +
+        (typeof e.className === 'string' && e.className ? '.' + e.className.trim().split(/\\s+/)[0] : '');
+      const name = e => {
+        const lb = e.getAttribute('aria-labelledby');
+        const byId = lb && lb.split(/\\s+/).map(i => (document.getElementById(i) || {}).textContent || '').join(' ');
+        return (e.getAttribute('aria-label') || byId || e.title ||
+                (e.labels && e.labels.length ? [...e.labels].map(l => l.textContent).join(' ') : '') ||
+                e.placeholder || e.textContent || e.value || '').trim();
+      };
+      for (const e of document.querySelectorAll('button,input,select,textarea,a[href],[role=button]')) {
+        if (!vis(e) || e.disabled) continue;
+        if (e.closest('.leaflet-container')) continue;      /* Leaflet's own controls */
+        if (!name(e)) bad.push('no accessible name: ' + id(e));
+      }
+      for (const e of document.querySelectorAll('[aria-haspopup],[aria-controls]')) {
+        if (!vis(e) || e.tagName === 'DIV') continue;
+        if (!e.hasAttribute('aria-expanded')) bad.push('no aria-expanded: ' + id(e));
+      }
+      for (const e of document.querySelectorAll('img')) {
+        if (!vis(e)) continue;
+        if (e.alt == null || (!e.alt && e.getAttribute('alt') === null)) bad.push('img without alt: ' + id(e));
+      }
+      for (const e of document.querySelectorAll('svg[role=img]')) {
+        if (vis(e) && !e.querySelector('title') && !e.getAttribute('aria-label')) bad.push('svg role=img without a title: ' + id(e));
+      }
+      return bad;
+    })()"""
+    triggers = ["[data-testid=ind-picker-btn]", "[data-testid=layers-btn]", "[data-testid=export-btn]"]
+    for r in ["map?ind=growth", "area/kommune/101?ind=growth", "data/areas/kommune?ind=growth",
+              "property?p=55.6545,12.539"]:
+        goto(page, r, settle=1400)
+        bad = page.evaluate(js)
+        assert not bad, f"{r}: {bad[:6]}"
+        for t in triggers:
+            if page.locator(t).count():
+                got = page.eval_on_selector_all(t, "els => els.map(e => e.getAttribute('aria-expanded'))")
+                assert all(v in ("true", "false") for v in got), f"{r}: {t} aria-expanded = {got}"
+
+
+@ac("AC-A2", phase="P8")
+def ac_a2(page, base):
+    """Tab from the page start reaches the indicator picker within 12 tabs on #map; Enter opens the
+    popover and Escape closes it again."""
+    goto(page, "map?ind=growth", settle=900)
+    page.evaluate("document.body.focus(); if (document.activeElement) document.activeElement.blur();")
+    seen = []
+    for n in range(12):
+        page.keyboard.press("Tab")
+        seen.append(page.evaluate("""(() => { const e = document.activeElement; if (!e) return '';
+            return e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') +
+              (e.getAttribute('data-testid') ? '[' + e.getAttribute('data-testid') + ']' : '') +
+              (typeof e.className === 'string' && e.className ? '.' + e.className.trim().split(/\\s+/).join('.') : ''); })()"""))
+        if page.evaluate("document.activeElement === document.querySelector('[data-testid=ind-picker-btn]')"):
+            break
+    else:
+        raise AssertionError(f"the picker was not reached in 12 tabs — the path was {seen}")
+    page.keyboard.press("Enter")
+    page.wait_for_timeout(300)
+    assert page.locator("[data-testid=ind-picker-pop]").is_visible(), "Enter did not open the picker"
+    assert page.locator("[data-testid=ind-picker-btn]").get_attribute("aria-expanded") == "true"
+    page.keyboard.press("Escape")
+    page.wait_for_timeout(300)
+    assert not page.locator("[data-testid=ind-picker-pop]").is_visible(), "Escape did not close the picker"
+    assert page.evaluate("document.activeElement === document.querySelector('[data-testid=ind-picker-btn]')"), \
+        "Escape did not hand focus back to the picker button"
+
+
+G1_RX = re.compile(r"\b(score|weighted|index of)\b", re.I)
+
+
+# The UI's own vocabulary: what the app writes rather than what a publisher wrote. Everything here
+# is chrome — if one of the G1 words turns up in it, the dashboard has invented a score or a weight.
+G1_CHROME = ("button, h1, h2, h3, h4, th, .tl, .tag, .lgtitle, .pk, .chip, .dtab, .segl, .sg, "
+             "[data-testid=nav-item], [data-testid=ind-picker-btn], .panel-hd, .inhlab, .xitem b")
+
+
+@ac("AC-G1", phase="P8")
+def ac_g1(page, base):
+    """No score, no weighting, no "index of" anywhere the dashboard speaks for itself — and every
+    remaining occurrence is the publisher's own prose, verbatim out of the built data.
+
+    Checked in two halves, because the data is out of this run's reach and must be: (1) no control,
+    heading, table header, tile label, tag, chip or legend title matches the phrase; (2) any visible
+    text that does match is a substring of the built registry — so the app never wrote it, it only
+    quoted a publisher ("pupil-weighted", which is how Uddannelsesstatistik publishes the FP9 grade,
+    and "…score high", a verb in two DST indicator descriptions). See docs/v3/DECISIONS.md."""
+    js = """(() => {
+      const out = [], w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      for (let n = w.nextNode(); n; n = w.nextNode()) {
+        const p = n.parentElement;
+        if (!p || p.closest('script,style,title')) continue;
+        const r = p.getBoundingClientRect();
+        if (r.width < 1 && r.height < 1) continue;
+        if (getComputedStyle(p).visibility === 'hidden') continue;
+        const t = (n.nodeValue || '').trim();
+        if (t) out.push(t);
+      }
+      return out;
+    })()"""
+    chrome_js = ("sel => [...document.querySelectorAll(sel)]"
+                 ".filter(e => { const r = e.getBoundingClientRect(); return r.width > 0 && r.height > 0; })"
+                 ".map(e => (e.textContent || '').trim())")
+    hits, quoted = [], []
+    for r in MUST_ROUTES:
+        goto(page, r, settle=900)
+        for t in page.evaluate(chrome_js, G1_CHROME):
+            if G1_RX.search(t):
+                hits.append(f"{r}: chrome says {t[:90]!r}")
+        for t in page.evaluate(js):
+            if G1_RX.search(t):
+                quoted.append((r, t))
+    assert not hits, "the dashboard's own words say score / weighted / index of — " + " | ".join(hits[:6])
+    if quoted:
+        blob = page.evaluate("JSON.stringify(D)")
+        strayed = [f"{r}: {t[:90]!r}" for r, t in quoted if t not in blob]
+        assert not strayed, ("text the app wrote itself says score / weighted / index of — "
+                             + " | ".join(strayed[:6]))
+
+
 # ---------------------------------------------------------------------------------------------
 def main():
     ap = argparse.ArgumentParser()

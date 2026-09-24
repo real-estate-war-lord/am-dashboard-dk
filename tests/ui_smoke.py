@@ -156,13 +156,38 @@ ROUTES = [
     dict(id="schoollist",     hash="schoollist/kommune:101",                 land=["table, .card"], state="S.view==='schoollist'", settle=2000),
 ]
 
-VIEWPORTS = {"1440x900": (1440, 900), "1366x768": (1366, 768), "390x844": (390, 844)}
+VIEWPORTS = {"1440x900": (1440, 900), "1536x864": (1536, 864), "1366x768": (1366, 768), "390x844": (390, 844)}
 
-# Horizontal overflow at phone width is a known v2.6 defect on every route (ENG_BRIEF §2.3): the
-# 900 px media query keeps the desktop grid semantics and the cards stay wider than 390. P8 rebuilds
-# the responsive shell and flips this to True; until then the finding is reported, not fatal.
-OVERFLOW_FATAL = False
-PHONE_W = 480
+# v3.0 P8 rebuilt the responsive shell (spec §4.1/§6), so horizontal overflow is fatal at **every**
+# viewport now, not only at phone width: AC-R1 is "no element may cause scrollWidth > innerWidth at
+# 390, 1366, 1440, 1536". Before P8 this was a v2.6 defect on every route (ENG_BRIEF §2.3) and the
+# finding was reported as a note.
+OVERFLOW_FATAL = True
+
+# The one expression that decides "this page scrolls sideways". `main` is checked as well as the
+# document: on desktop it is the scroll container, so a card wider than it never reaches <html>.
+# Leaflet containers always report scrollWidth > clientWidth, so they are excluded by name.
+OVERFLOW_JS = """(() => {
+  const slack = 2, out = [];
+  const pageW = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth);
+  if (pageW > window.innerWidth + slack) out.push(`document ${pageW}>${window.innerWidth}`);
+  const m = document.getElementById('main');
+  if (m && m.scrollWidth > m.clientWidth + slack) out.push(`#main ${m.scrollWidth}>${m.clientWidth}`);
+  if (!out.length) return '';
+  const lim = window.innerWidth + slack;
+  for (const e of document.querySelectorAll('#body *, .topbar *, aside *')) {
+    if (e.closest('.leaflet-container') || e.classList.contains('leaflet-container')) continue;
+    const r = e.getBoundingClientRect();
+    if (r.width < 1) continue;
+    if (r.right > lim || r.left < -slack) {
+      const id = e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') +
+                 (e.className && typeof e.className === 'string' ? '.' + e.className.trim().split(/\\s+/).join('.') : '');
+      out.push(`${id.slice(0, 60)} [${Math.round(r.left)},${Math.round(r.right)}]`);
+      if (out.length > 4) break;
+    }
+  }
+  return out.join(' · ');
+})()"""
 
 
 def assert_this_app(page, url):
@@ -273,11 +298,11 @@ def main():
                     except Exception as ex:
                         ok = False; issues.append(f"state threw: {str(ex).splitlines()[0][:120]}")
                     if not ok: issues.append(f"state false: {r['state']}")
-                # layout sanity: no horizontal page scroll at phone width, body not empty
-                hscroll = page.evaluate("document.documentElement.scrollWidth > window.innerWidth + 2 || document.getElementById('main').scrollWidth > document.getElementById('main').clientWidth + 2")
+                # layout sanity: the page never scrolls sideways at any viewport (spec §6, AC-R1)
+                hscroll = page.evaluate(OVERFLOW_JS)
                 notes = []
-                if hscroll and w <= PHONE_W:
-                    (issues if OVERFLOW_FATAL else notes).append("horizontal overflow at phone width")
+                if hscroll:
+                    (issues if OVERFLOW_FATAL else notes).append("horizontal overflow: " + hscroll)
                 page_errs = errs[before:]
                 shot = out / f"{r['id']}_{vname}.png"
                 page.screenshot(path=str(shot), full_page=False)

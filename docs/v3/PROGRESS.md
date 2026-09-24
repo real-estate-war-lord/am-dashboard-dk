@@ -810,3 +810,138 @@ three places, Esc, the v2.6 button gone, and Data › Sources ≡ the sources fi
 - **P9 (docs):** the file names, the schemas and the "every row carries its source" line belong in
   `README.md` / `CHANGELOG.md`; the column list is in `docs/v3/UI_SPEC_v3.md` §4.9 and in the header
   of `src/export_core.js`.
+
+---
+
+## P8 — The responsive shell, the number rules, the sheets and accessibility
+
+Commit: `v3.0 P8: responsive shell, number rules, sheets and accessibility`
+Gate: green — build, 116 node tests, 42 python tests, 150/150 route×viewport smoke checks with
+**0 JS errors and 0 horizontal overflow** (`OVERFLOW_FATAL = True`), **63/63 acceptance criteria**
+(3 P1 + 8 P2 + 9 P3 + 10 P4 + 12 P5 + 7 P6 + 6 P7 + 8 P8), budgets
+(app.js 445 KiB / 450, style.css 136 KiB / 140).
+
+### What was built
+
+**1. The app shell is a layout at every width** (spec §4.1, §6). `src/index.html` gained a 52 px
+`.mtop` bar (`topbar-mobile`) with `☰` (`nav-toggle`) and a `.drawer` (`nav-drawer`) **around the
+existing `<aside>`** — one element is the sidebar and the drawer's panel, so there is no second copy
+of the nav (and no third `export-btn`). `.drawer` is `display:contents` at ≥ 1025 px, so the desktop
+grid is unchanged apart from `--sidew` becoming a flat **240 px** (§4.1; the 212/180 steps went).
+Below 1025 px: one column, `body{overflow:auto}`, `.app{display:block}` — the page scrolls natively
+— and the drawer is a fixed off-canvas panel with a scrim, Esc, a focus trap and focus handed back
+to `☰` (`navDrawer()`, `navFocusables()`, `NAVD`). The closed drawer is `visibility:hidden`, which
+is what keeps `<aside>` out of the tab order, the a11y tree and Playwright's `is_visible()`.
+
+**2. Horizontal overflow is gone at every viewport, and it was one bug.**
+`@media (max-width:900px){:root{--sidew:100%}}` never undid `.app{grid-template-columns:var(--sidew)
+1fr}`, so at 390 px the phone grid was `390px 1fr` and every page was laid out in a second column
+starting at x ≈ 412 (the ~232 px content column P5 reported). `.card{overflow-x:auto}` masked it per
+card. Deleting both cleared **all** routes at 390, 1366, 1440 and 1536 in one go.
+`tests/ui_smoke.py` now has `OVERFLOW_FATAL = True`, checks **every** viewport rather than only
+phone width, adds `1536x864` to `VIEWPORTS`, and reports the offending elements by name through one
+shared expression (`OVERFLOW_JS`) that `tests/ui_ac.py` imports for AC-R1.
+
+**3. The rest of the §6 matrix.** Toolbars stack — `.trow` / `.artools` needed an explicit
+`width:100%` below 1025 px, because nested in two flex columns the map toolbar's first row was
+sized to its *max-content* (597 px at 390) and the card simply clipped the picker's right-hand end;
+AC-S1 now asserts that no toolbar control runs past `#mapcard`. The chips row scrolls sideways;
+tables scroll inside their card with the first column pinned (`.scrollx > .tbl th/td:first-child`);
+the tile grid goes 5 → 3+2 → 2 **and fills its last row**, which removes the grey slab P6 logged;
+the map goes edge to edge inside its card at ≤ 600 px (a map is the one thing that wants every
+pixel — AC-S1 asks for ≥ 350 of 390); the legend stack folds behind one `Legend ▾` pill
+(`legend-toggle`), toggled in place so the map underneath is never torn down; the breadcrumb bar is
+sticky under the 52 px bar and the two together stay inside §6's 96 px.
+
+**4. The number rules through one path** (spec §2.4). `rankHtml(rk, label)` is now the only rank
+renderer — `#n of N` everywhere with a `title` that names the peers ("of 77 municipalities with a
+figure"); the climate sheet's `#n / N` was the last survivor of the second format. `DASH` / `NC`
+separate "the publisher has no figure" from "not computed at this level". `projPersons()` /
+`projValueHtml()` / `smallBaseTag()` read the projection's own window out of the registry and render
+a projected % change **persons-first with a `small base` tag** when the base is under 1 000 persons,
+on the headline tiles, the chart panel's headline row and the Population-outlook tiles alike.
+
+**5. Sheets** (§5.7). `sheetTiles()` gives the project, public-building, school and climate sheets
+one §4.7 tile row (`data-testid=tiles`) and **never renders an empty slot** (AC-SH1). The climate
+sheet's header uses the shared PeriodControl (`periodHz()` → `data-testid=period[data-mode=horizon]`
+around the same `hzPill`), and "Show the zones on the map" emits the canonical
+`map/<kom>?ind=surge_dw_pct&hz=<hz>` (AC-SH2). The project sheet gained its `Source ↗ · updated`
+line and the school sheet a `Verify ↗ Uddannelsesstatistik` line under the tiles.
+
+**6. Empty / loading / error states** (§4.10). `stateCard(kind, title, note, action)` →
+`data-testid=state-empty|state-loading|state-error`, mono caption, one action, a three-bar skeleton
+while loading, never a modal. Wired into the two places that actually wait for a file: the test
+property before `geo/kommuner_lookup.json` lands (and an error card when it fails), and the
+public-building sheet before `public/<kom>.json` does.
+
+**7. Accessibility** (§7). One `:focus-visible` ring for the whole app; `aria-expanded` on every
+popover trigger (the new `nav-toggle` and `legend-toggle` join the picker, Layers and Export);
+11 px captions off `--muted` onto `--cap-ink` (`#6F7168`) on `.cap,.hint,.xcap,.laynote,.mm-note`;
+the breadcrumb `›` separators are `aria-hidden`; the search dropdown's rows are `tabindex="-1"`
+(it is a listbox driven by ↑ ↓ and Enter, and it opens on focus — 606 postal codes in the tab order
+buried every control after it, which is what AC-A2's twelve tabs exposed) and it now closes when
+focus leaves the box, so tabbing past it no longer leaves a list standing over the toolbar.
+
+**8. The P4 Copenhagen-climate limitation is fixed in the UI.** `#map/101` with a Climate indicator
+now switches to the **postal-code** view instead of swapping the indicator (and the storm-surge
+zones) away: `cph.json` publishes no Climate key, but the postal codes do. No data change.
+
+**9. Room for it.** 15.8 KB of the v2.6 Finnish-commented legacy CSS was deleted — 17 contiguous
+blocks whose class names occur in no `src/*.js` and not in `src/index.html` (`.tg*`, `.tgroup*`,
+`.mix-*`, `.pcard`/`.pc-*`, `.vbanner`/`.vb-*`, `.mk-*`, `.cxy*`, `.wk*`, `.sortth`, `.chwrap`).
+`style.css` went 139 KB → 129 KiB before P8's own block.
+
+### ACs delivered
+AC-S1, AC-S2, AC-R1, AC-SH1, AC-SH2, AC-A1, AC-A2, AC-G1 — all MUST, all registered in
+`tests/ui_ac.py` under `phase="P8"`. AC-S3 (P4) and AC-P5/AC-R2 (P5) still pass.
+
+### Deviations
+- **AC-A1 is a DOM check, not axe-core**, exactly as the phase file allows: `src/vendor/axe.min.js`
+  is not in the repo and the run installs nothing. It asserts an accessible name on every visible
+  control, `aria-expanded` on everything with `aria-haspopup`/`aria-controls`, and a text
+  alternative on every `img` / `svg[role=img]`, on the four routes the spec names. Leaflet's own
+  controls are excluded — vendor markup, not ours. **A daytime follow-up should run real axe-core.**
+- **AC-G1 is asserted in two halves** (see `DECISIONS.md`): none of the dashboard's *own* words
+  (button, heading, `th`, tile label, tag, chip, legend title) matches the phrase, and every
+  remaining visible match is a verbatim substring of the built registry — the publisher's prose.
+  Two DST descriptions use "score" as a verb and Uddannelsesstatistik publishes the FP9 grade
+  "pupil-weighted"; `data/` is out of this run's reach. The four captions where **app.js itself**
+  said "weighted" were reworded, so nothing is exempted by name.
+- **AC-SH2 lands on `map/101/postnr`**, not `map/101`. The AC asks for "a hash starting `map/101`",
+  which it is; the postal-code view is what makes the surge indicator and its zones survive the
+  drill (item 8 above).
+- **The school sheet's `Verify ↗` is one line under the tile row**, not one link per tile as §5.7
+  reads. Six identical links inside six 84 px tiles is noise; the line names the institution number
+  and the school year the tiles are from.
+- `1536x864` is in `tests/ui_smoke.py`'s `VIEWPORTS` but **not** in the gate's `--viewports` (the
+  gate script is outside this run's allowed files). AC-R1 walks all four widths itself.
+
+### Known issues / open items
+- `src/app.js` is at **445 KiB of the 450 KiB budget** (≈ 5 KB left) and `src/style.css` at 136 KiB
+  of 140 (≈ 4 KB). P9 has room for docs and small fixes only; anything larger wants either a
+  new `*_core.js` or another pass over the legacy CSS (≈ 6 KB of contiguous dead blocks remain, and
+  ~17 KB more in single lines — the same analysis, run per rule instead of per block).
+- The small-base rule has **no live case in the Danish data**: the smallest projection base is well
+  over 1 000 persons, so `smallBaseTag()` never fires on a real page today. It is exercised by
+  reading `projValueHtml`/`projPersons` directly, not by a route.
+- `stateCard` is wired into two lazy paths. The services, micro and climate-zone loads still show
+  their v2.6 inline text; a later pass can move them onto the same component.
+- The KK vs BBR "built 2010+" gap and the surge keys' horizon-in-the-`desc` are still data tasks.
+- `scripts/ui_check.py` still drives `#compare` (P2's note) and is not part of the gate.
+
+### What the next phase must know
+- **The shell is `.mtop` + `.drawer` + `<aside>` + `<main>` in `src/index.html`.** A new sidebar item
+  goes in `renderNav()` and appears in both places automatically, because there is only one place.
+  Anything that opens the drawer programmatically must go through `navDrawer(true|false)` — it owns
+  `aria-expanded`, the body class, the focus trap and the focus hand-back.
+- **Overflow is fatal now.** A new card, table or toolbar that is wider than its column fails the
+  gate at 390 *and* at 1366. Put a table in `.scrollx`, cap a popover at `100vw`, and check the
+  smoke message — it names the element.
+- **`rankHtml`, `DASH`, `NC`, `projValueHtml`, `smallBaseTag` are the §2.4 path.** A new surface that
+  shows a rank or a projected change uses them; do not re-format inline.
+- **`sheetTiles(items)` is the §5.7 tile row** — `[label, valueHtml, subHtml]`, a null slot is
+  dropped. `stateCard(kind, …)` is the §4.10 card, with the `state-*` test ids.
+- **`periodHz(where)`** is the PeriodControl in horizon mode on its own, for a header that is not
+  driven by the picker's active indicator (the climate sheet).
+- P9 (docs): the responsive matrix, the drawer, the `state-*` ids and the number rules belong in
+  `README.md`; `OVERFLOW_FATAL` and the two-half AC-G1 belong in `tests/README.md`.
