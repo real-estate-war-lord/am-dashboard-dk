@@ -2219,6 +2219,7 @@ function lfMicroLayers() {
   setLevelChip();
   lfInfraLayers();
   lfPublicLayers();
+  lfServicesLayers();   /* the ladder can enter buildings mode on zoom alone, so this must draw here too */
   if (cnt) cnt.textContent = `${nf(rows.length, 0)} of ${nf(d.meta.n, 0)} buildings · ${nf(rows.reduce((s_, r) => s_ + r[2], 0), 0)} dwellings`;
 }
 /* Keep the drawn granularity in step with the zoom, and with a pan that crosses a border.
