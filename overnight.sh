@@ -12,7 +12,7 @@
 set -u
 REPO="$(cd "$(dirname "$0")" && pwd)"; cd "$REPO" || exit 1
 BRANCH="v3.0-ui"
-ALL_PHASES=(P1 P2 P3 P4 P5 P6 P7 P8 P9)
+ALL_PHASES=(P1 P2 P3 P4 P5 P6 P7 P8 P9 P10 P11 P12)
 PHASE_TIMEOUT="${PHASE_TIMEOUT:-9000}"     # seconds per claude call (150 min)
 LIMIT_WAIT="${LIMIT_WAIT:-1200}"           # seconds to sleep when a usage limit is hit
 LIMIT_MAX_WAITS="${LIMIT_MAX_WAITS:-15}"   # up to 5 h of waiting in total

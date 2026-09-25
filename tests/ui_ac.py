@@ -33,7 +33,7 @@ from playwright.sync_api import sync_playwright
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from ui_smoke import our_url  # noqa: E402
 
-PHASES = ["P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9"]
+PHASES = ["P0", "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11", "P12"]
 VIEWPORTS = {"1440x900": (1440, 900), "1536x864": (1536, 864), "1366x768": (1366, 768), "390x844": (390, 844)}
 DEFAULT_VP = "1440x900"
 
