@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Assemble the self-contained dashboard: dist/index.html.
 
-Inlines src/style.css, vendored Leaflet, src/testprop.js, src/app.js and the data
+Inlines src/style.css, vendored Leaflet, src/testprop.js, src/climate_core.js,
+src/route_core.js, src/app.js and the data
 (data/processed/makro.json + market.json, optional portfolio.json) into the
 template src/index.html — one file that opens from disk or GitHub Pages.
 
@@ -139,7 +140,8 @@ def main():
     ap.add_argument("--out", default=str(ROOT / "dist" / "index.html"))
     args = ap.parse_args()
 
-    check_js([SRC / "app.js", SRC / "testprop.js", SRC / "climate_core.js"])
+    check_js([SRC / "app.js", SRC / "testprop.js", SRC / "climate_core.js", SRC / "route_core.js",
+              SRC / "picker_core.js", SRC / "export_core.js", SRC / "pin_core.js", SRC / "panels.js"])
     makro = load(pathlib.Path(args.data)) or {}
     market = load(pathlib.Path(args.market)) or {}
     portfolio = load(pathlib.Path(args.portfolio))
@@ -186,6 +188,11 @@ def main():
                 .replace("{{LEAFLET_JS}}", (SRC / "vendor" / "leaflet.js").read_text(encoding="utf-8"))
                 .replace("{{TESTPROP_JS}}", (SRC / "testprop.js").read_text(encoding="utf-8"))
                 .replace("{{CLIMATE_JS}}", (SRC / "climate_core.js").read_text(encoding="utf-8"))
+                .replace("{{ROUTE_JS}}", (SRC / "route_core.js").read_text(encoding="utf-8"))
+                .replace("{{PICKER_JS}}", (SRC / "picker_core.js").read_text(encoding="utf-8"))
+                .replace("{{EXPORT_JS}}", (SRC / "export_core.js").read_text(encoding="utf-8"))
+                .replace("{{PIN_JS}}", (SRC / "pin_core.js").read_text(encoding="utf-8"))
+                .replace("{{PANELS_JS}}", (SRC / "panels.js").read_text(encoding="utf-8"))
                 .replace("{{APP_JS}}", (SRC / "app.js").read_text(encoding="utf-8"))
                 .replace("{{DATA}}", payload)
                 .replace("{{BUILT}}", built))

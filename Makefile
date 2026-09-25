@@ -1,5 +1,8 @@
 # AM Dashboard — Denmark Edition · one command per pipeline step
 PY ?= python3
+# the Playwright venv the UI tests need (see docs/v3/ENG_BRIEF_v3.md §6); falls back to $(PY)
+UIPY ?= $(shell [ -x .venv-ui/bin/python3 ] && echo .venv-ui/bin/python3 || echo $(PY))
+UIURL ?= http://localhost:8080/
 
 validate:   ## check every table/value code in config against the live API, plus a sample of source links
 	$(PY) scripts/validate_config.py && $(PY) scripts/check_source_links.py --quick --sample 2
@@ -28,12 +31,17 @@ test:       ## every unit test (python + js)
 	$(PY) -m unittest discover -s tests -p 'test_*.py' && $(MAKE) test-js
 ui-check:   ## drive dist/index.html headless and assert on the app's own state (needs Chrome)
 	$(PY) scripts/ui_check.py
+smoke:      ## every route x 4 viewports: 0 JS errors, 0 overflow, DOM landmarks, redirects, shots (needs `make serve` on :8080)
+	$(UIPY) tests/ui_smoke.py --url $(UIURL) --no-network --phase adhoc --out logs/shots \
+	        --viewports 1440x900,1536x864,1366x768,390x844
+ac:         ## the UI spec's acceptance criteria, one test per AC id (needs `make serve` on :8080)
+	$(UIPY) tests/ui_ac.py --url $(UIURL) --out logs/ac
 validate-forecast: ## the Outlook layer's own checks (hard-data audit, reconciliations, backtest)
 	$(PY) scripts/validate_forecast.py
 fixture:    ## synthetic render check (never ship)
 	$(PY) tests/make_fixture.py && $(PY) scripts/build_dashboard.py --data tests/fixture_makro.json --market tests/fixture_market.json --cph tests/fixture_cph.json --out dist/fixture.html
 refresh: fetch build
-.PHONY: validate links validate-links validate-forecast geo geo-cph bbr fetch build serve fixture refresh schools forecast test test-js ui-check
+.PHONY: validate links validate-links validate-forecast geo geo-cph bbr fetch build serve fixture refresh schools forecast test test-js ui-check smoke ac
 
 # scripts/build_housing_gap.py is deliberately NOT a target: it needs a fitted household-size
 # trend, which the hard-data rule forbids in the UI (docs/FORECAST.md §0, §7). It stays in the

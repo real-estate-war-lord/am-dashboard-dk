@@ -48,8 +48,6 @@ aside{background:var(--side);color:var(--side-ink);display:flex;flex-direction:c
 .nav-item .ni-n{position:absolute;top:13px;right:14px;font-family:var(--mono);font-size:11.5px;color:#7C7F73}
 .side-foot{margin-top:auto;padding:14px 20px 18px;border-top:1px solid var(--side2);font-size:11px;color:var(--side-muted);line-height:1.5}
 .side-foot b{color:var(--side-ink);font-family:var(--body);font-weight:600}
-.side-foot label{display:block;margin:10px 0 4px;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase}
-#remu{width:100%;background:var(--side2);border:1px solid #2C3A32;color:var(--side-ink);font-family:var(--mono);font-size:10.5px;padding:5px 7px}
 
 main{overflow-y:auto;display:flex;flex-direction:column}
 .topbar{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line);padding:18px 26px 14px}
@@ -126,29 +124,8 @@ main{overflow-y:auto;display:flex;flex-direction:column}
 .today{display:flex;flex-direction:column;gap:2px}
 .today .rract{margin-top:4px;padding:8px 11px;font-size:12.5px}
 .today .rract em{font-style:normal;color:var(--ink2)}
-/* ---- toggle-lista: rivi kertoo mitä, avaus kertoo miksi ja mitä tehdä ---- */
-.tg{border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--panel)}
-.tg+.tg{margin-top:8px}
-.tgi{border-bottom:1px solid var(--line2)}
-.tgi:last-child{border-bottom:0}
-.tgi>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:11px 14px;font-size:13px}
-.tgi>summary::-webkit-details-marker{display:none}
-.tgi>summary:hover{background:var(--panel2)}
-.tgi[open]>summary{background:var(--panel2);border-bottom:1px solid var(--line2)}
-.tgi .tgt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tgi .tgt b{font-weight:600;font-family:var(--body)}
-.tgi .tgv{font-family:var(--mono);font-size:12.5px;color:var(--ink);white-space:nowrap}
-.tgi .tgv.bad{color:var(--bad)}.tgi .tgv.good{color:var(--good)}
-.tgi .tgx{font-family:var(--mono);font-size:15px;color:var(--dim);line-height:1;transition:transform .15s}
-.tgi[open] .tgx{transform:rotate(90deg)}
-.tgb{padding:2px 14px 14px 38px;font-size:12.5px;color:var(--ink2);line-height:1.6}
-.tgb b{font-family:var(--body)}
-.tghead{display:flex;align-items:center;gap:10px;padding:9px 14px;background:var(--panel2);border-bottom:1px solid var(--line2);
-  font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.tghead .tgn{margin-left:auto;color:var(--ink)}
-.tgmore{display:block;width:100%;text-align:center;background:none;border:0;border-top:1px solid var(--line2);
-  padding:9px;font-family:var(--mono);font-size:11px;color:var(--muted);cursor:pointer}
-.tgmore:hover{color:var(--ink);background:var(--panel2)}
+/* (v2.6 legacy `.tg / .tgi / .tgb / .tghead / .tgmore` toggle list deleted in P9 — not one of those
+   class names occurs in any src/*.js or in src/index.html.) */
 /* ---- kaksi yleiskuvaa: tapahtui / tapahtumassa ---- */
 .ovcols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 @media (max-width:1100px){.ovcols{grid-template-columns:1fr}}
@@ -185,32 +162,7 @@ main{overflow-y:auto;display:flex;flex-direction:column}
 .phead .ph-r{display:flex;flex-direction:column;align-items:flex-end;gap:9px}
 .ag-bad{background:#B0331B}.ag-warn{background:#C08A24}.ag-neu{background:#B9BCB2}.ag-good{background:#1C6B5C}
 /* hälytysryhmä: otsikkorivi jonka alta löydöslista aukeaa */
-.tgroup{border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:9px;background:var(--panel)}
-.tgroup>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:12px 14px;
-  background:var(--panel2);font-size:13.5px;font-weight:600}
-.tgroup>summary::-webkit-details-marker{display:none}
-.tgroup>summary:hover{background:#F2F2EE}
-.tgroup[open]>summary{border-bottom:1px solid var(--line2)}
-.tgroup .tgn2{font-family:var(--mono);font-size:15px;margin-left:auto}
-.tgroup .tgv2{font-family:var(--mono);font-size:12px;color:var(--muted);font-weight:400}
-.tgroup .tg{border:0;border-radius:0}
-.tgroup .tgx{font-weight:400}
-.portbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.tgsub{display:flex;flex-direction:column;gap:4px;margin-top:2px}
-.tgsr{display:flex;align-items:baseline;gap:10px;padding:5px 0;border-bottom:1px solid var(--line2)}
-.tgsr:last-child{border-bottom:0}
-.tgsr>span{flex:1;min-width:0}
-.tgsr>b{font-family:var(--mono);font-size:12px;white-space:nowrap}
-/* taitettava kortti */
-.card.fold{padding:0}
-.card.fold>summary{list-style:none;cursor:pointer;margin:0;padding:17px 20px;border-bottom:0}
-.card.fold>summary::-webkit-details-marker{display:none}
-.card.fold>summary:hover{background:var(--panel2)}
-.card.fold[open]>summary{border-bottom:1px solid var(--line2)}
-.card.fold>summary .tgx{margin-left:auto;font-family:var(--mono);font-size:15px;color:var(--dim);line-height:1;transition:transform .15s}
-.card.fold[open]>summary .tgx{transform:rotate(90deg)}
-.card.fold .foldb{padding:14px 20px 19px}
-.card.fold .foldb>.tbl:first-child,.card.fold .foldb>.hero:first-child{margin-top:0}
+/* (v2.6 legacy `.card.fold` / `.foldb` deleted in P9 — the v3.0 foldable card is `.card.arsec`.) */
 .hero.hero3{grid-template-columns:repeat(3,minmax(0,1fr))}
 @media (max-width:1100px){.hero.hero3{grid-template-columns:1fr 1fr}}
 .back{margin-bottom:2px}
@@ -325,20 +277,6 @@ td.hc.ht0,td.hc.ht1,td.hc.ht2,td.hc.ht3,td.hc.ht4{background:var(--hb);color:var
 .hb span{font-family:var(--mono);font-size:10px;color:var(--ink2)}
 .hb em{display:block;font-style:normal;font-family:var(--mono);font-size:9.5px;color:var(--muted)}
 .tenure{display:flex;gap:8px;align-items:end;margin-top:12px}
-.tn{flex:1;text-align:center}
-.tn i{display:block;background:var(--b3);width:100%}
-.tn span{font-family:var(--mono);font-size:10.5px}
-.tn em{display:block;font-style:normal;font-family:var(--mono);font-size:9px;color:var(--muted)}
-.mix{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;align-items:end;padding:10px 0 0}
-.mix-col{text-align:center;display:flex;flex-direction:column;justify-content:flex-end}
-.mix-stack{display:flex;flex-direction:column-reverse;width:100%;margin:4px 0 5px}
-.mix-stack i{display:block;width:100%;min-height:2px}
-.mc0{background:#8E9C93}.mc1{background:var(--b2)}.mc2{background:var(--bad)}.mc3{background:#5D4A75}
-.mix-tot{font-family:var(--mono);font-size:10.5px;color:var(--ink2)}
-.mix-eur{font-family:var(--mono);font-size:9px;color:var(--muted)}
-.mix-lab{font-family:var(--mono);font-size:9px;color:var(--dim)}
-.mix-legend{display:flex;flex-wrap:wrap;gap:4px 16px;margin-top:10px;font-size:11px;color:var(--ink2)}
-.mix-legend span{display:flex;align-items:center;gap:6px}.mix-legend i{width:10px;height:10px;display:block}
 
 .reasons{margin-top:4px}
 .rrow{display:grid;grid-template-columns:minmax(130px,1.2fr) 3fr 34px 40px;gap:9px;align-items:center;padding:2px 0}
@@ -360,19 +298,6 @@ td.hc.ht0,td.hc.ht1,td.hc.ht2,td.hc.ht3,td.hc.ht4{background:var(--hb);color:var
 .w-mid{font-size:11.5px;color:var(--muted);margin-top:2px}
 .w-why{font-size:12px;color:var(--ink2);margin-top:3px}
 
-.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-top:10px}
-.pcard{text-align:left;background:var(--panel2);border:1px solid var(--line);border-top:3px solid var(--muted);padding:12px;cursor:pointer;font:inherit}
-.pcard.red{border-top-color:var(--red)}.pcard.amber{border-top-color:var(--amber)}.pcard.green{border-top-color:var(--green)}
-.pcard:hover{border-color:var(--ink)}
-.pc-head{display:flex;align-items:center;gap:7px}
-.pc-head b{font-size:14px;font-family:var(--body)}
-.pc-city{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--muted)}
-.pc-addr{display:flex;gap:6px;align-items:baseline;margin:2px 0 0;font-size:11.5px;color:var(--ink2)}
-.pc-addr span{font-family:var(--mono);font-size:10px;color:var(--muted)}
-.pc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px 10px;margin-top:11px}
-.pc-grid span{display:block;font-family:var(--mono);font-size:8px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);line-height:1.25;min-height:20px}
-.pc-grid b{font-size:12.5px}
-.pc-spark{margin-top:9px;color:var(--ink2)}
 .pc-spark .spark{height:34px}
 .pc-spark em{display:block;margin-top:3px}
 .pc-spark em{font-style:normal;font-family:var(--mono);font-size:9px;color:var(--muted)}
@@ -416,20 +341,6 @@ td.hc.ht0,td.hc.ht1,td.hc.ht2,td.hc.ht3,td.hc.ht4{background:var(--hb);color:var
 
 .tools{display:flex;gap:8px;flex-wrap:wrap}
 .pv{font-family:var(--mono);font-size:9.5px;font-weight:600;opacity:.58;letter-spacing:-.2px}
-.chwrap{position:relative}
-.chtools{position:absolute;top:0;right:0;display:flex;gap:4px}
-.ps{display:inline-flex;align-items:center;gap:3px;font-family:var(--mono);font-size:10px;margin-right:6px}
-.ps em{font-style:normal;color:var(--muted)}
-.tw-bars i{position:relative}
-.tw-bars i b{position:absolute;top:-13px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:8.5px;color:var(--ink2);font-weight:500}
-.wk{display:flex;gap:8px;align-items:end;margin-top:10px;min-height:110px}
-.wkc{flex:1;text-align:center;display:flex;flex-direction:column;justify-content:flex-end}
-.wkc i{display:block;background:var(--b4);width:100%}
-.wkc span{font-family:var(--mono);font-size:11px}
-.wkc em{display:block;font-style:normal;font-family:var(--mono);font-size:9px;color:var(--muted)}
-.sortth{cursor:pointer;user-select:none}
-.sortth:hover{color:var(--ink)}
-.sortth.on{color:var(--ink);font-weight:700}
 .na{color:var(--dim)}
 .dot.q1{background:var(--red)}.dot.q2{background:#D2703F}.dot.q3{background:var(--amber)}.dot.q4{background:var(--green)}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px}
@@ -452,11 +363,9 @@ td.hc.ht0,td.hc.ht1,td.hc.ht2,td.hc.ht3,td.hc.ht4{background:var(--hb);color:var
 aside::-webkit-scrollbar-thumb{background:#2C3A32}
 ::-webkit-scrollbar-track{background:transparent}
 @media (max-width:1200px){.grid-2{grid-template-columns:1fr}}
+/* the one-column shell below 1025 px is the P8 block at the end of this file (spec §4.1, §6) */
 @media (max-width:900px){
-  body{overflow:auto}.app{grid-template-columns:1fr;height:auto}main{overflow:visible}
-  .topbar{position:static}#body{padding:12px}
   .mini-stats,.mini-stats.tight,.bigstats{grid-template-columns:1fr 1fr}
-  .card{padding:12px;overflow-x:auto}.pc-grid{grid-template-columns:repeat(3,1fr)}
 }
 
 /* ---- info-merkki ja tooltip ---- */
@@ -688,26 +597,6 @@ aside{width:250px}
 .mb-good{background:var(--good)}.mb-bad{background:var(--bad)}.mb-warn{background:var(--warn)}
 .mb-bad2{background:var(--bad2)}.mb-neu{background:#C6CDC3}
 
-.pc-act{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:9px;padding-top:9px;border-top:1px solid var(--line2)}
-.pc-up{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--good);font-weight:600}
-.pcard{padding:13px}
-.pc-grid{grid-template-columns:repeat(3,1fr)}
-.vbanner{display:flex;align-items:center;gap:20px;padding:14px 18px;border-top:3px solid var(--muted)}
-.vbanner.vb-good{border-top-color:var(--good);background:#F2F8F5}
-.vbanner.vb-bad{border-top-color:var(--bad);background:#FCF3F0}
-.vbanner.vb-warn{border-top-color:var(--warn);background:#FDF7EC}
-.vbanner.vb-bad2{border-top-color:var(--bad2);background:#FAEDE8}
-.vb-l{display:flex;align-items:center;gap:14px}
-.vb-ico{font-family:var(--mono);font-size:20px;font-weight:700;width:38px;height:38px;flex:0 0 38px;
-  display:flex;align-items:center;justify-content:center;border:2px solid currentColor;border-radius:50%}
-.vb-good .vb-ico{color:var(--good)}.vb-bad .vb-ico{color:var(--bad)}
-.vb-warn .vb-ico{color:var(--warn)}.vb-bad2 .vb-ico{color:var(--bad2)}
-.vb-l b{font-family:var(--disp);font-size:19px;letter-spacing:-.02em;display:block}
-.vb-l p{margin:2px 0 0;font-size:13px;color:var(--ink2);max-width:74ch}
-.vb-r{margin-left:auto;text-align:right;flex:0 0 auto}
-.vb-r span{display:block;font-family:var(--mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.vb-r b{font-family:var(--mono);font-size:24px;letter-spacing:-.02em;display:block}
-.vb-r em{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--muted)}
 
 #side-kpi{grid-template-columns:1fr 1fr}
 #side-kpi>div.wide{grid-column:1 / -1}
@@ -723,6 +612,10 @@ aside{width:250px}
 .hero .vdrow{padding-top:8px}
 .hero .mini-bar{margin-top:auto}
 .hero b{font-size:29px}
+/* Data › National series: the four labels are publisher names and some of them take two lines, so
+   the figure is pushed to the foot of the tile — otherwise the values in one row sit on two
+   different baselines and the row reads as broken. */
+.hero-nat b{margin-top:auto}
 .tw{height:210px}
 .grid-2>.card{display:flex;flex-direction:column}
 .grid-2>.card>.tbl:last-child,.grid-2>.card>p.cap:last-child{margin-top:auto}
@@ -789,8 +682,6 @@ aside{width:250px}
    (aiemmin overflow:clip leikkasi oikeat sarakkeet pois 1400 px:n leveydellä) */
 .card>.tbl,.card>.scrollx>.tbl{max-width:100%}
 .card:has(>.tbl){overflow-x:auto}
-.card.fold .foldb{overflow-x:auto}
-.card.fold .foldb>.tbl{min-width:0}
 .scrollx table tr>th:first-child{position:sticky;left:0;background:var(--panel);z-index:2}
 .scrollx table thead tr>th:first-child{z-index:3}
 .tbl.wraphead thead th{white-space:nowrap;line-height:1.3;vertical-align:bottom;font-size:8.5px}
@@ -811,24 +702,6 @@ aside{width:250px}
 .simpresets .sg{flex:1}
 
 /* ---- Makro-kartta ---- */
-.mkwrap{display:grid;grid-template-columns:1.15fr 1fr;gap:18px;align-items:start}
-.mkmap svg{width:100%;height:auto;display:block}
-.mk-t{cursor:pointer}
-.mk-t path{stroke:var(--panel);stroke-width:2.5;stroke-linejoin:round;transition:filter .12s}
-.mk-t:hover path{filter:brightness(.94);stroke:var(--ink)}
-.mk-name{font-family:var(--body);font-size:14px;font-weight:600}
-.mk-t2{stroke:#FFFFFF;stroke-width:1.1;stroke-linejoin:round;cursor:pointer}
-.mk-t2:hover{stroke:#141C18;stroke-width:1.6}
-.mk-name2{font-family:var(--body);font-size:11.5px;font-weight:600}
-.mk-own circle{fill:#FFFFFF;stroke:#141C18;stroke-width:2}
-.mk-ownlab{font-family:var(--body);font-size:10.5px;font-weight:600;fill:#141C18;
-  paint-order:stroke;stroke:#FFFFFF;stroke-width:3px;stroke-linejoin:round}
-.mk-val{font-family:var(--mono);font-size:11.5px}
-.mk-mark circle{fill:#fff;stroke:#1E2B24;stroke-width:1.5}
-.mk-mark text{font-family:var(--mono);font-size:10px;font-weight:600;fill:#1E2B24}
-.mklegend{display:flex;align-items:center;gap:6px;margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--muted);white-space:nowrap}
-.mklegend span{white-space:nowrap}
-.mklegend i{width:26px;height:10px;display:inline-block;border-radius:2px}
 @media (max-width:1200px){.mkwrap{grid-template-columns:1fr}}
 
 .simval{font-family:var(--mono);font-size:12px;color:var(--ink)}
@@ -846,19 +719,6 @@ tr.svd-done .lk.mini.svd{opacity:1}
 @media (max-width:1100px){.simgrid{grid-template-columns:1fr}}
 
 /* capex */
-.cxy{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;align-items:end;height:150px;margin-top:8px}
-.cxy-col{display:flex;flex-direction:column;justify-content:flex-end;height:100%;text-align:center}
-.cxy-bars{display:flex;align-items:flex-end;justify-content:center;gap:2px;height:100%}
-.cxy-bars i{display:block;width:11px;min-height:2px}
-.cx-est{background:var(--k2)} .cx-act{background:var(--k1)} .cx-pts{background:var(--k3)}
-.cxy-v{font-family:var(--mono);font-size:9.5px;color:var(--ink2);margin-top:4px}
-.cxy-l{font-family:var(--mono);font-size:9.5px;color:var(--muted)}
-.cxbar{height:8px;background:var(--line2);width:100%;min-width:60px}
-.cxbar i{display:block;height:100%}
-.cxstat{display:grid;gap:10px}
-.cxs{padding:8px 10px;background:var(--panel2);border:1px solid var(--line2)}
-.cxs b{display:block;font-size:18px;margin:4px 0 1px}
-.cxs em{font-style:normal;font-size:11px;color:var(--muted);display:block;margin-bottom:6px}
 #cxq{font:inherit;font-size:12.5px;padding:5px 10px;border:1px solid var(--line);background:var(--panel);min-width:180px}
 .tbl td em.dim{font-style:normal}
 
@@ -1005,19 +865,6 @@ aside{background:linear-gradient(178deg,#131C16 0%,#0D140F 100%)}
 
 
 /* capex */
-.cxy{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;align-items:end;height:150px;margin-top:8px}
-.cxy-col{display:flex;flex-direction:column;justify-content:flex-end;height:100%;text-align:center}
-.cxy-bars{display:flex;align-items:flex-end;justify-content:center;gap:2px;height:100%}
-.cxy-bars i{display:block;width:11px;min-height:2px}
-.cx-est{background:var(--k2)} .cx-act{background:var(--k1)} .cx-pts{background:var(--k3)}
-.cxy-v{font-family:var(--mono);font-size:9.5px;color:var(--ink2);margin-top:4px}
-.cxy-l{font-family:var(--mono);font-size:9.5px;color:var(--muted)}
-.cxbar{height:8px;background:var(--line2);width:100%;min-width:60px}
-.cxbar i{display:block;height:100%}
-.cxstat{display:grid;gap:10px}
-.cxs{padding:8px 10px;background:var(--panel2);border:1px solid var(--line2)}
-.cxs b{display:block;font-size:18px;margin:4px 0 1px}
-.cxs em{font-style:normal;font-size:11px;color:var(--muted);display:block;margin-bottom:6px}
 #cxq{font:inherit;font-size:12.5px;padding:5px 10px;border:1px solid var(--line);background:var(--panel);min-width:180px}
 .tbl td em.dim{font-style:normal}
 
@@ -1064,19 +911,6 @@ aside{background:linear-gradient(178deg,#131C16 0%,#0D140F 100%)}
 
 
 /* capex */
-.cxy{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;align-items:end;height:150px;margin-top:8px}
-.cxy-col{display:flex;flex-direction:column;justify-content:flex-end;height:100%;text-align:center}
-.cxy-bars{display:flex;align-items:flex-end;justify-content:center;gap:2px;height:100%}
-.cxy-bars i{display:block;width:11px;min-height:2px}
-.cx-est{background:var(--k2)} .cx-act{background:var(--k1)} .cx-pts{background:var(--k3)}
-.cxy-v{font-family:var(--mono);font-size:9.5px;color:var(--ink2);margin-top:4px}
-.cxy-l{font-family:var(--mono);font-size:9.5px;color:var(--muted)}
-.cxbar{height:8px;background:var(--line2);width:100%;min-width:60px}
-.cxbar i{display:block;height:100%}
-.cxstat{display:grid;gap:10px}
-.cxs{padding:8px 10px;background:var(--panel2);border:1px solid var(--line2)}
-.cxs b{display:block;font-size:18px;margin:4px 0 1px}
-.cxs em{font-style:normal;font-size:11px;color:var(--muted);display:block;margin-bottom:6px}
 #cxq{font:inherit;font-size:12.5px;padding:5px 10px;border:1px solid var(--line);background:var(--panel);min-width:180px}
 .tbl td em.dim{font-style:normal}
 
@@ -1202,28 +1036,8 @@ aside{background:linear-gradient(178deg,#131C16 0%,#0D140F 100%)}
 .crumb{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .artags{display:flex;gap:6px;flex-wrap:wrap}
 .artags .tag{color:var(--ink2);border-color:var(--line)}
-.hero.wrap{grid-template-columns:repeat(7,minmax(0,1fr));background:var(--panel);gap:0}
-@media (max-width:1250px){.hero.wrap{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media (max-width:800px){.hero.wrap{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.hero.wrap>div{border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
-.hero .tile{cursor:pointer;transition:background .12s}
-.hero .tile:hover{background:var(--panel2)}
-.hero .tile.on{box-shadow:inset 0 3px 0 var(--ink);background:#F0F4EE}
-.hero .tile{padding:11px 10px 9px;min-height:0}
-.hero .tile .tl{font-size:9px;letter-spacing:.06em;min-height:26px;line-height:1.35}
-.hero .tile .tv{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap;margin-top:4px}
-.hero .tile .tv b{font-size:19px;margin:0;display:inline;letter-spacing:-.03em}
-.hero .tile .tv i{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--ink2)}
-.hero .tile .tspark{width:100%;height:60px;display:block;margin-top:6px;overflow:visible}
-.hero .tile .tspark .ax{font-size:8.5px}
-.hero .tile .tm{display:grid;gap:2px;margin-top:4px;font-family:var(--mono);font-size:9.5px;color:var(--muted)}
-.hero .tile .tm i{font-style:normal;font-weight:600}
-.hero .tile .rk{display:flex;align-items:center;gap:6px;color:var(--ink2)}
-.rkbar{position:relative;display:inline-block;width:46px;height:5px;background:var(--line);border-radius:3px;flex:0 0 46px}
-.rkbar i{position:absolute;top:-2px;width:3px;height:9px;margin-left:-1px;background:var(--ink);border-radius:1px}
-.hero .tile .up{color:var(--good)}.hero .tile .dn{color:var(--bad)}
-.hero .tile em i{font-style:normal;font-weight:600}
-#armap{height:380px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);position:relative;z-index:0;isolation:isolate}
+/* the v2.6 "Key figures" 12-tab tile grid (.hero.wrap, .hero .tile, .tspark, .rkbar) and the old
+   #armap height went with the v3.0 area page — see the P5 block at the end of this file */
 .tbl .go{color:var(--dim);font-size:13px;font-weight:400;margin-left:2px}
 .back button+.dim{margin:0 4px}
 @media (max-width:1100px){.mstrip-k{margin-left:0}}
@@ -1242,20 +1056,15 @@ aside{background:linear-gradient(178deg,#131C16 0%,#0D140F 100%)}
 .dinfo>summary:hover{color:var(--ink)}
 
 /* ---- v1.3.1: responsive scaling for laptops with 125–150 % display scaling (Windows) ---- */
-:root{--sidew:250px}
+/* 240 px at every desktop width (spec §4.1: "was 268; 240 recovers 28 px for 1366 laptops") */
+:root{--sidew:240px}
 .app{grid-template-columns:var(--sidew) 1fr}
 aside{width:var(--sidew)}
 #lfmap{height:clamp(380px,calc(100vh - 250px),760px)}        /* the map fits the window: no scrolling to see the legend */
-#armap{height:clamp(300px,calc(100vh - 560px),420px)}
 .asrch input{min-width:min(300px,38vw)}
 .indsel{max-width:min(360px,44vw)}
 .card-head .tools{max-width:100%}
-.hero.wrap{grid-template-columns:repeat(7,minmax(0,1fr))}
-@media (max-width:1500px){.hero.wrap{grid-template-columns:repeat(5,minmax(0,1fr))}}
-@media (max-width:1180px){.hero.wrap{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media (max-width:820px){.hero.wrap{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:1400px){
-  :root{--sidew:212px}
   body{font-size:13px}
   .brand{padding:16px 14px 10px}.brand h2{font-size:14px}
   .nav-glab{padding:16px 12px 6px}
@@ -1269,22 +1078,14 @@ aside{width:var(--sidew)}
   .tbl.compact th,.tbl.compact td{padding:4px 6px;font-size:11px}
   .mstrip{gap:12px;padding:8px 12px}.mstrip-k{gap:12px}
   .arhead h2{font-size:24px}
-  .hero .tile .tv b{font-size:18px}
 }
 @media (max-width:1180px){
-  :root{--sidew:180px}
-  .nav-item em{display:none}
   .topbar h1{font-size:22px}
   .grid-2{grid-template-columns:1fr}
 }
 @media (max-height:760px){
   #lfmap{height:clamp(340px,calc(100vh - 230px),760px)}
   .indx p:not(.dim){display:inline}
-}
-@media (max-width:900px){
-  :root{--sidew:100%}
-  aside{width:auto}
-  .hero.wrap{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 /* Windows: scrollbars take 17 px — keep them from pushing content and from overlapping the map */
 main{scrollbar-gutter:stable}
@@ -1321,9 +1122,6 @@ main{scrollbar-gutter:stable}
 .chartbox{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
 .chartbox svg{width:100%;height:auto;display:block}
 #chtitle{font:inherit;font-size:12.5px;padding:5px 8px;border:1px solid var(--line);border-radius:7px;background:var(--panel)}
-.srcfold{margin-top:4px}
-.srcfold>summary{font-size:11px}
-.srcfold .card{margin-top:10px}
 .lfpop .lfrows{display:grid;grid-template-columns:1fr 1fr;column-gap:20px}
 .lfpop{max-width:520px}
 
@@ -1342,11 +1140,7 @@ main{scrollbar-gutter:stable}
 .crumbs .dim{font-family:var(--mono);font-size:10.5px;margin-left:8px;align-self:flex-end;padding-bottom:3px}
 /* card heads without a title */
 .card-head.tools-only{border-bottom:0;padding-bottom:0;margin-bottom:10px;flex-direction:column;align-items:stretch;gap:8px}
-/* quick indicator chips */
-.iq{display:flex;gap:4px;flex-wrap:wrap}
-.iqb{font-family:var(--mono);font-size:10.5px;padding:3px 9px;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--ink2);cursor:pointer}
-.iqb:hover{border-color:var(--ink);color:var(--ink)}
-.iqb.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+/* the quick indicator chips are the v3.0 .indchips row (spec §4.2) — see the P3 block at the end */
 /* indicator info: one line, opens on ⓘ */
 details.indx{padding:0;margin:0 0 10px;background:var(--panel2);border-left:3px solid var(--ink)}
 details.indx>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:7px 12px;font-size:12.5px}
@@ -1373,8 +1167,8 @@ details.indx .indx-body p{margin:0 0 3px}
 .maplegend.small .lgrow i{width:13px;height:10px;flex-basis:13px}
 #mapcard:fullscreen .maplegend,#mapcard.fs-fallback .maplegend{bottom:20px}
 .mklegend{display:none}
-/* area page header: headline row */
-.arhead .hl{flex-basis:100%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:9px;overflow:hidden;margin-top:12px}
+/* headline row: still the sheets' figure row (project, public building, school, climate); the area
+   page's own tiles are the .tiles / .hltile component of the P5 block at the end of this file */
 .hlc{background:var(--panel);border:0;text-align:left;padding:10px 14px 9px;cursor:pointer;font:inherit;display:flex;flex-direction:column;gap:2px;min-width:0}
 .hlc:hover{background:var(--panel2)}
 .hlc.on{background:#F0F4EE;box-shadow:inset 0 3px 0 var(--ink)}
@@ -1384,11 +1178,7 @@ details.indx .indx-body p{margin:0 0 3px}
 .hlc em i{font-style:normal;font-weight:600}
 .hlc .up{color:var(--good)}.hlc .dn{color:var(--bad)}
 .arhead h2{margin-top:0}
-@media (max-width:1180px){.arhead .hl{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media (max-width:820px){.arhead .hl{grid-template-columns:repeat(2,minmax(0,1fr))}}
-/* tiles: one context line, chart link in the corner */
-.hero .tile .tm{display:flex;flex-wrap:wrap;gap:2px 10px}
-.hero .tile{position:relative}
+/* the ↗ "open in Charts" corner button of a table row */
 .tch{position:absolute;top:6px;right:6px;border:0;background:none;color:var(--muted);font-size:12px;line-height:1;padding:3px 5px;border-radius:5px;cursor:pointer;opacity:0;transition:opacity .12s}
 .tile:hover .tch,tr:hover .tch,.tch:focus{opacity:1}
 .tch:hover{color:var(--ink);background:var(--panel)}
@@ -1469,7 +1259,7 @@ th .thn{display:inline}
 .maplegend .pubtog.off{opacity:.38;text-decoration:line-through}
 .maplegend .only{font-family:var(--mono);font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-left:auto;padding-left:6px;cursor:pointer}
 .maplegend .only:hover{color:var(--ink);text-decoration:underline}
-.maplegend .lgrow.gk .pubtog{display:inline-flex;align-items:center;gap:4px}
+.maplegend .lgrow.gk .pubtog,.maplegend .lgrow.gk>span{display:inline-flex;align-items:center;gap:4px}
 /* every category stays listed, so an off one needs a way back: greyed, struck through, hollow swatch */
 .maplegend .lgrow.gk.allhidden{color:var(--ink);margin-top:5px;white-space:normal;line-height:1.35}
 .maplegend .lgrow.gk.allhidden .only{margin-left:0;padding-left:0;color:var(--ink);text-decoration:underline}
@@ -1602,25 +1392,17 @@ th .thn{display:inline}
 .tppop .cap{margin:2px 0 0}
 
 /* ---------- Analysis sheet: one property against every layer ---------- */
-/* the title is an input, so the identity column needs a basis of its own — a bare input shrinks to ~20 characters */
-.anhead .arid{flex:1 1 420px;min-width:0}
+/* the identity block is a row of its own (spec §5.5′). It has to claim the whole line: `.tpnote`
+   above it is capped at 760 px, so a basis narrow enough to fit beside that cap put the title and
+   its action row in two columns with a hole between them from ~1500 px up. */
+.anhead .arid{flex:1 1 100%;min-width:0}
 .anhead .anlab{font-family:var(--disp);font-size:30px;font-weight:700;letter-spacing:-.03em;color:var(--ink);
   display:block;width:100%;border:1px solid transparent;border-radius:8px;background:transparent;padding:2px 7px;margin:0 0 8px -7px}
 .anhead .anlab:hover{border-color:var(--line)}
 .anhead .anlab:focus{border-color:var(--ink);background:var(--panel2);outline:none}
-.anhead .hl{grid-template-columns:repeat(5,minmax(0,1fr))}
 .anlead{font-family:var(--disp);font-size:17px;color:var(--ink2);margin:14px 0 2px}
 /* the empty state has the whole card to itself — the box does not have to share a toolbar */
 .card>.tools .tpbox .tpq{min-width:min(460px,60vw)}
-#anmap{height:clamp(320px,calc(100vh - 520px),460px);border:1px solid var(--line);border-radius:10px;background:var(--panel2);position:relative;z-index:0;isolation:isolate}
-/* with overlays on there is more to read on the mini map, so it gets the room for it */
-.anmapwrap.haslayers #anmap{height:clamp(460px,calc(100vh - 380px),680px)}
-/* the overlay legends own the right-hand column, so the choropleth one moves out of their way */
-.anmapwrap #anlegend{right:auto;left:8px;bottom:8px}
-/* three overlay legends are taller than the mini map, so this column scrolls (the map does not drag) */
-.anmapwrap .maplegs{pointer-events:auto;scrollbar-width:thin}
-.anlaybar{margin:0 0 10px}
-.anlaybar .hint{margin-left:2px}
 #anmap path{cursor:pointer}
 /* the indicator table: group headers, then the percentile bar column */
 .antbl tbody tr.angrp>th,.tbl tbody tr.angrp>th{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
@@ -1666,8 +1448,7 @@ th .thn{display:inline}
 .anskel span:nth-child(4){width:80%}.anskel span:nth-child(5){width:60%}
 @keyframes anshim{from{background-position:120% 0}to{background-position:-120% 0}}
 @media (prefers-reduced-motion:reduce){.anskel span{animation:none}}
-@media (max-width:1180px){.anhead .hl{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media (max-width:820px){.anhead .hl{grid-template-columns:repeat(2,minmax(0,1fr))}.anhead .anlab{font-size:24px}}
+@media (max-width:820px){.anhead .anlab{font-size:24px}}
 
 /* ---- climate legend and the collapsible legend blocks (v2.6) ---- */
 .maplegend.climatelegend{min-width:186px;pointer-events:auto}
@@ -1690,10 +1471,646 @@ th .thn{display:inline}
 .climtbl tr.hi>th,.climtbl th.hi{background:rgba(28,107,92,.07)}
 .climyes{color:#B5391F}
 .climno{color:#1C6B5C}
-/* ---- Compare: two areas, one row at a time, no overall winner (v2.6) ---- */
-.cmptbl td.cmpwin{background:rgba(28,107,92,.10);font-weight:600}
-.cmptbl .cmpnote{white-space:nowrap}
-.cmptbl .cmpnote em{font-style:normal;font-family:var(--mono);font-size:9.5px;color:var(--muted)}
-.cmptbl .cmpsame{color:var(--ink2,#33372C)}
-.cmptools{align-items:center;gap:8px;flex-wrap:wrap}
-.cmpvs{font-family:var(--mono);font-size:11px;color:var(--muted);padding:0 2px}
+
+/* ================= v3.0 design tokens (UI_SPEC_v3 §2.1–2.3) =================
+   Tokens only — no view is restyled here. They are declared at the end of the file so they win
+   over the two earlier :root blocks without either being edited, and so every later phase reads
+   its colours, spacing and type sizes from one place instead of from a literal. */
+:root{
+  /* §2.1 colour — projections purple, climate blue, inherited (municipality figure) grey */
+  --proj:#5B4A9C;--proj-2:#8A7CC2;--proj-bg:#F1EEF8;
+  --clim:#2F4E8C;--clim-2:#6E86B8;--clim-bg:#EDF1F8;
+  --inh:#8A8C81;--inh-bg:#F3F3EF;
+  --focus:#1C6B5C;--focus-ring:0 0 0 3px rgba(28,107,92,.28);
+  --danger-bg:#FBEFEC;--warn-bg:#FBF4E6;
+  --nodata:#D9DAD3;                       /* the "no data" bin of every ramp */
+  --cap-ink:#6F7168;                      /* §7 contrast: 11 px captions darken from --muted */
+  /* §2.2 spacing — one scale for card padding, gaps, page gutters and control heights */
+  --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;
+  --card-pad:16px;--card-pad-m:12px;--card-gap:16px;--gutter:26px;--gutter-m:16px;
+  --ctl-h:32px;--chip-h:24px;--tile-h:84px;
+  /* §2.3 type — the families live in the first :root; these are the sizes and the prose measure */
+  --fs-title:26px;--fs-card-title:13px;--fs-body:14px;--fs-tbl:13px;
+  --fs-cap:11.5px;--fs-tile-val:26px;--fs-legend:11px;--prose:78ch;
+}
+/* ⌖ re-centre — the control that comes with a draggable mini map (v3.0 P1) */
+.leaflet-bar.am-recentre a{font-size:15px;line-height:26px;color:var(--ink);font-family:var(--mono)}
+
+/* ================= v3.0 P2 — the Data section (spec §5.3) =================
+   One tab bar over the three tabular views. Mono uppercase labels and a green underline: the same
+   vocabulary as the card heads and the level segments, so it reads as part of the existing look. */
+.dtabs{display:flex;gap:var(--s1);align-items:flex-end;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.dtab{appearance:none;background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;
+  padding:7px 12px 6px;cursor:pointer;font-family:var(--mono);font-size:11px;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--muted);white-space:nowrap}
+.dtab:hover{color:var(--ink2)}
+.dtab.on{color:var(--ink);border-bottom-color:var(--k1);font-weight:600}
+.dtab:focus-visible{outline:none;box-shadow:var(--focus-ring);border-radius:4px}
+@media (max-width:600px){.dtabs{flex-wrap:nowrap;overflow-x:auto}.dtab{padding:7px 9px}}
+
+/* Data › National series: the four headline tiles stay, as a compact row above the table */
+.hero.hero-nat>div{min-height:0;padding:11px 14px 12px}
+.hero.hero-nat b{font-size:24px;margin-top:5px}
+.hero.hero-nat .u{font-size:12px}
+.hero.hero-nat em{margin-top:5px;font-size:11.5px;font-family:var(--mono);color:var(--muted)}
+/* the sparkline column: a fixed box, so the table cannot stretch a 160-wide svg into a chart */
+.sparkbox{display:inline-block;width:120px;vertical-align:middle}
+.tbl td.sp{width:132px}
+.tag.mini{font-size:9px;padding:0 4px;border-color:var(--line);color:var(--muted)}
+
+/* Data › Sources: eight columns. Fixed layout so the two dates and the licence always have their
+   room and the long catalogue names wrap instead of pushing the rest off the card. */
+table[data-testid=sources-table]{table-layout:fixed;width:100%;min-width:900px}
+table[data-testid=sources-table] th:nth-child(1){width:21%}
+table[data-testid=sources-table] th:nth-child(2){width:12%}
+table[data-testid=sources-table] th:nth-child(3){width:9%}
+table[data-testid=sources-table] th:nth-child(4){width:9%}
+table[data-testid=sources-table] th:nth-child(5){width:12%}
+table[data-testid=sources-table] th:nth-child(6){width:16%}
+table[data-testid=sources-table] th:nth-child(7){width:19%}
+table[data-testid=sources-table] th:nth-child(8){width:2%}
+table[data-testid=sources-table] td:nth-child(4),
+table[data-testid=sources-table] td:nth-child(5){white-space:nowrap}
+table[data-testid=sources-table] tbody th,
+table[data-testid=sources-table] td{overflow-wrap:anywhere}
+table[data-testid=sources-table] code{font-family:var(--mono);font-size:10px}
+
+/* ================= v3.0 P3 — IndicatorPicker · chips · PeriodControl (spec §4.2, §4.3) =========
+   One control, one look, in every view: a mono button that names the indicator and its unit, a
+   popover with a search box and the twelve groups, and a chips row under it. The vocabulary is the
+   existing one — mono uppercase group heads, the dark-green `on` state of .sg, the paper panel — so
+   the component reads as part of the dashboard rather than as a widget dropped into it.
+   z-index 1200 with position:relative: the map's panes sit at 400 inside .mapwrap's own stacking
+   context, and the sticky table head at 2, so the popover has to outrank both. */
+.indpick{position:relative;z-index:1200;display:inline-flex;min-width:0}
+.indpick-btn{display:inline-flex;align-items:center;gap:8px;min-height:var(--ctl-h);max-width:min(420px,52vw);
+  padding:5px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel2);cursor:pointer;
+  font-family:var(--body);font-size:13px;color:var(--ink);text-align:left}
+.indpick-btn:hover{border-color:var(--ink)}
+.indpick-btn:focus-visible{outline:none;box-shadow:var(--focus-ring);border-color:var(--ink)}
+.indpick.open .indpick-btn{border-color:var(--ink);background:var(--panel)}
+.indpick-btn .ip-l{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.indpick-btn .ip-u{font-family:var(--mono);font-size:10.5px;color:var(--muted);white-space:nowrap}
+.indpick-btn .ip-t{font-family:var(--mono);font-size:9.5px;color:var(--inh);border:1px solid var(--line);
+  padding:0 5px;border-radius:3px;background:var(--inh-bg);white-space:nowrap}
+.indpick-btn em{margin-left:auto;font-style:normal;color:var(--muted);font-size:10px}
+
+.indpop{position:absolute;top:calc(100% + 6px);left:0;width:420px;max-width:86vw;max-height:70vh;
+  display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  box-shadow:0 14px 40px rgba(20,28,24,.18);overflow:hidden}
+.indpop[hidden]{display:none}
+.indpop-h{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--line);background:var(--panel2)}
+.indsearch{flex:1;min-width:0;font-family:var(--body);font-size:13px;padding:5px 8px;border:1px solid var(--line);
+  border-radius:6px;background:var(--panel);color:var(--ink)}
+.indsearch:focus{outline:none;box-shadow:var(--focus-ring);border-color:var(--ink)}
+.indpop-esc{font-family:var(--mono);font-size:9.5px;color:var(--muted);border:1px solid var(--line);padding:1px 5px;border-radius:3px}
+.indlist{overflow-y:auto;padding:4px 0;flex:1}
+.indgrp{display:flex;align-items:center;gap:6px;padding:8px 12px 3px;font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--muted);position:sticky;top:0;background:var(--panel)}
+.indgrp[hidden]{display:none}
+.indgrp .tag{font-size:9px;padding:0 5px;font-style:normal}
+.indgrp .tag.clim{border-color:var(--clim);color:var(--clim)}
+/* flex rather than a grid: the "↓ lower is better" note is on some rows and not on others, and a
+   fixed column count would push the tag of the rows that have it onto a second line. */
+.indrow{position:relative;display:flex;flex-wrap:nowrap;align-items:baseline;gap:8px;width:100%;
+  padding:4px 12px 5px;border:0;background:none;cursor:pointer;text-align:left;
+  font-family:var(--body);font-size:13px;color:var(--ink)}
+.indrow[hidden]{display:none}
+.indrow:hover,.indrow.act{background:var(--panel2)}
+.indrow.on{background:var(--inh-bg)}
+.indrow.on .ir-l{font-weight:600}
+.indrow.on::before{content:"\25CF";position:absolute;left:4px;color:var(--k1);font-size:8px}
+.indrow:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+.indrow .ir-l{flex:1 1 auto;min-width:3ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.indrow .ir-u,.indrow .ir-d,.indrow .ir-t{font-family:var(--mono);font-size:9.5px;color:var(--muted);white-space:nowrap}
+.indrow .ir-u{flex:0 1 auto;overflow:hidden;text-overflow:ellipsis}
+.indrow .ir-d{flex:0 1 auto;color:var(--ink2);overflow:hidden;text-overflow:ellipsis}
+.indrow .ir-t{flex:0 0 56px;margin-left:auto;text-align:right}
+.indrow .ir-t.tag-muni{color:var(--inh)}
+.indrow .ir-t.tag-proj{color:var(--proj)}
+.indrow .ir-t.tag-hz{color:var(--clim)}
+.indnone{padding:14px 12px;font-family:var(--mono);font-size:11px;color:var(--cap-ink)}
+.indnone[hidden]{display:none}
+.indpop-f{padding:6px 12px 7px;border-top:1px solid var(--line);background:var(--panel2);
+  font-family:var(--mono);font-size:9.5px;color:var(--cap-ink)}
+
+/* the chips row: QUICK_KEYS at this level, the active one filled. `.chip` is shared with the Charts
+   entity chips, so the indicator chips reset the 4 px left border those carry. */
+.indchips{display:flex;gap:var(--s1);flex-wrap:wrap;margin:0}
+/* nowrap: the row scrolls sideways below 1025 px, so a chip must never break its own label in two —
+   "Rent (priv.)" on two lines made the row ragged and broke the 24 px chip height of §2.2 */
+.indchips .chip{border-left-width:1px;border-radius:999px;padding:0 10px;min-height:var(--chip-h);white-space:nowrap;
+  font-family:var(--mono);font-size:10.5px;color:var(--ink2);background:var(--panel);cursor:pointer}
+.indchips .chip:hover{border-color:var(--ink);color:var(--ink)}
+.indchips .chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.indchips .chip:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+
+/* PeriodControl: the three modes share one slot, so the toolbar keeps its shape when the family changes */
+.period{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;min-height:var(--ctl-h)}
+.period[data-mode=horizon]{max-width:min(520px,62vw)}
+.asofbadge{font-family:var(--mono);font-size:10.5px;color:var(--ink2);background:var(--panel2);
+  border:1px solid var(--line);border-radius:8px;padding:5px 9px;white-space:nowrap}
+
+/* Data › Areas: the active indicator's column is the one the table is sorted by (AC-D5) */
+.tbl thead th.on{color:var(--ink);border-bottom:2px solid var(--k1);background:var(--inh-bg)}
+
+@media (max-width:600px){
+  .indpick{flex:1 1 100%;width:auto;max-width:100%}
+  .indpick-btn{width:100%;max-width:100%}
+  .indpop{width:calc(100vw - 32px);max-width:calc(100vw - 32px)}
+  .indrow .ir-d{display:none}
+  .indrow .ir-t{flex-basis:48px}
+}
+
+/* ================= v3.0 P4 — Map: Layers ▾, unified search, legend stack (spec §4.4, §4.5, §5.1) ===
+   The map toolbar was five overlay buttons, two search boxes, two jump buttons, a privacy paragraph
+   and a full-screen button across three rows. It is one row now:
+     [search] [Layers ▾] [Indicator ▾] [Period]   + the drilled-state segments
+   with the chips under it and the info strip under that, which is what puts the map inside the first
+   screen at 1366×768 (AC-S3). Full screen moved to the top bar, the overlay toggles and their
+   category filters into the Layers popover, the jumps into the search dropdown, and the privacy
+   sentence into the search box's "?" tooltip. */
+
+/* the top bar carries page-level actions on its right */
+#hd{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--s3)}
+#hd .crumbs{flex:1 1 auto;min-width:0}
+.hd-act{display:flex;align-items:center;gap:var(--s2);flex:0 0 auto;padding-bottom:2px}
+
+/* the toolbar's two rows */
+#mapcard .tools{display:flex;flex-direction:column;align-items:stretch;gap:6px;max-width:100%}
+.trow{display:flex;align-items:center;gap:var(--s2);flex-wrap:wrap;min-width:0}
+.trow.chiprow:empty{display:none}
+/* the info strip is one line on the map, where every pixel above the fold belongs to the map */
+#mapcard details.indx{margin-bottom:8px}
+#mapcard details.indx>summary{padding:5px 12px;font-size:12px}
+#mapcard details.indx>summary b{font-size:13px}
+#mapcard .card-head.tools-only{margin-bottom:8px}
+
+/* ---- the unified search: one combobox for an area and for a location (spec §5.1) ---- */
+.asrch{position:relative;z-index:1210;display:inline-flex;align-items:center;gap:4px;min-width:0}
+/* an input, not a select: no chevron, a text caret, and room for a magnifier instead */
+.asrch input{min-width:min(320px,34vw);min-height:var(--ctl-h);cursor:text;font-size:11.5px;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12'><circle cx='5' cy='5' r='4' fill='none' stroke='%238A8C81' stroke-width='1.4'/><path d='M8 8l3.5 3.5' stroke='%238A8C81' stroke-width='1.4' stroke-linecap='round'/></svg>");
+  background-position:left 9px center;padding:5px 10px 5px 26px}
+.asrch input::-webkit-search-cancel-button{cursor:pointer}
+.asrchpop{position:absolute;top:calc(100% + 6px);left:0;width:min(440px,86vw);max-height:60vh;overflow-y:auto;
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 14px 40px rgba(20,28,24,.18);padding:4px 0}
+.asrchpop[hidden]{display:none}
+.as-jump{display:flex;align-items:center;gap:6px;padding:7px 12px 6px;border-bottom:1px solid var(--line);
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.as-jump button{appearance:none;border:1px solid var(--line);background:var(--panel2);border-radius:999px;
+  padding:2px 10px;cursor:pointer;font-family:var(--mono);font-size:10px;letter-spacing:.04em;text-transform:none;color:var(--ink2)}
+.as-jump button:hover{border-color:var(--ink);color:var(--ink)}
+.as-jump i{font-style:normal;color:var(--line2)}
+.as-row{display:flex;align-items:baseline;gap:8px;width:100%;padding:5px 12px 6px;border:0;background:none;
+  cursor:pointer;text-align:left;font-family:var(--body);font-size:13px;color:var(--ink)}
+.as-row:hover,.as-row.act{background:var(--panel2)}
+.as-row b{font-weight:500;white-space:nowrap}
+.as-row span{font-family:var(--mono);font-size:9.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.as-row.as-coord b{color:var(--k1)}
+.as-hint{padding:9px 12px 10px;font-family:var(--mono);font-size:10px;line-height:1.45;color:var(--cap-ink)}
+.as-hint b{font-weight:500;color:var(--ink2)}
+
+/* ---- Layers ▾ (spec §4.4) ---- */
+.layers{position:relative;z-index:1205;display:inline-flex}
+.lay-btn{display:inline-flex;align-items:center;gap:6px;min-height:var(--ctl-h);padding:5px 10px;
+  border:1px solid var(--line);border-radius:8px;background:var(--panel2);cursor:pointer;
+  font-family:var(--body);font-size:13px;color:var(--ink);white-space:nowrap}
+.lay-btn:hover{border-color:var(--ink)}
+.lay-btn:focus-visible{outline:none;box-shadow:var(--focus-ring);border-color:var(--ink)}
+.layers.open .lay-btn{border-color:var(--ink);background:var(--panel)}
+.lay-btn .lay-n{font-family:var(--mono);font-size:10.5px;font-weight:500;color:var(--k1)}
+.lay-btn em{font-style:normal;color:var(--muted);font-size:10px}
+.laypop{position:absolute;top:calc(100% + 6px);left:0;width:min(400px,88vw);max-height:70vh;overflow-y:auto;
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 14px 40px rgba(20,28,24,.18);padding:2px 0 6px}
+.laypop[hidden]{display:none}
+.lay-h{padding:9px 12px 3px;font-family:var(--mono);font-size:9.5px;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--muted)}
+.layrow{padding:1px 0 3px}
+.layrow.on{background:var(--inh-bg)}
+.laytog{display:flex;align-items:baseline;gap:8px;width:100%;padding:5px 12px 5px 10px;border:0;background:none;
+  cursor:pointer;text-align:left;font-family:var(--body);font-size:13px;color:var(--ink)}
+.laytog:hover{background:var(--panel2)}
+.laytog:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+.laytog b{font-weight:500;white-space:nowrap}
+.laytog span{font-family:var(--mono);font-size:9.5px;color:var(--muted);margin-left:auto;text-align:right;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.laybox{flex:0 0 14px;width:14px;height:14px;align-self:center;border:1px solid var(--line2);border-radius:3px;
+  background:var(--panel);font-style:normal;font-size:10px;line-height:13px;text-align:center;color:#fff}
+.layrow.on .laybox{background:var(--ink);border-color:var(--ink)}
+.laynote{margin:0;padding:0 12px 4px 32px;font-family:var(--mono);font-size:9.5px;line-height:1.4;color:var(--cap-ink)}
+.layfil{display:flex;flex-wrap:wrap;align-items:center;gap:4px;padding:2px 12px 6px 32px}
+.layf{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:999px;
+  padding:2px 9px;background:var(--panel2);cursor:pointer;font-family:var(--mono);font-size:10px;color:var(--ink2)}
+.layf:hover{border-color:var(--ink);color:var(--ink)}
+.layf:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+.layf.off{opacity:.5;text-decoration:line-through}
+.layf.all{border-color:var(--ink);color:var(--ink)}
+.layf i{width:9px;height:9px;flex:0 0 9px;border-radius:50%}
+.layf em{font-style:normal;font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:#B07A1E}
+.layf-sep{flex:0 0 1px;align-self:stretch;min-height:16px;background:var(--line);margin:1px 3px}
+
+/* ---- the drilled municipality card, now collapsible (spec §5.1) ----
+   The summary is the line the reader needs to see: who this is and its five headline figures. The
+   projects / public / climate / outlook blocks and the two page links open on click. */
+details.mstrip{display:block;padding:0;align-items:stretch}
+details.mstrip>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:8px 14px}
+details.mstrip>summary::-webkit-details-marker{display:none}
+details.mstrip>summary:hover{background:var(--panel)}
+details.mstrip .mstrip-more{font-style:normal;font-family:var(--mono);font-size:9.5px;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--muted);white-space:nowrap}
+details.mstrip>summary:hover .mstrip-more{color:var(--ink)}
+details.mstrip .mstrip-more::before{content:"▸ "}
+details.mstrip[open]>summary .mstrip-more::before{content:"▾ "}
+details.mstrip .mstrip-body{padding:2px 14px 11px;border-top:1px solid var(--line)}
+details.mstrip .mstrip-body>.upcoming:first-child{margin-top:8px}
+details.mstrip .mstrip-act{margin-top:10px}
+
+/* ---- the legend stack (spec §4.5, AC-LG1) ----
+   Bottom-right, newest on top (column-reverse over the DOM order indicator → zones → infra →
+   public → services), 8 px apart so two cards can never overlap. The stack is capped at 60 % of the
+   map's height and wraps into a second column (wrap-reverse keeps the indicator legend in the
+   corner); lgFit() folds the topmost feature legend to its title if even that is not enough. */
+/* bottom:26px, not 12: Leaflet's own attribution control sits in this corner and the credit line
+   (OpenStreetMap, DAGI) must stay readable — at 12 px the legend card's foot ran through it. */
+#maplegs{top:auto;bottom:26px;right:12px;left:auto;flex-flow:column-reverse wrap-reverse;align-items:flex-end;
+  align-content:flex-start;gap:var(--s2);max-height:60%;max-width:calc(100% - 24px);overflow:visible;pointer-events:none}
+#maplegs .maplegend{pointer-events:none;max-width:220px}
+/* a key plus a "zoom in" state can be wider than the card: let the state drop to its own line
+   rather than run out through the right edge (the text itself still never breaks mid-word) */
+#maplegs .maplegend .lgrow{flex-wrap:wrap}
+/* only the fold control takes a click now — the filters that used to live in here moved to Layers ▾ */
+#maplegs .maplegend .lgtitle[data-legfold]{pointer-events:auto}
+.maplegend.afold .lgtitle{margin-bottom:0}
+.maplegend.afold .lgrow,.maplegend.afold .lgnote,.maplegend.afold .lgsub,.maplegend.afold .lgtitle span{display:none}
+.maplegend.afold .lgtitle[data-legfold]::after{content:"+"}
+@media (max-width:900px){
+  #maplegs{left:12px;right:12px;align-items:stretch;max-height:46%}
+  #maplegs .maplegend{max-width:none}
+}
+
+/* ================= v3.0 P5 — the area page: tiles, the study row, the toggles (spec §5.2) ========
+   Header card + five tiles, one toolbar row, the study row (chart panel | mini map, same height by
+   being two stretched grid items), four <details>. No new visual vocabulary: the tiles are the old
+   headline row with the rank in the subline, the panel is the old Trend card, the mini map is the
+   old Neighbours card with the legend moved inside it. */
+
+/* ---- HeadlineTiles (§4.7): five, 84 px tall, clickable ---- */
+.tiles{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.arhead .tiles{flex-basis:100%;margin-top:var(--s3)}
+.tiles.wrap{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-top:var(--s2)}
+.hltile{background:var(--panel);border:0;text-align:left;padding:9px 13px 8px;cursor:pointer;font:inherit;
+  display:flex;flex-direction:column;gap:1px;min-width:0;min-height:var(--tile-h);position:relative;
+  transition:background .12s}
+.hltile:hover{background:var(--panel2)}
+.hltile.on{background:#F0F4EE;box-shadow:inset 0 3px 0 var(--ink)}
+.hltile:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+.hltile .tl{font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hltile b{font-family:var(--disp);font-size:var(--fs-tile-val);letter-spacing:-.03em;line-height:1.12;font-weight:700;
+  font-variant-numeric:tabular-nums;margin-top:auto}
+.hltile b.proj{color:var(--proj)}
+.hltile b.inh{color:var(--inh);font-weight:600}
+.hltile em{font-style:normal;font-family:var(--mono);font-size:10px;color:var(--ink2);line-height:1.35}
+.hltile em i{font-style:normal;font-weight:600}
+.hltile .up{color:var(--good)}.hltile .dn{color:var(--bad)}
+.hltile.inh{background:var(--inh-bg)}
+.hltile.inh:hover{background:#EDEDE8}
+.inhlab{font-family:var(--mono);font-size:9.5px;color:var(--inh)}
+/* the ^ that marks a bydel figure on a quarter: a glyph nobody can read is no marker at all, so it
+   carries its sentence in a title rather than the browser's default dotted underline */
+abbr.bmark{text-decoration:none;border-bottom:0;cursor:help;color:var(--muted)}
+.hltile .tpill{position:absolute;top:7px;right:8px;font-size:8.5px;padding:0 4px}
+@media (max-width:1250px){.tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:800px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ---- the one toolbar row: picker · period · chips ---- */
+.artools{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s2) var(--s3)}
+/* chips on a row of their own, as on the map toolbar: the horizon caption breaks any shared row */
+.artools .indchips{flex:1 0 100%}
+
+/* ---- the study row (§5.2, AC-P1): 60 / 40, two stretched grid items = equal height ---- */
+.studyrow{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:var(--card-gap);
+  align-items:stretch;min-height:380px}
+.studyrow>*{min-width:0}
+.card.panel{display:flex;flex-direction:column}
+.card.panel .card-head{margin-bottom:var(--s2)}
+.card.panel .panel-b{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;min-height:0}
+.card.panel .panel-b>svg{width:100%;height:auto}
+.panel-foot{margin-top:var(--s3)}
+.panel-def{margin-top:2px;max-width:var(--prose)}
+/* the headline row: the figure, then Δ y/y · rank · vs median as mono keys */
+.panel-hd{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;padding-bottom:var(--s2);
+  border-bottom:1px solid var(--line2)}
+.panel-hd .pv{font-family:var(--disp);font-size:34px;line-height:1.05;letter-spacing:-.035em;font-weight:700;
+  font-variant-numeric:tabular-nums}
+.panel-hd .pv.proj{color:var(--proj)}
+.panel-hd .pv.inh{color:var(--inh)}
+.panel-hd .pk{font-family:var(--mono);font-size:11px;color:var(--ink2);white-space:nowrap}
+.panel-hd .pk i{font-style:normal;font-weight:600}
+.panel-hd .up{color:var(--good)}.panel-hd .dn{color:var(--bad)}
+.panel-hd.none{font-family:var(--mono);font-size:12px;color:var(--ink2);border-bottom:1px solid var(--line2);
+  padding-bottom:var(--s2);margin:0}
+/* the empty / snapshot state card (§4.10) */
+.statecard{font-family:var(--mono);font-size:11.5px;color:var(--ink);background:var(--panel2);
+  border:1px solid var(--line);border-radius:7px;padding:7px 10px;margin:var(--s2) 0}
+/* the distribution strip and the climate bars */
+.diststrip{margin:var(--s2) 0}
+.diststrip .dtick{stroke:#B6BBB2;stroke-width:1.1}
+.diststrip .dmed{stroke:#5C5F52;stroke-width:1.6;stroke-dasharray:4 3}
+.diststrip .ddot{fill:var(--k1);stroke:#FFF;stroke-width:1.6}
+.diststrip .dlab{font-weight:600;fill:var(--ink)}
+.climbars .cbar{opacity:.88}
+.climbars .cbar.on{opacity:1;stroke:var(--ink);stroke-width:1.2}
+.climbars .cbv{font-weight:600;fill:var(--ink)}
+.climbars .whisk{stroke:#3B4A63;stroke-width:1.4}
+.climbars .cmed{stroke:#5C5F52;stroke-width:1.5;stroke-dasharray:5 4}
+.bleg i.lgdash{height:2px;background:#5C5F52}
+.bleg i.lgwhisk{height:10px;width:2px;flex-basis:2px;background:#3B4A63;margin:0 4px}
+
+/* ---- MiniMap (§4.6): the map fills the row, the legend and the ⤢ live inside it ---- */
+.minimap{position:relative;border:1px solid var(--line);border-radius:10px;background:var(--panel2);
+  overflow:hidden;isolation:isolate;z-index:0;min-height:320px}
+.minimap .mm-map{position:absolute;inset:0}
+.minimap .mm-leg{right:10px;bottom:10px;max-width:60%}
+/* the note runs along the top, between the zoom control and the ⤢ — the legend owns the bottom */
+.minimap .mm-note{position:absolute;left:48px;right:48px;top:10px;z-index:800;
+  background:rgba(255,255,255,.93);border:1px solid var(--line);border-radius:7px;padding:4px 8px;
+  font-family:var(--mono);font-size:10px;line-height:1.4;color:var(--ink);pointer-events:none}
+/* the chips exist only inside the full-screen overlay, which covers the page's own toolbar */
+.minimap .mm-chips:empty{display:none}
+.minimap .mm-chiprow{position:absolute;left:12px;bottom:12px;z-index:900;max-width:calc(100% - 260px);
+  background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:9px;padding:6px 8px}
+.minimap .mm-full{position:absolute;top:10px;right:10px;z-index:900;width:28px;height:28px;padding:0;
+  display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:6px;
+  background:rgba(255,255,255,.95);color:var(--ink);font-size:13px;line-height:1;cursor:pointer}
+.minimap .mm-full:hover{border-color:var(--ink)}
+.minimap .mm-full:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+/* full screen: a fixed overlay over the page, Esc or ✕ to leave (AC-MM2). The spec says z-index 100;
+   it has to clear the IndicatorPicker's 1200, or the picker button floats over the map. */
+.minimap.is-full{position:fixed;inset:0;z-index:1400;border-radius:0;border:0;min-height:0}
+.minimap.is-full .mm-note{right:auto;max-width:min(520px,calc(100% - 160px))}
+
+/* ---- the four toggles (§5.2): open state lives in show= ---- */
+.arsec{padding:0}
+.arsec>summary{cursor:pointer;list-style:none;display:flex;align-items:baseline;gap:var(--s3);flex-wrap:wrap;
+  padding:12px 17px}
+.arsec>summary::-webkit-details-marker{display:none}
+/* the triangle belongs to the title, not to the row: as a flex item of its own it stayed behind on
+   line 1 whenever a long section name wrapped, leaving a marker with nothing next to it */
+.arsec>summary .arsec-t::before{content:"\25B8";font-size:10px;color:var(--muted);letter-spacing:0;margin-right:var(--s2)}
+.arsec[open]>summary .arsec-t::before{content:"\25BE"}
+.arsec>summary:hover .arsec-t{color:var(--k1)}
+.arsec-t{font-family:var(--disp);font-size:var(--fs-card-title);font-weight:700;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--ink)}
+.arsec>summary .hint{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-left:auto;text-align:right}
+.arsec>summary .tag{font-style:normal}
+.arsec-b{padding:0 17px 17px;border-top:1px solid var(--line2);padding-top:var(--s3)}
+.arsub{margin-top:var(--s5);padding-top:var(--s3);border-top:1px solid var(--line2)}
+.arsec-b .tag-muni{font-family:var(--mono);font-size:9px;letter-spacing:.06em;color:var(--inh);margin-left:5px}
+.tbl tr.inh td:nth-child(2){color:var(--inh)}
+.tbl tr.proj td:nth-child(2){color:var(--proj)}
+.tbl tr.on>th{box-shadow:inset 3px 0 0 var(--k1)}
+/* the grouped popover: the rows live inside their group, so the header can stick to it */
+.indsec[hidden]{display:none}
+
+/* ---- responsive (§6): 58/42 at 1366, stacked below 1025 ---- */
+@media (max-width:1536px){.studyrow{min-height:344px}}
+@media (max-width:1250px){.studyrow{grid-template-columns:minmax(0,1.22fr) minmax(0,1fr);min-height:320px}}
+@media (max-width:1024px){
+  .studyrow{grid-template-columns:1fr;min-height:0}
+  .studyrow>*{min-height:320px}
+}
+@media (max-width:600px){
+  .studyrow{gap:var(--s3)}
+  .studyrow>*{min-height:300px}
+  .minimap{min-height:300px}
+  .arsec>summary{padding:10px 12px}
+  .arsec-b{padding:var(--s3) 12px 12px}
+  .panel-hd .pv{font-size:28px}
+  .minimap .mm-note{display:none}
+}
+
+/* ---- P6 · Test property (§5.5′): the same study row, one pin ---- */
+/* the legends stack inside the mini map, bottom right, the ⤢ keeps the top right to itself */
+/* bottom:24px for the same reason as #maplegs: a tiled mini map credits OpenStreetMap down there */
+.minimap .maplegs{top:auto;bottom:24px;right:10px;max-height:60%;max-width:66%;gap:6px;
+  pointer-events:auto;scrollbar-width:thin}
+/* 74 %, not the main map's 60 %, on a desktop mini map: it is half the height, and four folded
+   cards (the indicator plus three layers, P10) need the room. Under 60 % the last one was scrolled
+   out of the stack's own overflow with nothing to say so — and lgFitIn() now folds until the stack
+   fits its box rather than the map. On a phone the map itself is 175 px, so it keeps the 60 %. */
+@media (min-width:601px){ .minimap .maplegs{max-height:74%} }
+.minimap .maplegs .mm-leg{position:static;right:auto;bottom:auto;max-width:none}
+/* below 900 px the shared .maplegs rule stretches the stack to left:12px, where it runs into the
+   + − ⌖ control column; 52 px clears it and the card still has the width of the map to itself */
+@media (max-width:900px){.minimap .maplegs{left:52px}}
+/* Layers ▾ and the radius sit at the right end of the one toolbar row */
+.artools .tp-right{margin-left:auto;display:flex;align-items:center;gap:var(--s2)}
+/* …and they stay on it when the period control becomes the horizon segments, whose caption is two
+   lines of prose: unconstrained it pushes Layers ▾ onto a line of its own and opens a hole beside
+   the picker. The area page has nothing at the right end of this row, so it keeps the wider one. */
+.artools.tptools .period[data-mode=horizon]{max-width:min(340px,40vw)}
+.radsel{display:inline-flex;align-items:center;gap:6px}
+.radsel>span{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+/* the paste box owns its own row above the identity line; the privacy line sits tight under it so
+   the study row still starts inside the first screen at 1366 (§6) */
+.anhead>.tpinrow{flex-basis:100%;margin:0}
+.anhead>.tpnote{margin:0}
+.anhead>.arid{margin-top:2px}
+.tpbox .tpgo{flex:0 0 auto}
+/* n BBR records folded into one row (§5.5′ "group identical rows with a count") */
+.tag.pubn{margin-left:6px;font-family:var(--mono);font-size:9px;color:var(--ink2)}
+@media (max-width:600px){
+  .artools .tp-right{margin-left:0;flex:1 0 100%}
+  .tpbox{flex-wrap:wrap}
+  .tpbox .tpq{min-width:0;flex:1 1 200px}
+}
+
+/* ---- P7: Export ▾ (spec §4.9). One menu, three triggers, one open at a time. The sidebar's copy
+   keeps the dark side-panel look and opens upwards (its button sits at the bottom of the viewport);
+   a header copy looks like every other toolbar control and opens down from its right edge. */
+.xwrap{position:relative;z-index:1210}
+.xwrap[data-xat=page]{display:inline-flex}
+.xwrap[data-xat=page] .xbtn{display:inline-flex;align-items:center;gap:6px;width:auto;min-height:var(--ctl-h);
+  padding:5px 10px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;
+  font-family:var(--body);font-size:13px;color:var(--ink);white-space:nowrap}
+.xwrap[data-xat=page] .xbtn:hover{border-color:var(--ink)}
+.xwrap[data-xat=page].open .xbtn{border-color:var(--ink);background:var(--panel)}
+.xbtn em{font-style:normal;font-size:10px;color:var(--muted)}
+.xbtn:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+.xpop{position:absolute;top:calc(100% + 6px);left:0;width:min(300px,88vw);max-height:70vh;overflow-y:auto;
+  background:var(--panel);border:1px solid var(--line);border-radius:10px;text-align:left;
+  box-shadow:0 14px 40px rgba(20,28,24,.18);padding:2px 0 4px}
+.xpop[hidden]{display:none}
+/* the sidebar's copy opens upwards and stays inside the panel — `aside` scrolls, so anything wider
+   than it would simply be cut off — and wears the dark side-panel palette rather than paper */
+.xwrap[data-xat=side] .xpop{top:auto;bottom:calc(100% + 6px);left:0;right:0;width:auto;
+  background:var(--side2);border-color:#2C3A32;box-shadow:0 -10px 30px rgba(0,0,0,.35)}
+.xwrap[data-xat=side] .xitem{color:var(--side-ink);font-size:12.5px;padding:5px 10px}
+.xwrap[data-xat=side] .xitem:hover{background:#2C3A32}
+.xwrap[data-xat=side] .xitem span,.xwrap[data-xat=side] .lay-h,.xwrap[data-xat=side] .laynote{color:var(--side-muted)}
+.xwrap[data-xat=side] .xpop .laynote{border-top-color:#2C3A32}
+.xwrap[data-xat=page] .xpop{left:auto;right:0;width:min(330px,88vw)}
+.xitem{display:block;width:100%;padding:6px 12px;border:0;background:none;cursor:pointer;text-align:left;
+  font-family:var(--body);font-size:13px;color:var(--ink)}
+.xitem:hover{background:var(--panel2)}
+.xitem:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+.xitem b{display:block;font-weight:500}
+.xitem span{font-family:var(--mono);font-size:9.5px;color:var(--muted)}
+.xitem[disabled]{opacity:.55;cursor:default}
+.xitem[disabled]:hover{background:none}
+.xpop .laynote{margin:4px 0 0;padding:5px 12px 0;border-top:1px solid var(--line)}
+/* the status line of an export: one line, bottom-left, never a modal (spec §2.5) */
+.xtoast{position:fixed;left:16px;bottom:16px;z-index:1500;max-width:min(420px,calc(100vw - 32px));
+  padding:8px 12px;border:1px solid var(--line);border-radius:9px;background:var(--panel);
+  box-shadow:0 12px 30px rgba(20,28,24,.2);opacity:0;transform:translateY(6px);pointer-events:none;
+  transition:opacity .18s,transform .18s}
+.xtoast.on{opacity:1;transform:none}
+.xtoast b{display:block;font-family:var(--mono);font-size:11.5px;color:var(--ink)}
+.xtoast span{font-family:var(--mono);font-size:10px;color:var(--cap-ink)}
+@media (max-width:600px){.xwrap[data-xat=page] .xpop{right:auto;left:0}}
+
+/* ================= v3.0 P8 — the responsive shell, states and the number rules =================
+   Spec §4.1 (shell), §6 (responsive matrix), §2.4 (number rules), §4.10 (states), §7 (a11y).
+   Responsive is a layout here, not a patch: ≥1025 px the grid is `240px 1fr` and the page does not
+   scroll (the panes do); ≤1024 px there is one column, a 52 px bar with a drawer, and the page
+   scrolls natively. Nothing may make the document wider than the viewport at any width (AC-R1). */
+
+/* ---- the 52 px bar and the drawer (≤1024 px only; both are inert above it) ---- */
+.mtop{display:none}
+.drawer{display:contents}
+.scrim{display:none}
+
+@media (max-width:1024px){
+  body{overflow:auto}
+  .app{display:block;height:auto;min-height:100%}
+  main{overflow:visible;scrollbar-gutter:auto}
+  .mtop{display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:1300;height:52px;
+    padding:0 12px;background:var(--side);color:var(--side-ink);border-bottom:1px solid var(--side2)}
+  .navtog{flex:0 0 auto;width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+    background:none;border:1px solid var(--side2);border-radius:9px;color:var(--side-ink);
+    font-size:17px;line-height:1;cursor:pointer;padding:0}
+  .navtog:hover{background:var(--side2)}
+  .mbrand{font-family:var(--mono);font-size:10px;letter-spacing:.17em;text-transform:uppercase;
+    color:#F2F3EE;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mview{margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:.09em;
+    text-transform:uppercase;color:var(--side-muted);white-space:nowrap}
+  /* closed = visibility:hidden, so <aside> is neither visible, focusable nor in the a11y tree */
+  .drawer{display:block;position:fixed;inset:0;z-index:1400;visibility:hidden}
+  .drawer.open{visibility:visible}
+  .drawer>aside{position:absolute;left:0;top:0;bottom:0;width:280px;max-width:86vw;
+    transform:translateX(-100%);transition:transform .18s ease;box-shadow:0 0 40px rgba(0,0,0,.35)}
+  .drawer.open>aside{transform:none}
+  .scrim{display:block;position:absolute;inset:0;width:100%;border:0;padding:0;cursor:pointer;
+    background:rgba(20,28,24,.42);opacity:0;transition:opacity .18s ease}
+  .drawer.open .scrim{opacity:1}
+  body.nav-open{overflow:hidden}
+  /* the breadcrumb bar sits under the 52 px bar and stays inside the §6 budget of 96 px */
+  .topbar{position:sticky;top:52px;padding:9px var(--gutter-m) 8px}
+  .crumbs{font-size:12.5px;gap:4px}
+  .crumbs b{font-size:16px}
+  #body{padding:12px var(--gutter-m) 56px;gap:var(--s3)}
+  .card{padding:var(--card-pad-m) var(--card-pad-m) 14px}
+  /* toolbars stack; the chips scroll sideways inside their own row, never widening the page */
+  /* an explicit width, not `stretch`: nested inside two flex columns the toolbar row was sized to
+     its max-content (597 px at 390 px wide) and then clipped by the card, so nothing ever wrapped */
+  .trow,.artools{flex-wrap:wrap;width:100%;max-width:100%}
+  .indchips{flex:1 0 100%;flex-wrap:nowrap;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
+  /* a wrapped segmented control shows its 1 px-gap background through the empty end of the last
+     row — it scrolls sideways instead, like the chips */
+  .seg{flex-wrap:nowrap;overflow-x:auto;max-width:100%;scrollbar-width:none}
+  .seg .sg{white-space:nowrap;flex:0 0 auto}
+  /* tables scroll inside their card, first column pinned (§6) */
+  .scrollx{overflow-x:auto;overscroll-behavior-x:contain}
+  .scrollx>.tbl th:first-child,.scrollx>.tbl td:first-child{position:sticky;left:0;z-index:1;
+    background:var(--panel);box-shadow:1px 0 0 var(--line2)}
+  .scrollx>.tbl thead th:first-child{z-index:3}
+  .scrollx>.tbl tbody tr:hover>th:first-child,.scrollx>.tbl tbody tr:hover>td:first-child{background:var(--panel2)}
+  /* A table with no intrinsic width shrinks to its container by wrapping cells, so once the card is
+     this narrow a short categorical column gets squeezed into ~20 px and wraps one word per line:
+     "Outlook around this project"'s per-area verify link, and the school lists' "Private / free
+     school" on three lines in every one of 135 rows. Let those two keep their width — the table is
+     then wider than the card, which is when .scrollx above does its job. */
+  .olblock .tbl td:last-child,.tbl td.nw{white-space:nowrap}
+}
+@media (max-width:600px){
+  #lfmap{height:max(55vh,320px)}
+  /* the map goes edge to edge inside its card: at 390 px the two paddings would otherwise leave it
+     56 px narrower than the column, and a map is the one thing on the page that wants every pixel */
+  #mapcard .mapwrap{margin-left:calc(-1 * var(--card-pad-m));margin-right:calc(-1 * var(--card-pad-m));width:auto}
+  .topbar{padding:8px 12px 7px}
+  .crumbs .dim{flex-basis:100%;margin-left:0;padding-bottom:0}
+  #hd{flex-wrap:wrap;row-gap:6px}
+  .hd-act{flex:1 0 100%;justify-content:flex-start}
+}
+
+/* ---- §6 tiles: 5 → 3+2 → 2, and never a bare grid cell showing the separator colour through.
+   The 1 px gaps are the card's background, so an unfilled cell reads as a grey slab: the last tile
+   spans the rest of its row when it would otherwise sit there alone. ---- */
+@media (max-width:1250px){
+  .tiles:not(.wrap)>*:last-child:nth-child(3n+1){grid-column:span 3}
+  .tiles:not(.wrap)>*:last-child:nth-child(3n+2){grid-column:span 2}
+}
+@media (max-width:800px){
+  /* `.wrap` (the sheet and outlook tile rows) is auto-fit above this width, which collapses a track
+     nobody uses — but not the hole an odd last tile leaves in a two-column last row. Pin it to two
+     and give that tile the rest of its row, the same rule the five headline tiles follow. */
+  .tiles.wrap{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tiles>*:last-child{grid-column:auto}
+  .tiles>*:last-child:nth-child(2n+1){grid-column:span 2}
+}
+
+/* ---- §4.10 empty / loading / error states: mono caption + one action, never a modal ---- */
+.statecard{display:flex;flex-direction:column;gap:var(--s2);align-items:flex-start;
+  padding:var(--s4);border:1px dashed var(--line);border-radius:9px;background:var(--panel2)}
+.statecard b{font-family:var(--body);font-size:13.5px;font-weight:600;color:var(--ink)}
+.statecard p{margin:0;font-family:var(--mono);font-size:11px;color:var(--cap-ink);max-width:var(--prose)}
+.statecard[data-kind=error]{background:var(--danger-bg);border-color:#E7C9C0;border-style:solid}
+.statecard[data-kind=loading]{border-style:solid}
+.statecard .skel{display:grid;gap:6px;width:min(320px,100%)}
+.statecard .skel i{display:block;height:9px;border-radius:3px;background:var(--line2)}
+.statecard .skel i:nth-child(2){width:78%}.statecard .skel i:nth-child(3){width:54%}
+
+/* ---- §2.4 number rules: the classes every surface shares ---- */
+.rk{white-space:nowrap}
+.tag.smallbase{color:#8A5C12;border-color:#E3D3AE;background:var(--warn-bg)}
+.pctsecond{color:var(--cap-ink);font-family:var(--mono);font-weight:400}
+.nc{color:var(--dim);font-family:var(--mono)}
+
+/* ---- §7 accessibility: one focus ring, and 11 px captions off --muted ----
+   No `border-radius` in the focus rule: an element that changes shape when it is focused is a
+   worse affordance than one whose ring follows its own corners. Captions on the dark side panel
+   (`.xcap`) keep `--side-muted` — `--cap-ink` is a paper-background colour and would *lose*
+   contrast there. */
+:focus-visible{outline:none;box-shadow:var(--focus-ring)}
+.cap,.hint,.laynote,.mm-note,.indnone{color:var(--cap-ink)}
+
+/* ---- §5.1 the pin card: a pasted link lands on the map, not on another page (P10 item 1).
+        It sits between the info strip and the map, in the strip's own tone, so the reader's eye
+        goes back to the fill rather than to a popup over the polygons. ---- */
+.pincard{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:7px 12px;margin:0 0 12px;border:1px solid var(--line);border-radius:9px;
+  background:var(--panel2);border-left:3px solid var(--pin);font-size:12.5px}
+.pincard.err{border-left-color:var(--warn);color:var(--warn)}
+.pincard .pintitle{font-family:var(--disp);font-size:14px}
+.pincard .tag{font-family:var(--mono)}
+.pincard .pinwhere{color:var(--cap-ink);font-size:12px}
+.pincard .dim{font-family:var(--mono);font-size:10.5px}
+.pincard .pinact{display:flex;align-items:center;gap:6px;margin-left:auto}
+.pincard .pinmsg{font-size:12px}
+@media (max-width:600px){ .pincard .pinact{margin-left:0} }
+
+/* ---- §6 the legend stack folds into one "Legend ▾" pill on a phone ---- */
+.lgtog{display:none}
+@media (max-width:600px){
+  /* clear of Leaflet's attribution bar, which wraps to two lines at this width */
+  #maplegs{left:12px;right:auto;bottom:34px;max-height:62%;align-items:flex-start}
+  .lgtog{display:inline-flex;align-items:center;gap:6px;order:-1;align-self:flex-start;
+    padding:5px 10px;border:1px solid var(--line);border-radius:999px;background:var(--panel);
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--ink);cursor:pointer;box-shadow:0 4px 14px rgba(20,28,24,.16)}
+  #maplegs:not(.open)>.maplegend{display:none}
+  #maplegs.open{right:12px}
+}

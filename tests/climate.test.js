@@ -100,19 +100,11 @@ test("hz= round-trips through parse and serialise", () => {
   });
 });
 
-test("clim= parses, and clim=none is a state we keep", () => {
-  assert.deepStrictEqual([...C.climFilterParse({})].sort(), ["areas", "surge"], "no parameter means both");
-  assert.deepStrictEqual([...C.climFilterParse({ clim: "areas,surge" })].sort(), ["areas", "surge"]);
-  assert.deepStrictEqual([...C.climFilterParse({ clim: "areas" })], ["areas"]);
-  assert.deepStrictEqual([...C.climFilterParse({ clim: "none" })], [], "both switched off is not the default");
-  assert.deepStrictEqual([...C.climFilterParse({ clim: "areas,banana" })], ["areas"], "an unknown layer is dropped");
-});
-
-test("clim= serialises an empty set as none, so it survives a reload", () => {
-  assert.deepStrictEqual(C.climFilterSerialise(new Set()), ["clim=none"]);
-  assert.deepStrictEqual(C.climFilterSerialise(new Set(["areas"])), ["clim=areas"]);
-  const back = C.climFilterParse({ clim: C.climFilterSerialise(new Set())[0].split("=")[1] });
-  assert.strictEqual(back.size, 0, "none round-trips to the empty set, not back to the default");
+/* v3.0 P4: `clim=` went with the overlay it filtered. The zones and the official risk areas are one
+   context layer now, switched by `zones=0` and nothing else — there is no filter left to parse. */
+test("the context layer names both of its parts", () => {
+  assert.deepStrictEqual(Object.keys(C.CLIM_LAY).sort(), ["areas", "surge"]);
+  assert.ok(!("climFilterParse" in C) && !("climFilterSerialise" in C), "the clim= filter is gone");
 });
 
 test("every horizon label names both calendars", () => {
