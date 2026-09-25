@@ -1,5 +1,13 @@
 # Changelog
 
+## v3.0.1 — 2026-09-25
+
+- **Fixed — "Verify at source" on the map for Copenhagen quarter indicators.** The `ⓘ details` popover
+  sent the DST municipality code (`101`) to Københavns Kommune's own tables (`KKFR2026`, `OMRKK`), which
+  the publisher has never seen — a 400 instead of the figures. A quarter-level indicator now verifies
+  against KK's city total (`OMRKK=1000`), the same code the outlook comparison already used. Present
+  since v2.5; found by the owner right after the v3.0 release.
+
 ## v3.0 — 2026-09-25
 
 The interface, rebuilt around one idea: **study one indicator at a time, and let every surface agree

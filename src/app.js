@@ -1194,8 +1194,10 @@ function indExplain(i) {
     ${i.note ? `<p class="dim"><em>Note</em> ${esc(i.note)}</p>` : ""}
     <p class="dim"><em>Source</em> ${esc(i.source || "–")}${asof ? ` · <em>As of</em> ${asof}` : ""} · <em>Coverage</em> ${cov}${ys.length > 1 ? ` · <em>History</em> ${ys[0]}–${LATEST}` : ""}</p>
     ${(() => { const e_ = S.view === "area" ? areaEntity() : null;
-       const c_ = e_ ? (e_.type === "postnr" ? e_.o.nr : srcCode(e_.o, e_.type)) : (MK.muni || "");
-       const l_ = indSrcLink(i, c_, null, e_ ? e_.type : "kommune"); return l_ ? `<p class="dim">${l_}</p>` : ""; })()}
+       /* on the map a quarter-level indicator verifies against KK's own city total (OMRKK 1000) —
+          KKFR2026 and the other s30 tables have never seen a DST municipality code (a 400 otherwise) */
+       const c_ = e_ ? (e_.type === "postnr" ? e_.o.nr : srcCode(e_.o, e_.type)) : (i.level === "kvarter" ? "1000" : (MK.muni || ""));
+       const l_ = indSrcLink(i, c_, null, e_ ? e_.type : (i.level === "kvarter" ? "kvarter" : "kommune")); return l_ ? `<p class="dim">${l_}</p>` : ""; })()}
     ${src ? `<p class="dim">${esc(src)}</p>` : ""}
     ${i.warn ? `<p class="warnline">⚠ ${esc(i.warn)}</p>` : ""}</div>
   </details>`;

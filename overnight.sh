@@ -174,9 +174,9 @@ release() {
   gate P9 || { echo "✗ gate not green — not releasing"; exit 1; }
   git fetch -q origin
   git checkout -q main && git merge -q --ff-only origin/main 2>/dev/null
-  git merge -q --no-ff "$BRANCH" -m "Release v3.0 — UI overhaul" || { echo "✗ merge conflict — resolve by hand"; git merge --abort; git checkout -q "$BRANCH"; exit 1; }
-  git tag -f v3.0 >/dev/null
-  git push -q origin main && git push -q -f origin v3.0 && echo "✓ v3.0 pushed — GitHub Pages deploys in a few minutes"
+  git merge -q --no-ff "$BRANCH" -m "Release ${VERSION:-v3.0} — UI overhaul" || { echo "✗ merge conflict — resolve by hand"; git merge --abort; git checkout -q "$BRANCH"; exit 1; }
+  git tag -f "${VERSION:-v3.0}" >/dev/null
+  git push -q origin main && git push -q -f origin "${VERSION:-v3.0}" && echo "✓ ${VERSION:-v3.0} pushed — GitHub Pages deploys in a few minutes"
   git checkout -q "$BRANCH"
 }
 
