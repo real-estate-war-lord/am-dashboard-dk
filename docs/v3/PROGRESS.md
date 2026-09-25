@@ -1056,3 +1056,143 @@ legacy CSS, the two data tasks, and AC-A1 not being real axe-core. **Nothing is 
   returns every item and `p=a;b` already parses.
 - `scripts/ui_check.py` still drives `#compare` and will fail its compare group until someone
   removes that block. It is outside this run's allowed files and is not part of the gate.
+
+---
+
+## P10 — the owner's review: the pin stays on the map, and the test property reads every layer
+
+Commit: `v3.0 P10: owner review — the pin stays on the map, services, layer switches, the full picker`
+Gate: green — build, **131 node tests**, 42 python tests, **159/159** route×viewport smoke checks
+with **0 JS errors and 0 horizontal overflow**, **72/72 acceptance criteria** (3 P1 + 8 P2 + 9 P3 +
+10 P4 + 12 P5 + 7 P6 + 6 P7 + 8 P8 + 6 P9 + 3 P10), budgets (app.js 446 KiB / 450,
+style.css 139 KiB / 140) — ≈ 16 KB of app.js moved out into `src/pin_core.js` and `src/panels.js`
+to make room for the phase.
+
+### What was built
+
+**1. A pasted link lands on the map (owner item 1).** The unified search's coordinate row reads
+**"Drop a pin here"** and no longer navigates: `tpSearchDrop()` sets the default 1 km radius, waits
+for the kommune rings and calls `tpDrop()`, which drills to the pin's municipality and writes
+`pin=` / `pl=` / `rad=` into the **map** hash. `tpLayers()` then takes the camera to the pin at zoom
+13 — once, guarded by `LF.pinShown`, so a pan, a zoom, an indicator change or a re-render never
+pulls the map back. The auto-opening popup is gone.
+- **`mkPinCard()`** (`data-testid=pin-card`, in `#mkpin` between the info strip and the map) is the
+  pin's identity where it does not cover a polygon: label, coordinates, `quarter › postal code ›
+  municipality` (`PIN.pinPath`), the `approx.` tag while the ring file is in flight, the radius, and
+  two buttons — **`View test property ›`** (`pin-open` → `#property?p=…`) and **`✕`**. When a pasted
+  point falls outside Denmark the card is where the error line goes; the map has no `#tperr` box.
+- The row keeps `data-testid=search-coord`; **AC-M3 was rewritten** around the new behaviour (hash
+  starts `map`, `pin=` present, the card names the place, the rings are at 1 km, `pin-open` lands on
+  `#property?p=…`, `✕` removes both the pin and the card).
+
+**2. Services on the test-property map (owner item 2).** `TP_LAYERS` gained a **Services** row with
+the Macro map's own category and transport-mode filters. `srvMarkers(rows, map)` was factored out of
+`lfServicesLayers()` so both maps draw the same markers through **their own** pane and canvas
+renderer (`map._am`), and `srvLegendHtml(n, z)` / `setSrvLegendIn(id, live, n, z)` do the same for
+the legend. `anSrvKoms()` picks the municipalities whose file the ring touches, `srvLoad()` fetches
+them and now refreshes this map too when one lands, and `PIN.srvNear()` applies the category
+filters, the Macro map's zoom floors and the ring. URL: `lay=…,services` plus the existing `srv=`
+keys; default off. The sources section gains the OSM / Rejseplanen row while the layer is on, and
+`test_property_nearby_<date>.csv` gains its `service` rows — the fourth `kind` §5.5′ names, which
+P7 could not write because the page had no service list to export.
+
+**3. One switch per drawn layer, and the state sticks (owner item 3).** The test property's
+`Layers ▾` now lists **infra · public · services · buildings · rings** plus the storm-surge zones as
+context, each with exactly one switch, each removing its markers *and* emptying its legend box at
+once. New: `rings` (`ANL.rings`, `rings=0`) for the radius rings — the toolbar select still sets
+their *size*, which is also the ring the sections count inside — and, when a Climate indicator is
+active, the map's own `zones` row (`MK.zones`, `zones=0`) instead of the P6 `climate` row, so the
+zones are never offered twice. `anZonesOn()` is the one answer to "are they drawn".
+- The mini map's legend stack gained a card per layer with the §10 test ids (`legend-zones`,
+  `legend-services`, `legend-public`, `legend-infra`, `legend-buildings`) and all five are in
+  `MM_FOLD_ORDER`.
+- **The reported bug reproduced as a UI one, not a state one.** `ANL.pub` toggled, redrew and
+  survived a reload correctly at every sequence tried (cold, mid-load, after a re-render, after a
+  reload — see AC-TP8). What the owner clicked was the floating **legend card**, whose `+` only
+  unfolds it: the legend looked like the switch. The fix is that every drawn layer now has a row in
+  the menu where he was looking for one, and that the legend cards disappear with their layer.
+
+**4. The full indicator list on a pin (owner item 4).** `tpEntity()` carries the postal code the pin
+also sits in (`pn`) and offers `PIN.mergeInds(IND_Q, IND)` — **67 rows on a Copenhagen pin instead
+of 37**. `PIN.inhFrom()` is the area page's `inherits()` read one rung further, so a postal-code
+figure comes from the postal code and everything else from the municipality; `eFrom()`/`eVal()`
+return which level answered, and the picker lists the two sets under **"From the postal code"** and
+**"From the municipality"** (`PICKER_CORE.groupedLevel` takes a level name now, not a boolean).
+Tiles, the panel headline row and the Area profile name the right level.
+- **Climate appears** (AC-TP9): `climValue()` reads a quarter's non-surge Climate figures from
+  København, `climInh()` marks them inherited, and the Climate family keeps its own picker group
+  (its header carries the `Horizon` pill, and `surge_dw_pct` is the quarter's own figure). Selecting
+  one gives the horizon control, the three bars in the panel and the surge zones on the mini map.
+
+**5. Room for it.** `src/app.js` was 2 KB from its budget, so two files were split out:
+**`src/pin_core.js`** (`PIN_CORE`, pure, 13 `node --test` cases) with everything about a point that
+is a function of geometry or of the registry — ray casting, bounding boxes, `havM`, `featDistM`,
+the indicator union, the inheritance rule, the area path, the services filter, `komsNear`, `pctOf`,
+`dupGroup` — and **`src/panels.js`** (`PANELS`, *not* a pure module) with the four bodies of the
+chart panel, which read app.js's helpers through the shared global scope. Both are wired into
+`src/index.html` and `scripts/build_dashboard.py`.
+
+**6. Two visual fixes found in the screenshots.** The test property's toolbar broke into three lines
+with a hole beside the picker when the period control became the horizon segments (`.artools.tptools
+.period[data-mode=horizon]` is capped at 340 px), and the mini map's legend stack silently scrolled
+its last card out of sight (74 % of the map above 600 px, and `lgFitIn()` folds until the content
+fits **its own box**, not the map).
+
+### ACs delivered
+**AC-TP7** (services: the layer, its filters, its legend, and off means off), **AC-TP8** (one switch
+per drawn layer; public buildings go away and stay away across an async load and a reload; the rings
+are a layer and the pin is not), **AC-TP9** (≥ 55 rows, a Climate group, inherited rows tagged, and
+the horizon control + `clim-bars` + `legend-zones` on a Climate indicator) — all registered under
+`phase="P10"`. **AC-M3 (P4) was rewritten** for the new behaviour, as the phase file asks. Every
+other MUST from P1–P9 still passes, none weakened.
+
+### Deviations
+- **The rings have their size in the toolbar and their switch in Layers ▾.** §5.5′ draws the radius
+  select in the toolbar and the owner asks for one switch per drawn layer in the menu; a select is
+  not a switch, so both are true. In `DECISIONS.md`.
+- **`rings=0` and `zones=0` are their own keys**, not `lay=` values: they are on by default, and a
+  v2.6 link naming other layers must not switch them off.
+- **The Climate group is not folded into "From the municipality"** anywhere (the area page included),
+  because its header carries the `Horizon` pill. The rows keep their `muni` tag.
+- **The area page is unchanged.** Only a pin sits in two published areas at once, so `e.pn` and the
+  union are set on the test property's entity only — `#area/kvarter/…` still offers the quarter
+  registry, which is what an area page of that level publishes.
+- **The zones are not drawn on the area page's mini map.** The phase file says "like on the area
+  page"; the area page has never drawn them (only the Macro map and, since P6, the test property).
+  Adding them there is a change to a view this phase was told to leave alone.
+- **AC-TP8 asserts on the app's own layer state and on `_pub` markers**, not on a `.pub-marker`
+  class: the public buildings are canvas circle markers, which have no DOM node of their own. The
+  AC's own wording allows for "whatever class the public markers carry".
+- **A legend box that is off is emptied and hidden, not removed**, so AC-TP7 / AC-TP8 assert
+  "not visible" rather than "not in the DOM". That is how every legend on both maps has worked
+  since P4 (`setPubLegendIn`, `setServicesLegend`, `setClimateLegend`): the box is rendered with
+  the map and filled or blanked by the layer, which is what lets a layer redraw without touching
+  the page around it. `.maplegend:empty` catches any path that misses the `display:none`.
+
+### Known issues / open items
+- **At 390 px the mini map's legend stack scrolls** rather than fitting (the map is ~175 px tall and
+  the indicator legend alone is ~110 px): with three feature layers on, the last folded card sits
+  below the fold. The main map folds its whole stack behind a `Legend ▾` pill at that width; the
+  mini map wants the same control. `docs/v3/QA.md` O11.
+- `src/app.js` is at **446 KiB of 450** and `src/style.css` at **139 KiB of 140**. The next feature
+  needs another file or the remaining dead legacy CSS (QA.md O7).
+- Everything in QA.md's "Open — not blockers" carries over, and nothing there is a blocker.
+- `scripts/ui_check.py` still drives `#compare`; it is outside this run's allowed files.
+
+### What the next phase must know
+- **`PIN` is `window.PIN_CORE` and `PANELS` is `window.PANELS`**, aliased at the top of app.js. New
+  pure logic about a point or about the registry goes in `pin_core.js` with a `node --test` case;
+  a new chart body goes in `panels.js`. Both are inlined before app.js and share its global scope.
+- **`eFrom(e, k, y)` is the one answer to "whose figure is this"** — `""`, `"postnr"` or `"muni"` —
+  and `eVal()`, `ePeers()`, `ePeerLabel()`, the tiles, the panel headline row and `anRow()` all read
+  it. A new surface that shows an inherited figure uses it rather than testing `e.type` itself.
+- **`pickInherits(i, level)` returns a string now**, not a boolean: `""`, `"muni"` or `"postnr"`.
+  `pickGrpInh()` is the grouping variant (it keeps the Climate family in its own group).
+- **`anZonesOn()` decides whether the test property draws the zones**, and `tpLayerToggle()` owns
+  every row of its menu. A new layer there is one `TP_LAYERS` entry, one branch in `tpLayerToggle`,
+  one draw block in `anMapOverlays()` and one legend box in `TP_MAP_LEGENDS` + `MM_FOLD_ORDER`.
+- **`LF.pinShown` is what keeps the map's camera from following the pin twice.** Anything that drops
+  or clears a pin must set or null it.
+- The owner's next idea is still amendment A2's "paste several Google Maps links and they all appear
+  on the map": `route_core.propParse` already returns every item, `p=a;b` already parses, and the
+  map now has a pin card that a second pin would only have to repeat.

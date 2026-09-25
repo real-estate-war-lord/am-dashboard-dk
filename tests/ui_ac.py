@@ -776,25 +776,47 @@ def ac_m2(page, base):
 
 @ac("AC-M3", phase="P4")
 def ac_m3(page, base):
-    """Coordinates typed into the same box offer to open the spot as a test property, and the click
-    goes to #property?p=lat,lon (spec §5.1; read #properties as #property, amendment A2)."""
+    """Coordinates typed into the same box drop a pin on the map and keep the reader there: the hash
+    gains pin=, the pin card names the place, and that card is the way on to the test property
+    (spec §5.1 as amended by the owner review — P10 item 1; it used to navigate away at once)."""
     goto(page, "map?ind=growth", settle=1000)
     page.fill("[data-testid=search]", "55.6545, 12.539")
     page.wait_for_timeout(400)
     coord = page.locator("[data-testid=search-coord]")
     assert coord.count() == 1, "coordinates produced no search-coord result"
-    assert "test property" in coord.first.inner_text().lower(), coord.first.inner_text()
+    assert "drop a pin" in coord.first.inner_text().lower(), coord.first.inner_text()
     coord.first.click()
-    page.wait_for_timeout(1400)
-    assert cur_hash(page).startswith("property?p=55.6545,12.539"), f"the coord result landed on {cur_hash(page)!r}"
-    # a Google Maps link is read by the same box
+    page.wait_for_timeout(1800)
+    h = cur_hash(page)
+    assert h.startswith("map"), f"the coord result left the map: {h!r}"
+    assert "pin=55.65450,12.53900" in h, f"no pin in the hash: {h!r}"
+    assert page.evaluate("S.view === 'makro'"), "the coord result changed the view"
+    card = page.locator("[data-testid=pin-card]")
+    assert card.count() == 1 and card.is_visible(), "no pin card under the toolbar"
+    txt = card.inner_text()
+    for want in ["55.65450, 12.53900", "København"]:
+        assert want in txt, f"the pin card does not say {want!r}: {txt!r}"
+    # the rings are drawn at the default 1 km and the camera went to the pin
+    assert page.evaluate("TP.rad") == 1000, "the pin was dropped without the default radius"
+    assert page.evaluate("window.__maps[0].getZoom()") >= 12, "the map did not go to the pin"
+    # …and the card is the step on to the test property
+    page.click("[data-testid=pin-open]")
+    page.wait_for_timeout(1600)
+    assert cur_hash(page).startswith("property?p=55.6545,12.539"), f"View test property went to {cur_hash(page)!r}"
+    # a Google Maps link is read by the same box, and Enter does what the click does
     goto(page, "map?ind=growth", settle=900)
     page.fill("[data-testid=search]", "https://www.google.com/maps/@55.6761,12.5683,15z")
     page.wait_for_timeout(400)
     assert page.locator("[data-testid=search-coord]").count() == 1, "a Maps link produced no coord result"
     page.press("[data-testid=search]", "Enter")
-    page.wait_for_timeout(1400)
-    assert cur_hash(page).startswith("property?p=55.6761,12.5683"), f"the link landed on {cur_hash(page)!r}"
+    page.wait_for_timeout(1600)
+    h = cur_hash(page)
+    assert h.startswith("map") and "pin=55.67610,12.56830" in h, f"the link landed on {h!r}"
+    # and ✕ takes the pin away again
+    page.click("[data-testid=pin-card] [data-tp=remove]")
+    page.wait_for_timeout(900)
+    assert "pin=" not in cur_hash(page), f"removing the pin left {cur_hash(page)!r}"
+    assert page.locator("[data-testid=pin-card]").count() == 0, "the card outlived its pin"
 
 
 @ac("AC-P4SR", phase="P4")
@@ -1964,6 +1986,129 @@ def ac_q6(page, base):
           .filter(c => c.getClientRects().length > 1 || c.getBoundingClientRect().height > 30)
           .map(c => `${(c.textContent || '').trim()} ${Math.round(c.getBoundingClientRect().height)}px`)""")
         assert not tall, f"{route}: a chip wrapped onto two lines — " + " | ".join(tall)
+
+
+# =============================================================================================
+# P10 — the owner's review: the pin stays on the map, services and every switch on the test
+#       property, and the pin's full indicator list (docs/v3/phases/P10.md)
+# =============================================================================================
+TP10 = "property?p=55.69711,12.58399"       # the owner's pin: Østerport, 2100 København Ø
+
+
+def open_layers(page):
+    """Open Layers ▾ if it is not already open — the trigger toggles, so never click it twice."""
+    pop = page.locator("[data-testid=layers-pop]").first
+    if not pop.is_visible():
+        page.locator("[data-testid=layers-btn]").first.click()
+        page.wait_for_timeout(300)
+    assert pop.is_visible(), "clicking Layers ▾ did not open [data-testid=layers-pop]"
+    return pop
+
+
+def mm_legend(page, kind):
+    """The state of one legend card inside the mini map: visible / hidden / missing."""
+    return page.evaluate("""k => { const z = document.querySelector(
+        `[data-testid=minimap] [data-testid=legend-${k}]`);
+      return z ? (getComputedStyle(z).display === 'none' ? 'hidden' : 'visible') : 'missing'; }""", kind)
+
+
+@ac("AC-TP7", phase="P10")
+def ac_tp7(page, base):
+    """Services are a layer of the test-property map too — the same four categories, the same
+    filters, drawn around the pin with a legend of their own (P10 item 2). `lay=services` on the
+    property route switches them on, and switching them off removes markers and legend at once."""
+    goto(page, TP10 + "&lay=services", settle=3200, wait="#anmap .leaflet-pane")
+    del ERRORS[:]
+    box = open_layers(page).locator("[data-layer=services]")
+    assert box.count() == 1, "the test property's Layers ▾ has no Services row"
+    assert box.first.get_attribute("aria-checked") == "true", "lay=services did not tick the row"
+    assert mm_legend(page, "services") == "visible", "no services legend inside the mini map"
+    drawn = page.evaluate("""() => { let n = 0; ["anSrvG", "anSrvStG"].forEach(k =>
+        { if (LF[k]) LF[k].eachLayer(() => n++); }); return n; }""")
+    assert drawn > 0, "the services layer is on but nothing was drawn around the pin"
+    # the filters of Layers ▾ reach this map too
+    assert page.locator("[data-testid=layers-pop] [data-srvcat]").count() >= 4, \
+        "the Services row offers no category filters"
+    # off → no markers, no legend, and the hash says so
+    page.click("[data-layer=services]")
+    page.wait_for_timeout(900)
+    assert page.evaluate("""() => { let n = 0; ["anSrvG", "anSrvStG"].forEach(k =>
+        { if (LF[k]) LF[k].eachLayer(() => n++); }); return n; }""") == 0, "service markers survived the switch"
+    assert mm_legend(page, "services") == "hidden", "the services legend survived the switch"
+    assert "services" not in cur_hash(page).split("lay=")[1].split("&")[0], \
+        f"lay= still names services: {cur_hash(page)!r}"
+    assert not ERRORS, f"pageerror on the services layer: {ERRORS[:2]}"
+
+
+@ac("AC-TP8", phase="P10")
+def ac_tp8(page, base):
+    """Every layer the test-property map draws has exactly one switch in Layers ▾, switching it off
+    removes its markers *and* its legend at once, and the state survives a reload (P10 item 3)."""
+    goto(page, TP10, settle=2800, wait="#anmap .leaflet-pane")
+    del ERRORS[:]
+    pop = open_layers(page)
+    rows = page.evaluate("""() => [...document.querySelectorAll('[data-testid=layers-pop] [data-layer]')]
+        .map(b => b.dataset.layer)""")
+    assert len(rows) == len(set(rows)), f"a layer has two switches: {rows}"
+    for k in ["infra", "public", "services", "buildings", "rings"]:
+        assert k in rows, f"no switch for the {k} layer: {rows}"
+    # Public buildings: drawn, then switched off
+    assert page.evaluate("ANL.pub") is True and mm_legend(page, "public") == "visible"
+    assert page.evaluate("""() => { let n = 0; LF.anmap.eachLayer(l => { if (l._pub) n++; }); return n; }""") > 0, \
+        "the public layer is on but no building was drawn"
+    pop.locator("[data-layer=public]").click()
+    page.wait_for_timeout(1000)
+    left = page.evaluate("""() => ({
+        markers: (() => { let n = 0; LF.anmap.eachLayer(l => { if (l._pub) n++; }); return n; })(),
+        icons: document.querySelectorAll('[data-testid=minimap] .leaflet-marker-icon.pub-marker').length })""")
+    assert left["markers"] == 0 and left["icons"] == 0, f"public buildings survived the switch: {left}"
+    assert mm_legend(page, "public") == "hidden", "the Public buildings legend survived the switch"
+    # …and it stays off after an async file load and after a reload of the resulting hash
+    page.wait_for_timeout(2000)
+    assert page.evaluate("""() => { let n = 0; LF.anmap.eachLayer(l => { if (l._pub) n++; }); return n; }""") == 0, \
+        "a late public/<kom>.json put the layer back"
+    h = cur_hash(page)
+    page.goto(base + "#" + h, wait_until="load")
+    page.wait_for_function("typeof render === 'function' && IND.length > 0", timeout=60000)
+    page.wait_for_timeout(2600)
+    assert page.evaluate("ANL.pub") is False, f"the reloaded link turned the layer back on: {h!r}"
+    assert mm_legend(page, "public") == "hidden", "the legend came back on reload"
+    # the rings are a layer of their own, and the pin itself is never switched off
+    open_layers(page).locator("[data-layer=rings]").click()
+    page.wait_for_timeout(800)
+    assert "rings=0" in cur_hash(page), f"the rings switch did not reach the hash: {cur_hash(page)!r}"
+    assert page.evaluate("""() => { let n = 0; if (LF.anPinG) LF.anPinG.eachLayer(() => n++); return n; }""") == 1, \
+        "switching the rings off left something other than the pin behind"
+    assert not ERRORS, f"pageerror while switching layers: {ERRORS[:2]}"
+
+
+@ac("AC-TP9", phase="P10")
+def ac_tp9(page, base):
+    """A pin is read against every level it sits in: the picker offers the quarter's own figures
+    first and then what the postal code and the municipality publish — Climate included, with the
+    horizon control and the zones in the mini map (P10 item 4, spec §4.2 AC-I5)."""
+    goto(page, TP10, settle=2800, wait="#anmap .leaflet-pane")
+    del ERRORS[:]
+    page.click("[data-testid=ind-picker-btn]")
+    page.wait_for_timeout(400)
+    rows = page.locator("[data-testid=ind-picker-pop] [data-ind]").count()
+    assert rows >= 55, f"the picker offers {rows} indicators on a Copenhagen pin — the pin's own level only?"
+    groups = page.evaluate("""() => [...document.querySelectorAll('[data-testid=ind-picker-pop] [data-group]')]
+        .map(g => g.dataset.group)""")
+    assert "Climate" in groups, f"no Climate group on the test property: {groups}"
+    assert "From the municipality" in groups, f"nothing is marked as inherited: {groups}"
+    # an inherited row says where its figure comes from
+    tags = page.evaluate("""() => [...document.querySelectorAll('[data-group="From the municipality"] .indrow')]
+        .map(r => ({ key: r.dataset.ind, tag: !!r.querySelector('.tag-muni') }))""")
+    assert tags and all(t["tag"] for t in tags), f"an inherited row carries no muni tag: {tags[:3]}"
+    page.keyboard.press("Escape")
+    # …and choosing a Climate indicator brings the horizon control, the bars and the zones
+    goto(page, TP10 + "&ind=surge_dw_pct", settle=3200, wait="#anmap .leaflet-pane")
+    assert page.locator("[data-testid=period-hz]").count() >= 1, "no horizon control for a Climate indicator"
+    assert page.locator("[data-testid=chart-panel] [data-testid=clim-bars]").count() == 1, \
+        "the chart panel does not draw the three horizons"
+    assert mm_legend(page, "zones") == "visible", "the storm-surge zones are not in the mini map's legend stack"
+    assert not ERRORS, f"pageerror reading a Climate indicator on the test property: {ERRORS[:2]}"
 
 
 # ---------------------------------------------------------------------------------------------

@@ -16,8 +16,10 @@ components, export schema, test commands): [`docs/UI_V3.md`](docs/UI_V3.md).
   legends bottom right), zoom in for postal codes and Copenhagen quarters. One toolbar row:
   `[search] [Layers ▾] [Indicator ▾] [period]`, quick chips under it, then the info strip (label,
   level, unit, as of, `ⓘ details`). The search box takes an area name, a postal code, a quarter, a
-  Google Maps link **or** `lat, lon`. `Layers ▾` holds the three feature layers — Infra projects ·
-  Public buildings · Services — with their category filters. Zooming never changes what is selected.
+  Google Maps link **or** `lat, lon` — a location **drops a pin on the map** (rings, a pin card
+  under the info strip, `View test property ›` when you want the sheet), it does not navigate away.
+  `Layers ▾` holds the three feature layers — Infra projects · Public buildings · Services — with
+  their category filters. Zooming never changes what is selected.
 - **Indicator picker and period control** — one component each, on the map, the area page, Data ›
   Areas, Charts and the test property. The picker searches across label, short name, group and unit,
   groups the registry twelve ways, marks `↓ lower is better`, and lists indicators you are only
@@ -72,9 +74,10 @@ MACRO DASHBOARD
 Below 1025 px the sidebar becomes a 52 px top bar with a `☰` drawer and the page scrolls natively.
 
 The URL is the state, and a key is written only when it differs from the default: `ind` (indicator),
-`y` (year) or `hz` (`today|2070|2120`), `lay` (feature layers), `zones=0`, `p` (the pin), `rad`
-(radius), `show` (which sections are open), plus each view's own filters. `hashFor()` is the only
-serialiser and `parseHash()` the only parser, so *Copy link* always reproduces exactly what you see.
+`y` (year) or `hz` (`today|2070|2120`), `lay` (feature layers), `zones=0`, `rings=0`, `p` (the test
+property's pin) or `pin=`/`pl=` (the map's), `rad` (radius), `show` (which sections are open), plus
+each view's own filters. `hashFor()` is the only serialiser and `parseHash()` the only parser, so
+*Copy link* always reproduces exactly what you see.
 
 **Every v2.6 link still works.** `#table/<level>` → `#data/areas/<level>`, `#pipeline` →
 `#data/projects`, `#market` → `#data/national`, `#market?src=1` and `#sources` → `#data/sources`,
@@ -143,7 +146,7 @@ Every Education building that sits on a school's site carries that school's figu
 
 ### Test property — one address against every layer
 
-Paste a Google Maps link — or a plain `55.67610, 12.56830` — into the map's search box or into the box at the top of **Test property**, and the dashboard pins that point, drills to its municipality at postal-code level and draws 500 / 1 000 / 1 200 m rings around it; *Open as test property* opens **`#property?p=<lat>,<lon>[:label]`**, one address read against every layer at once: where it is (kommune · postal code · Copenhagen quarter, from the kommune's own boundary rings rather than from its postal code, so a Frederiksberg address is not labelled København), the full area profile with a direction-aware percentile bar against every area of the same level, safety, every infrastructure project within 3 km with its distance **computed from the geometry** — a station point, the nearest point of a line, 0 m inside a development area — the public buildings and schools inside the radius you choose (500 m · 1 km · 2 km · 5 km) including the ones across a municipality border, and a sources section built from what that pin actually read. The mini map drags, zooms and goes full screen, and carries the same layers as the Macro map through the same `Layers ▾` menu; its choropleth follows whichever indicator the picker — or a click on a headline tile — names. The link is the state: `&ind=`, `&lay=`, `&rad=`, `&show=` and the pin itself travel in it, so *Copy link* reproduces the view and Back returns to the map with the pin intact. It all runs in the browser — the link is parsed, never followed, which is also why short `maps.app.goo.gl` links are refused by name instead of guessed at, and why the box says the location is stored only in the page URL. **Coverage: national, except public buildings and schools (Copenhagen metro set).** Method, formats, distances and caveats: [`docs/ANALYSIS.md`](docs/ANALYSIS.md).
+Paste a Google Maps link — or a plain `55.67610, 12.56830` — into the map's search box and the dashboard pins that point without leaving the map: it drills to the pin's municipality at postal-code level, takes the camera to it, draws 500 / 1 000 / 1 200 m rings around it and puts a pin card under the info strip. *View test property ›* on that card (or the box at the top of **Test property**) opens **`#property?p=<lat>,<lon>[:label]`**, one address read against every layer at once: where it is (kommune · postal code · Copenhagen quarter, from the kommune's own boundary rings rather than from its postal code, so a Frederiksberg address is not labelled København), the full area profile with a direction-aware percentile bar against every area of the same level, safety, every infrastructure project within 3 km with its distance **computed from the geometry** — a station point, the nearest point of a line, 0 m inside a development area — the public buildings and schools inside the radius you choose (500 m · 1 km · 2 km · 5 km) including the ones across a municipality border, and a sources section built from what that pin actually read. A pin is read against every level it sits in, so a Copenhagen address offers the quarter's own figures, the postal code's under *From the postal code* and the municipality's under *From the municipality* — Climate included. The mini map drags, zooms and goes full screen, and carries the same layers as the Macro map through the same `Layers ▾` menu (infra · public buildings · services · BBR buildings · the radius rings · the storm-surge zones, one switch each); its choropleth follows whichever indicator the picker — or a click on a headline tile — names. The link is the state: `&ind=`, `&lay=`, `&rad=`, `&show=` and the pin itself travel in it, so *Copy link* reproduces the view and Back returns to the map with the pin intact. It all runs in the browser — the link is parsed, never followed, which is also why short `maps.app.goo.gl` links are refused by name instead of guessed at, and why the box says the location is stored only in the page URL. **Coverage: national, except public buildings and schools (Copenhagen metro set).** Method, formats, distances and caveats: [`docs/ANALYSIS.md`](docs/ANALYSIS.md).
 
 ![Test property — a pin in 2450 København SV with the infra and public-building overlays on the mini map](docs/screenshot-analysis.jpg)
 

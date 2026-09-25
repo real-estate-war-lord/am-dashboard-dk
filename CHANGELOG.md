@@ -38,10 +38,23 @@ data, same sources, same palette; a different thing to sit in front of.
   *Neighbours* cards are gone; the chart panel does all three jobs and shows a line chart, a peer
   distribution strip, the outlook chart or the three climate horizons depending on what you picked.
   Changing the indicator updates in place — your scroll position, your pan and your zoom survive it.
+- **A pasted link lands on the map, not on another page.** Type or paste a Google Maps link or
+  `lat, lon` into the map's search box and the first result is **Drop a pin here**: the pin lands on
+  the map, the camera goes to it, the 500 m / 1 km / 1,2 km rings are drawn, and a small **pin card**
+  under the info strip names the place (quarter › postal code › municipality). Study the area at
+  macro level first; `View test property ›` on the card opens the sheet when you want it. The pin
+  travels in the link (`#map/101/postnr?…&pin=55.65450,12.53900&rad=1000`).
 - **The test property is the same study row, anchored on a pin.** `#property?p=55.6545,12.539:Label`
   — one address read against every layer, with its own `Layers ▾`, a radius select (500 m · 1 km ·
   2 km · 5 km) that drives both the ring on the map and the counts below it, and eight foldable
-  sections. The mini map drags and has a full-screen `⤢`.
+  sections. The mini map drags and has a full-screen `⤢`. Its layers are **Infra projects · Public
+  buildings · Services · Buildings (BBR) · Radius rings** plus the storm-surge zones as context —
+  one switch each, and switching one off takes its markers *and* its legend away at once.
+- **A pin is read against every level it sits in.** A Copenhagen address is a quarter, a postal code
+  and a municipality at the same time, so the picker offers all 67 figures published for it: the
+  quarter's own first, then price/m² and the other postal-code figures under *From the postal code*,
+  then everything else under *From the municipality* — **Climate included**, with the horizon
+  control and the surge zones on the mini map.
 - **Inherited figures say so.** A municipality figure shown on a postal code or a quarter is dimmed,
   labelled **municipality figure** on a tile and tagged **muni** in a table, and the picker lists
   those indicators under *From the municipality*. Never a bare `°` on a headline figure again.
@@ -89,6 +102,7 @@ on load, and the address bar then shows the canonical spelling. Each of these is
 | `#compare?a=<type>:<code>&b=…` | `#area/<type>/<code>` of the **a** side |
 | `#map?…&infra=1&public=1&services=1` | `#map?…&lay=infra,public,services` |
 | `#map?…&climate=1` | `#map?…&ind=surge_dw_pct` |
+| `#property?…&lay=…` without `rings`/`zones` | the rings and the zones keep their defaults — only "off" is written (`rings=0`, `zones=0`) |
 | `#area/…?t=bbr\|ind\|sub&g=…` | `#area/…?show=figures\|sub` |
 
 ### Export schema
@@ -125,6 +139,9 @@ Danish Excel opens every one of them by double-click. `areas_long` is 104 028 ro
 - Two data definitions are surfaced rather than resolved: the KK vs BBR "dwellings built 2010+" gap
   (a caveat on the four Copenhagen quarters where the two differ by more than 15 pp) and the surge
   indicators' description, which names the default horizon inside its own sentence.
+- On a phone the mini map is ~175 px tall, so its legend stack scrolls rather than fitting: with
+  three feature layers on, the last folded card sits below the fold of the stack. The main map folds
+  its whole stack behind a `Legend ▾` pill at that width; the mini map wants the same treatment.
 - Copenhagen's quarter registry publishes no Climate figure, so a Climate indicator on `#map/101`
   switches to the postal-code view, where the figure exists.
 - The accessibility AC is a DOM check, not axe-core — the library is not vendored and the build

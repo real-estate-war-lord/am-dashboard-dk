@@ -99,7 +99,13 @@ ROUTES = [
     dict(id="map_zones_off",  hash="map?ind=surge_dw_pct&zones=0",           land=["#maplegend!"], state="!MK.zones && !climOn() && !document.querySelector('[data-testid=legend-zones]')"),
     dict(id="map_micro",      hash="map/101?ind=growth&micro=1&mind=rented_pct", land=["#lfmap", "#mindsel"], state="microMode()"),
     # the pin's radius filter moved into Layers ▾, where it only appears when there is a pin (P4)
-    dict(id="map_pin",        hash="map?ind=growth&pin=55.64250,12.53850&pl=Sydhavn&rad=1000", land=["#lfmap", "[data-layer=radius]"], state="TP.lat!=null && TP.rad===1000"),
+    # a pin lives on the map with a card of its own, and the way on to the test property (P10 item 1)
+    dict(id="map_pin",        hash="map?ind=growth&pin=55.64250,12.53850&pl=Sydhavn&rad=1000", land=["#lfmap", "[data-layer=radius]", "[data-testid=pin-card]!", "[data-testid=pin-open]"], state="TP.lat!=null && TP.rad===1000"),
+    # the state a dropped pin actually leaves behind: drilled to its municipality, card under the
+    # strip, rings on the map. (The camera goes to the pin the first time it is framed, which is a
+    # cold load of this link — this runner drives one page by its hash, so `map_pin` above framed it
+    # already and the reader's view is kept. AC-M3 asserts the zoom on a real drop.)
+    dict(id="map_pin_drill",  hash="map/101/postnr?ind=growth&pin=55.64250,12.53850&rad=1000", land=["#lfmap .leaflet-pane", "[data-testid=pin-card]!", "[data-testid=pin-open]", ".mstrip"], state="MK.muni==='101' && TP.lat!=null && !!LF.tpG && TP.rad===1000"),
     # --- area pages (v3.0 P5: header → tiles → picker → study row → four <details>) ---
     dict(id="area_kommune",   hash="area/kommune/101?ind=growth",            land=[".arhead h2!", "#armap .leaflet-pane", "#arlegend!", "[data-testid=tiles]!", "[data-testid=study-row]!", "[data-testid=chart-panel]!", "[data-testid=minimap]!", "[data-testid=minimap-full]", "[data-testid=ind-picker-btn]!", "[data-testid=ind-chips]!", "[data-testid=sec-figures]!", "[data-testid=sec-info]!"], state="S.view==='area' && !!LF.amap && window.__maps.length===1 && LF.amap.dragging.enabled() && document.querySelector('[data-testid=sec-outlook]').open"),
     dict(id="area_postnr",    hash="area/postnr/2450?ind=growth",            land=[".arhead h2!", "#armap", "[data-testid=study-row]!", "[data-testid=tile-unemp].inh"], state="AR.type==='postnr' && !document.querySelector('[data-testid=sec-outlook]')"),
@@ -145,6 +151,10 @@ ROUTES = [
     dict(id="property_show",  hash="property?p=55.64250,12.53850&ind=growth&show=profile,climate", land=["[data-testid=tp-sec-profile][open]", "[data-testid=tp-sec-climate][open]", "[data-testid=tp-sec-infra]:not([open])"], wait="#anmap .leaflet-pane", state="AN.show.has('profile') && !AN.show.has('infra')", settle=2200),
     # the radius drives the rings on the map and the ring the sections count inside
     dict(id="property_rad",   hash="property?p=55.64250,12.53850&ind=growth&rad=2000", land=["[data-testid=tp-radius]", "[data-testid=tp-sec-public]!"], wait="#anmap .leaflet-pane", state="AN.rad===2000 && anRing()===2000", settle=2200),
+    # P10: services are a layer of this map too, and every drawn layer has its own legend card
+    dict(id="property_srv",   hash="property?p=55.69711,12.58399&ind=growth&lay=infra,public,services", land=["[data-layer=services][aria-checked=true]", "[data-testid=minimap] [data-testid=legend-services]!", "[data-testid=minimap] [data-testid=legend-public]!"], wait="#anmap .leaflet-pane", state="ANL.srv && !!LF.anSrvG", settle=3000),
+    # P10: a Climate indicator on the pin — the horizon control, the three bars and the zones
+    dict(id="property_clim",  hash="property?p=55.69711,12.58399&ind=surge_dw_pct&hz=2070", land=["[data-testid=period-hz]!", "[data-testid=clim-bars]", "[data-testid=minimap] [data-testid=legend-zones]!"], wait="#anmap .leaflet-pane", state="curInd().key==='surge_dw_pct' && HZ.h==='2070' && anZonesOn()", settle=3000),
     # a pin outside Copenhagen: the entity is the postal code, so the picker offers the national list
     dict(id="property_postnr", hash="property?p=56.15700,10.21000:Aarhus C&ind=growth", land=["[data-testid=study-row]!", "[data-testid=chart-panel]!", "[data-testid=tiles]!", "[data-testid=tp-sec-profile]!"], wait="#anmap .leaflet-pane", state="S.view==='analysis' && anEntity().type==='postnr' && pickLevel()==='postnr' && curInds()===IND", settle=2400),
     dict(id="analysis_empty", hash="analysis",                               land=["#tpq", "[data-testid=state-empty]!"], state="S.view==='analysis'", redirect="property"),

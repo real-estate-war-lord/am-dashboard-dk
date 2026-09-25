@@ -81,15 +81,18 @@ every run. **Never remove an old hash from that list: it is the redirect test.**
 | `ind` | active indicator key | map, area, data/areas, charts, property, sheets |
 | `y` | year, only when it is not the latest | indicators with a year series |
 | `hz` | `today \| 2070 \| 2120` | Climate indicators, climate sheet |
-| `lay` | comma list of feature layers | map: `infra,public,services` · property: `infra,public,micro,climate` |
-| `zones` | `0` hides the storm-surge context layer | map, while a Climate indicator is active |
+| `lay` | comma list of feature layers | map: `infra,public,services` · property: `infra,public,services,buildings,climate` |
+| `zones` | `0` hides the storm-surge context layer | map and test property, while a Climate indicator is active |
+| `rings` | `0` hides the radius rings | test property |
+| `srv`, `pub`, `pubkind` | the sub-filters of the Services and Public-buildings layers | map and test property, when that layer is on |
 | `p` | `lat,lon[:label]` (codec is list-capable; v3.0 renders one) | test property |
 | `rad` | radius ring in metres: `500 \| 1000 \| 2000 \| 5000` | test property |
 | `show` | comma list of open sections, `none` when all closed | area page (`outlook,figures,sub,info`), test property (`outlook,profile,safety,infra,public,schools,climate,sources`) |
 | `q, region, minpop` | Areas table filters | data/areas |
 | `ptype, pstatus` | project filters | data/projects |
 | `a, y0, y1, med, mode, dist, t` | chart setup | charts |
-| `pin, pl, micro, mind` | the map's own pin and the buildings layer | map |
+| `pin, pl` | the pin dropped on the map (`lat,lon` and its label) and its `rad` rings — the map's search box writes them and stays where it is; the pin card's **View test property ›** is the step on to `#property?p=…` | map |
+| `micro, mind` | the BBR buildings mode of the drilled map | map |
 
 A key is written only when its value differs from the default, so a shared link stays short.
 
@@ -111,6 +114,7 @@ One implementation each. A view adopts a control by calling it — there is no s
 | State cards | `stateCard(kind, title, note, action)` | `state-empty`, `state-loading`, `state-error` |
 | Legend stack | `setLegend(...)`, `lgFitIn(wrap, map, order)` | `legend`, `legend-zones`, `legend-infra`, `legend-public`, `legend-services`, `legend-toggle` |
 | Unified search (areas, codes, Maps links, coordinates) | `areaSearch()`, `asrchRows()` | `search`, `search-coord` |
+| Pin card (the dropped pin, under the map's info strip) | `mkPinCard()`, `mkPinRefresh()` | `pin-card`, `pin-open` |
 | Shell | `renderNav()`, `navDrawer(open)` | `sidebar`, `nav-item`, `nav-toggle`, `nav-drawer`, `topbar-mobile` |
 
 `window.__maps` is the array of live Leaflet instances — the test hook every map AC uses. Every map is
@@ -129,6 +133,12 @@ everywhere), `DASH` (the publisher has no figure) vs `NC` (not computed at this 
 | `src/picker_core.js` | `PICKER_CORE` | `GROUP_ORDER`, grouping, search matching, period mode, availability tags | `tests/picker.test.js` |
 | `src/climate_core.js` | `CLIMATE_CORE` | horizons, the two calendars, zone/figure labels | `tests/climate.test.js` |
 | `src/export_core.js` | `EXPORT_CORE` | every column set, the source columns, the unit fix, `period_type`/`value_type`, the CSV rules | `tests/export.test.js` |
+| `src/pin_core.js` | `PIN_CORE` | where a point is (ray casting, bounding boxes, great-circle and feature distances) and what it can be read as (the indicator union, the inheritance rule, the area path, the services filter) | `tests/pin.test.js` |
+
+`src/panels.js` (`window.PANELS`) is **not** a pure module: it is app.js's chart-drawing half — the
+four bodies of the chart panel (history line, population outlook, distribution strip, Climate
+horizons) — split out so `src/app.js` stays inside its 450 KB budget. It reads app.js's own helpers
+through the shared global scope and is covered by the acceptance suite, not by `node --test`.
 
 A new `src/*.js` must be wired into **both** `src/index.html` and `scripts/build_dashboard.py` in the
 same commit — the build inlines them into one global scope, so a colliding top-level `const` blanks
@@ -149,7 +159,7 @@ writer.
 | National series | `national_series_<date>.csv` | long |
 | Sources catalogue | `sources_<date>.csv` | `key, label, publisher, tables, as_of, fetched, url, licence, used_for` |
 | Climate exposure | `climate_exposure_<date>.csv` | level × horizon: dwellings, dwellings in zone, share, zone km² |
-| Test property | `test_property_<date>.csv` + `test_property_nearby_<date>.csv` | long behind `property_label, lat, lon`; nearby = `kind, name, type, status, distance_m, source, source_url` |
+| Test property | `test_property_<date>.csv` + `test_property_nearby_<date>.csv` | long behind `property_label, lat, lon`; nearby = `kind, name, type, status, distance_m, source, source_url` — `kind` ∈ `infra \| public \| school \| service` (services while that layer is on) |
 
 **Long schema** (areas, national series, test property):
 
@@ -193,7 +203,7 @@ No element may make the page scroll sideways at any of those widths — `OVERFLO
 
 ```bash
 python3 scripts/build_dashboard.py          # src/ → dist/index.html
-node --test tests/*.test.js                 # 116 pure unit tests (route, picker, climate, export, testprop)
+node --test tests/*.test.js                 # 131 pure unit tests (route, picker, climate, export, pin, testprop)
 make serve                                  # http://localhost:8080
 
 # route × viewport smoke: DOM landmarks, app-state expressions, redirects,
@@ -202,9 +212,9 @@ make serve                                  # http://localhost:8080
     --viewports 1440x900,1536x864,1366x768,390x844 --out shots [--full-page]
 
 # acceptance suite: one function per AC id from the spec, registered with the phase that shipped it
-.venv-ui/bin/python3 tests/ui_ac.py --url http://localhost:8080/ --phase-upto P9 --out logs/ac
+.venv-ui/bin/python3 tests/ui_ac.py --url http://localhost:8080/ --phase-upto P10 --out logs/ac
 
-./overnight.sh gate P9                      # all of the above + the size budgets, in one command
+./overnight.sh gate P10                     # all of the above + the size budgets, in one command
 ```
 
 `make smoke` and `make ac` are the short forms. Both runners check the page title first and serve

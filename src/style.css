@@ -1897,12 +1897,21 @@ abbr.bmark{text-decoration:none;border-bottom:0;cursor:help;color:var(--muted)}
 /* bottom:24px for the same reason as #maplegs: a tiled mini map credits OpenStreetMap down there */
 .minimap .maplegs{top:auto;bottom:24px;right:10px;max-height:60%;max-width:66%;gap:6px;
   pointer-events:auto;scrollbar-width:thin}
+/* 74 %, not the main map's 60 %, on a desktop mini map: it is half the height, and four folded
+   cards (the indicator plus three layers, P10) need the room. Under 60 % the last one was scrolled
+   out of the stack's own overflow with nothing to say so — and lgFitIn() now folds until the stack
+   fits its box rather than the map. On a phone the map itself is 175 px, so it keeps the 60 %. */
+@media (min-width:601px){ .minimap .maplegs{max-height:74%} }
 .minimap .maplegs .mm-leg{position:static;right:auto;bottom:auto;max-width:none}
 /* below 900 px the shared .maplegs rule stretches the stack to left:12px, where it runs into the
    + − ⌖ control column; 52 px clears it and the card still has the width of the map to itself */
 @media (max-width:900px){.minimap .maplegs{left:52px}}
 /* Layers ▾ and the radius sit at the right end of the one toolbar row */
 .artools .tp-right{margin-left:auto;display:flex;align-items:center;gap:var(--s2)}
+/* …and they stay on it when the period control becomes the horizon segments, whose caption is two
+   lines of prose: unconstrained it pushes Layers ▾ onto a line of its own and opens a hole beside
+   the picker. The area page has nothing at the right end of this row, so it keeps the wider one. */
+.artools.tptools .period[data-mode=horizon]{max-width:min(340px,40vw)}
 .radsel{display:inline-flex;align-items:center;gap:6px}
 .radsel>span{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 /* the paste box owns its own row above the identity line; the privacy line sits tight under it so
@@ -2077,6 +2086,21 @@ abbr.bmark{text-decoration:none;border-bottom:0;cursor:help;color:var(--muted)}
    contrast there. */
 :focus-visible{outline:none;box-shadow:var(--focus-ring)}
 .cap,.hint,.laynote,.mm-note,.indnone{color:var(--cap-ink)}
+
+/* ---- §5.1 the pin card: a pasted link lands on the map, not on another page (P10 item 1).
+        It sits between the info strip and the map, in the strip's own tone, so the reader's eye
+        goes back to the fill rather than to a popup over the polygons. ---- */
+.pincard{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  padding:7px 12px;margin:0 0 12px;border:1px solid var(--line);border-radius:9px;
+  background:var(--panel2);border-left:3px solid var(--pin);font-size:12.5px}
+.pincard.err{border-left-color:var(--warn);color:var(--warn)}
+.pincard .pintitle{font-family:var(--disp);font-size:14px}
+.pincard .tag{font-family:var(--mono)}
+.pincard .pinwhere{color:var(--cap-ink);font-size:12px}
+.pincard .dim{font-family:var(--mono);font-size:10.5px}
+.pincard .pinact{display:flex;align-items:center;gap:6px;margin-left:auto}
+.pincard .pinmsg{font-size:12px}
+@media (max-width:600px){ .pincard .pinact{margin-left:0} }
 
 /* ---- §6 the legend stack folds into one "Legend ▾" pill on a phone ---- */
 .lgtog{display:none}

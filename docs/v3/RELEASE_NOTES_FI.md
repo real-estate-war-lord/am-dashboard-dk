@@ -1,5 +1,36 @@
 # Macro Dashboard v3.0 — aamun yhteenveto
 
+## P10 — omistajan korjaukset (25.9.2026)
+
+Katselmuksesi neljä kohtaa on tehty. Portti on vihreä: 131 yksikkötestiä, 159/159 savutestiä ilman
+yhtään JS-virhettä, 72/72 hyväksymiskriteeriä.
+
+1. **Liitetty linkki jää kartalle.** Kun liität Google Maps -linkin tai `lat, lon` -parin kartan
+   hakulaatikkoon, ensimmäinen tulos on nyt **"Drop a pin here"**: nasta putoaa kartalle, kamera
+   siirtyy siihen (zoom 13) ja säderenkaat piirtyvät (oletus 1 km) — kartalta ei poistuta.
+   Työkalurivin alle ilmestyy pieni **nastakortti**: nimi, koordinaatit, alueet (kaupunginosa ›
+   postinumero › kunta) ja kaksi painiketta — **`View test property ›`** ja **`✕`**. Nasta kulkee
+   linkissä (`pin=`), joten jaettu osoite avautuu samaan paikkaan.
+2. **Palvelut testikohteen kartalle.** `Layers ▾` -valikossa on nyt myös **Services** (ruokakaupat,
+   ravintolat ja kahvilat, apteekit, joukkoliikenteen pysäkit; OSM & Rejseplanen) samoilla
+   kategoriasuodattimilla kuin makrokartalla, piirrettynä renkaan sisään ja omalla selitteellään.
+   Oletuksena pois päältä; URL-avain `lay=…,services`.
+3. **Jokainen taso saa sammua — ja tila säilyy.** Testikohteen kartalla piirtyvillä tasoilla on nyt
+   täsmälleen yksi katkaisija `Layers ▾` -valikossa (infra · julkiset rakennukset · palvelut · BBR-
+   rakennukset · säderenkaat · myrskytulvavyöhykkeet). Sammutus poistaa sekä merkit **että**
+   selitteen heti, ja tila kulkee osoitteessa (`lay=`, `rings=0`, `zones=0`) — myös sivun
+   uudelleenlatauksen yli. Sivuhuomio: `ANL.pub` toimi jo ennen tätä joka testatussa järjestyksessä,
+   joten "ei saa klikattua pois" johtui todennäköisesti siitä, että minikartan kulmassa oleva
+   selitekortti näyttää katkaisijalta vaikka se on pelkkä selite. Katkaisija on `Layers ▾`
+   -valikossa — ja nyt siellä on rivi jokaiselle piirtyvälle tasolle.
+4. **Koko indikaattorilista testikohteelle.** Kööpenhaminalainen nasta on yhtä aikaa kaupunginosassa,
+   postinumerossa ja kunnassa, joten valitsin tarjoaa nyt kaikki 67 lukua (ennen 37): kaupunginosan
+   omat ensin, sitten postinumeron luvut otsikon **"From the postal code"** alla ja loput
+   **"From the municipality"** alla — mukaan lukien **Climate**, horisonttivalitsimineen ja
+   myrskytulvavyöhykkeineen minikartalla. Peritty luku on aina merkitty (`muni` / `postal code`).
+
+---
+
 Yön yhdeksän vaihetta (P1–P9) ovat valmiit haarassa `v3.0-ui`. **Mitään ei ole julkaistu** — sinä
 päätät sen. Loppuportti on vihreä: 116 yksikkötestiä, 150/150 reitti × näyttökoko -savutestiä ilman
 yhtään JS-virhettä, 69/69 hyväksymiskriteeriä, ja molemmat kokorajat alittuvat.

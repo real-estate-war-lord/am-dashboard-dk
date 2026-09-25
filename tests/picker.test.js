@@ -70,6 +70,26 @@ test("groupedLevel() adds no sub-heading on a page that inherits nothing", () =>
   assert.ok(!g.some(x => x.name === P.MUNI_GROUP));
   assert.deepStrictEqual(g.map(x => x.name), P.grouped(ALL).map(x => x.name));
 });
+test("groupedLevel() gives the postal code a sub-heading of its own, finest first (P10)", () => {
+  /* a pin in a Copenhagen quarter: it sits in a postal code as well as in the municipality */
+  const from = i => i.key === "rent_private" ? "postnr" : i.key === "unemp" ? "muni" : "";
+  const g = P.groupedLevel(ALL, undefined, from);
+  const tail = g.slice(-2).map(x => x.name);
+  assert.deepStrictEqual(tail, [P.PN_GROUP, P.MUNI_GROUP], "the finer level is listed first");
+  assert.deepStrictEqual(g[g.length - 2].inds.map(i => i.key), ["rent_private"]);
+  assert.deepStrictEqual(g[g.length - 1].inds.map(i => i.key), ["unemp"]);
+  assert.deepStrictEqual(g.flatMap(x => x.inds.map(i => i.key)).sort(), ALL.map(i => i.key).sort());
+  /* only one of the two rungs in play → only that sub-heading */
+  const one = P.groupedLevel(ALL, undefined, i => i.key === "rent_private" ? "postnr" : "");
+  assert.strictEqual(one[one.length - 1].name, P.PN_GROUP);
+  assert.ok(!one.some(x => x.name === P.MUNI_GROUP));
+});
+test("availTag names the level an inherited figure comes from", () => {
+  assert.strictEqual(P.availTag({ key: "unemp" }, { inherited: "muni" }).text, "muni");
+  assert.strictEqual(P.availTag({ key: "unemp" }, { inherited: true }).text, "muni");
+  assert.strictEqual(P.availTag({ key: "price_m2" }, { inherited: "postnr" }).text, "postal code");
+  assert.strictEqual(P.availTag({ key: "price_m2" }, { inherited: "postnr" }).cls, "tag-muni");
+});
 test("the inherited sub-heading carries no period pill of its own", () => {
   const g = P.groupedLevel(ALL, undefined, i => i.key === "surge_dw_pct");
   const muni = g[g.length - 1];

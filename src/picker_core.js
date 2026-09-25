@@ -35,6 +35,12 @@ const groupOf = i => (i && i.group) || OTHER;
    indicators whose figure is the municipality's are listed under one sub-heading at the end of the
    popover rather than scattered, dimmed, through the twelve groups. */
 const MUNI_GROUP = "From the municipality";
+/* …and the rung between, which only a pin has: a Copenhagen quarter sits inside a postal code, so
+   the figures the postal code publishes come from there rather than from the city (spec §5.5′). */
+const PN_GROUP = "From the postal code";
+const INH_GROUP = { muni: MUNI_GROUP, postnr: PN_GROUP };
+/* finest first, so the reader reads outwards from the area they picked */
+const INH_ORDER = [PN_GROUP, MUNI_GROUP];
 
 /* [{name, pill, inds}] in GROUP_ORDER, groups with no indicator left out, "Other" last. */
 function grouped(list, order) {
@@ -49,16 +55,20 @@ function grouped(list, order) {
   }));
 }
 
-/* grouped(), plus the "From the municipality" sub-heading for the rows whose figure is inherited at
-   the level on screen (spec §4.2, AC-I5). `isInherited(i)` is the caller's level test — picker_core
-   knows nothing about which view is on screen. Without it this is exactly grouped(). */
+/* grouped(), plus the "From the …" sub-headings for the rows whose figure is inherited at the level
+   on screen (spec §4.2, AC-I5). `isInherited(i)` is the caller's level test — it returns "" for a
+   row of the level's own, or which level the figure comes from (`"muni"` / `"postnr"`; `true` is
+   read as the municipality). picker_core knows nothing about which view is on screen; without the
+   test this is exactly grouped(). */
 function groupedLevel(list, order, isInherited) {
   const L = list || [];
   if (typeof isInherited !== "function") return grouped(L, order);
-  const inh = L.filter(i => isInherited(i));
+  const from = i => { const t = isInherited(i); return t === true ? MUNI_GROUP : (INH_GROUP[t] || ""); };
+  const inh = L.filter(i => from(i));
   if (!inh.length) return grouped(L, order);
-  const gs = grouped(L.filter(i => !isInherited(i)), order);
-  gs.push({ name: MUNI_GROUP, pill: "", inds: inh });
+  const gs = grouped(L.filter(i => !from(i)), order);
+  INH_ORDER.filter(n => inh.some(i => from(i) === n))
+    .forEach(n => gs.push({ name: n, pill: "", inds: inh.filter(i => from(i) === n) }));
   return gs;
 }
 
@@ -92,6 +102,7 @@ const PERIOD_KEY = { year: "y", horizon: "hz", projection: "" };
    would offer for it at that level. */
 function availTag(i, opts) {
   const o = opts || {};
+  if (o.inherited === "postnr") return { text: "postal code", cls: "tag-muni", title: "the postal code's figure, shown for a pin inside it" };
   if (o.inherited) return { text: "muni", cls: "tag-muni", title: "municipality figure shown at this level" };
   if (groupOf(i) === "Climate") return { text: "horizons", cls: "tag-hz", title: "published per horizon: Today · 2070 · 2120" };
   if (i && i.proj) return { text: `${i.proj.from || ""}→${i.proj.to || ""}`, cls: "tag-proj",
@@ -110,7 +121,7 @@ function step(cur, delta, n) {
   return Math.max(0, Math.min(n - 1, c + delta));
 }
 
-const API = { GROUP_ORDER, GROUP_PILL, OTHER, MUNI_GROUP, PERIOD_KEY, groupOf, grouped, groupedLevel,
+const API = { GROUP_ORDER, GROUP_PILL, OTHER, MUNI_GROUP, PN_GROUP, PERIOD_KEY, groupOf, grouped, groupedLevel,
               matches, filter, periodMode, availTag, step };
 if (typeof window !== "undefined") window.PICKER_CORE = API;
 if (typeof module !== "undefined" && module.exports) module.exports = API;

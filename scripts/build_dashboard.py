@@ -141,7 +141,7 @@ def main():
     args = ap.parse_args()
 
     check_js([SRC / "app.js", SRC / "testprop.js", SRC / "climate_core.js", SRC / "route_core.js",
-              SRC / "picker_core.js", SRC / "export_core.js"])
+              SRC / "picker_core.js", SRC / "export_core.js", SRC / "pin_core.js", SRC / "panels.js"])
     makro = load(pathlib.Path(args.data)) or {}
     market = load(pathlib.Path(args.market)) or {}
     portfolio = load(pathlib.Path(args.portfolio))
@@ -191,6 +191,8 @@ def main():
                 .replace("{{ROUTE_JS}}", (SRC / "route_core.js").read_text(encoding="utf-8"))
                 .replace("{{PICKER_JS}}", (SRC / "picker_core.js").read_text(encoding="utf-8"))
                 .replace("{{EXPORT_JS}}", (SRC / "export_core.js").read_text(encoding="utf-8"))
+                .replace("{{PIN_JS}}", (SRC / "pin_core.js").read_text(encoding="utf-8"))
+                .replace("{{PANELS_JS}}", (SRC / "panels.js").read_text(encoding="utf-8"))
                 .replace("{{APP_JS}}", (SRC / "app.js").read_text(encoding="utf-8"))
                 .replace("{{DATA}}", payload)
                 .replace("{{BUILT}}", built))
