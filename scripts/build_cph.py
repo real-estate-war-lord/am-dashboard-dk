@@ -176,11 +176,19 @@ def main():
         pass
     fcd = cph_forecast()
     if fcd:
+        groups = list(fcd["meta"]["groups"])
         for code, series in (fcd.get("omrkk") or {}).items():
             a = areas.get(code)
             if a is not None:
                 a["fc_pop"] = {y: v["total"] for y, v in series.items()}
-                a["fc_groups"] = {y: {g: v[g] for g in fcd["meta"]["groups"] if g in v} for y, v in series.items()}
+                a["fc_groups"] = {y: {g: v[g] for g in groups if g in v} for y, v in series.items()}
+        # the observed counterpart of fc_groups, from KKBEF1 — the same table pop_hist reads,
+        # so an age-band chart is solid up to the projection's base year and dashed after it
+        # (docs/FORECAST.md §5.6). `total` is left out: pop_hist already holds it.
+        for code, series in (fcd.get("observed") or {}).items():
+            a = areas.get(code)
+            if a is not None:
+                a["pop_groups"] = {y: {g: v[g] for g in groups if g in v} for y, v in series.items()}
     n_hist = int(c.get("history_years", 11))
     years = list(range(latest_year - n_hist + 1, latest_year + 1))
     inds = []

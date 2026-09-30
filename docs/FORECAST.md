@@ -103,6 +103,7 @@ row there.
 | Municipal projection | DST **`FRKM126`** via `api.statbank.dk/v1` | free reuse incl. commercial, attribution *Danmarks Statistik* | 98 kommuner (+ Christiansø, excluded) | 2050 | 2026, updated 2026-06-12 |
 | National control total | DST **`FRDK126`** | same | Denmark | 2070 | 2026 |
 | Base-year check | DST `FOLK1A` | same | 98 kommuner, quarterly | actual | 2026Q3 |
+| Observed age detail | DST **`FOLK1A`**, `ALDER=*`, Q1 only | same | 99 kommuner × 11 years | actual | 2016–2026 |
 
 **The table id carries the vintage** — `FRKM1` + `26`, and DST replaces the table each spring rather
 than keeping a history. `build_forecast.py` resolves it from the live catalogue on every run
@@ -118,6 +119,15 @@ elimination), so the sexes are pulled separately and summed in the build. One re
 sexes is 299 880 cells, but the API's pre-flight counter scores that selection at 1 499 400 and
 rejects it against the 1 000 000-cell CSV cap; per sex it is 149 940 and passes. Keeping the pulls
 separate also leaves the sex dimension in the raw files for later use.
+
+**A third pull: the observed years by age.** `FOLK1A` with `ALDER=*` and only the 1 January periods —
+105 areas × 127 ages × 11 years = **146 685 cells**, one request, ~8 s. It is what makes an age-band
+chart drawable: without a measured `a80p` series there is nothing solid to put before the dashed one,
+and the chart falls back to the whole population — a different number from the one in the headline
+above it. The window is `history_years` from `config/indicators.json`, so the age bands cover exactly
+the years `pop_hist` does; `--hist-years` overrides it. `KØN` and `CIVILSTAND` are named explicitly
+rather than eliminated, for the same pre-flight-counter reason as above. The result is
+`forecast.json`'s `observed` key (§2).
 
 Raw pulls land in `data/raw/forecast/dst/` (gitignored, re-downloadable); the `tableinfo` JSON beside
 them is committed, because the build reads municipality labels from it. That directory holds two
@@ -137,6 +147,9 @@ behind `docs/FORECAST_SOURCES.md`.
     "fetched": "2026-09-23", "built": "2026-09-23",
     "years": ["2026", …, "2040"], "first_year": "2026", "last_year": "2040",
     "groups": {"a0_5": "0–5", …, "a80p": "80+"},
+    "actual_table": "FOLK1A",         // the observed counterpart, below
+    "observed_years": ["2016", …, "2026"], "observed_period": "Q1 (1 January), …",
+    "max_observed_group_gap": 0, "join_gap": 1, "join_note": "…",
     "kommuner": 98, "excluded": ["411"],
     "max_group_gap": 14, "group_gap_note": "…",
     "licence": "free reuse with attribution", "source": "…", "url": "…"
@@ -144,6 +157,10 @@ behind `docs/FORECAST_SOURCES.md`.
   "kommuner": {
     "101": { "2026": { "total": 671714, "a0_5": 43517, "a6_16": 61399, "a17_19": 17614,
                        "a20_34": 234826, "a35_64": 240495, "a65_79": 56403, "a80p": 17460 }, … }
+  },
+  "observed": {                            // FOLK1A, the same groups, the years before the run
+    "101": { "2016": { "total": 591481, …, "a80p": 13281 }, …,
+             "2026": { "total": 671714, …, "a80p": 17460 } }
   },
   "national": { "2026": 6025603, … }      // FRDK126, for the reconciliation check
 }
@@ -155,10 +172,31 @@ Municipality codes are the plain three-digit DST codes (`101`, `751`, …) — t
 **Age groups** are contiguous and exhaustive over 0…100+: `a0_5` 0–5, `a6_16` 6–16, `a17_19` 17–19,
 `a20_34` 20–34, `a35_64` 35–64, `a65_79` 65–79, `a80p` 80 and over (including the `100-` code).
 
+**`observed` is the measured half of the same picture.** `kommuner` is one projection vintage;
+`observed` is FOLK1A's published 1 January population for the years before it, folded by the same
+`age_bucket` into the same seven groups. It exists so that an age-band chart can draw a *measured*
+line before the projected one, instead of falling back to the whole population (§5.6). Three things
+make it safe to put the two on one pair of axes:
+
+- **Same period.** FOLK1A's Q1 cell, which is the cell `makro.json`'s `pop_hist` already uses — so
+  the solid line of a band chart and the solid line of a total-population chart are the same series,
+  sliced differently.
+- **Same groups.** One `age_bucket`, imported by both builds. FOLK1A publishes ages 0–125 and the
+  projection 0–100+; both fold into `a80p` at 80.
+- **They meet, they are not spliced.** The projection's base year (2026) is an observed year, so
+  both tables publish it; `join_gap` records how far apart the two published figures are over every
+  municipality and age group (1 person on the 2026 vintage, from independent rounding). The build
+  warns above 10. The lines still stay two series: solid to the base year, dashed after it, never
+  one line (§4).
+
+`observed` covers **99 areas, not 98**: Christiansø has an observed population even though it has no
+projection, so `pop_hist` and its age split cover the same areas.
+
 **Two caveats baked into the file.**
 
-- **Christiansø (`411`) is excluded.** It appears in `KOMMUNEDK` but is not a municipality (~90
-  people). The app's own municipality list has 99 entries, so `411` simply carries no Outlook value.
+- **Christiansø (`411`) is excluded from `kommuner`.** It appears in `KOMMUNEDK` but is not a
+  municipality (~90 people). The app's own municipality list has 99 entries, so `411` simply carries
+  no Outlook value.
 - **`total` is DST's published `ALDER=TOT` cell**, not the sum of the age groups. DST rounds every
   cell independently, so the groups re-sum to within **14 persons** of it (recorded as
   `max_group_gap`). Using `TOT` means `forecast.json` reproduces the StatBank figure exactly — which
@@ -1086,7 +1124,18 @@ so `meta.unallocated` names them and any consumer drawing polygons must skip the
 
 **No crosswalk anywhere.** `KKFR2026`'s `OMRKK` code list is byte-identical to `KKBEF1`'s, which
 `scripts/build_cph.py` and `data/geo/cph_kvarterer.geojson` already key on — so the observed 2016–2026
-series and the 2026–2040 projection are one continuous line per kvarter, with no matching step.
+series and the 2026–2040 projection sit on one pair of axes per kvarter, with no matching step.
+(One pair of axes, two series: solid to 2026, dashed after it, never spliced — §4.)
+
+**A second pull: the observed years by age.** The same table, `KKBEF1`, but with `ALDER=*` and only
+the 1 January periods — 93 districts × 101 ages × 11 years ≈ **103 000 cells**, one request. It lands
+in `cph_forecast.json` under `observed`, in the seven groups `age_bucket` makes, and `build_cph.py`
+copies it onto each kvarter as `pop_groups`. Without it an age-band indicator has only a projected
+half to draw and the chart falls back to the whole population, which is a different number from the
+one in the headline. `KON` and `CIVILSTAND` are named explicitly rather than eliminated: the API's
+pre-flight counter scores an eliminated variable at its full value list and would reject the
+selection against the cap. The join is checked — `meta.join_gap` is how far `KKFR2026`'s base year
+and `KKBEF1`'s observed 2026 are apart over every district and group (1 person on this vintage).
 The kvarter → lokaludvalg step is the code structure itself (`2LLxx` → `20LL`); the lokaludvalg →
 bydel step reuses `LOK2BYDEL` from `build_cph.py` rather than restating it, and check 9 proves the
 result by summing (11/11 bydele, worst 2 persons).

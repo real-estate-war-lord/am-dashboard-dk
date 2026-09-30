@@ -121,18 +121,37 @@ function indSrcLink(i, code, label, level) {
     title="This figure does not come from a per-area StatBank query — open the publisher's own page">${esc(label || "Verify at source")} ↗ <span class="dim">(${esc(i.src_page[0])})</span></a>`;
   return "";
 }
+/* the age bands both projections publish, in the registry's own key order (docs/FORECAST.md §2) */
+const AGE_LABELS = { a0_5: "0–5", a6_16: "6–16", a17_19: "17–19", a20_34: "20–34", a35_64: "35–64", a65_79: "65–79", a80p: "80+" };
+/* Which series an Outlook indicator is about. The registry records it in `field`: "total",
+   "growth" or "abs" is the whole population, an age-group key ("a80p") is one published band of
+   the same run. Read from `field`, never guessed from the key, and only accepted when the area
+   actually carries that band — so a new band needs no change here (docs/FORECAST.md §3, §8). */
+function projGroupOf(ind, o) {
+  const f = (ind && ind.proj && ind.field) || "";
+  if (!AGE_LABELS[f] || !o || !o.fc_groups) return null;
+  return Object.keys(o.fc_groups).some(y => (o.fc_groups[y] || {})[f] != null) ? f : null;
+}
 /* "Projected change 2026→2031: −492 residents (−1.3 %/yr)" — the absolute change in people first,
    because a rate on its own does not tell a reader how many. Both come from the same two published
-   cells: the projected population in the first year and in the fifth. */
-function projChangeLine(o, level) {
+   cells: the projected population in the first year and in the fifth. With `group` it is that age
+   band's two cells instead, so the line always describes the series the chart above it draws. */
+function projChangeLine(o, level, group) {
   const list = level === "kvarter" ? IND_CPH : IND;
   const ri = list.find(i => i.key === "fc_pop_rate_5y");
   if (!ri || !o || !o.fc_pop) return "";
   const from = (ri.proj && ri.proj.from) || "2026", to = (ri.proj && ri.proj.to) || "2031";
-  const a = o.fc_pop[from], b = o.fc_pop[to];
+  const g = group && o.fc_groups ? group : null;
+  const at = y => g ? ((o.fc_groups[y] || {})[g] ?? null) : (o.fc_pop[y] ?? null);
+  const a = at(from), b = at(to);
   if (a == null || b == null) return "";
-  const abs = b - a, rate = o.fc_pop_rate_5y;
-  return `Projected change ${esc(from)}→${esc(to)}: <b>${sign(abs, x => nf(x, 0))} residents</b>`
+  const abs = b - a;
+  /* %/yr is fc_pop_rate_5y's own definition — the change over the window divided by the base cell
+     and by the years it spans. For the whole population the published value is used as it stands;
+     for a band the same arithmetic runs on that band's two published cells. */
+  const rate = g ? (a ? abs / a / (Number(to) - Number(from)) * 100 : null) : o.fc_pop_rate_5y;
+  const who = g ? ` aged ${AGE_LABELS[g] || g}` : "";
+  return `Projected change ${esc(from)}→${esc(to)}: <b>${sign(abs, x => nf(x, 0))} residents${esc(who)}</b>`
     + (rate != null ? ` (${sign(rate, x => nf(x, 1))} %/yr)` : "");
 }
 /* "Projection, DST 2026" at kommune level, "Projection, Københavns Kommune 2026" at kvarter/bydel —
@@ -832,17 +851,29 @@ function mkShade(t, key) {
 /* Diverging scale: breaks mirrored about `center`, so the same shade means the same magnitude on
    either side and the zero crossing is a class edge rather than the middle of a class. The three
    magnitudes are quantiles of |v − centre|, which is also the clamp: fc_abs runs from −4 617 to
-   +52 670, and on a linear symmetric ramp every municipality but one would sit in the middle class. */
+   +52 670, and on a linear symmetric ramp every municipality but one would sit in the middle class.
+
+   The symmetric geometry sets the *colours*; the *data* sets how many classes are drawn. fc_80p is
+   positive in all 98 municipalities, so the three classes below the centre hold nobody — and drawing
+   them put plum "shrinking" swatches in a legend where nothing shrinks. `first` and `span` keep each
+   drawn class at its own place on the full ramp, so pruning the empty ends changes what is listed,
+   never what a shade means. `mid` is the class holding the centre, and −1 when the values do not
+   straddle it, because there is no zero line to mark then. */
 function divergingScale(vals, center) {
   const dev = vals.map(v => Math.abs(v - center)).sort((a, b) => a - b).filter(d => d > 0);
   if (!dev.length) return null;
   const dq = p => dev[Math.min(dev.length - 1, Math.floor(p * dev.length))];
   const mags = [dq(.34), dq(.67), dq(.90)].filter((m, i, a) => m > 0 && (i === 0 || m > a[i - 1]));
   if (!mags.length) return null;
-  const breaks = mags.slice().reverse().map(m => center - m).concat(mags.map(m => center + m));
-  const n = breaks.length + 1;
-  const t = v => { if (v == null || isNaN(v)) return null; let c = 0; while (c < breaks.length && v > breaks[c]) c++; return c / (n - 1); };
-  return { t, lo: vals[0], hi: vals[vals.length - 1], breaks, classes: n, n: vals.length, center, diverging: true,
+  const all = mags.slice().reverse().map(m => center - m).concat(mags.map(m => center + m));
+  const span = all.length;                                  /* the symmetric class count, minus 1 */
+  const cls = v => { let c = 0; while (c < all.length && v > all[c]) c++; return c; };
+  const lo = vals[0], hi = vals[vals.length - 1];
+  const first = cls(lo), last = cls(hi);                    /* only these classes hold a value */
+  const t = v => v == null || isNaN(v) ? null : cls(v) / span;
+  return { t, lo, hi, breaks: all.slice(first, last), classes: last - first + 1, first, span,
+           n: vals.length, center, diverging: true,
+           mid: lo <= center && center <= hi ? cls(center) - first : -1,
            clamped: dev[dev.length - 1] > mags[mags.length - 1] };
 }
 function scaleOf(list, vk, fixed, ind) {
@@ -864,11 +895,14 @@ function legendHtml(sc, ind, key, note) {
   /* class-break legend drawn on top of the map (bottom right) */
   const f = fmtTight(ind); const b = sc.breaks || []; const n = sc.classes || 0;
   const lab = c => n === 1 ? f(sc.lo) : c === 0 ? `≤ ${f(b[0])}` : c === n - 1 ? `> ${f(b[c - 1])}` : `${f(b[c - 1])} – ${f(b[c])}`;
+  /* a class's shade is its place on the whole ramp, which for a diverging scale is anchored to the
+     centre rather than to the rows that happen to be listed (see divergingScale) */
+  const shade = c => sc.span ? (sc.first + c) / sc.span : (n > 1 ? c / (n - 1) : .5);
   const rows = []; for (let c = n - 1; c >= 0; c--) {
-    /* the centre class of a diverging scale is marked, so the zero line is visible as a boundary
-       rather than read off the numbers */
-    const mid = sc.diverging && c === (n - 1) / 2;
-    rows.push(`<div class="lgrow${mid ? " lgmid" : ""}"><i style="background:${mkShade(n > 1 ? c / (n - 1) : .5, key)}"></i>${lab(c)}${mid ? `<em class="lgctr">${f(sc.center || 0)}</em>` : ""}</div>`);
+    /* the class holding the centre of a diverging scale is marked, so the zero line is visible as a
+       boundary rather than read off the numbers */
+    const mid = sc.mid === c;
+    rows.push(`<div class="lgrow${mid ? " lgmid" : ""}"><i style="background:${mkShade(shade(c), key)}"></i>${lab(c)}${mid ? `<em class="lgctr">${f(sc.center || 0)}</em>` : ""}</div>`);
   }
   return `<div class="lgtitle">${esc(ind.short || ind.label)}<span>${esc(ind.unit || "")}</span></div>` +
     (n ? rows.join("") : `<div class="lgrow dim">no data</div>`) +
@@ -2065,7 +2099,6 @@ function stateCard(kind, title, note, action) {
     <b>${esc(title)}</b>${note ? `<p>${esc(note)}</p>` : ""}
     ${kind === "loading" ? `<span class="skel" aria-hidden="true"><i></i><i></i><i></i></span>` : ""}${action || ""}</div>`;
 }
-const AGE_LABELS = { a0_5: "0–5", a6_16: "6–16", a17_19: "17–19", a20_34: "20–34", a35_64: "35–64", a65_79: "65–79", a80p: "80+" };
 /* The Population outlook section (spec §5.2): the population chart, the age-group split, the
    projection's own caveat and — on Copenhagen quarters only — the single past-accuracy line of §9.7.
    Nothing else from §9. The card head is the <details> summary now, so this is the body only. */
@@ -2080,6 +2113,9 @@ function outlookBody(e) {
   const actualSrc = isQ ? "KKBEF1" : "FOLK1A";
   const tiles = ["fc_growth", "fc_20_34_rel", "fc_0_5", "fc_80p", "fc_pop_rate_5y"]
     .map(k => list.find(i => i.key === k)).filter(i => i && o[i.key] != null).slice(0, 5);
+  /* this section is the whole population, always — the age split is the strip below the chart.
+     `band` is only used to point at the panel, which follows the selected indicator instead. */
+  const band = projGroupOf(curInd(), o);
   const ageRows = ["a0_5", "a6_16", "a20_34", "a80p"].map(gk => {
     const a = (o.fc_groups || {})[pr.from || "2026"], b = (o.fc_groups || {})[pr.to || "2040"];
     if (!a || !b || a[gk] == null || !a[gk]) return "";
@@ -2095,7 +2131,7 @@ function outlookBody(e) {
     ${ageRows ? `<div class="olages"><span class="lfsec">Age groups ${esc(pr.from || "")}→${esc(pr.to || "")} · persons</span><div class="mstrip-k">${ageRows}</div></div>` : ""}
     ${isQ ? pastAccuracyLine(o) : ""}
     ${isQ ? cphFcCaveat("kvarter") : `<p class="cap">${esc((g && g.warn) || "")}</p>`}
-    <p class="cap dim">Observed population from ${esc(actualSrc)}; projection from ${esc(pr.table || "")}, ${esc(who)}. Two different series — the dashed line is a scenario, not a measurement, and the two are never spliced into one.</p>`;
+    <p class="cap dim">Observed population from ${esc(actualSrc)}; projection from ${esc(pr.table || "")}, ${esc(who)}. Two different series — the dashed line is a scenario, not a measurement, and the two are never spliced into one.${band ? ` This chart is the whole population; the panel above draws the ${esc(AGE_LABELS[band])} band of the same two runs.` : ""}</p>`;
 }
 /* the projection window a Population outlook section is showing, for its summary line */
 function projSpan(e) {
@@ -2205,11 +2241,17 @@ const PANEL_HINT = { history: "yearly series · this area, its parent and the me
                      snapshot: "published once — no year series, so the peers are the comparison",
                      outlook: "observed population solid, the projection dashed — never spliced into one series",
                      clim: "three published horizons, with the low–high scenario range" };
+/* the outlook hint says which series is on the chart, because the panel now follows the indicator */
+function panelHint(e, ind, mode) {
+  const g = mode === "outlook" ? projGroupOf(ind, e.o) : null;
+  return g ? `observed ${AGE_LABELS[g]} solid, the projection dashed — one published age band, never spliced into one series`
+           : PANEL_HINT[mode];
+}
 function chartPanel(e, opts) {
   const o = opts || {}, ind = curInd(), mode = panelMode(e, ind), s = tileStats(e, ind);
   return `<div class="card panel" data-testid="chart-panel" data-mode="${mode}">
     <div class="card-head"><h3 data-testid="panel-title">${esc(indLabel(ind, o.gap))}${ind.unit ? ` <span class="dim">${esc(ind.unit)}</span>` : ""}</h3>
-      <span class="hint">${esc(PANEL_HINT[mode])}</span></div>
+      <span class="hint">${esc(panelHint(e, ind, mode))}</span></div>
     ${panelHeadRow(e, ind, s)}
     <div class="panel-b">${panelBody(e, ind, mode)}</div>
     ${panelFoot(e, ind)}</div>`;
@@ -2231,9 +2273,13 @@ function panelHeadRow(e, ind, s) {
 }
 function panelBody(e, ind, mode) {
   if (mode === "clim") return climBars(e, ind);
-  if (mode === "outlook") return `<div data-testid="outlook-chart">${outlookChartFor(e)}</div>
-    ${projChangeLine(e.o, e.type === "kvarter" ? "kvarter" : "kommune") ? `<p class="olchg">${projChangeLine(e.o, e.type === "kvarter" ? "kvarter" : "kommune")}</p>` : ""}
-    <p class="cap">The whole projection, its age split and its caveat are in <b>Population outlook</b> below.</p>`;
+  if (mode === "outlook") {
+    const g = projGroupOf(ind, e.o), lvl = e.type === "kvarter" ? "kvarter" : "kommune";
+    const chg = projChangeLine(e.o, lvl, g);
+    return `<div data-testid="outlook-chart" data-group="${esc(g || "total")}">${outlookChartFor(e, ind)}</div>
+    ${chg ? `<p class="olchg">${chg}</p>` : ""}
+    <p class="cap">${g ? `Both lines are the ${esc(AGE_LABELS[g])} band of the same two published runs — the band the headline above counts, not the whole population. ` : ""}The whole projection, its age split and its caveat are in <b>Population outlook</b> below.</p>`;
+  }
   if (mode === "history") return areaChart(e, ind);
   /* snapshot: one published as-of, so the peers are the only comparison there is (spec §4.10) */
   const a = ind.asof || {};
@@ -2242,11 +2288,17 @@ function panelBody(e, ind, mode) {
     <span class="dim">— no year series, so there is no trend to draw. ${esc(e.name)} against the ${esc(ePeerLabel(e, ind.key))}:</span></p>
     ${distStrip(e, ind) || `<p class="empty">Fewer than three ${esc(ePeerLabel(e, ind.key))} have a figure — nothing to spread out.</p>`}`;
 }
-/* the Outlook panel draws the same two series the Population outlook section does */
-function outlookChartFor(e) {
+/* The Outlook panel draws the two series of the indicator that is selected: the whole population
+   for fc_growth / fc_growth_5y / fc_abs / fc_pop_rate_5y, and the age band itself for fc_0_5,
+   fc_6_16, fc_20_34, fc_20_34_rel, fc_20_34_abs and fc_80p — the observed band solid, the
+   projected band dashed. A band indicator whose headline is a change in 80-year-olds must not be
+   read off a line of the whole population. */
+function outlookChartFor(e, ind) {
   const isQ = e.type === "kvarter";
   const pr = ((isQ ? IND_CPH : IND).find(i => i.key === "fc_growth") || {}).proj || {};
-  return popOutlookChart(e.o, { actualSource: isQ ? "KKBEF1" : "FOLK1A", projSource: pr.table || pr.publisher || "DST" });
+  const g = projGroupOf(ind || curInd(), e.o);
+  return popOutlookChart(e.o, { actualSource: isQ ? "KKBEF1" : "FOLK1A", projSource: pr.table || pr.publisher || "DST",
+                                group: g, groupLabel: g ? AGE_LABELS[g] : "" });
 }
 /* source · table · as of · Verify ↗, then the definition — every value surface carries them (§0) */
 function panelFoot(e, ind) {
@@ -2315,8 +2367,12 @@ function areaSections(e, gap) {
   const ind = curInd();
   const out = [];
   const ol = outlookBody(e);
+  /* "shown above" only while the panel really is drawing this same series. With an age-band
+     Outlook indicator selected the panel is on that band and this section is still the whole
+     population, so the tag would be a false claim. */
+  const sameAbove = ind.proj && !projGroupOf(ind, e.o);
   if (ol) out.push(arSec("outlook", "Population outlook",
-    `${ind.proj ? `<span class="tag">shown above</span>` : ""}<span class="tag proj">Projection</span> <span class="dim">${esc(projSpan(e))}</span>`, ol));
+    `${sameAbove ? `<span class="tag">shown above</span>` : ""}<span class="tag proj">Projection</span> <span class="dim">${esc(projSpan(e))}</span>`, ol));
   out.push(arSec("figures", `All figures (${areaFigureCount(e)})`,
     `<span class="dim">click a row to read it above, ↗ to chart it</span>`, areaFigures(e, gap)));
   out.push(arSec("sub", areaSubLabel(e), `<span class="dim">click a row for its page</span>`, areaSubTable(e)));
@@ -2882,6 +2938,9 @@ function anOutlookBody(s) {
   const src = s.o, isQ = s.isQ, list = s.list, level = isQ ? "kvarter" : "kommune";
   const pr = ((list.find(i => i.key === "fc_growth") || {}).proj) || {};
   const tiles = ["fc_growth", "fc_growth_5y", "fc_20_34", "fc_80p"].map(k => list.find(i => i.key === k)).filter(i => i && src[i.key] != null);
+  /* the section is the whole population; `band` only points at the panel, which follows the
+     selected indicator (the same split the area page makes) */
+  const band = projGroupOf(curInd(), src);
   return `${tiles.length ? `<div class="tiles wrap">${tiles.map(i => `<button type="button" class="hltile ${MK.ind === i.key ? "on" : ""}" data-ind="${esc(i.key)}" title="${esc(i.desc || i.label)}">
       <span class="tl">${esc(i.short || i.label)}</span><b class="proj">${fmtOf(i)(src[i.key])}</b><em class="dim">${esc(i.unit || "")}</em></button>`).join("")}</div>` : ""}
     ${projChangeLine(src, level) ? `<p class="olchg big">${projChangeLine(src, level)}</p>` : ""}
@@ -2890,7 +2949,7 @@ function anOutlookBody(s) {
       ${srcLink(pr.actuals, srcCode(src, level), "Verify the observed population")}</p>
     ${isQ ? pastAccuracyLine(src) : ""}
     ${isQ ? cphFcCaveat("kvarter") : `<p class="cap">${esc(((list.find(i => i.key === "fc_growth")) || {}).warn || "")}</p>`}
-    <p class="cap dim">The projection is for the whole ${isQ ? "quarter" : "municipality"}, not for this address — it carries no housing programme, so a development on this plot is not in it. Observed population from ${esc(isQ ? "KKBEF1" : "FOLK1A")}; the dashed line is ${esc(pr.table || "")}, a scenario rather than a measurement.</p>`;
+    <p class="cap dim">The projection is for the whole ${isQ ? "quarter" : "municipality"}, not for this address — it carries no housing programme, so a development on this plot is not in it. Observed population from ${esc(isQ ? "KKBEF1" : "FOLK1A")}; the dashed line is ${esc(pr.table || "")}, a scenario rather than a measurement.${band ? ` This chart is the whole population; the panel at the top of the page draws the ${esc(AGE_LABELS[band])} band of the same two runs.` : ""}</p>`;
 }
 
 /* the nav item opens the pin that is on the map, if there is one — otherwise the empty state */
