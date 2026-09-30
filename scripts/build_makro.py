@@ -611,11 +611,20 @@ def main():
         munis[code].setdefault("pop_hist", {})[str(r["TID"])[:4]] = r["INDHOLD"]
     fcd = forecast_doc()
     if fcd:
+        groups = list(fcd["meta"]["groups"])
         for code, series in fcd["kommuner"].items():
             if code in munis:
                 munis[code]["fc_pop"] = {y: v["total"] for y, v in series.items()}
-                munis[code]["fc_groups"] = {y: {g: v[g] for g in fcd["meta"]["groups"] if g in v}
+                munis[code]["fc_groups"] = {y: {g: v[g] for g in groups if g in v}
                                             for y, v in series.items()}
+        # The observed counterpart of fc_groups: FOLK1A's own age detail for the years
+        # pop_hist covers, so an age-band chart has a measured series before the projection
+        # starts (docs/FORECAST.md §5.6). `total` is left out — pop_hist already holds it,
+        # from the same table and the same Q1 cell.
+        for code, series in (fcd.get("observed") or {}).items():
+            if code in munis:
+                munis[code]["pop_groups"] = {y: {g: v[g] for g in groups if g in v}
+                                             for y, v in series.items()}
     # postal-code areas from geometry
     areas = {}
     pn_geo = load_geo("postnumre")

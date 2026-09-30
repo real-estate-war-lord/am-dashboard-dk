@@ -39,17 +39,27 @@ function multiLine(series, ind, ys) {
    Two series, never one: the observed population (FOLK1A for kommuner, KKBEF1 for kvarterer) as a
    solid line, and the projection (FRKM / KKFR) as a dashed one that starts at the last observed
    year. A vertical marker separates them, the card carries a "Projection" badge, and every
-   projected point says so in its own tooltip — a projected point must never read as an actual. */
+   projected point says so in its own tooltip — a projected point must never read as an actual.
+
+   `opts.group` picks which series of those two runs to draw: without it the whole population
+   (`pop_hist` → `fc_pop`), with it one published age band (`pop_groups` → `fc_groups`, e.g.
+   "a80p"). Both halves are filtered the same way, so the two lines still meet at the projection's
+   base year — the one year both tables publish. Nothing here interpolates or splices; a band the
+   data does not carry simply has no observed half, and the projection is drawn on its own. */
 function popOutlookChart(o, opts) {
-  const hist = o.pop_hist || {}, proj = o.fc_pop || {};
-  const group = opts && opts.group;
-  const gp = o.fc_groups || {};
+  const op = opts || {}, group = op.group || null, band = group ? (op.groupLabel || group) : "";
+  /* one {year: value} map per half, so everything below is blind to which series it was given */
+  const pick = (src, g) => { const out = {};
+    Object.keys(src || {}).forEach(y => { const v = g ? (src[y] || {})[g] : src[y]; if (v != null) out[y] = v; });
+    return out; };
+  const hist = pick(group ? o.pop_groups : o.pop_hist, group);
+  const proj = pick(group ? o.fc_groups : o.fc_pop, group);
   const hy = Object.keys(hist).sort(), py = Object.keys(proj).sort();
   if (!py.length) return "";
   const cut = hy.length ? hy[hy.length - 1] : py[0];     /* the last observed year — the join */
   const ys = [...new Set(hy.concat(py))].sort();
-  const av = y => group ? null : (hist[y] != null ? hist[y] : null);
-  const pv = y => group ? ((gp[y] || {})[group] ?? null) : (proj[y] != null ? proj[y] : null);
+  const av = y => hist[y] != null ? hist[y] : null;
+  const pv = y => proj[y] != null ? proj[y] : null;
   const vals = ys.map(y => av(y) ?? pv(y)).filter(v => v != null);
   if (vals.length < 2) return "";
   const W = 900, H = 236, L0 = 78, R = 16, T0 = 16, B = 26;
@@ -65,7 +75,7 @@ function popOutlookChart(o, opts) {
       const v = getter(y);
       if (v == null) { open = false; return; }
       d += (open ? "L" : "M") + `${x(y).toFixed(1)},${yy(v).toFixed(1)}`; open = true;
-      dots += `<circle cx="${x(y).toFixed(1)}" cy="${yy(v).toFixed(1)}" r="${dash ? 2.2 : 2.6}" fill="${cls_}"><title>${y}: ${fmtN(v)}${dash ? " — projected" : ""}</title></circle>`;
+      dots += `<circle cx="${x(y).toFixed(1)}" cy="${yy(v).toFixed(1)}" r="${dash ? 2.2 : 2.6}" fill="${cls_}"><title>${y}: ${fmtN(v)}${band ? " · " + band : ""}${dash ? " — projected" : ""}</title></circle>`;
     });
     return `<path d="${d}" fill="none" stroke="${cls_}" stroke-width="${dash ? 2.2 : 2.6}"${dash ? ' stroke-dasharray="6 4"' : ""}/>${dots}`;
   };
@@ -77,11 +87,11 @@ function popOutlookChart(o, opts) {
     ${ys.map((y, i) => i % every ? "" : `<text class="ax" x="${x(y).toFixed(1)}" y="${H - 8}" text-anchor="middle">${y}</text>`).join("")}
     <line class="splitline" x1="${cutX}" x2="${cutX}" y1="${T0}" y2="${H - B}"/>
     <text class="ax projmark" x="${cutX}" y="${T0 - 4}" text-anchor="middle">${cut} · today</text>
-    ${group ? "" : line(av, null, "#1C6B5C", false)}
+    ${hy.length ? line(av, null, "#1C6B5C", false) : ""}
     ${line(pv, cut, "#5A3C96", true)}
   </svg>
-  <div class="bleg">${group ? "" : `<span><i style="background:#1C6B5C"></i>Observed${opts && opts.actualSource ? ` <span class="dim">${esc(opts.actualSource)}</span>` : ""} <b>${hist[cut] != null ? fmtN(hist[cut]) : "–"}</b> <span class="dim">${cut}</span></span>`}
-    <span><i style="background:#5A3C96;height:2px"></i>Projected${opts && opts.projSource ? ` <span class="dim">${esc(opts.projSource)}</span>` : ""} <b>${pv(py[py.length - 1]) != null ? fmtN(pv(py[py.length - 1])) : "–"}</b> <span class="dim">${py[py.length - 1]}</span></span></div>`;
+  <div class="bleg">${hy.length ? `<span><i style="background:#1C6B5C"></i>Observed${band ? " " + esc(band) : ""}${op.actualSource ? ` <span class="dim">${esc(op.actualSource)}</span>` : ""} <b>${fmtN(hist[cut])}</b> <span class="dim">${cut}</span></span>` : ""}
+    <span><i style="background:#5A3C96;height:2px"></i>Projected${band ? " " + esc(band) : ""}${op.projSource ? ` <span class="dim">${esc(op.projSource)}</span>` : ""} <b>${pv(py[py.length - 1]) != null ? fmtN(pv(py[py.length - 1])) : "–"}</b> <span class="dim">${py[py.length - 1]}</span></span></div>`;
 }
 
 /* Distribution strip (spec §5.2): every peer with a figure as a tick, the median marked, this area

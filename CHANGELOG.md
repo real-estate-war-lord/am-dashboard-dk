@@ -1,5 +1,36 @@
 # Changelog
 
+## v3.0.2 — 2026-09-30
+
+- **Fixed — the chart under an Outlook age-band indicator plotted the whole population.** Choosing
+  *Projected change, 80 and over* on the test property or an area page drew the quarter's (or
+  municipality's) total population, so a headline of `+17,9 %` sat above a line that fell by 14,7 %.
+  The chart panel now binds its two series to the selected indicator's own `field`: the six band
+  indicators (`fc_0_5`, `fc_6_16`, `fc_20_34`, `fc_20_34_rel`, `fc_20_34_abs`, `fc_80p`) draw that
+  age band, the four whole-population ones (`fc_growth`, `fc_growth_5y`, `fc_abs`,
+  `fc_pop_rate_5y`) are unchanged. The *Projected change 2026→2031* line under the chart counts the
+  same people ("+45 residents aged 80+"), and the panel's hint and tooltips name the band. The
+  **Population outlook** section below stays on the whole population — it is that section's subject,
+  and its age split is the strip under its chart — so it no longer claims to be *shown above* when
+  the panel is on a band, and says which chart is which.
+  Found by the owner on the Østerport test property.
+- **New data — the observed half of an age band.** The chart needed a *measured* `80+` series to
+  draw before the projected one, and neither layer had one. `build_forecast.py` now also pulls
+  `FOLK1A` by single year of age (Q1 only, the `history_years` window) and `build_cph_forecast.py`
+  pulls `KKBEF1` the same way; both fold them with the same `age_bucket` the projections use and
+  write an `observed` key beside the projected one. `makro.json` and `cph.json` carry it per area as
+  `pop_groups`, the observed counterpart of `fc_groups`. The two series still meet rather than
+  splice: the projection's base year is an observed year, published by both tables, and the build
+  records how far apart the two published figures are (`meta.join_gap` — 1 person on the 2026
+  vintages) and warns if that grows. docs/FORECAST.md §1, §2, §8.
+- **Fixed — a diverging legend listed classes the data never fills.** `fc_80p` is positive in all 98
+  municipalities, yet the map legend offered three plum *shrinking* classes holding nobody. The
+  symmetric break geometry still sets the colours — a shade means the same magnitude wherever it
+  appears — but only the classes that hold a value are listed, and the zero tick is drawn only where
+  the values actually cross zero. Maps are unchanged; this is the legend alone.
+- **Tests.** `AC-OL1` checks that each Outlook indicator's chart reproduces its own headline on the
+  test property and on both area levels; `AC-OL2` checks the legend has no empty classes.
+
 ## v3.0.1 — 2026-09-25
 
 - **Fixed — "Verify at source" on the map for Copenhagen quarter indicators.** The `ⓘ details` popover

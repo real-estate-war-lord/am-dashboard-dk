@@ -2112,6 +2112,89 @@ def ac_tp9(page, base):
 
 
 # ---------------------------------------------------------------------------------------------
+# P11 — the chart under an Outlook indicator is that indicator's own series, and a diverging
+#       legend lists only the classes the data fills (docs/FORECAST.md §3, §5.6)
+# ---------------------------------------------------------------------------------------------
+def outlook_series(page):
+    """The chart's plotted points, read back out of the SVG tooltips: {year: value}."""
+    return page.evaluate(r"""() => {
+        const oc = document.querySelector('[data-testid=outlook-chart]');
+        if (!oc) return null;
+        const out = {};
+        for (const t of oc.querySelectorAll('circle title')) {
+            const m = t.textContent.match(/^(\d{4}): ([\d .\u00a0]+)/);
+            if (m) out[m[1]] = Number(m[2].replace(/[ .\u00a0]/g, ''));
+        }
+        return out; }""")
+
+
+@ac("AC-OL1", phase="P11")
+def ac_ol1(page, base):
+    """An Outlook indicator's chart plots that indicator's own series. A band indicator (80+, 0–5,
+    20–34) draws the observed band solid and the projected band dashed; a whole-population one
+    (fc_growth and friends) still draws the whole population. The plotted change must reproduce the
+    headline, or the chart is illustrating a different number from the one above it."""
+    for route in (TP10, "area/kvarter/20105", "area/kommune/101"):
+        goto(page, route + ("&" if "?" in route else "?") + "ind=fc_80p&show=outlook", settle=2600)
+        grp = page.evaluate("document.querySelector('[data-testid=outlook-chart]').dataset.group")
+        assert grp == "a80p", f"{route}: the chart is bound to {grp!r}, not the 80+ band"
+        ser = outlook_series(page)
+        a, b = ser.get("2026"), ser.get("2040")
+        assert a and b, f"{route}: the chart has no 2026/2040 point: {sorted(ser)[:4]}"
+        head = page.inner_text("[data-testid=chart-panel] .panel-hd .pv")
+        pct = (b - a) / a * 100
+        shown = float(head.replace("%", "").replace("\u2212", "-").replace(",", ".").strip())
+        assert abs(pct - shown) <= 0.05, \
+            f"{route}: the plotted series moves {pct:+.2f} % but the headline says {head!r}"
+        assert ser.get("2016"), f"{route}: the chart has no observed half: {sorted(ser)[:4]}"
+        # …and the line under it counts the same people
+        chg = page.inner_text("[data-testid=chart-panel] .olchg")
+        assert "aged 80+" in chg, f"{route}: the projected-change line does not name the band: {chg!r}"
+
+        goto(page, route + ("&" if "?" in route else "?") + "ind=fc_growth&show=outlook", settle=2600)
+        assert page.evaluate("document.querySelector('[data-testid=outlook-chart]').dataset.group") == "total", \
+            f"{route}: fc_growth is not drawn on the whole population"
+        tot = outlook_series(page)
+        # both halves changed, not just the dashed one: the observed line is the band's own history
+        assert tot["2026"] > ser["2026"] and tot["2016"] > ser["2016"], (
+            f"{route}: the 80+ chart is the whole population in disguise "
+            f"(band {ser['2016']}/{ser['2026']} vs total {tot['2016']}/{tot['2026']})")
+
+
+@ac("AC-OL2", phase="P11")
+def ac_ol2(page, base):
+    """A diverging legend lists the classes the data fills and no others. fc_80p is positive in all
+    98 municipalities, so nothing may be coloured on the shrinking side; fc_growth has both signs, so
+    it keeps the full ladder with the zero class marked."""
+    def legend(page):
+        return page.evaluate(r"""() => [...document.querySelectorAll('[data-testid=legend] .lgrow')]
+            .filter(e => !/no data/.test(e.textContent))
+            .map(e => ({ lab: e.textContent.trim(),
+                         mid: e.classList.contains('lgmid'),
+                         rgb: (getComputedStyle(e.querySelector('i')).backgroundColor.match(/[\d.]+/g) || [])
+                              .slice(0, 3).map(Number) }))""")
+
+    goto(page, "map?ind=fc_80p", settle=1800)
+    rows = legend(page)
+    assert rows, "the fc_80p legend is empty"
+    # the shrinking hue is plum (red channel above blue); the growing one is violet (blue above red)
+    plum = [r for r in rows if r["rgb"] and r["rgb"][0] > r["rgb"][2]]
+    assert not plum, f"the fc_80p legend offers shrinking classes no municipality is in: {plum}"
+    assert not any(r["mid"] for r in rows), \
+        "a zero line is marked on a legend whose values never cross zero"
+    neg = [r["lab"] for r in rows if "-" in r["lab"] or "\u2212" in r["lab"]]
+    assert not neg, f"a negative break is listed for an all-positive indicator: {neg}"
+
+    goto(page, "map?ind=fc_growth", settle=1800)
+    rows = legend(page)
+    assert len(rows) >= 5, f"fc_growth lost its diverging ladder: {[r['lab'] for r in rows]}"
+    assert any(r["rgb"][0] > r["rgb"][2] for r in rows), "fc_growth has no shrinking classes"
+    assert any(r["rgb"][2] > r["rgb"][0] for r in rows), "fc_growth has no growing classes"
+    assert sum(1 for r in rows if r["mid"]) == 1, \
+        f"the zero class is not marked exactly once: {[r['lab'] for r in rows]}"
+
+
+# ---------------------------------------------------------------------------------------------
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--url", default="http://localhost:8080/")

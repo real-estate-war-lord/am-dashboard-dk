@@ -10,17 +10,27 @@ docs/FORECAST_SOURCES.md §1.1.
 Inputs  (fetched unless --no-fetch)
   api.statbank.dk/v1/tables                catalogue → latest FRKM1xx and FRDK1xx
   api.statbank.dk/v1/tableinfo/<table>     variables, codes, `updated`
-  api.statbank.dk/v1/data                  the projection itself
+  api.statbank.dk/v1/data                  the projection itself, and FOLK1A by age
+                                           for the observed years before it
 
 Raw pulls (gitignored, re-downloadable)
   data/raw/forecast/dst/<TABLE>[_<sex>]_<YYYY-MM-DD>.csv   semicolon CSV, value CODES
   data/raw/forecast/dst/<TABLE>.meta.json                  tableinfo
+  data/raw/forecast/dst/FOLK1A_ages_<YYYY-MM-DD>.csv       the observed age detail
 
 Output
   data/processed/forecast.json
     {"meta": {...},
      "kommuner": {"<code>": {"<year>": {"total": n, "a0_5": n, ... "a80p": n}}},
+     "observed": {"<code>": {"<year>": {"total": n, "a0_5": n, ... "a80p": n}}},
      "national": {"<year>": n}}
+
+`observed` is the measured counterpart of `kommuner`, in the same seven groups: FOLK1A's
+1 January (Q1) cell per year, folded by the same `age_bucket`. It is what an age-band chart
+draws solid before the dashed projection starts, so the two are comparable by construction,
+and they meet: the projection's first year *is* an observed year, published by both tables
+and rounded by both, so they agree to `meta.join_gap` persons (1 on the 2026 vintage). Still
+two series, never spliced into one (§4).
 
 Notes
   · Christiansø (411) is excluded — it is in KOMMUNEDK but is not a municipality, so the
@@ -56,8 +66,17 @@ import urllib.request
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 RAW = ROOT / "data" / "raw" / "forecast" / "dst"
 OUT = ROOT / "data" / "processed" / "forecast.json"
+CFG = ROOT / "config" / "indicators.json"
 API = "https://api.statbank.dk/v1"
 UA = {"User-Agent": "am-dashboard-dk/0.1", "Content-Type": "application/json"}
+
+# The observed population, by single year of age. The same table build_makro.py reads for
+# `pop_hist`, so the solid part of an age-band chart and the solid part of a total-population
+# chart come from one source and one period (1 January, i.e. Q1).
+ACTUALS = "FOLK1A"
+ACTUALS_TAG = "_ages"
+Q1 = "K1"
+CELL_CAP = 1_000_000     # the API's pre-flight limit for a CSV selection
 
 # Christiansø: in KOMMUNEDK, not a municipality.
 EXCLUDE = {"411"}
@@ -98,10 +117,15 @@ def resolve(prefix: str) -> tuple[str, int]:
 
 
 def age_bucket(code: str) -> str | None:
-    """'0'..'99' -> the group holding that age; '100-' -> a80p; 'TOT' -> None."""
-    if code == "TOT":
+    """'0'..'125' -> the group holding that age; '100-' -> a80p; a total code -> None.
+
+    The total code is spelled differently per table — 'TOT' in FRKM/KKFR/KKBEF1, 'IALT' in
+    FOLK1A — so anything that is not a number is a total rather than an age.
+    """
+    digits = code.rstrip("-")
+    if not digits.isdigit():
         return None
-    n = int(code.rstrip("-"))
+    n = int(digits)
     for key, lo, hi in GROUPS:
         if lo <= n <= hi:
             return key
@@ -216,6 +240,67 @@ def fetch(table: str, variables: dict, today: str, tag: str = "") -> pathlib.Pat
     return p
 
 
+def hist_years_default() -> int:
+    """`history_years` from config/indicators.json — the window the observed series on an
+    area page already shows, so the age bands cover exactly the same years. Falls back to
+    11 if the config cannot be read; this script is otherwise config-free."""
+    try:
+        return int(json.loads(CFG.read_text(encoding="utf-8")).get("history_years", 11))
+    except Exception:                                        # noqa: BLE001
+        return 11
+
+
+def q1_periods(codes: list[str], n: int) -> list[str]:
+    """The newest `n` 1-January periods of a quarterly Tid list: ['2016K1', … '2026K1'].
+
+    Read from the table's own codes, never generated — a year DST has not published yet
+    must not end up in the selection.
+    """
+    q1 = [c for c in codes if c.endswith(Q1)]
+    return q1[-n:] if n else q1
+
+
+def age_bands(path: pathlib.Path, area_var: str, periods: list[str],
+              keep=lambda code: True) -> tuple[dict, int]:
+    """A by-age pull -> ({code: {year: {total, a0_5, …}}}, the worst group-vs-total gap).
+
+    `total` is the publisher's own age-total cell, exactly as `aggregate()` keeps it for the
+    projection; the groups are summed from the single-year cells, so they re-sum to within a
+    rounding crumb of it rather than exactly. A large gap means an unmapped age code.
+    """
+    want = set(periods)
+    out: dict[str, dict[str, dict[str, int]]] = {}
+    checksum: dict[tuple[str, str], int] = {}
+    for r in rows(path):
+        code, period = str(r[area_var]).strip(), r["TID"]
+        if period not in want or not keep(code):
+            continue
+        year = period[:4]
+        n = int(r["INDHOLD"])
+        slot = out.setdefault(code, {}).setdefault(year, {k: 0 for k, _, _ in GROUPS})
+        g = age_bucket(r["ALDER"])
+        if g is None:
+            slot["total"] = n
+        else:
+            slot[g] += n
+            checksum[(code, year)] = checksum.get((code, year), 0) + n
+    missing = [(c, y) for c in out for y in out[c] if "total" not in out[c][y]]
+    if missing:
+        sys.exit(f"{len(missing)} area-years have no age-total cell, e.g. {missing[:3]} "
+                 f"— the {path.name} pull is incomplete")
+    gaps = {k: abs(v - out[k[0]][k[1]]["total"]) for k, v in checksum.items()}
+    worst, gap = max(gaps.items(), key=lambda kv: kv[1]) if gaps else ((None, None), 0)
+    rel = gap / max(1, out[worst[0]][worst[1]]["total"]) if worst[0] else 0
+    if gap > 100 and rel > 0.001:
+        sys.exit(f"observed age groups miss the age total by {gap} ({rel:.2%}) at {worst} "
+                 f"— an age code is unmapped")
+    for c in out:
+        for y in out[c]:
+            out[c][y] = {"total": out[c][y]["total"],
+                         **{k: out[c][y][k] for k, _, _ in GROUPS}}
+    return out, gap
+
+
 def kommune_names(table: str) -> dict[str, str]:
     """code -> name, from the cached tableinfo (English labels)."""
     p = RAW / f"{table}.meta.json"
@@ -234,6 +319,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-fetch", action="store_true", help="rebuild from the newest cached CSV")
     ap.add_argument("--years", type=int, default=15, help="length of the window, first year included")
+    ap.add_argument("--hist-years", type=int, default=hist_years_default(),
+                    help="observed years of age detail to pull (default: config history_years)")
     ap.add_argument("--indicators", nargs="?", const="", metavar="KEY",
                     help="print the derived Outlook values instead of rebuilding; "
                          "with a key, rank the kommuner by it")
@@ -293,7 +380,9 @@ def main():
         sexes = [x["id"] for v in info["variables"] if v["id"] == "KØN" for x in v["values"]]
         p_sex = {s: newest_raw(frkm, f"_{s}") for s in sexes}
         p_frdk = newest_raw(frdk)
-        print("  cached " + " · ".join(p.name for p in [*p_sex.values(), p_frdk]))
+        p_obs = newest_raw(ACTUALS, ACTUALS_TAG)
+        obs_periods = q1_periods(sorted({r["TID"] for r in rows(p_obs)}), args.hist_years)
+        print("  cached " + " · ".join(p.name for p in [*p_sex.values(), p_frdk, p_obs]))
     else:
         info = get(f"{API}/tableinfo/{frkm}?lang=en&format=JSON")
         codes = {v["id"]: [x["id"] for x in v["values"]] for v in info["variables"]}
@@ -311,6 +400,27 @@ def main():
                           today, f"_{s}") for s in sexes}
         # every other variable eliminated → the national total
         p_frdk = fetch(frdk, {"Tid": years}, today)
+        # The observed years, by single year of age, so an age-band chart has a measured
+        # series to draw before the projection starts. Only the 1 January cells: `pop_hist`
+        # is a Q1 series, and mixing quarters into a yearly line would invent a trend.
+        # KØN and CIVILSTAND are named explicitly rather than eliminated — the API's
+        # pre-flight counter scores an eliminated variable at its full value list and would
+        # reject the selection against the 1,000,000-cell cap.
+        a_info = get(f"{API}/tableinfo/{ACTUALS}?lang=en&format=JSON")
+        a_codes = {v["id"]: [x["id"] for x in v["values"]] for v in a_info["variables"]}
+        obs_periods = q1_periods(a_codes["Tid"], args.hist_years)
+        if not obs_periods:
+            sys.exit(f"{ACTUALS} has no Q1 period — has DST changed its time codes?")
+        a_cells = len(a_codes["OMRÅDE"]) * len(a_codes["ALDER"]) * len(obs_periods)
+        print(f"  {ACTUALS} {obs_periods[0][:4]}–{obs_periods[-1][:4]} · "
+              f"{len(a_codes['OMRÅDE'])} areas × {len(a_codes['ALDER'])} ages × "
+              f"{len(obs_periods)} years = {a_cells:,} cells".replace(",", " "))
+        if a_cells > CELL_CAP:
+            sys.exit(f"the {ACTUALS} pull is over the {CELL_CAP:,} cell cap — "
+                     "shorten --hist-years".replace(",", " "))
+        p_obs = fetch(ACTUALS, {"OMRÅDE": ["*"], "KØN": ["TOT"], "ALDER": ["*"],
+                                "CIVILSTAND": ["TOT"], "Tid": obs_periods},
+                      today, ACTUALS_TAG)
 
     # ---- aggregate: sum the sexes, fold single-year ages into the groups ----
     kom: dict[str, dict[str, dict[str, int]]] = {}
@@ -344,6 +454,28 @@ def main():
     if gap > 100 and rel > 0.001:
         sys.exit(f"age groups miss ALDER=TOT by {gap} ({rel:.2%}) at {worst} — an age code is unmapped")
 
+    # ---- the measured series: the same seven groups, the observed years ----
+    # Only the municipalities: FOLK1A's OMRÅDE also carries the country ('000') and the five
+    # regions, which no area page reads. Christiansø is kept here — it has an observed
+    # population even though it has no projection — so `pop_hist` and its age split cover
+    # the same 99 areas.
+    observed, obs_gap = age_bands(p_obs, "OMRÅDE", obs_periods,
+                                  keep=lambda c: c.isdigit() and int(c) >= 101)
+    obs_years = sorted({p[:4] for p in obs_periods})
+    # The projection's first year is an observed year, published by both tables, so the two
+    # series meet at one point rather than being stitched across a gap. Prove it rather than
+    # assume it. The two tables round independently, so a person or two apart is ordinary and
+    # is recorded rather than flagged; a real gap would mean the vintages have drifted apart.
+    joins = [(c, kom[c][years[0]][g] - observed[c][years[0]][g])
+             for c in kom if years[0] in observed.get(c, {})
+             for g in ("total", *(k for k, _, _ in GROUPS))]
+    join_gap = max((abs(d) for _, d in joins), default=0)
+    if join_gap > 10:
+        off = sorted({c for c, d in joins if abs(d) > 10})
+        print(f"  ⚠ {frkm} and {ACTUALS} disagree by up to {join_gap} persons in {years[0]} "
+              f"({len(off)} kommuner, e.g. {off[:3]}) — the observed line will not meet the "
+              f"projection", file=sys.stderr)
+
     national = {}
     for r in rows(p_frdk):
         if r["TID"] in years:
@@ -363,6 +495,21 @@ def main():
         "years": years,
         "first_year": years[0], "last_year": years[-1],
         "groups": {k: (f"{lo}+" if hi > 900 else f"{lo}–{hi}") for k, lo, hi in GROUPS},
+        "actual_table": ACTUALS,
+        "observed_years": obs_years,
+        "observed_period": "Q1 (1 January), the same cell pop_hist reads",
+        "observed_note": f"`observed` is {ACTUALS}'s measured population in the same seven "
+                         f"age groups, {obs_years[0]}–{obs_years[-1]}. It is the solid half of "
+                         "an age-band chart; the projection is the dashed half. They meet at "
+                         f"{years[0]}, which both tables publish, and are never spliced into "
+                         "one series (docs/FORECAST.md §4, §5.6).",
+        "max_observed_group_gap": obs_gap,
+        "join_gap": join_gap,
+        "join_note": f"At {years[0]} the projection's base year and {ACTUALS}'s observed cell "
+                     f"are the same population, published twice and rounded twice: they agree "
+                     f"to within {join_gap} person(s) over every municipality and age group, "
+                     "which is why an observed line and a projected line meet at that year "
+                     "instead of jumping.",
         "kommuner": len(kom),
         "excluded": sorted(EXCLUDE),
         "max_group_gap": gap,
@@ -374,11 +521,14 @@ def main():
         "url": f"https://api.statbank.dk/v1/tableinfo/{frkm}",
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(json.dumps({"meta": meta, "kommuner": kom, "national": national},
+    OUT.write_text(json.dumps({"meta": meta, "kommuner": kom, "observed": observed,
+                               "national": national},
                               ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     dev = max(abs(sum(kom[c][y]["total"] for c in kom) / national[y] - 1) for y in years) * 100
     print(f"  wrote {OUT.relative_to(ROOT)} · {len(kom)} kommuner × {len(years)} years "
           f"· max deviation vs {frdk}: {dev:.3f} % · age groups within {gap} of ALDER=TOT")
+    print(f"  observed {ACTUALS} {obs_years[0]}–{obs_years[-1]} · {len(observed)} areas "
+          f"· age groups within {obs_gap} of the published age total")
 
 
 if __name__ == "__main__":

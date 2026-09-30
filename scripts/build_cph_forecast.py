@@ -42,13 +42,21 @@ Inputs  (fetched unless --no-fetch)
 Raw pulls (gitignored, re-downloadable)
   data/raw/forecast/cph/<TABLE>_dist_age[_<from>-<to>]_<YYYY-MM-DD>.csv
   data/raw/forecast/cph/<TABLE>.meta.json
+  data/raw/forecast/cph/KKBEF1_ages_<YYYY-MM-DD>.csv    the observed age detail
 
 Output
   data/processed/cph_forecast.json
     {"meta": {...},
      "omrkk": {"<code>": {"<year>": {"total": n, "a0_5": n, ... "a80p": n}}},
+     "observed": {"<code>": {"<year>": {"total": n, "a0_5": n, ... "a80p": n}}},
      "indicators": {"<code>": {"fc_growth": …, "fc_20_34_rel": …}},
      "names": {"<code>": "…"}}
+
+`observed` is the measured counterpart of `omrkk`, from KKBEF1 — the same table
+`scripts/build_cph.py` reads for `pop_hist`, at the same 1 January (Q1) period and folded
+into the same seven groups. It is the solid half of an age-band chart; KKFR is the dashed
+half. The two meet at the projection's base year, which both tables publish, and are never
+spliced into one series (docs/FORECAST.md §4, §5.6).
 
 Usage
   python scripts/build_cph_forecast.py                  # resolve vintage, pull, build
@@ -67,7 +75,8 @@ import sys
 import urllib.request
 
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
-from build_forecast import GROUPS, age_bucket, indicators  # noqa: E402
+from build_forecast import (GROUPS, age_bands, age_bucket, hist_years_default,  # noqa: E402
+                            indicators, q1_periods)
 from build_cph import LOK2BYDEL  # noqa: E402  — lokaludvalg → bydel, one definition
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -102,6 +111,10 @@ MOVES = {"01": "levendefoedte", "02": "doede", "03": "foedselsoverskud",
 NETMIG, MOVED_IN, MOVED_OUT, NAT_INCR = "06", "04", "05", "03"
 BEDI = "KKFRBEDI"
 NETMIG_5Y = 5            # the short window, in movement years
+# The observed population per district, by single year of age — KK's own count, the same
+# table build_cph.py reads for `pop_hist`. ALDER runs '00'…'99' with '99' as 99+, which
+# age_bucket folds into a80p.
+ACTUALS = "KKBEF1"
 
 # ---- when does fc_netmig fail to reconcile with the stock table? -------------------
 # Over a window, ΔP should equal (natural increase + net migration). Three things make it
@@ -281,6 +294,48 @@ def fetch_moves(years: list[str], today: str) -> pathlib.Path:
     return p
 
 
+def fetch_actuals(periods: list[str], today: str) -> pathlib.Path:
+    """Pull KKBEF1's observed population per district by single year of age, Q1 only.
+
+    93 districts × 101 ages × ~11 years ≈ 103 000 cells, so never split. KON and CIVILSTAND
+    are named explicitly rather than eliminated: the API's pre-flight counter scores an
+    eliminated variable at its full value list and rejects the selection against the cap.
+    """
+    info = get(f"{API}/{DB}/tableinfo/{ACTUALS}?lang=en&format=JSON")
+    RAW.mkdir(parents=True, exist_ok=True)
+    (RAW / f"{ACTUALS}.meta.json").write_text(json.dumps(info, ensure_ascii=False, indent=1),
+                                              encoding="utf-8")
+    for stale in RAW.glob(f"{ACTUALS}_ages_{today}.csv"):
+        stale.unlink()
+    use = q1_periods(codes_of(info, "Tid"), 0)
+    use = [t for t in periods if t in use]
+    if not use:
+        sys.exit(f"{ACTUALS} publishes none of {periods[:3]}… — has KK changed its time codes?")
+    cells = len(codes_of(info, "OMRKK")) * len(codes_of(info, "ALDER")) * len(use)
+    print(f"  {ACTUALS} {use[0][:4]}–{use[-1][:4]} · {cells:,} cells".replace(",", " "))
+    if cells > CELL_CAP:
+        sys.exit(f"the {ACTUALS} pull is over the {CELL_CAP:,} cell cap".replace(",", " "))
+    text = post_csv({"table": ACTUALS, "format": "CSV", "delimiter": "Semicolon", "lang": "en",
+                     "valuePresentation": "Code",
+                     "variables": [{"code": "OMRKK", "values": ["*"]},
+                                   {"code": "KON", "values": ["TOT"]},
+                                   {"code": "ALDER", "values": ["*"]},
+                                   {"code": "CIVILSTAND", "values": ["TOT"]},
+                                   {"code": "Tid", "values": use}]})
+    if text.lstrip().startswith("{"):
+        sys.exit(f"{ACTUALS}: API returned an error instead of CSV:\n{text[:400]}")
+    p = RAW / f"{ACTUALS}_ages_{today}.csv"
+    p.write_text(text, encoding="utf-8")
+    return p
+
+
+def newest_actuals() -> pathlib.Path:
+    files = sorted(RAW.glob(f"{ACTUALS}_ages_20??-??-??.csv"))
+    if not files:
+        sys.exit(f"no cached {ACTUALS} pull in {RAW} — run without --no-fetch")
+    return files[-1]
+
+
 def newest_moves() -> pathlib.Path:
     files = sorted(RAW.glob(f"{BEDI}_moves_*_20??-??-??.csv"))
     if not files:
@@ -406,6 +461,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-fetch", action="store_true", help="rebuild from the newest cached CSV")
     ap.add_argument("--years", type=int, default=15, help="length of the window, first year included")
+    ap.add_argument("--hist-years", type=int, default=hist_years_default(),
+                    help="observed years of age detail to pull (default: config history_years)")
     ap.add_argument("--rank", type=int, default=10, help="rows at each end of the kvarter rankings")
     args = ap.parse_args()
     today = dt.date.today().isoformat()
@@ -419,7 +476,8 @@ def main():
         info = tableinfo(table)
         if not info:
             sys.exit(f"{RAW / f'{table}.meta.json'} missing — run without --no-fetch")
-        print("  cached " + " · ".join(p.name for p in paths))
+        p_obs = newest_actuals()
+        print("  cached " + " · ".join(p.name for p in [*paths, p_obs]))
     else:
         info = get(f"{API}/{DB}/tableinfo/{table}?lang=en&format=JSON")
         short = [y for y in years if y not in codes_of(info, "Tid")]
@@ -427,8 +485,27 @@ def main():
             sys.exit(f"{table} does not reach {short[-1]} "
                      f"(last year {codes_of(info, 'Tid')[-1]})")
         paths = fetch(table, years, codes_of(info, "OMRKK"), today)
+        p_obs = fetch_actuals([f"{y}K1" for y in range(int(years[0]) - args.hist_years + 1,
+                                                       int(years[0]) + 1)], today)
 
     omrkk, gap = aggregate(paths, years)
+    # The measured half of the same picture: KK's own observed count, folded by the same
+    # age_bucket into the same seven groups, so the solid line and the dashed line are the
+    # same arithmetic on two different published tables.
+    obs_periods = sorted({r["TID"] for r in rows([p_obs]) if str(r["TID"]).endswith("K1")})
+    observed, obs_gap = age_bands(p_obs, "OMRKK", obs_periods)
+    obs_years = sorted({t[:4] for t in obs_periods})
+    # Prove the join rather than assume it: the projection's base year is an observed year,
+    # published by both tables and rounded by both, so it must agree to a person or two.
+    joins = [omrkk[c][years[0]][g] - observed[c][years[0]][g]
+             for c in omrkk if years[0] in observed.get(c, {})
+             for g in ("total", *(k for k, _, _ in GROUPS))]
+    join_gap = max((abs(d) for d in joins), default=0)
+    if join_gap > TOL_CITY:
+        print(f"  ⚠ {table} and {ACTUALS} disagree by up to {join_gap} persons in {years[0]} "
+              f"— the observed line will not meet the projection", file=sys.stderr)
+    print(f"  observed {ACTUALS} {obs_years[0]}–{obs_years[-1]} · {len(observed)} districts "
+          f"· age groups within {obs_gap} of ALDER=TOT · join within {join_gap}")
     names = names_of(info)
 
     by_level: dict[str, list[str]] = {}
@@ -474,6 +551,16 @@ def main():
         "mid_year": str(vintage + 5),
         "groups": {k: (f"{lo}+" if hi > 900 else f"{lo}–{hi}") for k, lo, hi in GROUPS},
         "max_group_gap": gap,
+        "actual_table": ACTUALS,
+        "observed_years": obs_years,
+        "observed_period": "Q1 (1 January), the same cell build_cph.py reads for pop_hist",
+        "observed_note": f"`observed` is {ACTUALS}'s measured population per district in the "
+                         f"same seven age groups, {obs_years[0]}–{obs_years[-1]}. It is the "
+                         "solid half of an age-band chart and the projection is the dashed "
+                         f"half; they meet at {years[0]}, which both tables publish, and are "
+                         "never spliced into one series (docs/FORECAST.md §4, §5.6).",
+        "max_observed_group_gap": obs_gap,
+        "join_gap": join_gap,
         "group_gap_note": "KK rounds each cell independently, so the age groups re-sum to "
                           f"within {gap} persons of the published ALDER=TOT, which is what "
                           "`total` holds",
@@ -540,7 +627,7 @@ def main():
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(
-        {"meta": meta, "omrkk": omrkk, "indicators": vals,
+        {"meta": meta, "omrkk": omrkk, "observed": observed, "indicators": vals,
          "names": {c: names.get(c, "") for c in omrkk},
          "short_names": {c: short_name(names.get(c, "")) for c in omrkk}},
         ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
