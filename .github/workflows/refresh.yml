@@ -4,7 +4,7 @@ on:
     branches: [main]                 # UI/code change → rebuild + deploy (no data fetch)
   schedule: [{ cron: "0 6 3 * *" }]  # 3rd of each month, 06:00 UTC → fetch + build + commit + deploy
   workflow_dispatch:                 # manual: same as schedule
-permissions: { contents: write, pages: write, id-token: write }
+permissions: { contents: write, pages: write, id-token: write, issues: write }
 concurrency: { group: pages, cancel-in-progress: false }
 jobs:
   refresh:
@@ -47,8 +47,13 @@ jobs:
       #   python scripts/fetch_flood_official.py --areas
       # The committed data/processed/climate/ is left exactly as it is until then, and the layer
       # keeps working on it.
+      # fetch_klimaatlas.py and fetch_fp_claims.py are the only two scripts in this job that
+      # are not standard-library only: both import `requests`, which a fresh runner does not
+      # have. Without this line the job stopped here every month ("requests missing") and
+      # nothing after it — the rebuild, the commit, the deploy — ever ran.
       - name: Refresh the climate figures (Klimaatlas + Forsikring & Pension)
         run: |
+          python -m pip install --quiet "requests>=2.31"
           python scripts/fetch_klimaatlas.py
           python scripts/fetch_fp_claims.py
           python scripts/build_climate.py
@@ -61,6 +66,13 @@ jobs:
           git add data/processed data/raw/*.meta.json
           git commit -m "data: monthly refresh $(date +%F)" || echo "nothing to commit"
           git push
+      # A failed cron run is otherwise silent: the page just keeps last month's figures.
+      - name: Open an issue when the refresh fails
+        if: failure()
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          gh issue create --title "Monthly data refresh failed $(date +%F)" \
+            --body "The scheduled refresh did not finish, so the published page still shows the previous data. Log: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
   build-deploy:
     needs: refresh
     if: always() && (needs.refresh.result == 'success' || needs.refresh.result == 'skipped')
