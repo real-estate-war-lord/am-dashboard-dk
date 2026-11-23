@@ -4,7 +4,7 @@
  "description": "Unemployed persons (seasonally adjusted) by benefits sex and age, seasonal adjustment and actual figures and time",
  "unit": "-",
  "suppressedDataValue": "0",
- "updated": "2026-08-31T08:00:00",
+ "updated": "2026-10-30T08:00:00",
  "active": true,
  "contacts": [
   {
@@ -1056,6 +1056,14 @@
     {
      "id": "2026M07",
      "text": "2026M07"
+    },
+    {
+     "id": "2026M08",
+     "text": "2026M08"
+    },
+    {
+     "id": "2026M09",
+     "text": "2026M09"
     }
    ]
   }

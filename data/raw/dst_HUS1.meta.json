@@ -4,7 +4,7 @@
  "description": "Rent indices for housing by region, category of real property, unit and time",
  "unit": "Index",
  "suppressedDataValue": "0",
- "updated": "2026-07-14T08:00:00",
+ "updated": "2026-10-14T08:00:00",
  "active": true,
  "contacts": [
   {
@@ -189,6 +189,10 @@
     {
      "id": "2026K2",
      "text": "2026Q2"
+    },
+    {
+     "id": "2026K3",
+     "text": "2026Q3"
     }
    ]
   }

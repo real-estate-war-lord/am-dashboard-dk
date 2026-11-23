@@ -4,7 +4,7 @@
  "description": "Population at the first day of the quarter by region, sex, age, ancestry and time",
  "unit": "Number",
  "suppressedDataValue": "0",
- "updated": "2026-08-10T08:00:00",
+ "updated": "2026-11-10T08:00:00",
  "active": true,
  "contacts": [
   {
@@ -1321,6 +1321,10 @@
     {
      "id": "2026K3",
      "text": "2026Q3"
+    },
+    {
+     "id": "2026K4",
+     "text": "2026Q4"
     }
    ]
   }
