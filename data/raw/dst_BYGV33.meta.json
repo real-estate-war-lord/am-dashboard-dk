@@ -1,10 +1,10 @@
 {
  "id": "BYGV33",
- "text": "Residential Construction (not adjusted for delays)",
- "description": "Residential Construction (not adjusted for delays) by region, phase of construction, use, builders and time",
+ "text": "Residential construction (not adjusted for delays)",
+ "description": "Residential construction (not adjusted for delays) by region, phase of construction, use, builders and time",
  "unit": "Number",
  "suppressedDataValue": "0",
- "updated": "2026-08-14T08:00:00",
+ "updated": "2026-11-13T08:00:00",
  "active": true,
  "contacts": [
   {
@@ -924,6 +924,10 @@
     {
      "id": "2026K2",
      "text": "2026Q2"
+    },
+    {
+     "id": "2026K3",
+     "text": "2026Q3"
     }
    ]
   }

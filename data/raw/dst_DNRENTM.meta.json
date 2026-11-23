@@ -4,7 +4,7 @@
  "description": "Interest rates by item, country, methodology and time",
  "unit": "-",
  "suppressedDataValue": "0",
- "updated": "2026-09-01T08:00:00",
+ "updated": "2026-11-02T08:00:00",
  "active": true,
  "contacts": [
   {
@@ -2217,6 +2217,14 @@
     {
      "id": "2026M08",
      "text": "2026M08"
+    },
+    {
+     "id": "2026M09",
+     "text": "2026M09"
+    },
+    {
+     "id": "2026M10",
+     "text": "2026M10"
     }
    ]
   }

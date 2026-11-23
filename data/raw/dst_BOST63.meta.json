@@ -13,7 +13,10 @@
    "mail": "mrt@dst.dk"
   }
  ],
- "documentation": null,
+ "documentation": {
+  "id": "c2ebfa53-0b0e-4ed3-996d-a2cfd95cccd6",
+  "url": "https://www.dst.dk/documentationofstatistics/c2ebfa53-0b0e-4ed3-996d-a2cfd95cccd6"
+ },
  "footnote": {
   "text": "Because of problems with the data quality in 2022 there is a slightly greater uncertainty.",
   "mandatory": true
@@ -520,7 +523,7 @@
     },
     {
      "id": "002",
-     "text": "february"
+     "text": "February"
     },
     {
      "id": "003",
